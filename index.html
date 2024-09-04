@@ -440,32 +440,43 @@ SOP 完成，未檢查鏡片內容及製作偏大、偏小問題。 </h2>
             </div>
             <!-- 可以添加更多新聞文章 -->
         </div>
+	<div id="noResults">沒有找到相關內容</div>
         <div class="search-result" id="searchResult"></div>
     </main>
     <footer>
         <p>聯絡方式：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
     </footer>
-    <script>
-        function searchArticles() {
-            var input, filter, articles, article, title, i, txtValue;
-            input = document.getElementById('searchInput');
-            filter = input.value.toUpperCase();
-            articles = document.getElementById('articles');
-            article = articles.getElementsByClassName('article');
-            for (i = 0; i < article.length; i++) {
-                title = article[i].getAttribute('data-title');
-                txtValue = title;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    article[i].style.display = "";
-                } else {
-                    article[i].style.display = "none";
-                }
+<script>
+    function searchArticles() {
+        var input, filter, articles, article, title, i, txtValue;
+        var noResultsMessage = document.getElementById('noResultsMessage');
+        input = document.getElementById('searchInput');
+        filter = input.value.toUpperCase();
+        articles = document.getElementById('articles');
+        article = articles.getElementsByClassName('article');
+        var found = false;
+
+        for (i = 0; i < article.length; i++) {
+            title = article[i].getAttribute('data-title');
+            txtValue = title;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                article[i].style.display = "";
+                found = true;
+            } else {
+                article[i].style.display = "none";
             }
         }
+
+        if (found) {
+            noResultsMessage.style.display = "none";
+        } else {
+            noResultsMessage.style.display = "block";
+        }
+    }
 
     document.getElementById('searchInput').addEventListener('input', function() {
         setTimeout(searchArticles, 100);  // 100 毫秒延遲
     });
-    </script>
+</script>
 </body>
 </html>
