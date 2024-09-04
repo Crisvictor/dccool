@@ -446,18 +446,19 @@ SOP 完成，未檢查鏡片內容及製作偏大、偏小問題。 </h2>
         <p>聯絡方式：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
     </footer>
     <script>
-        function filterFunction() {
-            var input, filter, ul, li, i, txtValue;
+        function searchArticles() {
+            var input, filter, articles, article, title, i, txtValue;
             input = document.getElementById('searchInput');
             filter = input.value.toUpperCase();
-            ul = document.getElementById("list");
-            li = ul.getElementsByTagName('li');
-            for (i = 0; i < li.length; i++) {
-                txtValue = li[i].textContent || li[i].innerText;
+            articles = document.getElementById('articles');
+            article = articles.getElementsByClassName('article');
+            for (i = 0; i < article.length; i++) {
+                title = article[i].getAttribute('data-title');
+                txtValue = title;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    li[i].style.display = "";
+                    article[i].style.display = "";
                 } else {
-                    li[i].style.display = "none";
+                    article[i].style.display = "none";
                 }
             }
         }
