@@ -446,27 +446,21 @@ SOP 完成，未檢查鏡片內容及製作偏大、偏小問題。 </h2>
         <p>聯絡方式：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
     </footer>
     <script>
-        // 獲取搜尋輸入框和搜尋結果容器
-        const searchInput = document.getElementById('search-input');
-        const searchResults = document.getElementById('search-results').children;
-
-        // 監聽輸入框的輸入事件
-        searchInput.addEventListener('input', () => {
-            const searchTerm = searchInput.value.toLowerCase();
-
-            // 遍歷所有搜尋結果項目
-            for (let i = 0; i < searchResults.length; i++) {
-                const item = searchResults[i];
-                const text = item.textContent.toLowerCase();
-
-                // 根據搜尋詞篩選顯示或隱藏項目
-                if (text.includes(searchTerm)) {
-                    item.classList.remove('hidden');
+        function filterFunction() {
+            var input, filter, ul, li, i, txtValue;
+            input = document.getElementById('searchInput');
+            filter = input.value.toUpperCase();
+            ul = document.getElementById("list");
+            li = ul.getElementsByTagName('li');
+            for (i = 0; i < li.length; i++) {
+                txtValue = li[i].textContent || li[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    li[i].style.display = "";
                 } else {
-                    item.classList.add('hidden');
+                    li[i].style.display = "none";
                 }
             }
-        });
+        }
     </script>
 </body>
 </html>
