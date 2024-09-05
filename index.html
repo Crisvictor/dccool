@@ -455,6 +455,7 @@ SOP 完成，未檢查鏡片內容及製作偏大、偏小問題。 </h2>
 	<div id="noResults">沒有找到相關內容</div>
         <div class="search-result" id="searchResult"></div>
     </main>
+    <canvas id="fishCanvas"></canvas>
     <footer>
         <p>聯絡方式：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
     </footer>
@@ -489,62 +490,58 @@ SOP 完成，未檢查鏡片內容及製作偏大、偏小問題。 </h2>
     document.getElementById('searchInput').addEventListener('input', function() {
         setTimeout(searchArticles, 100);  // 100 毫秒延遲
     });
-	       // 調整畫布尺寸以適應視窗
-        var canvas = document.getElementById('fishCanvas');
-        var ctx = canvas.getContext('2d');
+
+    // 背景魚動畫相關代碼
+    var canvas = document.getElementById('fishCanvas');
+    var ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', function() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+    });
 
-        window.addEventListener('resize', function() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+    var fishes = [];
+    var fishCount = 10;
+
+    for (var i = 0; i < fishCount; i++) {
+        fishes.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 20 + 10,
+            speedX: (Math.random() - 0.5) * 2,
+            speedY: (Math.random() - 0.5) * 2
         });
+    }
 
-        // 魚的數據
-        var fishes = [];
-        var fishCount = 10; // 魚的數量
+    function drawFish(fish) {
+        ctx.beginPath();
+        ctx.arc(fish.x, fish.y, fish.size, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(0, 150, 255, 0.5)';
+        ctx.fill();
+    }
 
-        for (var i = 0; i < fishCount; i++) {
-            fishes.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 20 + 10, // 魚的大小
-                speedX: (Math.random() - 0.5) * 2, // 魚的水平移動速度
-                speedY: (Math.random() - 0.5) * 2 // 魚的垂直移動速度
-            });
+    function updateFishes() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (var i = 0; i < fishes.length; i++) {
+            var fish = fishes[i];
+            fish.x += fish.speedX;
+            fish.y += fish.speedY;
+
+            if (fish.x > canvas.width) fish.x = 0;
+            if (fish.x < 0) fish.x = canvas.width;
+            if (fish.y > canvas.height) fish.y = 0;
+            if (fish.y < 0) fish.y = canvas.height;
+
+            drawFish(fish);
         }
 
-        // 繪製魚
-        function drawFish(fish) {
-            ctx.beginPath();
-            ctx.arc(fish.x, fish.y, fish.size, 0, 2 * Math.PI);
-            ctx.fillStyle = 'rgba(0, 150, 255, 0.5)'; // 魚的顏色 (淡藍色)
-            ctx.fill();
-        }
+        requestAnimationFrame(updateFishes);
+    }
 
-        // 更新魚的狀態
-        function updateFishes() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            for (var i = 0; i < fishes.length; i++) {
-                var fish = fishes[i];
-                fish.x += fish.speedX;
-                fish.y += fish.speedY;
-
-                // 當魚超出畫布邊界時，將它們移到另一邊
-                if (fish.x > canvas.width) fish.x = 0;
-                if (fish.x < 0) fish.x = canvas.width;
-                if (fish.y > canvas.height) fish.y = 0;
-                if (fish.y < 0) fish.y = canvas.height;
-
-                drawFish(fish);
-            }
-
-            requestAnimationFrame(updateFishes);
-        }
-
-        // 啟動動畫
-        updateFishes();
+    updateFishes();
 </script>
 </body>
 </html>
