@@ -454,40 +454,41 @@ SOP 完成，未檢查鏡片內容及製作偏大、偏小問題。 </h2>
             </div>
             <!-- 可以添加更多新聞文章 -->
         </div>
-	<div id="noResults">沒有找到相關內容</div>
-        <div class="search-result" id="searchResult"></div>
+	<p id="noResultsMessage" style="display: none;">沒有找到相關內容</p>
     </main>
     <canvas id="fishCanvas"></canvas>
     <footer>
         <p>聯絡方式：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
     </footer>
 <script>
-    function searchArticles() {
-        var input, filter, articles, article, title, i, txtValue;
-        var noResultsMessage = document.getElementById('noResultsMessage');
-        input = document.getElementById('searchInput');
-        filter = input.value.toUpperCase();
-        articles = document.getElementById('articles');
-        article = articles.getElementsByClassName('article');
-        var found = false;
+function searchArticles() {
+    var input, filter, articles, article, title, i, txtValue;
+    var noResultsMessage = document.getElementById('noResultsMessage');
+    input = document.getElementById('searchInput');
+    filter = input.value.toUpperCase();  // 獲取搜索框的輸入並轉換為大寫
+    articles = document.getElementById('articles');  // 文章區域
+    article = articles.getElementsByClassName('article');  // 文章列表
+    var found = false;  // 記錄是否有找到結果
 
-        for (i = 0; i < article.length; i++) {
-            title = article[i].getAttribute('data-title');
-            txtValue = title;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                article[i].style.display = "";
-                found = true;
-            } else {
-                article[i].style.display = "none";
-            }
-        }
-
-        if (found) {
-            noResultsMessage.style.display = "none";
+    // 遍歷所有文章，檢查標題是否匹配搜索條件
+    for (i = 0; i < article.length; i++) {
+        title = article[i].getAttribute('data-title');  // 獲取文章的標題
+        txtValue = title;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            article[i].style.display = "";  // 顯示符合條件的文章
+            found = true;  // 找到匹配的結果
         } else {
-            noResultsMessage.style.display = "block";
+            article[i].style.display = "none";  // 隱藏不匹配的文章
         }
     }
+
+    // 如果找到匹配的文章，隱藏“沒有找到相關內容”的提示
+    if (found) {
+        noResultsMessage.style.display = "none";
+    } else {
+        noResultsMessage.style.display = "block";  // 否則顯示提示
+    }
+}
 
     document.getElementById('searchInput').addEventListener('input', function() {
         setTimeout(searchArticles, 100);  // 100 毫秒延遲
@@ -520,7 +521,7 @@ SOP 完成，未檢查鏡片內容及製作偏大、偏小問題。 </h2>
     function drawFish(fish) {
         ctx.beginPath();
         ctx.arc(fish.x, fish.y, fish.size, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(0, 150, 255, 0.5)';
+        ctx.fillStyle = 'rgba(68, 68, 68, 0.4)';
         ctx.fill();
     }
 
