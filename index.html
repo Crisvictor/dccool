@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <title>大倉酷扣項細則</title>
 
     <!-- CSS樣式 -->
@@ -49,17 +51,19 @@
         .search-result {
             margin-top: 20px;
         }
-        
         /* 新增 canvas 相關樣式 */
         html, body {
             height: 100%;
-            overflow: hidden; /* 防止畫布超出頁面範圍 */
-        }
+            overflow: auto; /* 允许显示滚动条 */
+            margin: 0; /* 移除默认的页边距 */
+	}
         canvas {
             position: absolute;
             top: 0;
             left: 0;
-            z-index: -1; /* 確保 canvas 在背景 */
+            width: 100%; /* 确保 canvas 跨越整个页面宽度 */
+            height: 100%; /* 确保 canvas 跨越整个页面高度 */
+            z-index: -1; /* 确保 canvas 在背景 */
         }
     </style>
 </head>
