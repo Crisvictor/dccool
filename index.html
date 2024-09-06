@@ -65,6 +65,22 @@
             height: 100%; /* 确保 canvas 跨越整个页面高度 */
             z-index: -1; /* 确保 canvas 在背景 */
         }
+        #searchInput {
+            margin: 20px;
+            padding: 10px;
+            width: 300px;
+            background-color: black; /* 搜索框背景色 */
+            color: white; /* 搜索框文字顏色 */
+            border: 1px solid white;
+        }
+        #noResultsMessage {
+            display: none;
+            color: red;
+            font-weight: bold;
+        }
+        .article {
+            margin: 20px;
+        }
     </style>
 </head>
 <body>
@@ -344,13 +360,17 @@
             </div>
             <!-- 可以添加更多文章 -->
         </div>
+	<!-- 沒有找到相關內容的提示 -->
 	<p id="noResultsMessage" style="display: none;">沒有找到相關內容</p>
     </main>
+    <!-- 背景畫布 -->
+    <canvas id="backgroundCanvas"></canvas>
     <canvas id="fishCanvas"></canvas>
     <footer>
        <p>聯絡方式：<a href="mailto:xd67332@gmail.com" style="color: silver;">xd67332@gmail.com</a></p>
     </footer>
 <script>
+// 搜索功能
 function searchArticles() {
     var input, filter, articles, article, title, i, txtValue;
     var noResultsMessage = document.getElementById('noResultsMessage');
@@ -359,7 +379,6 @@ function searchArticles() {
     articles = document.getElementById('articles');  // 文章區域
     article = articles.getElementsByClassName('article');  // 文章列表
     var found = false;  // 記錄是否有找到結果
-
     // 遍歷所有文章，檢查標題是否匹配搜索條件
     for (i = 0; i < article.length; i++) {
         title = article[i].getAttribute('data-title');  // 獲取文章的標題
@@ -371,7 +390,6 @@ function searchArticles() {
             article[i].style.display = "none";  // 隱藏不匹配的文章
         }
     }
-
     // 如果找到匹配的文章，隱藏“沒有找到相關內容”的提示
     if (found) {
         noResultsMessage.style.display = "none";
@@ -379,11 +397,39 @@ function searchArticles() {
         noResultsMessage.style.display = "block";  // 否則顯示提示
     }
 }
-
     document.getElementById('searchInput').addEventListener('input', function() {
-        setTimeout(searchArticles, 100);  // 100 毫秒延遲
+        setTimeout(searchArticles, 100);  // 100 毫秒搜索刷新延遲
     });
+ // 背景發光效果
+        var bgCanvas = document.getElementById('backgroundCanvas');
+        var bgCtx = bgCanvas.getContext('2d');
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
 
+        window.addEventListener('resize', function() {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+        });
+        function drawGlow(x, y, size, opacity) {
+            var gradient = bgCtx.createRadialGradient(x, y, size * 0.1, x, y, size);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, ' + opacity + ')');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            bgCtx.beginPath();
+            bgCtx.arc(x, y, size, 0, 2 * Math.PI);
+            bgCtx.fillStyle = gradient;
+            bgCtx.fill();
+        }
+        function randomGlow() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            for (var i = 0; i < 5; i++) {
+                var x = Math.random() * bgCanvas.width;
+                var y = Math.random() * bgCanvas.height;
+                var size = Math.random() * 200 + 50;
+                var opacity = Math.random() * 0.5 + 0.2;
+                drawGlow(x, y, size, opacity);
+            }
+        }
+        setInterval(randomGlow, 2000); // 每2秒更新一次背景發光效果
     // 背景魚動畫相關代碼
     var canvas = document.getElementById('fishCanvas');
     var ctx = canvas.getContext('2d');
@@ -394,10 +440,8 @@ function searchArticles() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
     });
-
     var fishes = [];
     var fishCount = 10;
-
     for (var i = 0; i < fishCount; i++) {
         fishes.push({
             x: Math.random() * canvas.width,
@@ -407,14 +451,12 @@ function searchArticles() {
             speedY: (Math.random() - 0.5) * 2
         });
     }
-
     function drawFish(fish) {
         ctx.beginPath();
         ctx.arc(fish.x, fish.y, fish.size, 0, 2 * Math.PI);
         ctx.fillStyle = 'rgba(68, 68, 68, 0.4)';
         ctx.fill();
     }
-
     function updateFishes() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -427,13 +469,10 @@ function searchArticles() {
             if (fish.x < 0) fish.x = canvas.width;
             if (fish.y > canvas.height) fish.y = 0;
             if (fish.y < 0) fish.y = canvas.height;
-
             drawFish(fish);
         }
-
         requestAnimationFrame(updateFishes);
     }
-
     updateFishes();
 </script>
 </body>
