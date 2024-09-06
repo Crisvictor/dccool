@@ -54,16 +54,16 @@
         /* 新增 canvas 相關樣式 */
         html, body {
             height: 100%;
-            overflow: auto; /* 允许显示滚动条 */
-            margin: 0; /* 移除默认的页边距 */
+            overflow: auto; /* 允許顯示滾軸條 */
+            margin: 0; /* 移除默認的頁面距 */
 	}
         canvas {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%; /* 确保 canvas 跨越整个页面宽度 */
-            height: 100%; /* 确保 canvas 跨越整个页面高度 */
-            z-index: -1; /* 确保 canvas 在背景 */
+            width: 100%; /* 確保 canvas 跨越整个頁面寬度 */
+            height: 100%; /* 確保 canvas 跨越整个页面高度 */
+            z-index: -1; /* 確保 canvas 在背景 */
         }
         #searchInput {
             margin: 20px;
@@ -88,8 +88,10 @@
         <h1>扣項實行細則</h1>
     </header>
     <main>
+	        <!-- 搜索欄 -->
         <input type="text" id="searchInput" onkeyup="searchArticles()" placeholder="搜索關鍵字...">
-        <div id="articles">
+	        <!-- 搜索結果區域 -->
+        <div id="articles">		
             <div class="article" data-title="迎賓及送客口號呼喊不完整、配鏡流程及買一送一活動未主動說明。 站哨期間無故擅離崗位，無法提供合理正當理由說明。">
                 <h2>迎賓及送客口號呼喊不完整、配鏡流程及買一送一活動未主動說明。<br>站哨期間無故擅離崗位，無法提供合理正當理由說明。</h2>
                 <p>(扣個人/主管20點)</p>
@@ -400,36 +402,47 @@ function searchArticles() {
     document.getElementById('searchInput').addEventListener('input', function() {
         setTimeout(searchArticles, 100);  // 100 毫秒搜索刷新延遲
     });
- // 背景發光效果
-        var bgCanvas = document.getElementById('backgroundCanvas');
-        var bgCtx = bgCanvas.getContext('2d');
-        bgCanvas.width = window.innerWidth;
-        bgCanvas.height = window.innerHeight;
-
-        window.addEventListener('resize', function() {
-            bgCanvas.width = window.innerWidth;
-            bgCanvas.height = window.innerHeight;
-        });
-        function drawGlow(x, y, size, opacity) {
-            var gradient = bgCtx.createRadialGradient(x, y, size * 0.1, x, y, size);
-            gradient.addColorStop(0, 'rgba(255, 255, 255, ' + opacity + ')');
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            bgCtx.beginPath();
-            bgCtx.arc(x, y, size, 0, 2 * Math.PI);
-            bgCtx.fillStyle = gradient;
-            bgCtx.fill();
-        }
-        function randomGlow() {
-            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-            for (var i = 0; i < 5; i++) {
-                var x = Math.random() * bgCanvas.width;
-                var y = Math.random() * bgCanvas.height;
-                var size = Math.random() * 200 + 50;
-                var opacity = Math.random() * 0.5 + 0.2;
-                drawGlow(x, y, size, opacity);
-            }
-        }
-        setInterval(randomGlow, 2000); // 每2秒更新一次背景發光效果
+// 創建光柱的隨機位置、亮度和長度
+function drawLightBar(x, width, brightness) {
+    // 隨機設定光柱長度為畫面高度的 20% 到 40%
+    var lightBarHeight = Math.random() * (bgCanvas.height * 0.4 - bgCanvas.height * 0.2) + bgCanvas.height * 0.2;
+    // 創建從底部向上漸進發散的線性漸變效果，調整為透明藍色光
+    var gradient = bgCtx.createLinearGradient(x, bgCanvas.height, x, bgCanvas.height - lightBarHeight);
+    gradient.addColorStop(0, 'rgba(34,174,209, ' + brightness + ')');  // 底部最亮，藍光
+    gradient.addColorStop(1, 'rgba(34,174,209, 0)');  // 上方逐漸變透明
+    bgCtx.fillStyle = gradient;
+    // 畫光柱，位置從頁面底部向上發散，寬度固定
+    bgCtx.fillRect(x, bgCanvas.height - lightBarHeight, width, lightBarHeight);
+}
+// 更新光柱效果，光柱隨機位置，隨機亮度
+function updateLightBars() {
+    // 清空畫布
+    bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+    for (var i = 0; i < lightBars.length; i++) {
+        var lightBar = lightBars[i];
+        // 隨機亮度和寬度
+        var brightness = Math.random() * 0.3 + 0.1;  // 藍光透明感，亮度較低
+        var width = Math.random() * 30 + 10;  // 光柱寬度
+        // 隨機水平位置
+        var x = Math.random() * bgCanvas.width;
+        // 繪製光柱
+        drawLightBar(x, width, brightness);
+    }
+    requestAnimationFrame(updateLightBars);
+}
+// 初始化畫布和光柱
+var bgCanvas = document.getElementById('lightBarCanvas');
+var bgCtx = bgCanvas.getContext('2d');
+bgCanvas.width = window.innerWidth;
+bgCanvas.height = window.innerHeight;
+window.addEventListener('resize', function() {
+    bgCanvas.width = window.innerWidth;
+    bgCanvas.height = window.innerHeight;
+});
+// 設定光柱數量和隨機性
+var lightBars = new Array(5).fill(null);
+// 啟動光柱動畫
+updateLightBars();
     // 背景魚動畫相關代碼
     var canvas = document.getElementById('fishCanvas');
     var ctx = canvas.getContext('2d');
