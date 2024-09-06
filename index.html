@@ -54,28 +54,34 @@
         /* 新增 canvas 相關樣式 */
         html, body {
             height: 100%;
+            padding: 0;
             overflow: auto; /* 允許顯示滾軸條 */
             margin: 0; /* 移除默認的頁面距 */
 	}
-        canvas {
+        #backgroundCanvas, #fishCanvas {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%; /* 確保 canvas 跨越整个頁面寬度 */
-            height: 100%; /* 確保 canvas 跨越整个页面高度 */
-            z-index: -1; /* 確保 canvas 在背景 */
+            z-index: -1; /* 確保這兩個canvas在背景 */
         }
+        #backgroundCanvas {
+            z-index: 1; /* 背景光柱 */
+        }
+        #fishCanvas {
+            z-index: 2; /* 魚動畫 */
+        }
+	    
         #searchInput {
             margin: 20px;
             padding: 10px;
-            width: 300px;
-            background-color: black; /* 搜索框背景色 */
+            width: 250px;
+            background-color: DimGray; /* 搜索框背景色 */
             color: white; /* 搜索框文字顏色 */
             border: 1px solid white;
         }
         #noResultsMessage {
             display: none;
-            color: red;
+            color: LightCoral;
             font-weight: bold;
         }
         .article {
@@ -411,6 +417,7 @@ function drawLightBar(x, width, brightness) {
     bgCtx.fillStyle = gradient;
     bgCtx.fillRect(x, bgCanvas.height - lightBarHeight, width, lightBarHeight);
 }
+
 function updateLightBars() {
     bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
     for (var i = 0; i < lightBars.length; i++) {
@@ -421,14 +428,17 @@ function updateLightBars() {
     }
     requestAnimationFrame(updateLightBars);
 }
+
 var bgCanvas = document.getElementById('backgroundCanvas');
 var bgCtx = bgCanvas.getContext('2d');
 bgCanvas.width = window.innerWidth;
 bgCanvas.height = window.innerHeight;
+
 window.addEventListener('resize', function() {
     bgCanvas.width = window.innerWidth;
     bgCanvas.height = window.innerHeight;
 });
+
 var lightBars = new Array(5).fill(null);
 updateLightBars();
 
@@ -437,12 +447,15 @@ var fishCanvas = document.getElementById('fishCanvas');
 var fishCtx = fishCanvas.getContext('2d');
 fishCanvas.width = window.innerWidth;
 fishCanvas.height = window.innerHeight;
+
 window.addEventListener('resize', function() {
     fishCanvas.width = window.innerWidth;
     fishCanvas.height = window.innerHeight;
 });
+
 var fishes = [];
 var fishCount = 10;
+
 for (var i = 0; i < fishCount; i++) {
     fishes.push({
         x: Math.random() * fishCanvas.width,
@@ -452,27 +465,35 @@ for (var i = 0; i < fishCount; i++) {
         speedY: (Math.random() - 0.5) * 2
     });
 }
+
 function drawFish(fish) {
     fishCtx.beginPath();
     fishCtx.arc(fish.x, fish.y, fish.size, 0, 2 * Math.PI);
     fishCtx.fillStyle = 'rgba(68, 68, 68, 0.4)';
     fishCtx.fill();
 }
+
 function updateFishes() {
     fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
+
     for (var i = 0; i < fishes.length; i++) {
         var fish = fishes[i];
         fish.x += fish.speedX;
         fish.y += fish.speedY;
+
         if (fish.x > fishCanvas.width) fish.x = 0;
         if (fish.x < 0) fish.x = fishCanvas.width;
         if (fish.y > fishCanvas.height) fish.y = 0;
         if (fish.y < 0) fish.y = fishCanvas.height;
+
         drawFish(fish);
     }
+
     requestAnimationFrame(updateFishes);
 }
+
 updateFishes();
+</script>
 </script>
 </body>
 </html>
