@@ -58,11 +58,11 @@
             overflow: auto; /* 允許顯示滾軸條 */
             margin: 0; /* 移除默認的頁面距 */
 	}
-        #backgroundCanvas, #fishCanvas {
+        #fishCanvas {
             position: absolute;
             top: 0;
             left: 0;
-            z-index: -1; /* 確保這兩個canvas在背景 */
+            z-index: -1; 
         }
         #searchInput {
             margin: 20px;
@@ -401,69 +401,6 @@ function searchArticles() {
     document.getElementById('searchInput').addEventListener('input', function() {
         setTimeout(searchArticles, 100);  // 100 毫秒搜索刷新延遲
     });
-// 背景光柱
-function drawLightBar(x, width, opacity) {
-    var lightBarHeight = Math.random() * (bgCanvas.height * 0.3 - bgCanvas.height * 0.1) + bgCanvas.height * 0.1;
-    var gradient = bgCtx.createLinearGradient(x, bgCanvas.height, x, bgCanvas.height - lightBarHeight - 20);
-    gradient.addColorStop(0, 'rgba(40, 100, 150, ' + opacity + ')');  // 底部最亮
-    gradient.addColorStop(0.8, 'rgba(40, 100, 150, 0.2)');  // 中間柔化
-    gradient.addColorStop(1, 'rgba(40, 100, 150, 0)');  // 上方逐漸變透明
-
-    bgCtx.fillStyle = gradient;
-    bgCtx.fillRect(x, bgCanvas.height - lightBarHeight, width, lightBarHeight);
-}
-
-// 更新光柱效果
-function updateLightBars() {
-    bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-    var now = Date.now();
-    lightBars.forEach(function(lightBar) {
-        var elapsedTime = (now - lightBar.startTime) / 1000;
-        var opacity, visible;
-        
-        if (elapsedTime < 1) {
-            opacity = elapsedTime;  // Fade-in
-            visible = true;
-        } else if (elapsedTime < 2) {
-            opacity = 1;  // Fully visible
-            visible = true;
-        } else if (elapsedTime < 3) {
-            opacity = 1 - (elapsedTime - 2);  // Fade-out
-            visible = opacity > 0;
-        } else {
-            lightBar.startTime = now;
-            return;  // Move to the next lightBar
-        }
-
-        if (visible) {
-            drawLightBar(lightBar.x, lightBar.width, opacity);
-        }
-    });
-
-    requestAnimationFrame(updateLightBars);
-}
-
-// 初始化畫布和光柱
-var bgCanvas = document.getElementById('backgroundCanvas');
-var bgCtx = bgCanvas.getContext('2d');
-bgCanvas.width = window.innerWidth;
-bgCanvas.height = window.innerHeight;
-window.addEventListener('resize', function() {
-    bgCanvas.width = window.innerWidth;
-    bgCanvas.height = window.innerHeight;
-});
-
-var lightBars = [];
-for (var i = 0; i < 5; i++) {
-    lightBars.push({
-        x: Math.random() * bgCanvas.width,
-        width: Math.random() * 100 + 60,  // 光柱寬度範圍60到160像素
-        startTime: Date.now() - Math.random() * 4000  // 隨機開始時間，避免所有光柱同步更新
-    });
-}
-
-updateLightBars();
-	
 // 背景魚動畫相關代碼
 var fishCanvas = document.getElementById('fishCanvas');
 var fishCtx = fishCanvas.getContext('2d');
