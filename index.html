@@ -405,8 +405,8 @@ function searchArticles() {
 function drawLightBar(x, width, opacity) {
     var lightBarHeight = Math.random() * (bgCanvas.height * 0.4 - bgCanvas.height * 0.2) + bgCanvas.height * 0.2;
     var gradient = bgCtx.createLinearGradient(x, bgCanvas.height, x, bgCanvas.height - lightBarHeight);
-    gradient.addColorStop(0, 'rgba(176,196,222, ' + opacity + ')');  // 底部最亮
-    gradient.addColorStop(1, 'rgba(176,196,222, 0)');  // 上方逐漸變透明
+    gradient.addColorStop(0, 'rgba(40, 100, 150, ' + opacity + ')');  // 底部最亮
+    gradient.addColorStop(1, 'rgba(40, 100, 150, 0)');  // 上方逐漸變透明
     bgCtx.fillStyle = gradient;
     bgCtx.fillRect(x, bgCanvas.height - lightBarHeight, width, lightBarHeight);
 }
@@ -452,7 +452,7 @@ window.addEventListener('resize', function() {
 });
 
 var lightBars = [];
-for (var i = 0; i < 7; i++) {
+for (var i = 0; i < 5; i++) {
     lightBars.push({
         x: Math.random() * bgCanvas.width,
         width: Math.random() * 100 + 60,  // 光柱寬度範圍60到160像素
