@@ -402,36 +402,26 @@ function searchArticles() {
     document.getElementById('searchInput').addEventListener('input', function() {
         setTimeout(searchArticles, 100);  // 100 毫秒搜索刷新延遲
     });
-// 創建光柱的隨機位置、亮度和長度
+// 光柱效果相關代碼
 function drawLightBar(x, width, brightness) {
-    // 隨機設定光柱長度為畫面高度的 20% 到 40%
     var lightBarHeight = Math.random() * (bgCanvas.height * 0.4 - bgCanvas.height * 0.2) + bgCanvas.height * 0.2;
-    // 創建從底部向上漸進發散的線性漸變效果，調整為透明藍色光
     var gradient = bgCtx.createLinearGradient(x, bgCanvas.height, x, bgCanvas.height - lightBarHeight);
-    gradient.addColorStop(0, 'rgba(34,174,209, ' + brightness + ')');  // 底部最亮，藍光
-    gradient.addColorStop(1, 'rgba(34,174,209, 0)');  // 上方逐漸變透明
+    gradient.addColorStop(0, 'rgba(34,174,209, ' + brightness + ')');
+    gradient.addColorStop(1, 'rgba(34,174,209, 0)');
     bgCtx.fillStyle = gradient;
-    // 畫光柱，位置從頁面底部向上發散，寬度固定
     bgCtx.fillRect(x, bgCanvas.height - lightBarHeight, width, lightBarHeight);
 }
-// 更新光柱效果，光柱隨機位置，隨機亮度
 function updateLightBars() {
-    // 清空畫布
     bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
     for (var i = 0; i < lightBars.length; i++) {
-        var lightBar = lightBars[i];
-        // 隨機亮度和寬度
-        var brightness = Math.random() * 0.3 + 0.1;  // 藍光透明感，亮度較低
-        var width = Math.random() * 30 + 10;  // 光柱寬度
-        // 隨機水平位置
+        var brightness = Math.random() * 0.3 + 0.1;
+        var width = Math.random() * 30 + 10;
         var x = Math.random() * bgCanvas.width;
-        // 繪製光柱
         drawLightBar(x, width, brightness);
     }
     requestAnimationFrame(updateLightBars);
 }
-// 初始化畫布和光柱
-var bgCanvas = document.getElementById('lightBarCanvas');
+var bgCanvas = document.getElementById('backgroundCanvas');
 var bgCtx = bgCanvas.getContext('2d');
 bgCanvas.width = window.innerWidth;
 bgCanvas.height = window.innerHeight;
@@ -439,54 +429,50 @@ window.addEventListener('resize', function() {
     bgCanvas.width = window.innerWidth;
     bgCanvas.height = window.innerHeight;
 });
-// 設定光柱數量和隨機性
 var lightBars = new Array(5).fill(null);
-// 啟動光柱動畫
 updateLightBars();
-    // 背景魚動畫相關代碼
-    var canvas = document.getElementById('fishCanvas');
-    var ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
 
-    window.addEventListener('resize', function() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+// 背景魚動畫相關代碼
+var fishCanvas = document.getElementById('fishCanvas');
+var fishCtx = fishCanvas.getContext('2d');
+fishCanvas.width = window.innerWidth;
+fishCanvas.height = window.innerHeight;
+window.addEventListener('resize', function() {
+    fishCanvas.width = window.innerWidth;
+    fishCanvas.height = window.innerHeight;
+});
+var fishes = [];
+var fishCount = 10;
+for (var i = 0; i < fishCount; i++) {
+    fishes.push({
+        x: Math.random() * fishCanvas.width,
+        y: Math.random() * fishCanvas.height,
+        size: Math.random() * 20 + 10,
+        speedX: (Math.random() - 0.5) * 2,
+        speedY: (Math.random() - 0.5) * 2
     });
-    var fishes = [];
-    var fishCount = 10;
-    for (var i = 0; i < fishCount; i++) {
-        fishes.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            size: Math.random() * 20 + 10,
-            speedX: (Math.random() - 0.5) * 2,
-            speedY: (Math.random() - 0.5) * 2
-        });
+}
+function drawFish(fish) {
+    fishCtx.beginPath();
+    fishCtx.arc(fish.x, fish.y, fish.size, 0, 2 * Math.PI);
+    fishCtx.fillStyle = 'rgba(68, 68, 68, 0.4)';
+    fishCtx.fill();
+}
+function updateFishes() {
+    fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
+    for (var i = 0; i < fishes.length; i++) {
+        var fish = fishes[i];
+        fish.x += fish.speedX;
+        fish.y += fish.speedY;
+        if (fish.x > fishCanvas.width) fish.x = 0;
+        if (fish.x < 0) fish.x = fishCanvas.width;
+        if (fish.y > fishCanvas.height) fish.y = 0;
+        if (fish.y < 0) fish.y = fishCanvas.height;
+        drawFish(fish);
     }
-    function drawFish(fish) {
-        ctx.beginPath();
-        ctx.arc(fish.x, fish.y, fish.size, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(68, 68, 68, 0.4)';
-        ctx.fill();
-    }
-    function updateFishes() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        for (var i = 0; i < fishes.length; i++) {
-            var fish = fishes[i];
-            fish.x += fish.speedX;
-            fish.y += fish.speedY;
-
-            if (fish.x > canvas.width) fish.x = 0;
-            if (fish.x < 0) fish.x = canvas.width;
-            if (fish.y > canvas.height) fish.y = 0;
-            if (fish.y < 0) fish.y = canvas.height;
-            drawFish(fish);
-        }
-        requestAnimationFrame(updateFishes);
-    }
-    updateFishes();
+    requestAnimationFrame(updateFishes);
+}
+updateFishes();
 </script>
 </body>
 </html>
