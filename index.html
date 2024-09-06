@@ -403,10 +403,12 @@ function searchArticles() {
     });
 // 背景光柱
 function drawLightBar(x, width, opacity) {
-    var lightBarHeight = Math.random() * (bgCanvas.height * 0.4 - bgCanvas.height * 0.2) + bgCanvas.height * 0.2;
-    var gradient = bgCtx.createLinearGradient(x, bgCanvas.height, x, bgCanvas.height - lightBarHeight);
+    var lightBarHeight = Math.random() * (bgCanvas.height * 0.3 - bgCanvas.height * 0.1) + bgCanvas.height * 0.1;
+    var gradient = bgCtx.createLinearGradient(x, bgCanvas.height, x, bgCanvas.height - lightBarHeight - 20);
     gradient.addColorStop(0, 'rgba(40, 100, 150, ' + opacity + ')');  // 底部最亮
+    gradient.addColorStop(0.8, 'rgba(40, 100, 150, 0.2)');  // 中間柔化
     gradient.addColorStop(1, 'rgba(40, 100, 150, 0)');  // 上方逐漸變透明
+
     bgCtx.fillStyle = gradient;
     bgCtx.fillRect(x, bgCanvas.height - lightBarHeight, width, lightBarHeight);
 }
@@ -456,7 +458,7 @@ for (var i = 0; i < 5; i++) {
     lightBars.push({
         x: Math.random() * bgCanvas.width,
         width: Math.random() * 100 + 60,  // 光柱寬度範圍60到160像素
-        startTime: Date.now() - Math.random() * 3000  // 隨機開始時間，避免所有光柱同步更新
+        startTime: Date.now() - Math.random() * 4000  // 隨機開始時間，避免所有光柱同步更新
     });
 }
 
