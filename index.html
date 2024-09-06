@@ -68,7 +68,7 @@
             margin: 20px;
             padding: 10px;
             width: 250px;
-            background-color: DimGray; /* 搜索框背景色 */
+            background-color: Black; /* 搜索框背景色 */
             color: white; /* 搜索框文字顏色 */
             border: 1px solid white;
         }
@@ -401,51 +401,43 @@ function searchArticles() {
     document.getElementById('searchInput').addEventListener('input', function() {
         setTimeout(searchArticles, 100);  // 100 毫秒搜索刷新延遲
     });
-// 創建光柱的隨機位置、亮度和長度
-function drawLightBar(x, width, brightness, opacity) {
-    // 隨機設定光柱長度為畫面高度的 20% 到 40%
+// 背景光柱
+function drawLightBar(x, width, opacity) {
     var lightBarHeight = Math.random() * (bgCanvas.height * 0.4 - bgCanvas.height * 0.2) + bgCanvas.height * 0.2;
-    // 創建從底部向上漸進發散的線性漸變效果，調整為透明藍色光
     var gradient = bgCtx.createLinearGradient(x, bgCanvas.height, x, bgCanvas.height - lightBarHeight);
-    gradient.addColorStop(0, 'rgba(34,174,209, ' + opacity + ')');  // 底部最亮，藍光
-    gradient.addColorStop(1, 'rgba(34,174,209, 0)');  // 上方逐漸變透明
+    gradient.addColorStop(0, 'rgba(176,196,222, ' + opacity + ')');  // 底部最亮
+    gradient.addColorStop(1, 'rgba(176,196,222, 0)');  // 上方逐漸變透明
     bgCtx.fillStyle = gradient;
-    // 畫光柱，位置從頁面底部向上發散，寬度固定
     bgCtx.fillRect(x, bgCanvas.height - lightBarHeight, width, lightBarHeight);
 }
-// 更新光柱效果，光柱隨機位置，隨機亮度，淡入淡出
-var lightBars = [];
-var lightBarCount = 7;
-var updateInterval = 3000; // 光柱更新間隔時間
-var fadeInDuration = 1000; // 淡入時間
-var visibleDuration = 1000; // 可見時間
-var fadeOutDuration = 1000; // 淡出時間
-var elapsedTime = 0;
-function updateLightBars(timestamp) {
-    var fadeInProgress = Math.min((timestamp - elapsedTime) / fadeInDuration, 1);
-    var visibleProgress = Math.max(0, Math.min((timestamp - (elapsedTime + fadeInDuration)) / visibleDuration, 1));
-    var fadeOutProgress = Math.max(0, Math.min((timestamp - (elapsedTime + fadeInDuration + visibleDuration)) / fadeOutDuration, 1));
 
-    if (fadeOutProgress >= 1) {
-        elapsedTime = timestamp;
-        fadeInProgress = 0;
-        visibleProgress = 0;
-        fadeOutProgress = 0;
-    }
+// 更新光柱效果
+function updateLightBars() {
     bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+    var now = Date.now();
+    lightBars.forEach(function(lightBar) {
+        var elapsedTime = (now - lightBar.startTime) / 1000;
+        var opacity, visible;
+        
+        if (elapsedTime < 1) {
+            opacity = elapsedTime;  // Fade-in
+            visible = true;
+        } else if (elapsedTime < 2) {
+            opacity = 1;  // Fully visible
+            visible = true;
+        } else if (elapsedTime < 3) {
+            opacity = 1 - (elapsedTime - 2);  // Fade-out
+            visible = opacity > 0;
+        } else {
+            lightBar.startTime = now;
+            return;  // Move to the next lightBar
+        }
 
-    for (var i = 0; i < lightBarCount; i++) {
-        var lightBar = lightBars[i];
-        var opacity = Math.max(0, Math.min(fadeInProgress, 1)) * Math.max(0, Math.min(visibleProgress, 1)) * Math.max(0, 1 - fadeOutProgress);
-        var width = Math.random() * (160 - 60) + 60; // 光柱寬度
-        var x = Math.random() * bgCanvas.width; // 隨機水平位置
-        drawLightBar(x, width, Math.random() * 0.3 + 0.1, opacity);
-    }
-    requestAnimationFrame(updateLightBars);
-}
+        if (visible) {
+            drawLightBar(lightBar.x, lightBar.width, opacity);
+        }
+    });
 
-function initializeLightBars() {
-    lightBars = new Array(lightBarCount).fill(null);
     requestAnimationFrame(updateLightBars);
 }
 
@@ -454,12 +446,21 @@ var bgCanvas = document.getElementById('backgroundCanvas');
 var bgCtx = bgCanvas.getContext('2d');
 bgCanvas.width = window.innerWidth;
 bgCanvas.height = window.innerHeight;
-
 window.addEventListener('resize', function() {
     bgCanvas.width = window.innerWidth;
     bgCanvas.height = window.innerHeight;
 });
-initializeLightBars();
+
+var lightBars = [];
+for (var i = 0; i < 7; i++) {
+    lightBars.push({
+        x: Math.random() * bgCanvas.width,
+        width: Math.random() * 100 + 60,  // 光柱寬度範圍60到160像素
+        startTime: Date.now() - Math.random() * 3000  // 隨機開始時間，避免所有光柱同步更新
+    });
+}
+
+updateLightBars();
 	
 // 背景魚動畫相關代碼
 var fishCanvas = document.getElementById('fishCanvas');
