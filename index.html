@@ -6,7 +6,10 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <title>大倉酷扣項細則</title>
-
+    <video autoplay muted loop playsinline id="background-video">
+    <source src="HexUp2.mp4" type="video/mp4">
+    您的瀏覽器不支援 HTML5 視訊。
+</video>
     <!-- CSS樣式 -->
     <style>
         body {
@@ -79,6 +82,15 @@
         }
         .article {
             margin: 20px;
+        }
+        #background-video {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover; /* 確保視頻會完全覆蓋畫面 */
+          z-index: -2; /* 放在其他內容的背後 */
         }
     </style>
 </head>
