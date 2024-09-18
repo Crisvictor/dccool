@@ -7,100 +7,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>射擊遊戲</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: black;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: black;
+    color: white;
+    font-family: Arial, sans-serif;
+}
 
-        canvas {
-            display: block;
-            background-color: black;
-        }
+canvas {
+    display: block;
+    background-color: black;
+}
 
-        .control-button {
-            position: fixed;
-            bottom: 20px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            font-size: 20px;
-            padding: 20px;
-            border-radius: 50%;
-            cursor: pointer; /* 指標光標 */
-        }
+.control-button {
+    position: fixed;
+    bottom: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 20px;
+    padding: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+}
 
-        .move-left { bottom: 20px; left: 20px; }
-        .move-right { bottom: 20px; left: 100px; }
-        .shoot { bottom: 20px; right: 20px; }
+.move-left { left: 20px; }
+.move-right { left: 100px; }
+.shoot { right: 20px; }
 
-        .shoot .cooldown-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 5px;
-            width: 100%;
-            background-color: rgba(255, 0, 0, 0.5);
-            transform-origin: left;
-            transform: scaleX(0);
-            transition: transform 0.35s linear;
-        }
+.shoot .cooldown-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 5px;
+    width: 100%;
+    background-color: rgba(255, 0, 0, 0.5);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.35s linear;
+}
 
-        #background-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -1;
-            filter: brightness(70%);
-        }
+#background-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    filter: brightness(70%);
+}
 
-        #mobile-controls {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            z-index: 2;
-        }
+#mobile-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 2;
+}
 
-        .control-btn {
-            width: 60px;
-            height: 60px;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 60px;
-            font-size: 30px;
-            margin: 5px;
-            user-select: none;
-            cursor: pointer;
-        }
+.control-btn {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 60px;
+    font-size: 30px;
+    margin: 5px;
+    user-select: none;
+    cursor: pointer;
+}
 
-        .control-btn:hover {
-            background-color: rgba(255, 255, 255, 0.4);
-        }
+.control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
 
-        #score {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            z-index: 10;
-        }
+#score {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    z-index: 10;
+}
 
-        #menuCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            background: rgba(0, 0, 0, 0.5);
-        }
+#menuCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    background: rgba(0, 0, 0, 0.5);
+}
+
     </style>
 </head>
 <body>
