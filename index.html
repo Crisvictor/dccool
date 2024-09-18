@@ -93,6 +93,24 @@
           z-index: -1; /* 放在其他內容的背後 */
 	  filter: brightness(0.3); /* 设置视频亮度为50% */
         }
+	.game-button {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          padding: 10px 20px;
+          background-color: #007BFF; /* 按鈕背景顏色 */
+          color: #fff; /* 按鈕文字顏色 */
+          border: none;
+          border-radius: 5px;
+          text-decoration: none;
+          font-size: 16px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          transition: background-color 0.3s;
+          }
+
+        .game-button:hover {
+          background-color: #0056b3; /* 滑鼠懸停時的顏色變化 */
+          }
     </style>
 </head>
 <body>
@@ -382,6 +400,7 @@
     <canvas id="fishCanvas"></canvas>
     <footer>
        <p>當前版本：v20240909<br>與我聯繫：<a href="mailto:xd67332@gmail.com" style="color: silver;">xd67332@gmail.com</a></p>
+       <a href="Bee.html" class="game-button">玩遊戲</a>
     </footer>
 <script>
 // 搜索功能
