@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-    <link rel="icon" href="enemy.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="enemy.ico" type="image/x-icon">
+    <link rel="icon" href="Enemy.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="Enemy.ico" type="image/x-icon">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +17,7 @@ body {
 
 canvas {
     display: block;
-    background-color: black;
+    background-color: transparent;
 }
 
 .control-button {
@@ -98,8 +98,13 @@ canvas {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 5;
+    z-index: 2;
     background: rgba(0, 0, 0, 0.5);
+}
+        
+#gameCanvas {
+    position: absolute;
+    z-index: 1; /* 遊戲層應高於背景影片 */
 }
 
     </style>
