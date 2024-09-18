@@ -45,29 +45,31 @@
             background-color: rgba(255, 255, 255, 0.4);
         }
 
-        #background-image {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-            z-index: -1;
-        }
-
         #menu-text {
             color: white;
             font-size: 24px;
             text-align: center;
             margin-top: 200px;
         }
+
+        #background-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 確保影片覆蓋整個背景並保持比例 */
+            z-index: -1; /* 確保影片在其他內容的下方 */
+            filter: brightness(70%); /* 設定亮度為50%，數值範圍是0%到100%，100%為原始亮度 */
+       }
     </style>
 </head>
 <body>
-
-<!-- 背景 GIF -->
-<img id="background-image" src="background.gif" alt="背景圖片">
-
+<!-- 畫布 -->
+    <video id="background-video" autoplay muted loop>
+    <source src="background.webm" type="video/webm">
+     Your browser does not support the video tag.
+    </video>
 <!-- 主選單畫布 -->
 <canvas id="menuCanvas"></canvas>
 
