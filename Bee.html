@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小蜜蜂射擊遊戲</title>
+    <title>射擊遊戲</title>
     <style>
         body {
             margin: 0;
@@ -26,14 +26,14 @@
             font-size: 20px;
             padding: 20px;
             border-radius: 50%;
-            cursor: pointer; /* 指標光標 */
-            z-index: 10; /* 確保按鈕在最上層 */
+            cursor: pointer;
+            z-index: 10;
         }
+
         .move-left { bottom: 20px; left: 20px; }
         .move-right { bottom: 20px; left: 100px; }
         .shoot { bottom: 20px; right: 20px; }
 
-        /* 射擊冷卻條 */
         .shoot .cooldown-bar {
             position: absolute;
             bottom: 0;
@@ -42,24 +42,10 @@
             width: 100%;
             background-color: rgba(255, 0, 0, 0.5);
             transform-origin: left;
-            transform: scaleX(0); /* 初始為0 */
-            transition: transform 0.4s linear;
+            transform: scaleX(0);
+            transition: transform 0.7s linear;
         }
-        /* 分數顯示 */
-        #score {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            z-index: 10;
-        }
-        #menu-text {
-            color: white;
-            font-size: 24px;
-            text-align: center;
-            margin-top: 200px;
-        }
-        /* 背景  */
+
         #background-video {
             position: absolute;
             top: 0;
@@ -70,68 +56,134 @@
             z-index: -1;
             filter: brightness(70%);
         }
+
+        #mobile-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 2;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 60px;
+            font-size: 30px;
+            margin: 5px;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            z-index: 10;
+        }
+
+        #menuCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 <body>
-        <!-- 背景影片 -->
+    <!-- 背景影片 -->
     <video id="background-video" autoplay muted loop>
         <source src="background.webm" type="video/webm">
         Your browser does not support the video tag.
     </video>
 
-    <canvas id="gameCanvas"></canvas>
-    <div id="score">分數: 0</div>
-    <button class="control-button move-left">←</button>
-    <button class="control-button move-right">→</button>
-    <button class="control-button shoot">
-        射擊
-        <div class="cooldown-bar"></div>
-    </button>
+    <!-- 主選單畫布 -->
+    <canvas id="menuCanvas"></canvas>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+    <!-- 遊戲畫布 -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- 手機控制按鈕 -->
+    <div id="mobile-controls">
+        <div class="control-btn" id="left-btn">←</div>
+        <div class="control-btn" id="right-btn">→</div>
+        <div class="control-btn" id="shoot-btn">●</div>
+    </div>
+    
+ <script>
+        const gameCanvas = document.getElementById('gameCanvas');
+        const ctx = gameCanvas.getContext('2d');
+        const menuCanvas = document.getElementById('menuCanvas');
+        const menuCtx = menuCanvas.getContext('2d');
+        const backgroundVideo = document.getElementById('background-video');
+
+        gameCanvas.width = window.innerWidth;
+        gameCanvas.height = window.innerHeight;
+        menuCanvas.width = window.innerWidth;
+        menuCanvas.height = window.innerHeight;
 
         const playerImage = new Image();
         playerImage.src = 'me.png'; // 自機圖片
 
         const enemyImage = new Image();
-        enemyImage.src = 'enemy.png'; // 敵人圖片
+        enemyImage.src = 'Enemy.png'; // 敵人圖片
 
-        let player = { x: canvas.width / 2, y: canvas.height - 50, width: 50, height: 10, speed: 5 };
-        let bullets = [];
+        let isGameRunning = false;
+        let player = { x: gameCanvas.width / 2, y: gameCanvas.height - 50, width: 50, height: 50, speed: 5 };
         let enemies = [];
+        let bullets = [];
         let score = 0;
         let lastShotTime = 0;
-        let cooldownTime = 800; // 0.8秒冷卻
+        let cooldownTime = 700; // 0.7秒冷卻
         let isCoolingDown = false;
-
         let moveLeft = false;
         let moveRight = false;
 
-        // 生成敵人
+        function drawMenu() {
+            menuCtx.clearRect(0, 0, menuCanvas.width, menuCanvas.height);
+            menuCtx.fillStyle = "white";
+            menuCtx.font = "36px Arial";
+            menuCtx.textAlign = "center";
+            menuCtx.fillText("按空白鍵開始遊戲", menuCanvas.width / 2, menuCanvas.height / 2);
+            menuCtx.font = "24px Arial";
+            menuCtx.fillText("操作說明：", menuCanvas.width / 2, menuCanvas.height / 2 + 50);
+            menuCtx.fillText("← → 移動, 空白鍵射擊", menuCanvas.width / 2, menuCanvas.height / 2 + 100);
+        }
+
+        function startGame() {
+            isGameRunning = true;
+            menuCanvas.style.display = 'none';
+            gameCanvas.style.display = 'block';
+            update();
+        }
+
         function spawnEnemy() {
             let enemy = {
-                x: Math.random() * (canvas.width - 50),
+                x: Math.random() * (gameCanvas.width - 50),
                 y: -50,
                 width: 50,
                 height: 50,
                 speed: 2 + Math.random() * 3,
-                image: new Image()
             };
-            enemy.image.src = 'enemy.png'; // 設置敵人的圖片
             enemies.push(enemy);
         }
 
-        // 移動玩家
         function movePlayer() {
             if (moveLeft && player.x > 0) player.x -= player.speed;
-            if (moveRight && player.x + player.width < canvas.width) player.x += player.speed;
+            if (moveRight && player.x + player.width < gameCanvas.width) player.x += player.speed;
         }
 
-        // 發射子彈
         function shoot() {
             if (Date.now() - lastShotTime >= cooldownTime) {
                 bullets.push({ x: player.x + player.width / 2 - 2.5, y: player.y - 10, width: 5, height: 10 });
@@ -140,7 +192,6 @@
             }
         }
 
-        // 冷卻條觸發
         function triggerCooldown() {
             isCoolingDown = true;
             const cooldownBar = document.querySelector('.shoot .cooldown-bar');
@@ -151,45 +202,38 @@
             }, cooldownTime);
         }
 
-        // 更新和渲染遊戲
         function update() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!isGameRunning) return;
+
+            ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
             
-            // 移動玩家
             movePlayer();
 
-            // 畫玩家
-            ctx.fillStyle = 'white';
-            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
 
-            // 移動子彈
             bullets.forEach((bullet, index) => {
                 bullet.y -= 5;
-                if (bullet.y < 0) bullets.splice(index, 1); // 移除超出螢幕的子彈
+                if (bullet.y < 0) bullets.splice(index, 1);
             });
 
-            // 畫子彈
             bullets.forEach(bullet => {
+                ctx.fillStyle = 'white';
                 ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
             });
 
-            // 移動敵人
             enemies.forEach((enemy, index) => {
                 enemy.y += enemy.speed;
-                if (enemy.y > canvas.height) enemies.splice(index, 1); // 移除超出螢幕的敵人
+                if (enemy.y > gameCanvas.height) enemies.splice(index, 1);
             });
 
-            // 畫敵人
             enemies.forEach(enemy => {
-                ctx.drawImage(enemy.image, enemy.x, enemy.y, enemy.width, enemy.height);
+                ctx.drawImage(enemyImage, enemy.x, enemy.y, enemy.width, enemy.height);
             });
 
-            // 子彈和敵人碰撞檢測
             enemies.forEach((enemy, eIndex) => {
                 bullets.forEach((bullet, bIndex) => {
                     if (bullet.x < enemy.x + enemy.width && bullet.x + bullet.width > enemy.x &&
                         bullet.y < enemy.y + enemy.height && bullet.y + bullet.height > enemy.y) {
-                        // 增加爆炸效果
                         ctx.fillStyle = 'red';
                         ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
                         enemies.splice(eIndex, 1);
@@ -203,11 +247,11 @@
             requestAnimationFrame(update);
         }
 
-        // 按鍵控制
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') moveLeft = true;
             if (e.key === 'ArrowRight') moveRight = true;
-            if (e.key === ' ') shoot();
+            if (e.key === ' ' && !isGameRunning) startGame();
+            if (e.key === ' ' && isGameRunning) shoot();
         });
 
         document.addEventListener('keyup', (e) => {
@@ -215,16 +259,17 @@
             if (e.key === 'ArrowRight') moveRight = false;
         });
 
-        // 手機操作
-        document.querySelector('.move-left').addEventListener('mousedown', () => moveLeft = true);
-        document.querySelector('.move-left').addEventListener('mouseup', () => moveLeft = false);
-        document.querySelector('.move-right').addEventListener('mousedown', () => moveRight = true);
-        document.querySelector('.move-right').addEventListener('mouseup', () => moveRight = false);
-        document.querySelector('.shoot').addEventListener('mousedown', shoot);
+        // 手機控制
+        document.getElementById('left-btn').addEventListener('touchstart', () => moveLeft = true);
+        document.getElementById('left-btn').addEventListener('touchend', () => moveLeft = false);
+        document.getElementById('right-btn').addEventListener('touchstart', () => moveRight = true);
+        document.getElementById('right-btn').addEventListener('touchend', () => moveRight = false);
+        document.getElementById('shoot-btn').addEventListener('touchstart', () => {
+            if (isGameRunning) shoot();
+        });
 
-        // 遊戲初始化
-        setInterval(spawnEnemy, 1000); // 每秒生成一個敵人
-        update();
+        // 初始化主選單
+        drawMenu();
     </script>
 </body>
 </html>
