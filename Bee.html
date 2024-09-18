@@ -110,6 +110,9 @@
         Your browser does not support the video tag.
     </video>
 
+    <!-- 分數顯示 -->
+    <div id="score">分數: 0</div>
+
     <!-- 主選單畫布 -->
     <canvas id="menuCanvas"></canvas>
 
@@ -122,7 +125,6 @@
     <button class="control-button move-right">→</button>
     <button class="control-button shoot">●<div class="cooldown-bar"></div>
     </button>
-
     
  <script>
         const gameCanvas = document.getElementById('gameCanvas');
@@ -130,19 +132,16 @@
         const menuCanvas = document.getElementById('menuCanvas');
         const menuCtx = menuCanvas.getContext('2d');
         const backgroundVideo = document.getElementById('background-video');
-
         gameCanvas.width = window.innerWidth;
         gameCanvas.height = window.innerHeight;
         menuCanvas.width = window.innerWidth;
         menuCanvas.height = window.innerHeight;
 
+        let isGameRunning = false;
         const playerImage = new Image();
         playerImage.src = 'me.png'; // 自機圖片
-
         const enemyImage = new Image();
         enemyImage.src = 'Enemy.png'; // 敵人圖片
-
-        let isGameRunning = false;
         let player = { x: gameCanvas.width / 2, y: gameCanvas.height - 50, width: 50, height: 50, speed: 5 };
         let enemies = [];
         let bullets = [];
@@ -168,7 +167,7 @@
         function startGame() {
             isGameRunning = true;
             score = 0;
-            player = { x: gameCanvas.width / 2, y: gameCanvas.height - 50, width: 40, height: 40 };
+            player = { x: gameCanvas.width / 2 - 20, y: gameCanvas.height - 50, width: 40, height: 40 }; // 注意這裡的 x 和 y 位置
             enemies = [];
             bullets = [];
             document.getElementById('mobile-controls').style.display = "block";
@@ -178,15 +177,16 @@
         
         // 生成敵人
         function spawnEnemy() {
-            let enemy = {
-                x: Math.random() * (gameCanvas.width - 50),
-                y: -50,
-                width: 50,
-                height: 50,
-                speed: 2 + Math.random() * 3,
-            };
-            enemies.push(enemy);
-            console.log('Enemy spawned:', enemy); // 添加這行來檢查敵人是否被生成
+         if (!isGameRunning) return; // 遊戲未開始則不生成敵人
+
+        let enemy = {
+        x: Math.random() * (gameCanvas.width - 50),
+        y: -50,
+        width: 50,
+        height: 50,
+        speed: 2 + Math.random() * 3
+        };
+        enemies.push(enemy);
         }
 
         // 移動玩家
@@ -217,7 +217,9 @@
 
         // 更新和渲染遊戲
         function update() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!isGameRunning) return;
+            
+            ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
             // 移動玩家
             movePlayer();
@@ -286,9 +288,26 @@
         document.getElementById('shoot-btn').addEventListener('touchstart', () => {
             if (isGameRunning) shoot();
         });
-
+ 
+        // 遊戲初始化
+        update();
+     
         // 初始化主選單
         drawMenu();
+
+        // 遊戲結束
+        function endGame() {
+            isGameRunning = false;
+            document.getElementById('mobile-controls').style.display = "none";
+            menuCtx.clearRect(0, 0, menuCanvas.width, menuCanvas.height);
+            menuCtx.fillStyle = "white";
+            menuCtx.font = "36px Arial";
+            menuCtx.textAlign = "center";
+            menuCtx.fillText("遊戲結束", menuCanvas.width / 2, menuCanvas.height / 2);
+            menuCtx.font = "24px Arial";
+            menuCtx.fillText(`得分: ${score}`, menuCanvas.width / 2, menuCanvas.height / 2 + 50);
+            menuCanvas.style.display = 'block'; // 顯示主選單畫布
+}
     </script>
 </body>
 </html>
