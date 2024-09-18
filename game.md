@@ -1,3 +1,197 @@
-layout: page
-title: "dccool"  # 替換為頁面的標題
-permalink: /game/  # 替換為你想要的頁面 URL 路徑
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小蜜蜂射擊遊戲</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+            font-family: Arial, sans-serif;
+        }
+
+        #gameCanvas, #menuCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+
+        #mobile-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 2;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 60px;
+            font-size: 30px;
+            margin: 5px;
+            user-select: none;
+        }
+
+        .control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        #background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        #menu-text {
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            margin-top: 200px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 背景 GIF -->
+<img id="background-image" src="background.gif" alt="背景圖片">
+
+<!-- 主選單畫布 -->
+<canvas id="menuCanvas"></canvas>
+
+<!-- 遊戲畫布 -->
+<canvas id="gameCanvas"></canvas>
+
+<!-- 手機控制按鈕 -->
+<div id="mobile-controls" style="display: none;">
+    <div class="control-btn" id="left-btn">←</div>
+    <div class="control-btn" id="right-btn">→</div>
+    <div class="control-btn" id="shoot-btn">射</div>
+</div>
+
+<script>
+    const gameCanvas = document.getElementById('gameCanvas');
+    const ctx = gameCanvas.getContext('2d');
+    const menuCanvas = document.getElementById('menuCanvas');
+    const menuCtx = menuCanvas.getContext('2d');
+    gameCanvas.width = window.innerWidth;
+    gameCanvas.height = window.innerHeight;
+    menuCanvas.width = window.innerWidth;
+    menuCanvas.height = window.innerHeight;
+
+    let isGameRunning = false;
+    let player, enemies = [], bullets = [], score = 0;
+
+    function drawMenu() {
+        menuCtx.clearRect(0, 0, menuCanvas.width, menuCanvas.height);
+        menuCtx.fillStyle = "white";
+        menuCtx.font = "36px Arial";
+        menuCtx.textAlign = "center";
+        menuCtx.fillText("按空白鍵開始遊戲", menuCanvas.width / 2, menuCanvas.height / 2);
+        menuCtx.font = "24px Arial";
+        menuCtx.fillText("操作說明：", menuCanvas.width / 2, menuCanvas.height / 2 + 50);
+        menuCtx.fillText("← → 移動, 空白鍵射擊", menuCanvas.width / 2, menuCanvas.height / 2 + 100);
+    }
+
+    function startGame() {
+        isGameRunning = true;
+        score = 0;
+        player = { x: gameCanvas.width / 2, y: gameCanvas.height - 50, width: 40, height: 40 };
+        enemies = [];
+        bullets = [];
+        document.getElementById('mobile-controls').style.display = "block";
+        requestAnimationFrame(gameLoop);
+    }
+
+    function gameLoop() {
+        if (!isGameRunning) return;
+
+        ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+        // 玩家繪製
+        ctx.fillStyle = 'white';
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+
+        // 子彈繪製
+        bullets.forEach((bullet, index) => {
+            bullet.y -= 5;
+            ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+            if (bullet.y < 0) bullets.splice(index, 1); // 移除越界子彈
+        });
+
+        // 敵人繪製
+        enemies.forEach((enemy, index) => {
+            enemy.y += enemy.speed;
+            ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+            if (enemy.y > gameCanvas.height) enemies.splice(index, 1); // 移除越界敵人
+        });
+
+        // 檢測碰撞（簡單的矩形碰撞檢測）
+        enemies.forEach((enemy, eIndex) => {
+            bullets.forEach((bullet, bIndex) => {
+                if (bullet.x < enemy.x + enemy.width && bullet.x + bullet.width > enemy.x &&
+                    bullet.y < enemy.y + enemy.height && bullet.y + bullet.height > enemy.y) {
+                    // 播放爆炸效果，移除敵人和子彈
+                    ctx.fillStyle = 'red';
+                    ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height); // 暫時用紅色代表爆炸
+                    enemies.splice(eIndex, 1);
+                    bullets.splice(bIndex, 1);
+                    score += 10; // 增加分數
+                }
+            });
+        });
+
+        // 顯示分數
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Arial';
+        ctx.fillText(`分數: ${score}`, gameCanvas.width - 100, 30);
+
+        // 隨機生成敵人
+        if (Math.random() < 0.02) {
+            let speed = Math.random() * 2 + 1;
+            enemies.push({ x: Math.random() * gameCanvas.width, y: 0, width: 30, height: 30, speed: speed });
+        }
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    // 電腦鍵盤控制
+    document.addEventListener('keydown', function (event) {
+        if (event.code === 'Space' && !isGameRunning) {
+            startGame();
+        } else if (event.code === 'ArrowLeft') {
+            player.x -= 10;
+        } else if (event.code === 'ArrowRight') {
+            player.x += 10;
+        } else if (event.code === 'Space') {
+            bullets.push({ x: player.x + player.width / 2 - 5, y: player.y, width: 5, height: 10 });
+        }
+    });
+
+    // 手機控制
+    document.getElementById('left-btn').addEventListener('touchstart', function () {
+        player.x -= 10;
+    });
+    document.getElementById('right-btn').addEventListener('touchstart', function () {
+        player.x += 10;
+    });
+    document.getElementById('shoot-btn').addEventListener('touchstart', function () {
+        bullets.push({ x: player.x + player.width / 2 - 5, y: player.y, width: 5, height: 10 });
+    });
+
+    drawMenu();
+</script>
+</body>
+</html>
