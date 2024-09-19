@@ -1,35 +1,166 @@
-<html>
+<!DOCTYPE html>
+<html lang="zh">
 <head>
-<meta charset="utf8">
-<title>Pac-Man </title>
+<meta charset="utf-8">
+<title>Pac-Man</title>
 <link rel="shortcut icon" href="pac-favicon.png">
 <style>
-	body{background-color: #292929}
-	*{padding:0;margin:0;}
-	.wrapper{
-		width: 960px;
-		margin:0 auto;
-		line-height:36px;
-		text-align:center;
-		color:#999;
-	}
-	canvas{display:block;background: #000;}
-	.mod-botton{
-		height: 32px;
-		padding: 15px 0;
-		text-align: center;
-	}
+    body {
+        background-color: #003540;
+        margin: 0;
+        padding: 0;
+    }
+    .wrapper {
+        width: 960px;
+        margin: 0 auto;
+        text-align: center;
+        color: #999;
+    }
+    canvas {
+        display: block;
+        background: #000;
+    }
+    p {
+        margin: 15px 0;
+    }
+
+    /* 控制按鈕區域 */
+    .mobile-controls {
+        position: fixed;
+        bottom: 10px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        pointer-events: none;
+    }
+
+    .control-left, .control-right {
+        display: flex;
+        align-items: center;
+        pointer-events: auto;
+    }
+
+    .control-left {
+        margin-left: 20px;
+    }
+
+    .control-right {
+        margin-right: 20px;
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 50px;
+        height: 50px;
+        background-color: #ddd;
+        border: none;
+        border-radius: 50%;
+        margin: 10px;
+        font-size: 24px;
+        color: #666;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn:active {
+        background-color: orange;
+    }
+
+    .btn:focus {
+        outline: none;
+    }
+
+    .direction {
+        background-color: #ddd;
+        width: 60px;
+        height: 60px;
+        margin: 5px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 60px;
+        font-size: 30px;
+        color: #666;
+        transition: background-color 0.2s ease;
+    }
+
+    .direction:active {
+        background-color: orange;
+    }
+
+    /* 讓按鈕在橫豎屏切換時自適應 */
+    @media (orientation: landscape) {
+        .control-right {
+            flex-direction: row;
+        }
+    }
 </style>
 </head>
 <body>
-
 <div class="wrapper">
-	<canvas id="canvas" width="960" height="640">瀏覽器不支持html5語法</canvas>
-	<p>如果你是電腦玩家 按［空格］暫停或繼續</p>		
+    <canvas id="canvas" width="960" height="640">瀏覽器不支持html5語法</canvas>
+    <p>如果你是電腦玩家 按［空格］暫停或繼續</p>
 </div>
+
+<!-- 手機控制按鈕 -->
+<div class="mobile-controls">
+    <!-- 左側圓形按鈕 (空白鍵) -->
+    <div class="control-left">
+        <button class="btn" id="space-btn">O</button>
+    </div>
+
+    <!-- 右側方向鍵 (上下左右) -->
+    <div class="control-right">
+        <button class="direction" id="up-btn">▲</button>
+        <div>
+            <button class="direction" id="left-btn">◄</button>
+            <button class="direction" id="right-btn">►</button>
+        </div>
+        <button class="direction" id="down-btn">▼</button>
+    </div>
+</div>
+
+<script>
+    // 獲取按鈕元素
+    const upBtn = document.getElementById('up-btn');
+    const downBtn = document.getElementById('down-btn');
+    const leftBtn = document.getElementById('left-btn');
+    const rightBtn = document.getElementById('right-btn');
+    const spaceBtn = document.getElementById('space-btn');
+
+    // 模擬鍵盤事件
+    function triggerKeyEvent(keyCode, type) {
+        const event = new KeyboardEvent(type, { keyCode: keyCode, bubbles: true });
+        document.dispatchEvent(event);
+    }
+
+    // 按住按鈕時連續觸發事件
+    function handleContinuousInput(btn, keyCode) {
+        let intervalId;
+
+        btn.addEventListener('touchstart', () => {
+            triggerKeyEvent(keyCode, 'keydown');
+            intervalId = setInterval(() => {
+                triggerKeyEvent(keyCode, 'keydown');
+            }, 100);  // 每100ms持續輸出訊息
+        });
+
+        btn.addEventListener('touchend', () => {
+            clearInterval(intervalId);
+            triggerKeyEvent(keyCode, 'keyup');
+        });
+    }
+
+    // 上下左右鍵及空白鍵對應的KeyCode
+    handleContinuousInput(upBtn, 38);    // Up Arrow Key
+    handleContinuousInput(downBtn, 40);  // Down Arrow Key
+    handleContinuousInput(leftBtn, 37);  // Left Arrow Key
+    handleContinuousInput(rightBtn, 39); // Right Arrow Key
+    handleContinuousInput(spaceBtn, 32); // Space Key
+</script>
 <script src="game.js"></script>
 <script src="index.js"></script>
-<div style="text-align:center;">
-</div>
+
 </body>
 </html>
