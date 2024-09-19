@@ -1,174 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pac-Man</title>
-    <link rel="shortcut icon" href="pac-favicon.png">
-    <style>
-        body {
-            background-color: #292929;
-            user-select: none; /* 禁止選取文字 */
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-        .wrapper {
-            width: 960px;
-            margin: 0 auto;
-            text-align: center;
-            color: #999;
-        }
-        canvas {
-            display: block;
-            background: #000;
-        }
-        .controls {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-        .arrow-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            position: absolute;
-            right: 20px;
-            bottom: 20px;
-        }
-        .button {
-            width: 80px;
-            height: 80px;
-            background-color: #999;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 36px;
-            cursor: pointer;
-            user-select: none;
-        }
-        .button:active {
-            background-color: orange;
-        }
-        .directional-buttons {
-            display: grid;
-            grid-template-areas:
-                ". up ."
-                "left . right"
-                ". down .";
-            gap: 10px;
-            margin-right: 20px;
-        }
-        .directional-buttons button {
-            width: 80px;
-            height: 80px;
-            font-size: 32px;
-        }
-        .spacebar-button {
-            position: absolute;
-            left: 20px;
-            bottom: 20px;
-            width: 120px;
-            height: 120px;
-            background-color: #999;
-            border-radius: 50%;
-            font-size: 36px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-        }
-        .spacebar-button:active {
-            background-color: orange;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pac-Man</title>
+  <link rel="shortcut icon" href="pac-favicon.png">
+  <style>
+    body {
+      background-color: #292929;
+      user-select: none; /* 禁止選取文字 */
+      margin: 0;
+      padding: 0;
+    }
+    
+    .wrapper {
+      width: 960px;
+      margin: 0 auto;
+      text-align: center;
+      color: #999;
+    }
+
+    canvas {
+      display: block;
+      background: #000;
+      margin: 20px auto;
+    }
+
+    .mod-button {
+      height: 32px;
+      padding: 15px 0;
+      text-align: center;
+    }
+
+    /* 控制按鈕的樣式 */
+    .control-buttons {
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .arrow-buttons {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .button {
+      width: 80px;
+      height: 80px;
+      background-color: #ccc;
+      border-radius: 10px;
+      text-align: center;
+      line-height: 80px;
+      font-size: 36px;
+      color: #fff;
+      user-select: none;
+      transition: background-color 0.1s;
+    }
+
+    .button:active {
+      background-color: orange;
+    }
+
+    .control-buttons .button {
+      width: 100px;
+      height: 100px;
+      line-height: 100px;
+    }
+
+    .arrow-buttons .button {
+      width: 90px;
+      height: 90px;
+      line-height: 90px;
+    }
+
+    .no-select {
+      user-select: none; /* 禁止選取文字 */
+    }
+  </style>
 </head>
 <body>
 
 <div class="wrapper">
-    <canvas id="canvas" width="960" height="640">瀏覽器不支持html5語法</canvas>
+  <canvas id="canvas" width="960" height="640">瀏覽器不支持html5語法</canvas>
     <p>電腦操作：按［空格］開始與暫停，方向鍵操控</p>
     <p>手機操作：按 ［o］按鍵 開始與暫停，十字按鍵操控 </p>
 </div>
 
-<div class="controls">
-    <div class="arrow-buttons">
-        <div class="directional-buttons">
-            <button class="button" id="up-btn">▲</button>
-            <button class="button" id="left-btn">◀</button>
-            <button class="button" id="right-btn">▶</button>
-            <button class="button" id="down-btn">▼</button>
-        </div>
-    </div>
-    <div class="spacebar-button" id="spacebar-btn">o</div>
+<!-- 操作按鈕 -->
+<div class="control-buttons">
+  <div id="spacebar" class="button no-select">O</div>
+</div>
+
+<div class="arrow-buttons">
+  <div style="display: flex; justify-content: center; gap: 10px;">
+    <div id="up" class="button no-select">▲</div>
+  </div>
+  <div style="display: flex; justify-content: space-between; gap: 10px;">
+    <div id="left" class="button no-select">◄</div>
+    <div id="down" class="button no-select">▼</div>
+    <div id="right" class="button no-select">►</div>
+  </div>
 </div>
 
 <script src="game.js"></script>
 <script src="index.js"></script>
 
 <script>
-    let upPressed = false;
-    let downPressed = false;
-    let leftPressed = false;
-    let rightPressed = false;
-    let spacebarPressed = false;
+  // 禁止拖曳按鈕時選取內容
+  const buttons = document.querySelectorAll('.button');
+  buttons.forEach(button => {
+    button.style.webkitUserSelect = "none";
+    button.style.msUserSelect = "none";
+    button.style.userSelect = "none";
+  });
 
-    // 方向鍵事件處理
-    document.getElementById('up-btn').addEventListener('touchstart', function () {
-        upPressed = true;
-        console.log('Up pressed');
-    });
-    document.getElementById('up-btn').addEventListener('touchend', function () {
-        upPressed = false;
-        console.log('Up released');
+  // 空白鍵的行為（按一次送一次）
+  const spacebar = document.getElementById('spacebar');
+  spacebar.addEventListener('touchstart', () => {
+    triggerSpaceKey();
+    spacebar.style.backgroundColor = 'orange';
+    setTimeout(() => spacebar.style.backgroundColor = '#ccc', 100);
+  });
+
+  spacebar.addEventListener('click', () => {
+    triggerSpaceKey();
+    spacebar.style.backgroundColor = 'orange';
+    setTimeout(() => spacebar.style.backgroundColor = '#ccc', 100);
+  });
+
+  function triggerSpaceKey() {
+    // 在這裡添加空白鍵的邏輯
+    const event = new KeyboardEvent('keydown', { key: ' ' });
+    document.dispatchEvent(event);
+  }
+
+  // 上下左右按鈕持續輸出訊息
+  const upButton = document.getElementById('up');
+  const downButton = document.getElementById('down');
+  const leftButton = document.getElementById('left');
+  const rightButton = document.getElementById('right');
+
+  const arrowButtons = [upButton, downButton, leftButton, rightButton];
+
+  arrowButtons.forEach(button => {
+    button.addEventListener('touchstart', () => {
+      triggerArrowKey(button.id);
+      button.style.backgroundColor = 'orange';
     });
 
-    document.getElementById('down-btn').addEventListener('touchstart', function () {
-        downPressed = true;
-        console.log('Down pressed');
-    });
-    document.getElementById('down-btn').addEventListener('touchend', function () {
-        downPressed = false;
-        console.log('Down released');
+    button.addEventListener('touchend', () => {
+      stopArrowKey(button.id);
+      button.style.backgroundColor = '#ccc';
     });
 
-    document.getElementById('left-btn').addEventListener('touchstart', function () {
-        leftPressed = true;
-        console.log('Left pressed');
-    });
-    document.getElementById('left-btn').addEventListener('touchend', function () {
-        leftPressed = false;
-        console.log('Left released');
+    button.addEventListener('mousedown', () => {
+      triggerArrowKey(button.id);
+      button.style.backgroundColor = 'orange';
     });
 
-    document.getElementById('right-btn').addEventListener('touchstart', function () {
-        rightPressed = true;
-        console.log('Right pressed');
+    button.addEventListener('mouseup', () => {
+      stopArrowKey(button.id);
+      button.style.backgroundColor = '#ccc';
     });
-    document.getElementById('right-btn').addEventListener('touchend', function () {
-        rightPressed = false;
-        console.log('Right released');
-    });
+  });
 
-    // 空白鍵事件處理
-    document.getElementById('spacebar-btn').addEventListener('touchstart', function () {
-        if (!spacebarPressed) {  // 每次按一次只輸出一次
-            spacebarPressed = true;
-            console.log('Spacebar pressed');
-            // 模擬按下空白鍵
-            // 在這裡加入你需要空白鍵發出的遊戲操作邏輯
-            setTimeout(function () {
-                spacebarPressed = false;
-            }, 200);  // 給空白鍵一個短暫的時間重置狀態
-        }
-    });
+  function triggerArrowKey(direction) {
+    const keyMap = {
+      up: 'ArrowUp',
+      down: 'ArrowDown',
+      left: 'ArrowLeft',
+      right: 'ArrowRight'
+    };
+    const event = new KeyboardEvent('keydown', { key: keyMap[direction] });
+    document.dispatchEvent(event);
+  }
+
+  function stopArrowKey(direction) {
+    const keyMap = {
+      up: 'ArrowUp',
+      down: 'ArrowDown',
+      left: 'ArrowLeft',
+      right: 'ArrowRight'
+    };
+    const event = new KeyboardEvent('keyup', { key: keyMap[direction] });
+    document.dispatchEvent(event);
+  }
 </script>
 
 </body>
