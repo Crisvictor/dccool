@@ -20,7 +20,7 @@
             background-color: transparent;
         }
 
-    .control-button {
+        .control-button {
             position: fixed;
             bottom: 20px;
             background-color: rgba(255, 255, 255, 0.2);
@@ -67,10 +67,32 @@
         .control-btn:hover {
             background-color: rgba(255, 255, 255, 0.4);
         }
-
-        .move-left { left: 20px; }
-        .move-right { left: 100px; }
-        .shoot { right: 20px; }
+        
+        #left-btn, #right-btn, #shoot-btn {
+            position: absolute;
+            opacity: 0.7;
+            z-index: 100; /* 確保按鈕位於最上層 */
+        }
+        @media only screen and (max-width: 768px) {
+        #left-btn {
+            bottom: 10px;
+            left: 10px;
+            width: 80px;
+            height: 80px;
+        }
+        #right-btn {
+            bottom: 10px;
+            left: 100px;
+            width: 80px;
+            height: 80px;
+        }
+        #shoot-btn {
+            bottom: 10px;
+            right: 10px;
+            width: 80px;
+            height: 80px;
+            }
+        }
         
         #score {
             position: absolute;
