@@ -10,6 +10,7 @@
         margin: 0;
         padding: 0;
         font-family: Arial, sans-serif;
+        user-select: none; /* 禁止選取文字 */
     }
 
     .wrapper {
@@ -137,7 +138,7 @@
         console.log('方向鍵按下:', direction);
     }
 
-    // 手機方向鍵監聽
+    // 手機方向鍵監聽，使用 touch 事件
     upBtn.addEventListener('touchstart', () => startHolding('up'));
     upBtn.addEventListener('touchend', () => stopHolding('up'));
 
@@ -154,6 +155,28 @@
     spaceBtn.addEventListener('click', () => {
         console.log('空白鍵按下');
         // 這裡處理空白鍵輸出的邏輯
+    });
+
+    // 電腦上使用鍵盤操作
+    document.addEventListener('keydown', (event) => {
+        switch(event.key) {
+            case 'ArrowUp':
+                sendDirectionInput('up');
+                break;
+            case 'ArrowDown':
+                sendDirectionInput('down');
+                break;
+            case 'ArrowLeft':
+                sendDirectionInput('left');
+                break;
+            case 'ArrowRight':
+                sendDirectionInput('right');
+                break;
+            case ' ':
+                console.log('空白鍵按下');
+                // 這裡處理空白鍵輸出邏輯
+                break;
+        }
     });
 </script>
 </body>
