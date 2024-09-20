@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@
       margin: 0;
       padding: 0;
     }
-    
+
     .wrapper {
       width: 960px;
       margin: 0 auto;
@@ -90,9 +90,9 @@
 <body>
 
 <div class="wrapper">
-  <canvas id="canvas" width="960" height="640">瀏覽器不支持html5語法</canvas>
-    <p>電腦操作：按［空格］開始與暫停，方向鍵操控</p>
-    <p>手機操作：按 ［o］按鍵 開始與暫停，十字按鍵操控 </p>
+  <canvas id="canvas" width="960" height="640">瀏覽器不支持HTML5語法</canvas>
+  <p>電腦操作：按［空格］開始與暫停，方向鍵操控</p>
+  <p>手機操作：按 ［o］按鍵 開始與暫停，十字按鍵操控 </p>	
 </div>
 
 <!-- 操作按鈕 -->
@@ -123,23 +123,23 @@
     button.style.userSelect = "none";
   });
 
-  // 空白鍵的行為（按一次送一次）
+  // 模擬空白鍵按下行為
   const spacebar = document.getElementById('spacebar');
+
   spacebar.addEventListener('touchstart', () => {
-    triggerSpaceKey();
+    simulateKeyPress(' ');
     spacebar.style.backgroundColor = 'orange';
     setTimeout(() => spacebar.style.backgroundColor = '#ccc', 100);
   });
 
   spacebar.addEventListener('click', () => {
-    triggerSpaceKey();
+    simulateKeyPress(' ');
     spacebar.style.backgroundColor = 'orange';
     setTimeout(() => spacebar.style.backgroundColor = '#ccc', 100);
   });
 
-  function triggerSpaceKey() {
-    // 在這裡添加空白鍵的邏輯
-    const event = new KeyboardEvent('keydown', { key: ' ' });
+  function simulateKeyPress(key) {
+    const event = new KeyboardEvent('keydown', { key: key });
     document.dispatchEvent(event);
   }
 
