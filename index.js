@@ -92,7 +92,7 @@
 				context.textAlign = 'right';
 				context.textBaseline = 'bottom';
 				context.fillStyle = '#AAA';
-				context.fillText('按下 〔空白〕 開始 ',this.x,this.y);
+				context.fillText('Press space to start',this.x,this.y);
 			}
 		});
 		//事件绑定
