@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pac-Man</title>
   <link rel="shortcut icon" href="pac-favicon.png">
   <style>
     body {
       background-color: #292929;
+      user-select: none; /* 禁止選取文字 */
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      user-select: none; /* 禁止選取文字 */
     }
 
     .wrapper {
@@ -23,68 +24,42 @@
     canvas {
       display: block;
       background: #000;
-      margin: 0 auto;
+      margin: 20px auto;
     }
 
-    .controls {
+    .control-buttons, .arrow-buttons {
       position: fixed;
       z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
-    .control-button {
-      background-color: #aaa;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      margin: 10px;
-      font-size: 24px;
-      text-align: center;
-      line-height: 60px;
-      user-select: none; /* 禁止文字選取 */
-      touch-action: none; /* 禁止手勢滑動行為 */
-      -webkit-user-select: none; /* 為 iOS 設置不可選取 */
-    }
-
-    .control-button:active {
-      background-color: orange;
-    }
-
-    #up-btn {
-      position: fixed;
-      bottom: 150px;
-      right: 80px;
-    }
-
-    #down-btn {
-      position: fixed;
+    .control-buttons {
       bottom: 60px;
-      right: 80px;
+      left: 20px;
     }
 
-    #left-btn {
-      position: fixed;
-      bottom: 105px;
-      right: 140px;
-    }
-
-    #right-btn {
-      position: fixed;
-      bottom: 105px;
+    .arrow-buttons {
+      bottom: 60px;
       right: 20px;
     }
 
-    #space-btn {
-      position: fixed;
-      bottom: 60px;
-      left: 20px;
+    .button {
       width: 80px;
       height: 80px;
+      background-color: #aaa;
+      border-radius: 10px;
+      text-align: center;
       line-height: 80px;
-      font-size: 32px;
+      font-size: 36px;
+      color: #fff;
       user-select: none;
-      touch-action: none;
+      transition: background-color 0.1s;
+    }
+
+    .button:active {
+      background-color: orange;
     }
   </style>
 </head>
@@ -92,106 +67,82 @@
 
 <div class="wrapper">
   <canvas id="canvas" width="960" height="640">瀏覽器不支持html5語法</canvas>
-  <p>電腦操作：按［空格］開始與暫停，方向鍵操控</p>
-  <p>手機操作：按 ［O］按鍵 開始與暫停，十字按鍵操控</p>
+  <p>如果你是電腦玩家，按［空格］暫停或繼續</p>		
 </div>
 
 <!-- 手機控制按鈕 -->
-<div class="controls">
-  <button id="up-btn" class="control-button">▲</button>
-  <button id="down-btn" class="control-button">▼</button>
-  <button id="left-btn" class="control-button">◄</button>
-  <button id="right-btn" class="control-button">►</button>
-  <button id="space-btn" class="control-button">O</button>
+<div class="control-buttons">
+  <button id="space-btn" class="button">O</button>
+</div>
+
+<div class="arrow-buttons">
+  <div id="up-btn" class="button">▲</div>
+  <div style="display: flex; justify-content: space-between; gap: 10px;">
+    <div id="left-btn" class="button">◄</div>
+    <div id="down-btn" class="button">▼</div>
+    <div id="right-btn" class="button">►</div>
+  </div>
 </div>
 
 <script src="game.js"></script>
 <script src="index.js"></script>
 
 <script>
-  const upBtn = document.getElementById('up-btn');
-  const downBtn = document.getElementById('down-btn');
-  const leftBtn = document.getElementById('left-btn');
-  const rightBtn = document.getElementById('right-btn');
-  const spaceBtn = document.getElementById('space-btn');
-
-  // 設置方向鍵長按時連續輸入
-  let holdDirection = { up: false, down: false, left: false, right: false };
-
-  function startHolding(direction) {
-    holdDirection[direction] = true;
-    sendDirectionInput(direction); // 第一次按下即觸發
-    const intervalId = setInterval(() => {
-      if (holdDirection[direction]) {
-        sendDirectionInput(direction);
-      } else {
-        clearInterval(intervalId);
-      }
-    }, 100); // 每100毫秒連續輸入
-  }
-
-  function stopHolding(direction) {
-    holdDirection[direction] = false;
-  }
-
-  function sendDirectionInput(direction) {
-    // 這裡處理方向輸入的邏輯，例如傳送給遊戲程式
-    console.log('方向鍵按下:', direction);
-  }
-
-  // 手機方向鍵監聽，使用 touch 事件
-  upBtn.addEventListener('touchstart', () => startHolding('up'));
-  upBtn.addEventListener('touchend', () => stopHolding('up'));
-
-  downBtn.addEventListener('touchstart', () => startHolding('down'));
-  downBtn.addEventListener('touchend', () => stopHolding('down'));
-
-  leftBtn.addEventListener('touchstart', () => startHolding('left'));
-  leftBtn.addEventListener('touchend', () => stopHolding('left'));
-
-  rightBtn.addEventListener('touchstart', () => startHolding('right'));
-  rightBtn.addEventListener('touchend', () => stopHolding('right'));
-
-  // 空白鍵按一次輸出一次
-  spaceBtn.addEventListener('touchstart', () => {
-    triggerSpaceKey();
-    spaceBtn.style.backgroundColor = 'orange';
-    setTimeout(() => spaceBtn.style.backgroundColor = '#aaa', 100);
-  });
-
-  spaceBtn.addEventListener('click', () => {
-    triggerSpaceKey();
-    spaceBtn.style.backgroundColor = 'orange';
-    setTimeout(() => spaceBtn.style.backgroundColor = '#aaa', 100);
-  });
-
-  function triggerSpaceKey() {
-    const event = new KeyboardEvent('keydown', { key: ' ' });
-    document.dispatchEvent(event);
-    console.log('空白鍵按下');
-  }
-
-  // 電腦上使用鍵盤操作
-  document.addEventListener('keydown', (event) => {
-    switch(event.key) {
-      case 'ArrowUp':
-        sendDirectionInput('up');
-        break;
-      case 'ArrowDown':
-        sendDirectionInput('down');
-        break;
-      case 'ArrowLeft':
-        sendDirectionInput('left');
-        break;
-      case 'ArrowRight':
-        sendDirectionInput('right');
-        break;
-      case ' ':
-        console.log('空白鍵按下');
-        // 這裡處理空白鍵輸出邏輯
-        break;
+    // 模擬鍵盤事件
+    function triggerKeyEvent(keyCode, type) {
+        const event = new KeyboardEvent(type, { keyCode: keyCode, bubbles: true });
+        document.dispatchEvent(event);
     }
-  });
+
+    // 按住按鈕時連續觸發事件 (方向鍵)
+    function handleContinuousInput(btn, keyCode) {
+        let intervalId;
+
+        btn.addEventListener('touchstart', () => {
+            triggerKeyEvent(keyCode, 'keydown');
+            intervalId = setInterval(() => {
+                triggerKeyEvent(keyCode, 'keydown');
+            }, 100);  // 每100ms持續輸出訊息
+        });
+
+        btn.addEventListener('touchend', () => {
+            clearInterval(intervalId);
+            triggerKeyEvent(keyCode, 'keyup');
+        });
+
+        // 處理點擊事件，讓電腦也可以操作
+        btn.addEventListener('mousedown', () => {
+            triggerKeyEvent(keyCode, 'keydown');
+        });
+
+        btn.addEventListener('mouseup', () => {
+            triggerKeyEvent(keyCode, 'keyup');
+        });
+    }
+
+    // 單次按下的按鈕 (空白鍵)
+    function handleSingleInput(btn, keyCode) {
+        btn.addEventListener('touchstart', () => {
+            triggerKeyEvent(keyCode, 'keydown');
+            triggerKeyEvent(keyCode, 'keyup'); // 只觸發一次
+        });
+
+        // 處理點擊事件，讓電腦也可以操作
+        btn.addEventListener('click', () => {
+            triggerKeyEvent(keyCode, 'keydown');
+            triggerKeyEvent(keyCode, 'keyup'); // 只觸發一次
+        });
+    }
+
+    // 上下左右鍵 (持續輸出)
+    handleContinuousInput(document.getElementById('up-btn'), 38);    // Up Arrow Key
+    handleContinuousInput(document.getElementById('down-btn'), 40);  // Down Arrow Key
+    handleContinuousInput(document.getElementById('left-btn'), 37);  // Left Arrow Key
+    handleContinuousInput(document.getElementById('right-btn'), 39); // Right Arrow Key
+
+    // 空白鍵 (只輸出一次)
+    handleSingleInput(document.getElementById('space-btn'), 32);     // Space Key
 </script>
+
 </body>
 </html>
