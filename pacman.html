@@ -15,10 +15,14 @@
     }
 
     .wrapper {
-      width: 960px;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
       margin: 0 auto;
       text-align: center;
       color: #999;
+      align-items: flex-start; /* 置頂 */
     }
 
     canvas {
@@ -48,7 +52,7 @@
     .button {
       width: 80px;
       height: 80px;
-      background-color: #aaa;
+      background-color: rgba(255, 255, 255, 0.2);
       border-radius: 10px;
       text-align: center;
       line-height: 80px;
@@ -59,7 +63,7 @@
     }
 
     .button:active {
-      background-color: orange;
+      background-color: rgba(255, 165, 0, 0.2);
     }
 
         #up-btn {
@@ -96,6 +100,27 @@
       font-size: 32px;
       user-select: none;
       touch-action: none;
+    }
+
+        /* 橫屏模式 */
+        @media only screen and (orientation: landscape) {
+      .wrapper {
+        justify-content: center; /* 居中顯示遊戲窗口 */
+        align-items: center; /* 垂直居中 */
+      }
+
+      canvas {
+        width: 80vw; /* 設置 canvas 寬度為 80% 螢幕寬度 */
+        height: auto; /* 自動調整高度 */
+      }
+    }
+
+        /* 直立模式 */
+    @media only screen and (orientation: portrait) {
+      canvas {
+        width: 100vw; /* 直立模式下，遊戲窗口寬度佔滿整個螢幕寬度 */
+        height: auto; /* 高度自動調整 */
+      }
     }
   </style>
 </head>
