@@ -127,8 +127,7 @@
 <body>
 
 <div class="wrapper">
-  <canvas id="canvas" width="960" height="640">瀏覽器不支持html5語法</canvas>
-  <p>如果你是電腦玩家，按［空格］暫停或繼續</p>		
+  <canvas id="canvas" width="960" height="640">瀏覽器不支持html5語法</canvas>	
 </div>
 
 <!-- 手機控制按鈕 -->
@@ -183,10 +182,21 @@
 
     // 單次按下的按鈕 (空白鍵)
     function handleSingleInput(btn, keyCode) {
+        let isCooldown = false;  // 設置冷卻標誌
+        const cooldownTime = 500; // 冷卻時間，單位為毫秒
+
         btn.addEventListener('touchstart', () => {
+            if (isCooldown) return;  // 如果在冷卻中，則忽略按下事件
+
             triggerKeyEvent(keyCode, 'keydown');
             triggerKeyEvent(keyCode, 'keyup'); // 只觸發一次
+
+            isCooldown = true;  // 設置為冷卻狀態
+            setTimeout(() => {
+                isCooldown = false;  // 冷卻時間結束後允許再次觸發
+            }, cooldownTime);
         });
+    }
 
         // 處理點擊事件，讓電腦也可以操作
         btn.addEventListener('click', () => {
