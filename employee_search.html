@@ -17,6 +17,7 @@
       justify-content: center;
       height: 100vh;
       flex-direction: column;
+      padding: 10px; /* 在手機上增加內邊距 */
     }
 
     .container {
@@ -25,6 +26,8 @@
       padding: 20px;
       background-color: #333;
       border-radius: 8px;
+      width: 100%; /* 容器寬度為100% */
+      max-width: 500px; /* 控制最大寬度 */
     }
 
     h1 {
@@ -161,6 +164,21 @@
       color: red;
       font-size: 18px;
       margin-bottom: 20px;
+    }
+    
+    /* 媒體查詢，調整手機顯示 */
+    @media (max-width: 600px) {
+      body {
+        padding: 20px; /* 增加內邊距 */
+      }
+
+      .results {
+        max-height: 400px; /* 調整最大高度 */
+      }
+
+      .result-item span {
+        padding: 8px; /* 增加內邊距 */
+      }
     }
   </style>
 </head>
