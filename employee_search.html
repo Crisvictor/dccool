@@ -160,11 +160,24 @@
     }
 
     .branch {
-      background-color: #333;
+      background-color: #778899 !important;
     }
 
     .id, .name, .date {
       background-color: #5A5A5A;
+    }
+
+    .tra {
+      background-color: #5A5A5A;
+    }
+
+    .manager {
+      background-color: #ffbf00 !important; /* 金幣黃 for 訓別 */
+      color: black !important;
+      font-size: 14px !important; /* 設定較小的字體 */
+      padding: 2px 6px !important; /* 調整內邊距使其更小 */
+      border-radius: 6px !important; /* 調整邊框圓角 */
+      margin-top: 5px !important; /* 增加一點間距 */
     }
 
     footer {
@@ -249,13 +262,13 @@
 </div>
 
 <footer>
-  <p>當前版本：v20241022<br>問題聯繫：<a href="mailto:xd67332@gmail.com" style="color: silver;">xd67332@gmail.com</a></p>
+  <p>當前版本：v20241109<br>問題聯繫：<a href="mailto:xd67332@gmail.com" style="color: silver;">xd67332@gmail.com</a></p>
 </footer>
 
 <script>
   const employees = [
-    { branch: "經國", id: '1', name: "劉酈萱", dateOfEntry: "2022-1-1" },
-    { branch: "經國", id: '2', name: "賴柏滔", dateOfEntry: "2017-2-1" },
+    { branch: "總公司", id: '1', name: "劉酈萱", dateOfEntry: "2022-1-1" },
+    { branch: "經國", id: '2', name: "賴柏滔", dateOfEntry: "2017-2-1" , manager:"♤" },
     { branch: "經國", id: '7', name: "李彥杰", dateOfEntry: "2018-12-1" },
     { branch: "環東", id: '22', name: "馮韻庭", dateOfEntry: "2022-8-15" },
     { branch: "總公司", id: '25', name: "黃玫瑛", dateOfEntry: "2018-10-15" },
@@ -264,14 +277,14 @@
     { branch: "經國", id: '34', name: "石鈺眞", dateOfEntry: "2018-8-25" },
     { branch: "總公司", id: '36', name: "李靜琴", dateOfEntry: "2016-10-11" },
     { branch: "西門", id: '38', name: "吳國維", dateOfEntry: "2019-4-4" },
-    { branch: "西門", id: '39', name: "黃彥賓", dateOfEntry: "2019-6-4" },
+    { branch: "西門", id: '39', name: "黃彥賓", dateOfEntry: "2019-6-4" , manager:"♤" },
     { branch: "總公司", id: '43', name: "劉軒伍", dateOfEntry: "2017-5-2" },
     { branch: "龜山", id: '51', name: "劉琦", dateOfEntry: "2023-7-1" },
     { branch: "總公司", id: '53', name: "洪國揚", dateOfEntry: "2019-5-4" },
-    { branch: "三峽", id: '56', name: "郭文在", dateOfEntry: "2019-5-7" },
-    { branch: "中壢", id: '64', name: "劉婷婷", dateOfEntry: "2019-5-27" },
-    { branch: "板橋", id: '66', name: "曹瑜庭", dateOfEntry: "2019-6-1" },
-    { branch: "南崁", id: '70', name: "林秉燊", dateOfEntry: "2019-6-3" },
+    { branch: "桃鶯", id: '56', name: "郭文在", dateOfEntry: "2019-5-7" , manager:"♤" },
+    { branch: "中壢", id: '64', name: "劉婷婷", dateOfEntry: "2019-5-27" , manager:"♤" },
+    { branch: "板橋", id: '66', name: "曹瑜庭", dateOfEntry: "2019-6-1" , manager:"♤" },
+    { branch: "南崁", id: '70', name: "林秉燊", dateOfEntry: "2019-6-3" , manager:"♤" },
     { branch: "板橋", id: '88', name: "陳宣妤", dateOfEntry: "2019-7-4" },
     { branch: "中壢", id: '93', name: "范姜芊晴", dateOfEntry: "2019-7-23" },
     { branch: "中壢", id: '99', name: "彭鉦驊", dateOfEntry: "2019-9-1" },
@@ -279,17 +292,17 @@
     { branch: "正光", id: '122', name: "楊繼增", dateOfEntry: "2021-7-9" },
     { branch: "總公司", id: '129', name: "王韋翔", dateOfEntry: "2020-4-20" },
     { branch: "新泰", id: '156', name: "簡志有", dateOfEntry: "2020-7-1" },
-    { branch: "永和", id: '157', name: "林學儀", dateOfEntry: "2020-7-1" },
+    { branch: "永和", id: '157', name: "林學儀", dateOfEntry: "2020-7-1" , manager:"♤" },
     { branch: "西門", id: '159', name: "周彤瑾", dateOfEntry: "2020-7-1" },
     { branch: "南昌", id: '164', name: "胡書豪", dateOfEntry: "2020-7-20" },
-    { branch: "龜山", id: '177', name: "黃維震", dateOfEntry: "2020-8-6" },
+    { branch: "龜山", id: '177', name: "黃維震", dateOfEntry: "2020-8-6" , manager:"♤" },
     { branch: "環東", id: '188', name: "袁祥敏育嬰留停", dateOfEntry: "2020-8-20" },
     { branch: "南昌", id: '194', name: "周品如", dateOfEntry: "2022-8-1" },
     { branch: "總公司", id: '196', name: "何柏穎", dateOfEntry: "2020-9-10" },
     { branch: "西門", id: '199', name: "楊宸齡", dateOfEntry: "2020-9-21" },
     { branch: "龍安", id: '207', name: "曹喻涵", dateOfEntry: "2020-11-2" },
-    { branch: "三峽", id: '209', name: "林育滕", dateOfEntry: "2020-11-4" },
-    { branch: "板橋", id: '212', name: "呂欣庭", dateOfEntry: "2020-11-10" },
+    { branch: "三峽", id: '209', name: "林育滕", dateOfEntry: "2020-11-4" , manager:"♤" },
+    { branch: "板橋", id: '212', name: "呂欣庭", dateOfEntry: "2020-11-10" , manager:"♤" },
     { branch: "龍安", id: '214', name: "姜宛榕", dateOfEntry: "2020-11-17" },
     { branch: "總公司", id: '215', name: "陳鈞益", dateOfEntry: "2020-11-24" },
     { branch: "南崁", id: '216', name: "林倢煊", dateOfEntry: "2020-11-24" },
@@ -299,21 +312,21 @@
     { branch: "永和", id: '236', name: "佘心平", dateOfEntry: "2021-3-2" },
     { branch: "楊梅", id: '238', name: "李希蕓", dateOfEntry: "2022-9-1" },
     { branch: "板橋", id: '240', name: "歐陽禎", dateOfEntry: "2021-3-8" },
-    { branch: "大竹", id: '242', name: "陳維興", dateOfEntry: "2021-3-10" },
-    { branch: "新泰", id: '248', name: "林芷若", dateOfEntry: "2021-3-15" },
+    { branch: "大竹", id: '242', name: "陳維興", dateOfEntry: "2021-3-10" , manager:"♤" },
+    { branch: "新泰", id: '248', name: "林芷若", dateOfEntry: "2021-3-15" , manager:"♤" },
     { branch: "中壢", id: '261', name: "陳圓佳", dateOfEntry: "2022-4-15" },
     { branch: "西門", id: '262', name: "沈冠杰", dateOfEntry: "2021-5-6" },
     { branch: "新泰", id: '263', name: "鄧暐達", dateOfEntry: "2021-5-10" },
     { branch: "龜山", id: '270', name: "楊惟珽", dateOfEntry: "2021-7-26" },
     { branch: "龜山", id: '271', name: "宋品言", dateOfEntry: "2021-7-26" },
     { branch: "新泰", id: '275', name: "蔡宜衡", dateOfEntry: "2021-8-2" },
-    { branch: "竹北", id: '278', name: "黃羽豪", dateOfEntry: "2021-8-9" },
+    { branch: "竹北", id: '278', name: "黃羽豪", dateOfEntry: "2021-8-9" , manager:"♤" },
     { branch: "龍潭", id: '280', name: "陳嘉宏", dateOfEntry: "2022-10-3" },
     { branch: "三峽", id: '281', name: "以蜜.新固", dateOfEntry: "2021-8-25" },
-    { branch: "楊梅", id: '282', name: "李冠霖", dateOfEntry: "2021-9-1" },
-    { branch: "八德", id: '286', name: "胡哲誌", dateOfEntry: "2021-9-11" },
+    { branch: "楊梅", id: '282', name: "李冠霖", dateOfEntry: "2021-9-1" , manager:"♤" },
+    { branch: "八德", id: '286', name: "胡哲誌", dateOfEntry: "2021-9-11" , manager:"♤" },
     { branch: "龍潭", id: '301', name: "郭玉文", dateOfEntry: "2021-10-18" },
-    { branch: "福科", id: '306', name: "黃俊䥵", dateOfEntry: "2021-11-1" },
+    { branch: "福科", id: '306', name: "黃俊䥵", dateOfEntry: "2021-11-1" , manager:"♤" },
     { branch: "南崁", id: '307', name: "謝宗穎", dateOfEntry: "2021-11-1" },
     { branch: "楊梅", id: '311', name: "黃怡慧", dateOfEntry: "2021-11-1" },
     { branch: "楊梅", id: '318', name: "張義捷", dateOfEntry: "2021-11-22" },
@@ -329,12 +342,12 @@
     { branch: "桃鶯", id: '362', name: "林純鴻", dateOfEntry: "2022-3-1" },
     { branch: "正光", id: '373', name: "褚詠心", dateOfEntry: "2022-4-6" },
     { branch: "龍潭", id: '379', name: "黃建翔", dateOfEntry: "2022-4-13" },
-    { branch: "龍潭", id: '382', name: "薛舜鴻", dateOfEntry: "2022-4-26" },
+    { branch: "龍潭", id: '382', name: "薛舜鴻", dateOfEntry: "2022-4-26" , manager:"♤" },
     { branch: "龍潭", id: '386', name: "姚櫳軍", dateOfEntry: "2024-1-8" },
-    { branch: "正光", id: '391', name: "陳珊珊", dateOfEntry: "2022-5-17" },
+    { branch: "正光", id: '391', name: "陳珊珊", dateOfEntry: "2022-5-17" , manager:"♤" },
     { branch: "龍潭", id: '395', name: "江家瑜", dateOfEntry: "2022-5-21" },
-    { branch: "環東", id: '403', name: "謝東儒", dateOfEntry: "2022-6-1" },
-    { branch: "南昌", id: '405', name: "林奕煒", dateOfEntry: "2022-6-20" },
+    { branch: "環東", id: '403', name: "謝東儒", dateOfEntry: "2022-6-1" , manager:"♤" },
+    { branch: "南昌", id: '405', name: "林奕煒", dateOfEntry: "2022-6-20" , manager:"♤" },
     { branch: "總公司", id: '406', name: "黃晨瑜", dateOfEntry: "2022-6-20" },
     { branch: "公益", id: '408', name: "邱岱倫", dateOfEntry: "2022-6-29" },
     { branch: "大竹", id: '409', name: "黃妤蓁", dateOfEntry: "2022-7-4" },
@@ -343,12 +356,11 @@
     { branch: "板橋", id: '415', name: "洪雪真", dateOfEntry: "2022-7-11" },
     { branch: "環東", id: '418', name: "李承祖", dateOfEntry: "2022-8-1" },
     { branch: "公益", id: '419', name: "林冠廷", dateOfEntry: "2022-8-1" },
-    { branch: "崇德", id: '420', name: "陳柏翰", dateOfEntry: "2022-8-1" },
+    { branch: "崇德", id: '420', name: "陳柏翰", dateOfEntry: "2022-8-1" , manager:"♤" },
     { branch: "大竹", id: '424', name: "簡孟宸", dateOfEntry: "2022-8-5" },
     { branch: "竹北", id: '434', name: "詹芷榆", dateOfEntry: "2022-9-1" },
     { branch: "環東", id: '437', name: "鍾淇淇", dateOfEntry: "2022-9-1" },
-    { branch: "龍安", id: '441', name: "陳靚娟", dateOfEntry: "2022-9-15" },
-    { branch: "桃鶯", id: '445', name: "何瑞鈴", dateOfEntry: "2022-9-26" },
+    { branch: "龍安", id: '441', name: "陳靚娟", dateOfEntry: "2022-9-15" , manager:"♤" },
     { branch: "永和", id: '448', name: "林蘇", dateOfEntry: "2022-10-1" },
     { branch: "龍安", id: '454', name: "鄧圓坊", dateOfEntry: "2022-10-11" },
     { branch: "西門", id: '458', name: "李依軒", dateOfEntry: "2022-11-1" },
@@ -372,7 +384,7 @@
     { branch: "公益", id: '521', name: "蔡旻錡", dateOfEntry: "2023-5-1" },
     { branch: "竹北", id: '524', name: "張儀芳", dateOfEntry: "2023-5-2" },
     { branch: "板橋", id: '526', name: "林克樺", dateOfEntry: "2023-5-8" },
-    { branch: "永和", id: '527', name: "蕭琇蕙", dateOfEntry: "2023-5-9" },
+    { branch: "永和", id: '527', name: "蕭琇蕙", dateOfEntry: "2023-5-9" , manager:"♤" },
     { branch: "竹北", id: '532', name: "張家瑜", dateOfEntry: "2023-5-22" },
     { branch: "板橋", id: '535', name: "張元實", dateOfEntry: "2023-6-1" },
     { branch: "環東", id: '538', name: "王智昱", dateOfEntry: "2023-6-5" },
@@ -393,7 +405,7 @@
     { branch: "崇德", id: '579', name: "戴佳真", dateOfEntry: "2023-8-21" },
     { branch: "楊梅", id: '581', name: "張庭毓", dateOfEntry: "2023-8-21" },
     { branch: "竹北", id: '582', name: "鄭安妤", dateOfEntry: "2023-8-30" },
-    { branch: "公益", id: '583', name: "沈采渝", dateOfEntry: "2023-9-1" },
+    { branch: "公益", id: '583', name: "沈采渝", dateOfEntry: "2023-9-1" , manager:"♤" },
     { branch: "八德", id: '584', name: "莊芊慧", dateOfEntry: "2023-9-1" },
     { branch: "永和", id: '585', name: "鄭塏頻", dateOfEntry: "2023-9-1" },
     { branch: "新泰", id: '586', name: "李芷萱", dateOfEntry: "2023-9-11" },
@@ -410,7 +422,7 @@
     { branch: "龍潭", id: '610', name: "徐悅誠", dateOfEntry: "2023-11-13" },
     { branch: "西門", id: '613', name: "莊翔智", dateOfEntry: "2023-12-4" },
     { branch: "中壢", id: '617', name: "陳宓", dateOfEntry: "2023-12-19" },
-    { branch: "西門", id: '618', name: "李慧君", dateOfEntry: "2023-12-21" },
+    { branch: "西門", id: '618', name: "李慧君", dateOfEntry: "2023-12-21" , manager:"♤" },
     { branch: "總公司", id: '619', name: "施旻秀", dateOfEntry: "2023-12-26" },
     { branch: "八德", id: '620', name: "蘇宥哲", dateOfEntry: "2024-1-1" },
     { branch: "經國", id: '622', name: "陳孟廷", dateOfEntry: "2024-1-2" },
@@ -440,7 +452,6 @@
     { branch: "南崁", id: '675', name: "黃偉", dateOfEntry: "2024-5-27" },
     { branch: "永和", id: '678', name: "羅以軒", dateOfEntry: "2024-6-11" },
     { branch: "大竹", id: '679', name: "黃禹媜", dateOfEntry: "2024-6-11" },
-    { branch: "崇德", id: '682', name: "楊佳真", dateOfEntry: "2024-6-24" },
     { branch: "永和", id: '686', name: "王譽蓁", dateOfEntry: "2024-7-1" },
     { branch: "經國", id: '688', name: "張雅玲", dateOfEntry: "2024-7-1" },
     { branch: "崇德", id: '689', name: "蘇宸志", dateOfEntry: "2024-7-1" },
@@ -449,7 +460,6 @@
     { branch: "楊梅", id: '695', name: "羅元鴻", dateOfEntry: "2024-7-15" },
     { branch: "西門", id: '696', name: "陳佳郁", dateOfEntry: "2024-8-1" },
     { branch: "經國", id: '698', name: "李亭儀", dateOfEntry: "2024-8-1" },
-    { branch: "竹北", id: '701', name: "張靖蓉", dateOfEntry: "2024-8-1" },
     { branch: "崇德", id: '702', name: "江福餘", dateOfEntry: "2024-8-7" },
     { branch: "中壢", id: '703', name: "羅懷彥", dateOfEntry: "2024-8-19" },
     { branch: "板橋", id: '704', name: "邱彥斐", dateOfEntry: "2024-8-20" },
@@ -461,7 +471,10 @@
     { branch: "環東", id: '710', name: "盧韻涵(建教生)", dateOfEntry: "2024-9-30" },
     { branch: "桃鶯", id: '712', name: "徐紫筠", dateOfEntry: "2024-10-01" },
     { branch: "南崁", id: '713', name: "丘育瑄", dateOfEntry: "2024-10-01" },
-    { branch: "崇德", id: '714', name: "邱旻瑄", dateOfEntry: "2024-10-21" }
+    { branch: "崇德", id: '714', name: "邱旻瑄", dateOfEntry: "2024-10-21" },
+    { branch: "竹北", id: '715', name: "陳怡穎", dateOfEntry: "2024-10-29" },
+    { branch: "龍潭", id: '716', name: "范振淵", dateOfEntry: "2024-11-01" },
+    { branch: "楊梅", id: '717', name: "韓德富", dateOfEntry: "2024-11-04" }
   ];
 
   const correctPassword = [2, 4, 5, 7];
@@ -537,50 +550,67 @@
     document.querySelectorAll('.line').forEach(line => line.remove());
   }
 
-  function searchEmployees() {
+function searchEmployees() {
     const input = document.getElementById('employeeIdInput').value.trim();
     const selectedBranch = document.getElementById('branchSelect').value;
     const resultsDiv = document.getElementById('searchResults');
     resultsDiv.innerHTML = '';
 
     const filteredEmployees = employees.filter(emp => {
-      const matchId = emp.id.includes(input);
-      const matchBranch = !selectedBranch || emp.branch === selectedBranch;
-      return matchId && matchBranch;
+        const matchId = emp.id.includes(input);
+        const matchBranch = !selectedBranch || emp.branch === selectedBranch;
+        return matchId && matchBranch;
     });
 
     if (filteredEmployees.length > 0) {
-      filteredEmployees.forEach(emp => {
-        const resultItem = document.createElement('div');
-        resultItem.classList.add('result-item');
-        
-        const branchSpan = document.createElement('span');
-        branchSpan.textContent = `分店: ${emp.branch}`;
-        branchSpan.classList.add('branch');
-        
-        const idSpan = document.createElement('span');
-        idSpan.textContent = `工號: ${emp.id}`;
-        idSpan.classList.add('id');
-        
-        const nameSpan = document.createElement('span');
-        nameSpan.textContent = `姓名: ${emp.name}`;
-        nameSpan.classList.add('name');
-        
-        const dateSpan = document.createElement('span');
-        dateSpan.textContent = `入職日期: ${emp.dateOfEntry}`;
-        dateSpan.classList.add('date');
-        
-        resultItem.appendChild(branchSpan);
-        resultItem.appendChild(idSpan);
-        resultItem.appendChild(nameSpan);
-        resultItem.appendChild(dateSpan);
-        
-        resultsDiv.appendChild(resultItem);
-      });
+        filteredEmployees.forEach(emp => {
+            const resultItem = document.createElement('div');
+            resultItem.classList.add('result-item');
+            
+            const branchSpan = document.createElement('span');
+            branchSpan.textContent = `${emp.branch}`;
+            branchSpan.classList.add('branch');
+            
+            const idSpan = document.createElement('span');
+            idSpan.textContent = `${emp.id}`;
+            idSpan.classList.add('id');
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = `${emp.name}`;
+            nameSpan.classList.add('name');
+            
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = `入職: ${emp.dateOfEntry}`;
+            dateSpan.classList.add('date');
+
+            // 依序加入各欄位
+            resultItem.appendChild(branchSpan);
+            resultItem.appendChild(idSpan);
+            resultItem.appendChild(nameSpan);
+            resultItem.appendChild(dateSpan);
+
+            // 如果 emp.Tra 有值，將訓別欄位加入最尾
+            if (emp.Tra) {
+                const traSpan = document.createElement('span');
+                traSpan.textContent = `${emp.Tra}`;
+                traSpan.classList.add('tra'); // 設定受訓樣式
+                resultItem.appendChild(traSpan);
+            }
+
+            // 如果 emp.manager 有值，將主管欄位加入最尾
+            if (emp.manager) {
+                const managerSpan = document.createElement('span');
+                managerSpan.textContent = `${emp.manager}`;
+                managerSpan.classList.add('manager'); // 設定金幣黃樣式
+                resultItem.appendChild(managerSpan);
+            }
+            
+            resultsDiv.appendChild(resultItem);
+        });
     } else {
-      resultsDiv.textContent = '無符合條件的員工';
+        resultsDiv.textContent = '無符合條件的員工';
     }
-  }
+}
 </script>
 
 </body>
