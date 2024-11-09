@@ -467,10 +467,9 @@
     { branch: "南崁", id: '675', name: "黃偉", dateOfEntry: "2024-5-27" },
     { branch: "永和", id: '678', name: "羅以軒", dateOfEntry: "2024-6-11" },
     { branch: "大竹", id: '679', name: "黃禹媜", dateOfEntry: "2024-6-11" },
-    { branch: "永和", id: '686', name: "王譽蓁", dateOfEntry: "2024-7-1" },
     { branch: "經國", id: '688', name: "張雅玲", dateOfEntry: "2024-7-1" },
     { branch: "崇德", id: '689', name: "蘇宸志", dateOfEntry: "2024-7-1" },
-    { branch: "板橋", id: '690', name: "王喬安", dateOfEntry: "2024-7-1" },
+    { branch: "板橋", id: '690', name: "王喬安", dateOfEntry: "2024-7-1"  , Tra:"✎" },
     { branch: "桃鶯", id: '694', name: "蘇乙芯", dateOfEntry: "2024-7-15" },
     { branch: "楊梅", id: '695', name: "羅元鴻", dateOfEntry: "2024-7-15" },
     { branch: "西門", id: '696', name: "陳佳郁", dateOfEntry: "2024-8-1" },
@@ -623,8 +622,8 @@ function searchEmployees() {
             // 如果 emp.suspended 有值，將停職欄位加入最尾
             if (emp.suspended) {
                 const suspendedSpan = document.createElement('span');
-                traSpan.textContent = `${emp.suspended}`;
-                traSpan.classList.add('suspended'); // 設定停職樣式
+                suspendedSpan.textContent = `${emp.suspended}`;
+                suspendedSpan.classList.add('suspended'); // 設定停職樣式
                 resultItem.appendChild(suspendedSpan);
             }
 
