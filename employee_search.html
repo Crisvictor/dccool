@@ -117,15 +117,15 @@
     }
 
     .search-container {
-      display: flex;       /* 讓搜尋框容器內的元素水平排列 */
-      gap: 10px;           /* 搜尋框之間的間距 */
+      display: flex;       /* 搜尋框容器內的元素水平排列 */
+      gap: 10px;           /* 搜尋框之間距 */
     }
 
-    #employeeIdInput, #employeeNameInput {
+    #branchSelect, #categorySelect, #employeeIdInput, #employeeNameInput {
       flex: 1;             /* 讓兩個搜尋框平分寬度 */
       padding: 8px;        /* 內邊距 */
       font-size: 14px;     /* 字體大小 */
-      border: 1px solid #ccc; /* 邊框 */
+      border: 1px solid #a3a3a3; /* 邊框 */
      border-radius: 4px;  /* 圓角 */
     }
 
@@ -332,6 +332,7 @@
     <input type="text" id="employeeIdInput" placeholder="輸入工號..." onkeyup="searchEmployees()">
     <input type="text" id="employeeNameInput" placeholder="輸入姓名..." onkeyup="searchEmployees()">
   </div>
+  <div class="search-container">
     <select id="branchSelect" onchange="searchEmployees()">
       <option value="">選擇分店</option>
       <option value="總公司">總公司</option>
@@ -358,9 +359,18 @@
       <option value="南昌">南昌</option>
       <option value="崇德">崇德</option>
     </select>
+    <select id="categorySelect" onchange="searchEmployees()">
+        <option value="">選擇類群</option>
+        <option value="manager">主管</option>
+        <option value="opto">驗光人員</option>
+        <option value="depot">倉儲</option>
+        <option value="trainee">建教生</option>
+        <option value="tra">技術訓</option>
+        <option value="suspended">停職</option>
+    </select>
+    </div>
     <div id="searchResults" class="results"></div>
-  </div>
-</div>
+    </div>
 
 <footer>
   <p>當前版本：v20241111<br>問題聯繫：<a href="mailto:xd67332@gmail.com" style="color: silver;">xd67332@gmail.com</a></p>
@@ -622,7 +632,7 @@
     previousDot = null;
   }
 
-  function drawLine(fromDot, toDot) {
+  function drawLine(fromDot, toDot) {  // 密碼線條造型
     const grid = document.getElementById('grid');
     const fromRect = fromDot.getBoundingClientRect();
     const toRect = toDot.getBoundingClientRect();
@@ -645,7 +655,7 @@
     grid.appendChild(line);
     }
 
-    function resetDots() {
+    function resetDots() {   // 密碼輸入錯誤刷新重置
       document.querySelectorAll('.dot').forEach(dot => {
         dot.classList.remove('active');
     });
@@ -655,7 +665,8 @@
     function searchEmployees() {
       const inputId = document.getElementById('employeeIdInput').value.trim();   // 取得工號輸入值
       const inputName = document.getElementById('employeeNameInput').value.trim(); // 取得姓名輸入值
-      const selectedBranch = document.getElementById('branchSelect').value;
+      const selectedBranch = document.getElementById('branchSelect').value;  // 分店選擇值
+      const selectedCategory = document.getElementById('categorySelect').value; // 屬性分類選擇值
       const resultsDiv = document.getElementById('searchResults');
       resultsDiv.innerHTML = '';
 
@@ -663,7 +674,8 @@
       const matchId = !inputId || emp.id.includes(inputId);   // 工號匹配
       const matchName = !inputName || emp.name.includes(inputName); // 姓名匹配
       const matchBranch = !selectedBranch || emp.branch === selectedBranch; // 分公司匹配
-      return matchId && matchName && matchBranch;
+      const matchCategory = !selectedCategory || emp[selectedCategory]; // 屬性分類匹配
+      return matchId && matchName && matchBranch && matchCategory;
    });
 
     if (filteredEmployees.length > 0) {
