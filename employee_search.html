@@ -189,10 +189,49 @@
     .manager { /* 主管標示✦ */
       background-color: #ffbf00 !important; /* 金幣黃 */
       color: white !important;
-      font-size: 14px !important; /* 設定字體大小 */
+      font-size: 16px !important; /* 設定字體大小 */
       padding: 2px 6px !important; /* 調整內邊距 */
       border-radius: 8px !important; /* 調整邊框圓角 */
       margin-top: 5px !important; /* 上間距 */
+    }
+
+    .trainee { /* 建教生標示❀ */
+      background-color: #43512a !important; /* 深綠 */
+      color: white !important;
+      font-size: 16px !important; /* 設定字體大小 */
+      padding: 2px 6px !important; /* 調整內邊距 */
+      border-radius: 8px !important; /* 調整邊框圓角 */
+      margin-top: 5px !important; /* 上間距 */
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .tooltip::after {
+      content: attr(data-tooltip); /* 提示文字 */
+      visibility: hidden;
+      opacity: 0;
+      width: 100px;
+      background-color: black;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: opacity 0.3s;
+    }
+
+    /* 當懸停時顯示提示框 */
+    .tooltip:hover::after {
+      visibility: visible;
+      opacity: 1;
     }
 
     footer {
@@ -391,7 +430,7 @@
     { branch: "環東", id: '497', name: "王羽萱", dateOfEntry: "2023-3-8" , Tra:"✎" },
     { branch: "永和", id: '498', name: "顏俊漢", dateOfEntry: "2023-3-13" },
     { branch: "南崁", id: '504', name: "何霈沂", dateOfEntry: "2023-3-20" , Tra:"✎" },
-    { branch: "竹北", id: '506', name: "劉怡涵", dateOfEntry: "2023-4-1" , Tra:"✎" },
+    { branch: "竹北", id: '506', name: "劉怡涵", dateOfEntry: "2023-4-1"  , Tra:"✎" },
     { branch: "福科", id: '507', name: "林孟穎", dateOfEntry: "2023-4-1" , Tra:"✎" },
     { branch: "楊梅", id: '509', name: "管孟琳", dateOfEntry: "2023-4-6" },
     { branch: "三峽", id: '512', name: "董又禎", dateOfEntry: "2023-4-10" , Tra:"✎" },
@@ -477,11 +516,11 @@
     { branch: "中壢", id: '703', name: "羅懷彥", dateOfEntry: "2024-8-19" },
     { branch: "板橋", id: '704', name: "邱彥斐", dateOfEntry: "2024-8-20" },
     { branch: "龍潭", id: '705', name: "藍莉鈞", dateOfEntry: "2024-9-1" },
-    { branch: "南崁", id: '706', name: "金洛伊", dateOfEntry: "2024-9-1" , Tra:"❀" },
-    { branch: "八德", id: '707', name: "沈勤崢", dateOfEntry: "2024-9-1" , Tra:"❀" },
-    { branch: "環東", id: '708', name: "謝旻言", dateOfEntry: "2024-9-1" , Tra:"❀" },
-    { branch: "八德", id: '709', name: "唐詩婷", dateOfEntry: "2024-9-30" , Tra:"❀" },
-    { branch: "環東", id: '710', name: "盧韻涵", dateOfEntry: "2024-9-30" , Tra:"❀" },
+    { branch: "南崁", id: '706', name: "金洛伊", dateOfEntry: "2024-9-1" , trainee:"❀" },
+    { branch: "八德", id: '707', name: "沈勤崢", dateOfEntry: "2024-9-1" , trainee:"❀" },
+    { branch: "環東", id: '708', name: "謝旻言", dateOfEntry: "2024-9-1" , trainee:"❀" },
+    { branch: "八德", id: '709', name: "唐詩婷", dateOfEntry: "2024-9-30" , trainee:"❀" },
+    { branch: "環東", id: '710', name: "盧韻涵", dateOfEntry: "2024-9-30" , trainee:"❀" },
     { branch: "桃鶯", id: '712', name: "徐紫筠", dateOfEntry: "2024-10-01" },
     { branch: "南崁", id: '713', name: "丘育瑄", dateOfEntry: "2024-10-01" },
     { branch: "崇德", id: '714', name: "邱旻瑄", dateOfEntry: "2024-10-21" },
@@ -556,14 +595,7 @@
     grid.appendChild(line);
   }
 
-  function resetDots() {
-    document.querySelectorAll('.dot').forEach(dot => {
-      dot.classList.remove('active');
-    });
-    document.querySelectorAll('.line').forEach(line => line.remove());
-  }
-
-function searchEmployees() {
+    function searchEmployees() {
     const input = document.getElementById('employeeIdInput').value.trim();
     const selectedBranch = document.getElementById('branchSelect').value;
     const resultsDiv = document.getElementById('searchResults');
@@ -596,34 +628,45 @@ function searchEmployees() {
             dateSpan.textContent = `入職: ${emp.dateOfEntry}`;
             dateSpan.classList.add('date');
 
-            // 依序加入各欄位
             resultItem.appendChild(branchSpan);
             resultItem.appendChild(idSpan);
             resultItem.appendChild(nameSpan);
             resultItem.appendChild(dateSpan);
 
-            // 如果 emp.Tra 有值，將訓別欄位加入最尾
+            // 訓別符號
             if (emp.Tra) {
                 const traSpan = document.createElement('span');
                 traSpan.textContent = `${emp.Tra}`;
-                traSpan.classList.add('tra'); // 設定受訓樣式
+                traSpan.classList.add('tra', 'tooltip');
+                traSpan.setAttribute('data-tooltip', '技術訓');
                 resultItem.appendChild(traSpan);
             }
 
-            // 如果 emp.manager 有值，將主管欄位加入最尾
+            // 主管符號
             if (emp.manager) {
                 const managerSpan = document.createElement('span');
                 managerSpan.textContent = `${emp.manager}`;
-                managerSpan.classList.add('manager'); // 設定金幣黃樣式
+                managerSpan.classList.add('manager', 'tooltip');
+                managerSpan.setAttribute('data-tooltip', '主管');
                 resultItem.appendChild(managerSpan);
             }
 
-            // 如果 emp.suspended 有值，將停職欄位加入最尾
+            // 停職符號
             if (emp.suspended) {
                 const suspendedSpan = document.createElement('span');
                 suspendedSpan.textContent = `${emp.suspended}`;
-                suspendedSpan.classList.add('suspended'); // 設定停職樣式
+                suspendedSpan.classList.add('suspended', 'tooltip');
+                suspendedSpan.setAttribute('data-tooltip', '停職');
                 resultItem.appendChild(suspendedSpan);
+            }
+
+            // 建教生符號
+            if (emp.trainee) {
+                const traineeSpan = document.createElement('span');
+                traineeSpan.textContent = `${emp.trainee}`;
+                traineeSpan.classList.add('trainee', 'tooltip');
+                traineeSpan.setAttribute('data-tooltip', '建教生');
+                resultItem.appendChild(traineeSpan);
             }
 
             resultsDiv.appendChild(resultItem);
@@ -632,6 +675,25 @@ function searchEmployees() {
         resultsDiv.textContent = '無符合條件的員工';
     }
 }
+
+//* 點擊顯示提示框，隨後再次點擊隱藏提示框 *//
+document.querySelectorAll('.tooltip').forEach(item => {
+    item.addEventListener('click', function() {
+        const tooltipText = this.querySelector('.tooltiptext');
+        tooltipText.style.visibility = tooltipText.style.visibility === 'visible' ? 'hidden' : 'visible';
+        tooltipText.style.opacity = tooltipText.style.opacity === '1' ? '0' : '1';
+
+        // 點擊外部時隱藏提示框
+        document.addEventListener('click', function hideTooltip(event) {
+            if (!item.contains(event.target)) {
+                tooltipText.style.visibility = 'hidden';
+                tooltipText.style.opacity = '0';
+                document.removeEventListener('click', hideTooltip);
+            }
+        });
+    });
+});
+
 </script>
 
 </body>
