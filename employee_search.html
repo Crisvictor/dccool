@@ -116,6 +116,19 @@
       box-sizing: border-box; /* 確保不超出 container */
     }
 
+    .search-container {
+      display: flex;       /* 讓搜尋框容器內的元素水平排列 */
+      gap: 10px;           /* 搜尋框之間的間距 */
+    }
+
+    #employeeIdInput, #employeeNameInput {
+      flex: 1;             /* 讓兩個搜尋框平分寬度 */
+      padding: 8px;        /* 內邊距 */
+      font-size: 14px;     /* 字體大小 */
+      border: 1px solid #ccc; /* 邊框 */
+     border-radius: 4px;  /* 圓角 */
+    }
+
     button {
       padding: 10px 20px;
       background-color: #ff6600;
@@ -166,13 +179,13 @@
     .id, .name, .date {
       background-color: #5A5A5A;
       margin-top: 3px !important; /* 增加一點間距 */
+      margin-bottom: 3px !important;    /* 下方間距 */
     }
 
     .tra { /* 技術訓標示🖊️ */
       display: inline-flex !important;
       background-color: #7cc396 !important; /* 草綠色 */
-      color: white !important;
-      font-size: 12px !important; /* 設定字體大小 */
+      font-size: 14px !important; /* 設定字體大小 */
       justify-content: center !important;   /* 水平置中 */
       width: 10px !important;
       height: 20px !important;
@@ -183,7 +196,6 @@
     .opto { /* 驗光人員標示👓 */
       display: inline-flex !important;
       background-color: #f5f5f5 !important; /* 白煙色 */
-      color: #191a1a !important;
       font-size: 14px !important; /* 設定字體大小 */
       justify-content: center !important;   /* 水平置中 */
       width: 10px !important;
@@ -195,7 +207,6 @@
     .suspended { /* 停職標示❄ */
       display: inline-flex !important;
       background-color: #539dec !important; /* 冰藍  */
-      color: white !important;
       font-size: 18px !important; /* 設定字體大小 */
       justify-content: center !important;   /* 水平置中 */
       width: 10px !important;
@@ -207,8 +218,7 @@
     .manager { /* 主管標示♠️ */
       display: inline-flex !important;
       background-color: #e6c35c !important; /* 金幣黃 */
-      color: white !important;
-      font-size: 22px !important; /* 設定字體大小 */
+      font-size: 14px !important; /* 設定字體大小 */
       justify-content: center !important;   /* 水平置中 */
       width: 10px !important;
       height: 20px !important;
@@ -219,7 +229,6 @@
     .trainee { /* 建教生標示🎓 */
       display: inline-flex !important;
       background-color: #eee8aa !important; /* 灰金菊色 */
-      color: white !important;
       font-size: 14px !important; /* 設定字體大小 */
       justify-content: center !important;   /* 水平置中 */
       width: 10px !important;
@@ -231,7 +240,6 @@
     .depot { /* 倉儲標示📦 */
       display: inline-flex !important;
       background-color: #d8bfd8 !important; /* 薊紫 */
-      color: white !important;
       font-size: 14px !important; /* 設定字體大小 */
       justify-content: center !important;   /* 水平置中 */
       width: 10px !important;
@@ -250,7 +258,7 @@
       content: attr(data-tooltip); /* 提示文字 */
       visibility: hidden;
       opacity: 0;
-      width: 100px;
+      width: 70px;
       background-color: black;
       color: #fff;
       text-align: center;
@@ -320,7 +328,10 @@
   <!-- 搜索區域 -->
   <div id="searchSection" class="hidden">
     <h1 id="searchTitle">員工查詢</h1>
+  <div class="search-container">
     <input type="text" id="employeeIdInput" placeholder="輸入工號..." onkeyup="searchEmployees()">
+    <input type="text" id="employeeNameInput" placeholder="輸入姓名..." onkeyup="searchEmployees()">
+  </div>
     <select id="branchSelect" onchange="searchEmployees()">
       <option value="">選擇分店</option>
       <option value="總公司">總公司</option>
@@ -642,16 +653,18 @@
     }
 
     function searchEmployees() {
-    const input = document.getElementById('employeeIdInput').value.trim();
-    const selectedBranch = document.getElementById('branchSelect').value;
-    const resultsDiv = document.getElementById('searchResults');
-    resultsDiv.innerHTML = '';
+      const inputId = document.getElementById('employeeIdInput').value.trim();   // 取得工號輸入值
+      const inputName = document.getElementById('employeeNameInput').value.trim(); // 取得姓名輸入值
+      const selectedBranch = document.getElementById('branchSelect').value;
+      const resultsDiv = document.getElementById('searchResults');
+      resultsDiv.innerHTML = '';
 
     const filteredEmployees = employees.filter(emp => {
-        const matchId = emp.id.includes(input);
-        const matchBranch = !selectedBranch || emp.branch === selectedBranch;
-        return matchId && matchBranch;
-    });
+      const matchId = !inputId || emp.id.includes(inputId);   // 工號匹配
+      const matchName = !inputName || emp.name.includes(inputName); // 姓名匹配
+      const matchBranch = !selectedBranch || emp.branch === selectedBranch; // 分公司匹配
+      return matchId && matchName && matchBranch;
+   });
 
     if (filteredEmployees.length > 0) {
         filteredEmployees.forEach(emp => {
