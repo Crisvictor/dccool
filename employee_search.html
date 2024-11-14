@@ -286,6 +286,20 @@
       margin-top: 20px;
     }
 
+  	.game-button {
+    	  position: relative; /* 設定相對位置，而不是固定 */
+    	  padding: 10px 20px;
+    	  background-color: #21315d; /* 按鈕背景顏色 */
+    	  color: #fff; /* 按鈕文字顏色 */
+ 	      border: none;
+     	  border-radius: 5px;
+    	  text-decoration: none;
+    	  font-size: 16px;
+    	  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    	  transition: background-color 0.3s;
+     	  display: inline-block; /* 確保按鈕為區塊元素 */
+  	}
+    
     #errorMessage {
       color: red; 
       text-align: center;
@@ -373,7 +387,7 @@
     </div>
 
 <footer>
-  <p>當前版本：v20241111<br>問題聯繫：<a href="mailto:xd67332@gmail.com" style="color: silver;">xd67332@gmail.com</a></p>
+  <p>當前版本：v20241115 <a href="index.html" class="game-button">扣項細則</a><br>問題聯繫：<a href="mailto:xd67332@gmail.com" style="color: silver;">xd67332@gmail.com</a></p>
 </footer>
 
 <script>
@@ -427,7 +441,7 @@
     { branch: "新泰", id: '248', name: "林芷若", dateOfEntry: "2021-3-15" , manager:"♠️" },
     { branch: "中壢", id: '261', name: "陳圓佳", dateOfEntry: "2022-4-15" , Tra:"🖊️" },
     { branch: "西門", id: '262', name: "沈冠杰", dateOfEntry: "2021-5-6" },
-    { branch: "新泰", id: '263', name: "鄧暐達", dateOfEntry: "2021-5-10" , Tra:"🖊️" },
+    { branch: "新泰", id: '263', name: "鄧暐達", dateOfEntry: "2021-5-10" , Tra:"🖊️" , manager:"♠️" },
     { branch: "龜山", id: '270', name: "楊惟珽", dateOfEntry: "2021-7-26" , opto:"👓" },
     { branch: "龜山", id: '271', name: "宋品言", dateOfEntry: "2021-7-26" , opto:"👓" },
     { branch: "新泰", id: '275', name: "蔡宜衡", dateOfEntry: "2021-8-2" , opto:"👓" },
@@ -578,8 +592,8 @@
     { branch: "環東", id: '708', name: "謝旻言", dateOfEntry: "2024-9-1" , trainee:"🎓" },
     { branch: "八德", id: '709', name: "唐詩婷", dateOfEntry: "2024-9-30" , trainee:"🎓" },
     { branch: "環東", id: '710', name: "盧韻涵", dateOfEntry: "2024-9-30" , trainee:"🎓" },
-    { branch: "桃鶯", id: '712', name: "徐紫筠", dateOfEntry: "2024-10-01" , opto:"👓" },
-    { branch: "南崁", id: '713', name: "丘育瑄", dateOfEntry: "2024-10-01" },
+    { branch: "桃鶯", id: '712', name: "徐紫筠", dateOfEntry: "2024-10-01" },
+    { branch: "南崁", id: '713', name: "丘育瑄", dateOfEntry: "2024-10-01" , opto:"👓" },
     { branch: "崇德", id: '714', name: "邱旻瑄", dateOfEntry: "2024-10-21" },
     { branch: "竹北", id: '715', name: "陳怡穎", dateOfEntry: "2024-10-29" },
     { branch: "龍潭", id: '716', name: "范振淵", dateOfEntry: "2024-11-01" , opto:"👓" },
@@ -587,6 +601,8 @@
     { branch: "大竹", id: '719', name: "陳伊琳", dateOfEntry: "2024-11-11" },
     { branch: "板橋", id: '720', name: "林依蝶", dateOfEntry: "2024-11-11" },
     { branch: "總公司", id: '721', name: "陳凱勛", dateOfEntry: "2024-11-11" , depot:"📦" },
+    { branch: "八德", id: '722', name: "戴一帆", dateOfEntry: "2024-11-12" , opto:"👓" },
+    { branch: "楊梅", id: '722', name: "翁藜甄", dateOfEntry: "2024-11-12" },
   ];
 
   const correctPassword = [2, 4, 5, 7];
