@@ -279,26 +279,50 @@
     }
 
     footer {
-      background-color: #1f1f1f;
-      padding: 10px;
-      text-align: center;
-      color: #aaa;
-      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;=
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #1a1a1a;
+      color: #ccc;
+      font-size: 14px;
     }
 
-  	.game-button {
-    	  position: relative; /* 設定相對位置，而不是固定 */
-    	  padding: 10px 20px;
-    	  background-color: #21315d; /* 按鈕背景顏色 */
-    	  color: #fff; /* 按鈕文字顏色 */
- 	      border: none;
-     	  border-radius: 5px;
-    	  text-decoration: none;
-    	  font-size: 16px;
-    	  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    	  transition: background-color 0.3s;
-     	  display: inline-block; /* 確保按鈕為區塊元素 */
-  	}
+    .footer-left {
+      flex: 1; 
+    }
+
+    .footer-right {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    footer a {
+      color: #ccc;
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      color: #fff; 
+    }
+    
+    .game-button {
+      padding: 10px 20px;
+      background-color: #3a4a7d;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 14px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s;
+      display: inline-block;
+    }
+
+    .game-button:hover {
+      background-color: #4a5c9a;
+    }
     
     #errorMessage {
       color: red; 
@@ -387,7 +411,13 @@
     </div>
 
 <footer>
-  <p>當前版本：v20241115 <a href="index.html" class="game-button">扣項細則</a><br>問題聯繫：<a href="mailto:xd67332@gmail.com" style="color: silver;">xd67332@gmail.com</a></p>
+  <div class="footer-left">
+    <p>當前版本：v20241115</p>
+  </div>
+  <div class="footer-right">
+    <a href="index.html" class="game-button">扣項細則</a>
+    <p>問題聯繫：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
+  </div>
 </footer>
 
 <script>
@@ -602,7 +632,7 @@
     { branch: "板橋", id: '720', name: "林依蝶", dateOfEntry: "2024-11-11" },
     { branch: "總公司", id: '721', name: "陳凱勛", dateOfEntry: "2024-11-11" , depot:"📦" },
     { branch: "八德", id: '722', name: "戴一帆", dateOfEntry: "2024-11-12" , opto:"👓" },
-    { branch: "楊梅", id: '722', name: "翁藜甄", dateOfEntry: "2024-11-12" },
+    { branch: "楊梅", id: '723', name: "翁藜甄", dateOfEntry: "2024-11-12" },
   ];
 
   const correctPassword = [2, 4, 5, 7];
