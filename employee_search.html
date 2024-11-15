@@ -53,28 +53,28 @@
       cursor: pointer;
       user-select: none;
       transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2); /* 多層陰影 */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2); 
     }
 
     .dot:hover {
       transform: translateY(-7px); /* 懸浮效果 */
-      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.3); /* 陰影更強 */
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.3); 
     }
 
     .dot.active {
       background-color: orange;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3); /* 按下時的陰影效果 */
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
     }
 
     .line {
       position: absolute;
       height: 4px;
       background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0) 100%); /* 漸變效果 */
-      box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5); /* 光暈效果 */
-      border-radius: 2px; /* 圓潤的邊角 */
+      box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+      border-radius: 2px;
       transform-origin: left;
       z-index: 1;
-      transition: all 0.2s ease; /* 平滑過渡 */
+      transition: all 0.2s ease; 
     }
 
     .line::after {
@@ -86,7 +86,7 @@
       border-radius: 50%;
       top: -3px;
       right: -3px;
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6); /* 在連線末端添加微光點 */
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
     }
 
     .hidden {
@@ -100,7 +100,7 @@
       border-radius: 5px;
       margin-bottom: 10px;
       text-align: center;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2); /* 多層陰影 */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
     }
 
     /* 搜索區域 */
@@ -122,11 +122,11 @@
     }
 
     #branchSelect, #categorySelect, #employeeIdInput, #employeeNameInput {
-      flex: 1;             /* 讓兩個搜尋框平分寬度 */
-      padding: 8px;        /* 內邊距 */
-      font-size: 14px;     /* 字體大小 */
-      border: 1px solid #a3a3a3; /* 邊框 */
-      border-radius: 4px;  /* 圓角 */
+      flex: 1;            
+      padding: 8px;       
+      font-size: 14px;     
+      border: 1px solid #a3a3a3; 
+      border-radius: 4px;  
     }
 
     #searchResults {
@@ -151,7 +151,7 @@
 
     /* 搜索結果 */
     .results {
-      max-height: 300px;
+      max-height: 350px;
       overflow-y: auto;
       background-color: #222;
       padding: 15px;
@@ -159,13 +159,15 @@
     }
 
     .result-item {
+      position: relative;
+      align-items: center;
       background-color: #444;
-      border-radius: 10px;
-      padding: 15px;
+      border-radius: 8px;
+      padding: 12px;
       margin-bottom: 10px;
       display: flex;
       flex-wrap: wrap;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
 
     .result-item span {
@@ -177,13 +179,37 @@
     }
 
     .branch {
+      position: absolute; top: 0; left: 0;
+      width: 40px !important; 
+      height: 40px !important; 
       background-color: #778899 !important;
+      font-size: 12px !important;
+      padding: 1px 1px !important;
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+      border-top-left-radius: 8px; 
+      border-bottom-right-radius: 8px;
+      z-index: 2;
     }
 
-    .id, .name, .date {
+    .date {
+      position: absolute ; bottom: 0; right: 0;
+      font-size: 12px !important; 
+      padding: 2px 5px !important;
+      background-color: rgba(255, 255, 255, 0.1) !important; /* 半透明背景 */
+      color: #ddd !important; 
+      border-radius: 4px;
+    }
+
+    .id, .name, 
       background-color: #5A5A5A;
-      margin-top: 3px !important; /* 增加一點間距 */
-      margin-bottom: 3px !important;    /* 下方間距 */
+      margin-top: 3px !important;
+      margin-bottom: 3px !important; 
+      z-index: 1;
+    }
+
+    .id {
+      position: relative;
+      margin-left: 59px !important;
     }
 
     .tra { /* 技術訓標示🖊️ */
@@ -283,24 +309,21 @@
     }
 
     footer {
+      position: relative;
       display: flex;
       justify-content: space-between;=
       align-items: center;
-      padding: 10px 20px;
+      padding: 5px 14px;
       background-color: #1a1a1a;
       color: #ccc;
-      font-size: 14px;
+      font-size: 13px;
       border-radius: 4px;
     }
 
-    .footer-left {
+    .footer-center {
       flex: 1; 
-    }
-
-    .footer-right {
       display: flex;
-      gap: 15px;
-      align-items: center;
+      justify-content: center; 
     }
 
     footer a {
@@ -311,18 +334,43 @@
     footer a:hover {
       color: #fff; 
     }
-    
+
+    footer img {
+      width: 60px; 
+      height: 60px; 
+      animation: moveFlip 6s infinite; 
+    }
+
+    @keyframes moveFlip {
+      0% {
+        transform: translateX(0) scaleX(1);
+      }
+      25% {
+        transform: translateX(-50px) scaleX(1); 
+      }
+      50% {
+        transform: translateX(-100px) scaleX(-1);
+      }
+      75% {
+        transform: translateX(-50px) scaleX(-1); 
+      }
+      100% {
+        transform: translateX(0) scaleX(1);
+      }
+    }
+
     .game-button {
+      position: absolute ; bottom: 15px; right: 20px;
       padding: 10px 12px;
       background-color: #3a4a7d;
       color: #fff;
       border: none;
       border-radius: 5px;
       text-decoration: none;
-      font-size: 14px;
+      font-size: 13px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       transition: background-color 0.3s;
-      display: inline-block;
+      z-index: 1;
     }
 
     .game-button:hover {
@@ -330,7 +378,7 @@
     }
     
     #errorMessage {
-      color: red; 
+      color: #e25c7d; 
       text-align: center;
       font-size: 18px; 
       margin-top: 20px; 
@@ -367,6 +415,10 @@
 
   <p id="errorMessage" class="error hidden">連接錯誤，請重試。</p>
   <div id="unlockMessage" class="unlock-message hidden">解鎖成功</div>
+
+
+  <audio id="audioPlayer" src="click1.mp3"></audio>
+  <audio id="successAudio" src="Inok1.mp3"></audio>
 
   <!-- 搜索區域 -->
   <div id="searchSection" class="hidden">
@@ -415,12 +467,11 @@
     <div id="searchResults" class="results"></div>
     </div>
 <footer>
-  <div class="footer-left">
-    <p>當前版本：v20241115</p><br>
-  </div>
-  <div class="footer-right">
-    <a href="index.html" class="game-button">扣項細則</a>
-    <p>問題聯繫：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
+    <p>當前版本：v20241115<br>
+    問題聯繫：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
+   <a href="index.html" class="game-button">扣項細則</a>
+  <div class="footer-center">
+    <img src="R2O.gif" alt="GIF Animation">
   </div>
 </footer>
 
@@ -475,7 +526,7 @@
     { branch: "新泰", id: '248', name: "林芷若", dateOfEntry: "2021-3-15" , manager:"♠️" },
     { branch: "中壢", id: '261', name: "陳圓佳", dateOfEntry: "2022-4-15" , Tra:"🖊️" },
     { branch: "西門", id: '262', name: "沈冠杰", dateOfEntry: "2021-5-6" },
-    { branch: "新泰", id: '263', name: "鄧暐達", dateOfEntry: "2021-5-10" , Tra:"🖊️" , manager:"♠️" },
+    { branch: "新泰", id: '263', name: "鄧暐達", dateOfEntry: "2021-5-10" , manager:"♠️" , Tra:"🖊️" },
     { branch: "龜山", id: '270', name: "楊惟珽", dateOfEntry: "2021-7-26" , opto:"👓" },
     { branch: "龜山", id: '271', name: "宋品言", dateOfEntry: "2021-7-26" , opto:"👓" },
     { branch: "新泰", id: '275', name: "蔡宜衡", dateOfEntry: "2021-8-2" , opto:"👓" },
@@ -644,6 +695,8 @@
   let previousDot = null;
 
   function selectDot(value, element) {
+    var audio = document.getElementById('audioPlayer');
+    audio.play();
     element.classList.add('active');
     currentInput.push(value);
 
@@ -660,6 +713,8 @@
 
   function checkPassword() {
     if (JSON.stringify(currentInput) === JSON.stringify(correctPassword)) {
+      var successAudio = document.getElementById('successAudio');
+      successAudio.play();
       document.getElementById('unlockMessage').classList.remove('hidden');
       document.getElementById('searchSection').classList.remove('hidden');
       document.getElementById('errorMessage').classList.add('hidden');
@@ -737,6 +792,10 @@
             branchSpan.textContent = `${emp.branch}`;
             branchSpan.classList.add('branch');
             
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = `In: ${emp.dateOfEntry}`;
+            dateSpan.classList.add('date');
+
             const idSpan = document.createElement('span');
             idSpan.textContent = `${emp.id}`;
             idSpan.classList.add('id');
@@ -744,24 +803,12 @@
             const nameSpan = document.createElement('span');
             nameSpan.textContent = `${emp.name}`;
             nameSpan.classList.add('name');
-            
-            const dateSpan = document.createElement('span');
-            dateSpan.textContent = `入職: ${emp.dateOfEntry}`;
-            dateSpan.classList.add('date');
 
             resultItem.appendChild(branchSpan);
+            resultItem.appendChild(dateSpan);
             resultItem.appendChild(idSpan);
             resultItem.appendChild(nameSpan);
-            resultItem.appendChild(dateSpan);
 
-            // 訓別符號
-            if (emp.Tra) {
-                const traSpan = document.createElement('span');
-                traSpan.textContent = `${emp.Tra}`;
-                traSpan.classList.add('tra', 'tooltip');
-                traSpan.setAttribute('data-tooltip', '技術訓');
-                resultItem.appendChild(traSpan);
-            }
 
             // 主管符號
             if (emp.manager) {
@@ -770,6 +817,24 @@
                 managerSpan.classList.add('manager', 'tooltip');
                 managerSpan.setAttribute('data-tooltip', '主管');
                 resultItem.appendChild(managerSpan);
+            }
+
+            // 驗光符號
+            if (emp.opto) {
+                const optoSpan = document.createElement('span');
+                optoSpan.textContent = `${emp.opto}`;
+                optoSpan.classList.add('opto', 'tooltip');
+                optoSpan.setAttribute('data-tooltip', '驗光人員');
+                resultItem.appendChild(optoSpan);
+            }
+
+            // 訓別符號
+            if (emp.Tra) {
+                const traSpan = document.createElement('span');
+                traSpan.textContent = `${emp.Tra}`;
+                traSpan.classList.add('tra', 'tooltip');
+                traSpan.setAttribute('data-tooltip', '技術訓');
+                resultItem.appendChild(traSpan);
             }
 
             // 停職符號
@@ -788,15 +853,6 @@
                 traineeSpan.classList.add('trainee', 'tooltip');
                 traineeSpan.setAttribute('data-tooltip', '建教生');
                 resultItem.appendChild(traineeSpan);
-            }
-
-            // 驗光符號
-            if (emp.opto) {
-                const optoSpan = document.createElement('span');
-                optoSpan.textContent = `${emp.opto}`;
-                optoSpan.classList.add('opto', 'tooltip');
-                optoSpan.setAttribute('data-tooltip', '驗光人員');
-                resultItem.appendChild(optoSpan);
             }
 
             // 倉儲符號
