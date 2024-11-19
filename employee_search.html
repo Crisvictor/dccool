@@ -212,7 +212,7 @@
       margin-left: 59px !important;
     }
 
-    .tra { /* 技術訓標示🖊️ */
+    .Tra { /* 技術訓標示🖊️ */
       display: inline-flex !important;
       background-color: #7cc396 !important; /* 草綠色 */
       font-size: 14px !important; /* 設定字體大小 */
@@ -830,11 +830,11 @@
 
             // 訓別符號
             if (emp.Tra) {
-                const traSpan = document.createElement('span');
-                traSpan.textContent = `${emp.Tra}`;
-                traSpan.classList.add('tra', 'tooltip');
-                traSpan.setAttribute('data-tooltip', '技術訓');
-                resultItem.appendChild(traSpan);
+                const TraSpan = document.createElement('span');
+                TraSpan.textContent = `${emp.Tra}`;
+                TraSpan.classList.add('Tra', 'tooltip');
+                TraSpan.setAttribute('data-tooltip', '技術訓');
+                resultItem.appendChild(TraSpan);
             }
 
             // 停職符號
