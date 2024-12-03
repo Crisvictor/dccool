@@ -131,6 +131,7 @@
           display: flex;
           gap: 10px;
           flex-wrap: wrap; /* 自動換行（小螢幕適配） */
+          margin: 20px; 
           margin-bottom: 20px;
         }
         /* 單個標籤 */
@@ -533,6 +534,11 @@ document.querySelector(".tags-container").appendChild(clearFilter);
 clearFilter.addEventListener("click", () => {
   articles.forEach(article => {
     article.style.display = "block";
+  });
+	
+  const tags = document.querySelectorAll(".tag");
+  tags.forEach(tag => {
+    tag.classList.remove("selected");
   });
 });
 	
