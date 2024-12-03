@@ -511,20 +511,29 @@ const articles = document.querySelectorAll(".article");
 // 點擊標籤事件
 tags.forEach(tag => {
   tag.addEventListener("click", () => {
-    const selectedTag = tag.dataset.tag;
+    tag.classList.toggle("active");
 
-    // 篩選文章
+    const activeTags = Array.from(document.querySelectorAll(".tag.active"))
+      .map(activeTag => activeTag.textContent.trim());
+
     articles.forEach(article => {
-      const tags = article.dataset.tags.split(" ");
-      if (tags.includes(selectedTag)) {
-        article.style.display = "block"; // 顯示
-      } else {
-        article.style.display = "none"; // 隱藏
-      }
+      const articleTags = article.dataset.tags.split(",");
+      article.style.display = activeTags.every(tag => articleTags.includes(tag))
+        ? "block"
+        : "none";
     });
   });
 });
+// 顯示所有按鈕
+clearFilter.addEventListener("click", () => {
+  articles.forEach(article => {
+    article.style.display = "block";
+  });
 
+  const activeTags = document.querySelectorAll(".tag.active");
+  activeTags.forEach(tag => tag.classList.remove("active"));
+});
+	
 // 顯示所有文章（如清除篩選）
 const clearFilter = document.createElement("button");
 clearFilter.textContent = "顯示所有";
