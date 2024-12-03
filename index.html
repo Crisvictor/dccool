@@ -536,9 +536,9 @@ clearFilter.addEventListener("click", () => {
     article.style.display = "block";
   });
 	
-  const tags = document.querySelectorAll(".tag");
+  const tags = document.querySelectorAll(".tag.active"); 
   tags.forEach(tag => {
-    tag.classList.remove("selected");
+    tag.classList.remove("active"); 
   });
 });
 	
