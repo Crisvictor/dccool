@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+  <title>隨機抽籤轉盤</title>
+  <style>
+    body {
+      font-family: "Noto Sans TC", sans-serif;
+      background-color: #0c2537;
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 30px;
+    }
+
+    .wheel-container {
+      position: relative;
+    }
+
+    #wheel {
+      width: 300px;
+      height: 300px;
+      border: 4px solid #fff;
+      border-radius: 50%;
+      z-index: 1;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .arrow {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 30px solid red;
+      transform: translateX(-50%) rotate(180deg); 
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+      z-index: 2;
+    }
+
+    textarea {
+      width: 200px;
+      height: 150px;
+      resize: none;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    #spinButton {
+      background-color: #238547;
+    }
+
+    #updateButton {
+      background-color: #2196f3;
+    }
+
+    .result {
+      background-color: #008000;
+      color: #fff;
+      font-size: 34px;
+      border-radius: 15px;
+      padding: 10px 20px;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      }
+
+    #resultBox {
+      position: absolute !important;
+      top: 30px !important; 
+      right: 10px !important; 
+      width: 200px; 
+      height: 100px; 
+      background-color: rgba(78, 125, 104, 0.9); 
+      border: 2px solid #333;  
+      border-radius: 10px; 
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+      font-size: 36px; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      display: none; 
+      z-index: 10;
+    }
+    
+  </style>
+</head>
+<body>
+  <h1>隨機抽籤轉盤</h1>
+
+  <div class="container">
+    <div class="wheel-container">
+      <div class="arrow"></div>
+      <svg id="wheel" viewBox="0 0 300 300"></svg>
+      <div class="buttons">
+        <button id="spinButton">開始抽籤</button>
+      </div>
+    </div>
+
+    <div class="options-container">
+      <textarea id="optionsInput" placeholder="請輸入選項，每行一個"></textarea>
+      <div class="buttons">
+        <button id="updateButton">更新選項</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="result" id="resultBox"></div>
+  <audio id="startSound" src="start-sound.mp3"></audio>
+  <audio id="resultSound" src="result-sound.mp3"></audio>
+
+  <script>
+const wheel = document.getElementById("wheel");
+const spinButton = document.getElementById("spinButton");
+const updateButton = document.getElementById("updateButton");
+const optionsInput = document.getElementById("optionsInput");
+const resultBox = document.getElementById("resultBox");
+
+let options = ["1", "2", "3", "4", "5", "6"];
+let spinning = false;
+
+ function isDarkColor(color) {
+      const hex = color.replace("#", "");
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness < 128;
+    }
+
+function drawWheel() {
+  wheel.innerHTML = "";
+  const numOptions = options.length;
+  if (numOptions === 0) {
+    alert('請輸入至少一個選項');
+    return;
+  }
+  const angleStep = 360 / numOptions;
+  const colors = ["#7cc396", "#5aa575", "#89b699", "#00a15c", "#2dce89", "#acdcc8", "#8fd9b6", "#6abf9c", "#a1e5d4", "#94d9c4"];
+
+  for (let i = 0; i < numOptions; i++) {
+    const angle = i * angleStep;
+    const color = colors[i % colors.length];
+
+    // 繪製扇形
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", describeArc(150, 150, 150, angle, angle + angleStep));
+    path.setAttribute("fill", color);
+    wheel.appendChild(path);
+
+    // 添加文字
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    const textRadius = 100; 
+    const x = 150 + textRadius * Math.cos((angle + angleStep / 2 - 90) * Math.PI / 180);
+    const y = 150 + textRadius * Math.sin((angle + angleStep / 2 - 90) * Math.PI / 180);
+    
+    text.setAttribute("x", x);
+    text.setAttribute("y", y);
+    text.setAttribute("text-anchor", "middle");
+    text.style.fontSize = "24px";
+
+    // 確保文字朝向圓心
+    const textAngle = angle + angleStep / 2;
+    let rotateAngle = textAngle;
+    if (textAngle > 90 && textAngle < 270) {
+      rotateAngle += 180; // 讓文字反轉
+    }
+
+    text.setAttribute("transform", `rotate(${rotateAngle}, ${x}, ${y})`);
+    text.textContent = options[i];
+
+    // 設定文字顏色
+    const textColor = isDarkColor(color) ? "#fff" : "#000";
+    text.setAttribute("fill", textColor);
+
+    wheel.appendChild(text);
+  }
+}
+
+function spinWheel() {
+  if (spinning) return;
+  spinning = true;
+
+  // 播放開始音效
+    const startSound = document.getElementById('startSound');
+  if (startSound) {
+    startSound.play().catch(error => console.warn('無法播放音效', error));
+  }
+
+  // 禁用按鈕並添加淡化效果
+  spinButton.disabled = true;
+  spinButton.style.opacity = "0.5";
+  spinButton.style.cursor = "not-allowed";
+
+  // 重置轉盤角度
+  wheel.style.transition = "none";
+  wheel.style.transform = "rotate(0deg)";
+
+  // 隨機選擇一個項目
+  const numOptions = options.length;
+  const randomIndex = Math.floor(Math.random() * numOptions);
+
+  // 計算停止的角度，確保停在 12 點鐘方向
+  const sliceDegree = 360 / numOptions;
+  const targetDegree = 360 - (randomIndex * sliceDegree + sliceDegree / 2);
+
+  // 加上 8 圈的旋轉
+  const spinDegree = 360 * 18 + targetDegree;
+
+  // 執行旋轉
+  setTimeout(() => {
+    wheel.style.transition = "transform 7.5s ease-out";
+    wheel.style.transform = `rotate(${spinDegree}deg)`;
+
+    // 動畫結束後顯示結果
+    setTimeout(() => {
+      resultBox.textContent = `抽中: ${options[randomIndex]}`;
+      resultBox.style.display = "flex";
+
+      // 播放結果音效（加上彩花）
+      const resultSound = document.getElementById('resultSound');
+      if (resultSound) {
+        resultSound.play().catch(error => console.warn('無法播放音效', error));
+      }
+      showConfetti();
+
+      // 7 秒後隱藏結果並重置按鈕
+      setTimeout(() => {
+        resultBox.style.display = "none";
+        spinning = false;
+        spinButton.disabled = false;
+        spinButton.style.opacity = "1";
+        spinButton.style.cursor = "pointer";
+      }, 7500);
+    },7500);
+  }, 10);
+}
+
+function describeArc(x, y, radius, startAngle, endAngle) {
+  const start = polarToCartesian(x, y, radius, endAngle);
+  const end = polarToCartesian(x, y, radius, startAngle);
+  const largeArcFlag = (endAngle - startAngle + 360) % 360 > 180 ? "1" : "0";
+
+  return [
+    "M", x, y,
+    "L", start.x, start.y,
+    "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+    "Z"
+  ].join(" ");
+}
+
+function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+  const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+  return {
+    x: centerX + (radius * Math.cos(angleInRadians)),
+    y: centerY + (radius * Math.sin(angleInRadians))
+  };
+}
+
+spinButton.addEventListener("click", spinWheel);
+updateButton.addEventListener("click", () => {
+  const newOptions = optionsInput.value.trim().split("\n").map(opt => opt.trim()).filter(opt => opt);
+  if (newOptions.length === 0) {
+    alert("請輸入至少一個選項");
+    return;
+  }
+  options = newOptions;
+  drawWheel();
+});
+
+// 初始繪製轉盤
+drawWheel();
+
+    function showConfetti() {
+      confetti({ particleCount: 100, spread: 70, origin: { x: 0 } });
+      confetti({ particleCount: 100, spread: 70, origin: { x: 1 } });
+    }
+
+  </script>
+</body>
+</html>
