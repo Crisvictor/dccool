@@ -6,12 +6,18 @@
     <link rel="icon" href="truble.ico" type="image/x-icon">
     <link rel="shortcut icon" href="truble.ico" type="image/x-icon">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
-  <title>隨機抽籤轉盤</title>
+  <title>命運抽籤轉盤</title>
   <style>
     body {
       font-family: "Noto Sans TC", sans-serif;
-      background-color: #0c2537;
+      min-height: 100vh;
       color: #fff;
+      background-image: 
+        linear-gradient(rgba(0, 25, 43, 0.74), rgba(0, 25, 43, 0.74)), /* 半透明濾鏡 */
+        url('Wall.jpg');
+      background-size: cover; 
+      background-position: center;
+      background-repeat: no-repeat;
       text-align: center;
       margin: 0;
       padding: 20px;
@@ -35,7 +41,7 @@
       border: 4px solid #fff;
       border-radius: 50%;
       z-index: 1;
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 1px 15px rgba(0, 0, 0, 0.6);
     }
 
     .arrow {
@@ -46,9 +52,9 @@
       height: 0;
       border-left: 15px solid transparent;
       border-right: 15px solid transparent;
-      border-bottom: 30px solid red;
+      border-bottom: 30px solid #617dbf;
       transform: translateX(-50%) rotate(180deg); 
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+      filter: drop-shadow(0 -8px 3px rgba(0, 0, 0, 0.7));
       z-index: 2;
     }
 
@@ -75,11 +81,32 @@
     }
 
     #spinButton {
+      margin-top: 20px;
       background-color: #238547;
     }
 
     #updateButton {
       background-color: #2196f3;
+    }
+
+    #clock {
+      font-size: 18px;
+      margin-top: 20px;
+      line-height: 1.5; 
+    }
+
+    #timeDisplay {
+      margin-top: 20px;              
+      padding: 10px 20px;
+      font-size: 18px; 
+      text-align: center;  
+      color: #fff;  
+      background-color: #192e3a; 
+      border-radius: 8px;  
+      box-shadow: inset 0px 2px 5px rgba(0, 0, 0, 0.7);
+      width: fit-content;     
+      margin-left: auto;          
+      margin-right: auto;
     }
 
     .result {
@@ -97,11 +124,11 @@
 
     #resultBox {
       position: absolute !important;
-      top: 30px !important; 
-      right: 10px !important; 
-      width: 200px; 
-      height: 100px; 
-      background-color: rgba(78, 125, 104, 0.9); 
+      top: 425px !important; 
+      width: 270px; 
+      height: 40px; 
+      text-align: center; 
+      background-color: rgba(78, 125, 104, 1); 
       border: 2px solid #333;  
       border-radius: 10px; 
       box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
@@ -114,24 +141,59 @@
       z-index: 10;
     }
     
+    .template-buttons {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .template-buttons button {
+      padding: 10px 15px;
+      background-color: #24367d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.2s;
+    }
+
+    .template-buttons button:hover {
+      background-color: #384a91;
+    }
+
   </style>
 </head>
 <body>
-  <h1>隨機抽籤轉盤</h1>
+  <h1>抽籤轉盤</h1>
 
   <div class="container">
     <div class="wheel-container">
       <div class="arrow"></div>
       <svg id="wheel" viewBox="0 0 300 300"></svg>
       <div class="buttons">
-        <button id="spinButton">開始抽籤</button>
+        <button id="spinButton">啟動轉盤</button>
+      </div>
+
+      <div id="timeDisplay">
+        <div id="date"></div>
+        <div id="time"></div>
       </div>
     </div>
-
+  
     <div class="options-container">
-      <textarea id="optionsInput" placeholder="請輸入選項，每行一個"></textarea>
+      <textarea id="optionsInput" placeholder="請輸入抽籤選項，每行一個"></textarea>
       <div class="buttons">
-        <button id="updateButton">更新選項</button>
+        <button id="updateButton">更新轉盤</button>
+        <div class="template-buttons">
+          <button id="coinTemplate">擲硬幣</button>
+          <button id="foodTemplate">點餐</button>
+          <button id="gunTemplate">左輪手槍</button>
+        </div>
+        <div class="template-buttons">
+          <button id="diceTemplate">骰子</button>
+          <button id="playTemplate">聚會</button>
+          <button id="weekTemplate">排假</button>
       </div>
     </div>
   </div>
@@ -181,24 +243,31 @@ function drawWheel() {
 
     // 添加文字
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    const textRadius = 100; 
-    const x = 150 + textRadius * Math.cos((angle + angleStep / 2 - 90) * Math.PI / 180);
-    const y = 150 + textRadius * Math.sin((angle + angleStep / 2 - 90) * Math.PI / 180);
+    const textRadius = 110; 
+    const midAngle = angle + angleStep / 2;
+    const x = 150 + textRadius * Math.cos((midAngle - 90) * Math.PI / 180);
+    const y = 150 + textRadius * Math.sin((midAngle - 90) * Math.PI / 180);
     
     text.setAttribute("x", x);
     text.setAttribute("y", y);
     text.setAttribute("text-anchor", "middle");
-    text.style.fontSize = "24px";
+    text.setAttribute("dominant-baseline", "middle");
 
-    // 確保文字朝向圓心
-    const textAngle = angle + angleStep / 2;
-    let rotateAngle = textAngle;
-    if (textAngle > 90 && textAngle < 270) {
-      rotateAngle += 180; // 讓文字反轉
+    // 讓文字的側邊面向圓心
+    text.setAttribute("transform", `rotate(${midAngle + 90}, ${x}, ${y})`);
+
+    // 根據字數和選項數量調整字型大小
+    const optionText = options[i];
+    let fontSize = "24px"; // 預設字型大小
+
+    if (options.length > 17) {
+      fontSize = "14px"; // 如果選項數量超過17個字型調小
+    } else if (optionText.length > 3) {
+      fontSize = "16px"; // 如果字數超過3個字型調小
     }
 
-    text.setAttribute("transform", `rotate(${rotateAngle}, ${x}, ${y})`);
-    text.textContent = options[i];
+    text.style.fontSize = fontSize;
+    text.textContent = optionText;
 
     // 設定文字顏色
     const textColor = isDarkColor(color) ? "#fff" : "#000";
@@ -235,8 +304,8 @@ function spinWheel() {
   const sliceDegree = 360 / numOptions;
   const targetDegree = 360 - (randomIndex * sliceDegree + sliceDegree / 2);
 
-  // 加上 8 圈的旋轉
-  const spinDegree = 360 * 18 + targetDegree;
+  // 圈數旋轉設定
+  const spinDegree = 360 * 12 + targetDegree;
 
   // 執行旋轉
   setTimeout(() => {
@@ -302,10 +371,78 @@ updateButton.addEventListener("click", () => {
 // 初始繪製轉盤
 drawWheel();
 
+    // 範例設定
+    const templates = {
+      coin: ["人頭(正面)", "數字(反面)"],
+      food: ["披薩", "速食", "便利商店", "水餃", "燒烤", "海鮮", "咖啡廳", "麵包", "麵類", "炸物", "港式", "泰式", "飯類", "早餐店", "泡麵", "鍋貼", "西餐"],
+      gun: ["miss", "miss", "miss", "💥", "miss", "miss"],
+      dice: ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"],
+      play: ["電影院","桌遊之夜","爬山遠足","博物館","露營","溫泉/泳池","餐廳","遊樂園","音樂廳","美術館","DIY勞作體驗","海邊","咖啡館","運動","烤肉","購物中心","觀光農場","公路旅行","森林公園","歡唱KTV"],
+      week: ["星期一","星期二","星期三","星期四","星期五","星期六","星期日"],
+    };
+
+// 按鈕事件監聽器
+document.getElementById("coinTemplate").addEventListener("click", () => {
+  options = templates.coin;
+  drawWheel();
+});
+
+document.getElementById("foodTemplate").addEventListener("click", () => {
+  options = templates.food;
+  drawWheel();
+});
+
+document.getElementById("gunTemplate").addEventListener("click", () => {
+  options = templates.gun;
+  drawWheel();
+});
+
+document.getElementById("diceTemplate").addEventListener("click", () => {
+  options = templates.dice;
+  drawWheel();
+});
+
+document.getElementById("playTemplate").addEventListener("click", () => {
+  options = templates.play;
+  drawWheel();
+});
+
+document.getElementById("weekTemplate").addEventListener("click", () => {
+  options = templates.week;
+  drawWheel();
+});
+
+    // 彩花
     function showConfetti() {
       confetti({ particleCount: 100, spread: 70, origin: { x: 0 } });
       confetti({ particleCount: 100, spread: 70, origin: { x: 1 } });
     }
+
+    // 時鐘
+    function updateClock() {
+      const now = new Date();
+      
+      // 取得年月日
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      
+      // 取得時分秒
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      
+      // 更新日期與時間
+      document.getElementById('date').textContent = `${year} 年 ${month} 月 ${day} 日`;
+      document.getElementById('time').textContent = `${hours} ： ${minutes} ： ${seconds} `;
+    }
+
+    // 每秒更新一次時鐘
+    setInterval(updateClock, 1000);
+
+    // 初始化時鐘
+    updateClock();
+
 
   </script>
 </body>
