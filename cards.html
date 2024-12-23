@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽籤與點名系統</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Helvetica", "Arial", "LiHei Pro", "黑體-繁", "微軟正黑體", sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        #video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #ffffff;
+            text-align: center;
+        }
+        #buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.3);
+        }
+        #shuffle-btn, #call-btn {
+            background-color: #89c6b9;
+        }
+        #shuffle-btn:hover, #call-btn:hover {
+            background-color: #77b2a7;
+        }
+        #clear-btn {
+            background-color: #e95c35;
+        }
+        #clear-btn:hover {
+            background-color: #d54422;
+        }
+        textarea {
+            display: block;
+            width: 100%;
+            max-width: 600px;
+            margin: 10px auto;
+            height: 150px;
+            background-color: rgba(227, 227, 227, 0.75);
+            color: #000;
+            border: 1px solid #000;
+            border-radius: 3px;
+            padding: 10px;
+            font-size: 16px;
+            box-shadow: inset 0px 3px 5px rgba(0, 0, 0, 0.2);
+            resize: none;
+            overflow-y: auto;
+        }
+        .example-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin: 20px auto;
+            background-color: rgba(61, 61, 61, 0.6);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            position: relative;
+        }
+        #example-options {
+            display: flex;
+            flex-direction: row;
+            gap: 5px;
+            margin-top: 10px; 
+            position: absolute;
+            left: 20%;
+            top: 0;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s ease;
+        }
+        #example-options.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+        .example-option {
+            writing-mode: horizontal-tb;
+            text-orientation: mixed;
+            text-align: center;
+            background-color: #176367;
+            color: #fff;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.3);
+        }
+        .example-option:hover {
+            background-color: #277377;
+        }
+        .example-container, #example-options {
+            writing-mode: unset;
+        }
+        #example-btn {
+            background-color: #003d40; 
+            color: #fff; 
+            padding: 10px 20px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.3);
+            text-align: center; 
+        }
+        #example-btn:hover {
+            background-color: #084548; 
+        }      
+        .card-container {
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(200, 200, 200, 0.3);
+            border-radius: 4px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+            border: 4px solid rgba(255, 255, 255, 0.5);
+        }
+        .card {
+            width: 80px;
+            height: 120px;
+            margin: 8px;
+            position: relative;
+            perspective: 1000px;
+            cursor: pointer; 
+        }
+        .card .inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            transform: rotateY(180deg); /* 初始狀態顯示背面 */
+        }
+        .card.hidden .inner {
+            transform: rotateY(0deg); /* 點擊後翻轉正面 */
+        }
+        .card .back, .card .front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            backface-visibility: hidden;
+        }
+        .card .back {
+            background-image: url('img/backcard.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        .card .front {
+            background-color: #e4dbcf;
+            color: #000;
+            font-weight: bold;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            transform: rotateY(180deg);
+        }
+        .dimmed {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(4px); 
+            -webkit-backdrop-filter: blur(2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        .dimmed-container { 
+            max-height: 100px !important;
+            padding: 5px ; 
+            overflow-y: auto !important;
+        }
+        .hoverable {
+            transition: transform 0.2s;
+        }
+        .hoverable:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <video id="video-background" autoplay muted loop>
+        <source src="Wall1.webm" type="video/webm">
+        Your browser does not support the video tag.
+    </video>
+    <div id="overlay"></div>
+
+    <h1>抽籤與點名系統</h1>
+
+    <div id="buttons-container">
+        <button id="shuffle-btn" class="button">洗牌抽籤</button>
+        <button id="call-btn" class="button">啟動點名</button>
+        <button id="clear-btn" class="button">清除資料</button>
+    </div>
+
+    <textarea id="input-area" placeholder="請輸入項目，每行一個項目"></textarea>
+
+    <div class="example-container">
+        <button id="example-btn" class="button">範例選擇</button>
+        <div id="example-options" class="horizontal-options">
+            <div class="example-option" data-value="經國\n大竹\n南崁\n南昌\n中壢\n環東\n桃鶯\n正光\n八德\n龍潭\n楊梅\n竹北\n公益\n福科\n崇德\n三峽\n板橋\n新泰\n龍安\n西門\n永和">分店點名</div>
+            <div class="example-option" data-value="A♠️\nK♠️\nQ♠️\nJ♠️\n10♠️\n9♠️\n8♠️\n7♠️\n6♠️\n5♠️\n4♠️\n3♠️\n2♠️\nA♥️\nK♥️\nQ♥️\nJ♥️\n10♥️\n9♥️\n8♥️\n7♥️\n6♥️\n5♥️\n4♥️\n3♥️\n2♥️\nA♦️\nK♦️\nQ♦️\nJ♦️\n10♦️\n9♦️\n8♦️\n7♦️\n6♦️\n5♦️\n4♦️\n3♦️\n2♦️\nA♣️\nK♣️\nQ♣️\nJ♣️\n10♣️\n9♣️\n8♣️\n7♣️\n6♣️\n5♣️\n4♣️\n3♣️\n2♣️\n鬼王\n小鬼">撲克牌(54)</div>
+            <div class="example-option" data-value="A♠️\nK♠️\nQ♠️\nJ♠️\n10♠️\n9♠️\n8♠️\n7♠️\n6♠️\nA♥️\nK♥️\nQ♥️\nJ♥️\n10♥️\n9♥️\n8♥️\n7♥️\n6♥️\nA♦️\nK♦️\nQ♦️\nJ♦️\n10♦️\n9♦️\n8♦️\n7♦️\nA♣️\nK♣️\nQ♣️\nJ♣️\n10♣️\n9♣️\n8♣️\n7♣️\n鬼王\n小鬼">撲克牌(36)</div>
+        </div>
+    </div>
+
+    <div id="card-container" class="card-container"></div>
+
+    <script>
+        const inputArea = document.getElementById('input-area');
+        const cardContainer = document.getElementById('card-container');
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        const callBtn = document.getElementById('call-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const exampleBtn = document.getElementById('example-btn');
+        const exampleOptions = document.getElementById('example-options');
+        const exampleContainer = document.querySelector('.example-container'); 
+
+        exampleBtn.addEventListener('click', () => {
+            exampleOptions.classList.toggle('visible');
+        });
+
+        document.querySelectorAll('.example-option').forEach(option => {
+            option.addEventListener('click', () => {
+                inputArea.value = option.dataset.value.replace(/\\n/g, '\n');
+            });
+        });
+
+        shuffleBtn.addEventListener('click', () => {
+            const items = inputArea.value.trim().split('\n').filter(Boolean);
+            if (items.length < 2) {
+                alert('請至少輸入兩個項目進行抽籤！');
+                return;
+            }
+            inputArea.style.display = 'none';
+            exampleContainer.style.display = 'none'; 
+            cardContainer.style.display = 'flex';
+            cardContainer.innerHTML = '';
+            items.sort(() => Math.random() - 0.5);
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                const content = generateCardContent(item);
+                 card.innerHTML = `<div class="inner">
+                            <div class="back"></div>
+                            <div class="front">${content}</div>
+                          </div>`;
+                card.classList.add('hidden');
+                card.addEventListener('click', () => {
+                    card.classList.toggle('hidden');
+                });
+                cardContainer.appendChild(card);
+            });
+        });
+
+    function generateCardContent(item) {
+        if (item === '小鬼') {
+            return `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <img src="img/joker_small.png" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>`;
+        }
+        if (item === '鬼王') {
+            return `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <img src="img/joker_big.png" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>`;
+        }
+        if (item === '10♠️') {
+            return `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <img src="img/10_spades.png" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>`;
+        }
+        if (item === '10♥️') {
+           return `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <img src="img/10_hearts.png" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>`;
+        }
+        if (item === '10♦️') {
+            return `<div style="width: 100%; height: 100%; display: flex;     align-items: center; justify-content: center;">
+                        <img src="img/10_diamonds.png" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>`;
+        }
+        if (item === '10♣️') {
+            return `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <img src="img/10_clubs.png" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>`;
+        }
+        if (/[♥️♠️♣️♦️]/.test(item)) {
+            const symbol = item.match(/[♥️♠️♣️♦️]/)[0];
+            const number = item.replace(/[♥️♠️♣️♦️]/, '');
+            const displayText = (number === '10') 
+                ? `<span style="display: inline-block;">${item}</span>` 
+                : `<span style="writing-mode: vertical-rl;">${item}</span>`; 
+            return `
+                <div style="position: relative; width: 100%; height: 100%; padding: 5px;">
+                    <div style="position: absolute; top: 5px; left: 5px; font-size: 16px; font-weight: bold;">
+                    ${displayText}
+                    </div>
+                    <div style="position: absolute; bottom: 5px; right: 5px; font-size: 16px; font-weight: bold; transform: rotate(180deg);">
+                    ${displayText}
+                    </div>
+                </div>`;
+        }
+        return `<div style="text-align: center; font-size: 16px; font-weight: bold;">${item}</div>`;
+    }
+
+        callBtn.addEventListener('click', () => {
+            const items = inputArea.value.trim().split('\n').filter(Boolean);
+            if (items.length < 1) {
+                alert('請至少輸入一個項目進行點名！');
+                return;
+            }
+            inputArea.style.display = 'none';
+            exampleContainer.style.display = 'none'; 
+            cardContainer.style.display = 'flex';
+            cardContainer.innerHTML = '';
+            const colorMap = {
+                '#728ee2': ["經國","大竹","南崁","南昌","中壢","環東","桃鶯","正光","八德","龍潭","楊梅"],
+                '#9bc490': ["竹北"],
+                '#d4b280': ["公益","福科","崇德"],
+                '#b48cc8': ["三峽","板橋","新泰","龍安","西門","永和"]
+            };
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card hoverable';
+                card.textContent = item;
+                card.style.height = '28px'; 
+                card.style.lineHeight = '28px';
+                card.style.fontSize = '16px';
+                card.style.textAlign = 'center';
+                card.style.backgroundColor = '#e6c35c';
+                card.style.color = '#000';
+                card.style.fontWeight = 'bold';
+                card.style.borderRadius = '4px';
+                card.style.boxShadow = '0px 3px 5px rgba(0, 0, 0, 0.6)';
+                for (const [color, keywords] of Object.entries(colorMap)) {
+                    if (keywords.includes(item)) {
+                        card.style.backgroundColor = color;
+                        break;
+                    }
+                }
+                card.addEventListener('click', () => {
+                    card.classList.toggle('dimmed');
+                });
+                cardContainer.appendChild(card);
+            });
+        });
+
+        clearBtn.addEventListener('click', () => {
+            inputArea.value = '';
+            cardContainer.innerHTML = '';
+            inputArea.style.display = 'block';
+            exampleContainer.style.display = 'flex';
+            exampleOptions.style.visibility = 'flex';
+            cardContainer.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
