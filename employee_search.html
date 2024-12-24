@@ -359,6 +359,16 @@
       }
     }
 
+    .search-count {
+      background-color: #2f4f4f; 
+      color: white;
+      text-align: center;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+
     .game-button {
       position: absolute ; bottom: 15px; right: 20px;
       padding: 10px 12px;
@@ -466,6 +476,7 @@
     </div>
     <div id="searchResults" class="results"></div>
     </div>
+    <div id="searchCount" class="search-count hidden"></div>
 <footer>
     <p>當前版本：v20241224<br>
     問題聯繫：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
@@ -771,6 +782,7 @@
       const selectedBranch = document.getElementById('branchSelect').value;  // 分店選擇值
       const selectedCategory = document.getElementById('categorySelect').value; // 屬性分類選擇值
       const resultsDiv = document.getElementById('searchResults');
+      const searchCountDiv = document.getElementById('searchCount');
       resultsDiv.innerHTML = '';
 
     const filteredEmployees = employees.filter(emp => {
@@ -780,6 +792,14 @@
       const matchCategory = !selectedCategory || emp[selectedCategory]; // 屬性分類匹配
       return matchId && matchName && matchBranch && matchCategory;
    });
+
+   // 顯示搜尋結果數量
+    if (filteredEmployees.length > 0) {
+      searchCountDiv.textContent = `該搜尋結果共 ${filteredEmployees.length} 員`;
+      searchCountDiv.classList.remove('hidden');
+    } else {
+      searchCountDiv.classList.add('hidden');
+    }
 
     if (filteredEmployees.length > 0) {
         filteredEmployees.forEach(emp => {
