@@ -12,7 +12,16 @@
             padding: 0;
             font-family: "Helvetica", "Arial", "LiHei Pro", "黑體-繁", "微軟正黑體", sans-serif;
             min-height: 100vh;
-            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            overflow: auto;
+        }
+        #header-container {
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 10px; 
+            gap: 10px;
         }
         #video-background {
             position: fixed;
@@ -33,9 +42,9 @@
             z-index: -1;
         }
         h1 {
-            margin-bottom: 20px;
+            margin: 0;
             color: #ffffff;
-            text-align: center;
+            font-size: 18px;
         }
         #buttons-container {
             display: flex;
@@ -67,10 +76,11 @@
         }
         textarea {
             display: block;
-            width: 100%;
-            max-width: 600px;
+            width: 90%;
+            max-width: 550px;
             margin: 10px auto;
             height: 150px;
+            max-height: 300px; 
             background-color: rgba(227, 227, 227, 0.75);
             color: #000;
             border: 1px solid #000;
@@ -82,41 +92,42 @@
             overflow-y: auto;
         }
         .example-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            margin: 20px auto;
-            background-color: rgba(61, 61, 61, 0.6);
+            max-width: 550px;
+            width: 90%; 
+            margin: 20px auto; 
             padding: 10px;
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
-            max-width: 600px;
-            position: relative;
+            background-color: rgba(61, 61, 61, 0.6); 
+            display: flex;
+            flex-direction: column; 
+            align-items: flex-start;
+            overflow: hidden; 
+            gap: 10px;
         }
         #example-options {
-            display: flex;
-            flex-direction: row;
-            gap: 5px;
-            margin-top: 10px; 
-            position: absolute;
-            left: 20%;
-            top: 0;
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0s, opacity 0.3s ease;
+            display: none;
+            flex-wrap: wrap; /* 自動換行 */
+            gap: 5px; /* 子按鍵間距 */
+            padding: 10px;
+            width: 100%; /* 填滿父框寬度 */
+            max-height: 40vh; /* 限制最大高度 */
+            overflow-y: auto; /* 垂直滾動條 */
+            overflow-x: hidden; /* 禁止水平滾動 */
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.4); /* 半透明背景 */
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
         }
         #example-options.visible {
             visibility: visible;
             opacity: 1;
         }
         .example-option {
-            writing-mode: horizontal-tb;
-            text-orientation: mixed;
+            font-size: 12px;
             text-align: center;
             background-color: #176367;
             color: #fff;
-            padding: 5px 10px;
-            margin: 5px;
+            padding: 5px 8px;
             border-radius: 4px;
             cursor: pointer;
             box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.3);
@@ -126,12 +137,13 @@
         }
         .example-container, #example-options {
             writing-mode: unset;
+            width: 90%;
         }
         #example-btn {
             background-color: #003d40; 
             color: #fff; 
-            padding: 10px 20px; 
-            font-size: 16px; 
+            padding: 5px 10px; 
+            font-size: 14px; 
             font-weight: bold; 
             border-radius: 6px; 
             cursor: pointer; 
@@ -143,19 +155,20 @@
         }      
         .card-container {
             display: none;
+            max-width: 550px;
             flex-wrap: wrap;
             justify-content: center;
             margin: 20px auto;
             padding: 20px;
-            background-color: rgba(200, 200, 200, 0.3);
+            background-color: rgba(200, 200, 200, 0.2);
             border-radius: 4px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
-            border: 4px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
         .card {
-            width: 80px;
-            height: 120px;
-            margin: 8px;
+            width: 60px;
+            height: 100px;
+            margin: 6px;
             position: relative;
             perspective: 1000px;
             cursor: pointer; 
@@ -194,35 +207,120 @@
             text-orientation: upright;
             transform: rotateY(180deg);
         }
+        .container {
+            max-width: 800px; 
+            width: 90%; 
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
         .dimmed {
-            background-color: rgba(255, 255, 255, 0.1) !important;
+            background-color: rgba(100, 100, 100, 0.1) !important;
             backdrop-filter: blur(4px); 
             -webkit-backdrop-filter: blur(2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); 
             border-radius: 4px;
             transition: all 0.3s ease;
         }
         .dimmed-container { 
-            max-height: 100px !important;
-            padding: 5px ; 
+            display: none;
+            max-height: 70vh !important;
             overflow-y: auto !important;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 4px ; 
+        }
+        #time-display {
+            display: inline-block;
+            padding: 3px; 
+            font-size: 13px; 
+            color: #ffffff; 
+            background-color: rgba(0, 0, 0, 0.5); 
+            border-radius: 5px; 
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5); 
+            text-align: center; 
+            font-family: "Helvetica", "Arial", sans-serif; 
+        }
+        textarea::-webkit-scrollbar,
+        .dimmed-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track,
+        .dimmed-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3); 
+            border-radius: 10px; 
+        }
+        textarea::-webkit-scrollbar-thumb,
+        .dimmed-container::-webkit-scrollbar-thumb {
+            background: rgba(137, 198, 185, 0.8);
+            border-radius: 10px; 
+            border: 2px solid rgba(119, 136, 153, 0.5);
+            cursor: pointer; 
+        }
+        textarea::-webkit-scrollbar-thumb:hover,
+        .dimmed-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(77, 160, 140, 0.9); 
+        }
+        textarea::-webkit-scrollbar-corner,
+        .dimmed-container::-webkit-scrollbar-corner {
+            background: transparent;
         }
         .hoverable {
             transition: transform 0.2s;
         }
         .hoverable:hover {
-            transform: translateY(-5px);
+            transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+            .container {
+                width: 85% !important;
+            }
+            .card {
+                width: 50px; 
+                height: 80px;
+                font-size: 14px !important;
+            }
+            .card-container {
+                width: 90% !important;
+                max-height: 60vh !important;
+                padding: 8px !important;
+            }
+            .example-option {
+                left: 25% !important;
+                font-size: 10px; 
+                padding: 4px 4px;
+            }
+            #example-options {
+                max-height: 30vh; 
+            }
+            #example-btn {
+                padding: 8px 10px !important;
+                font-size: 12px !important;
+            }
+            textarea {
+                width: 90% !important;
+                max-width: 90% !important;
+            }
+            .example-container {
+                max-height: 40vh;
+                padding: 8px;
+                gap: 3px;
+                flex-direction: column; 
+            }
         }
     </style>
 </head>
 <body>
-    <video id="video-background" autoplay muted loop>
-        <source src="Wall1.webm" type="video/webm">
+    <video id="video-background" autoplay muted loop playsinline>
+        <source src="v/Wall1.webm" type="video/webm">
         Your browser does not support the video tag.
     </video>
     <div id="overlay"></div>
 
-    <h1>抽籤與點名系統</h1>
+    <div id="header-container">
+        <h1>大倉酷抽籤與點名系統</h1>
+        <div id="time-display"></div>
+    </div>
 
     <div id="buttons-container">
         <button id="shuffle-btn" class="button">洗牌抽籤</button>
@@ -235,9 +333,15 @@
     <div class="example-container">
         <button id="example-btn" class="button">範例選擇</button>
         <div id="example-options" class="horizontal-options">
-            <div class="example-option" data-value="經國\n大竹\n南崁\n南昌\n中壢\n環東\n桃鶯\n正光\n八德\n龍潭\n楊梅\n竹北\n公益\n福科\n崇德\n三峽\n板橋\n新泰\n龍安\n西門\n永和">分店點名</div>
-            <div class="example-option" data-value="A♠️\nK♠️\nQ♠️\nJ♠️\n10♠️\n9♠️\n8♠️\n7♠️\n6♠️\n5♠️\n4♠️\n3♠️\n2♠️\nA♥️\nK♥️\nQ♥️\nJ♥️\n10♥️\n9♥️\n8♥️\n7♥️\n6♥️\n5♥️\n4♥️\n3♥️\n2♥️\nA♦️\nK♦️\nQ♦️\nJ♦️\n10♦️\n9♦️\n8♦️\n7♦️\n6♦️\n5♦️\n4♦️\n3♦️\n2♦️\nA♣️\nK♣️\nQ♣️\nJ♣️\n10♣️\n9♣️\n8♣️\n7♣️\n6♣️\n5♣️\n4♣️\n3♣️\n2♣️\n鬼王\n小鬼">撲克牌(54)</div>
-            <div class="example-option" data-value="A♠️\nK♠️\nQ♠️\nJ♠️\n10♠️\n9♠️\n8♠️\n7♠️\n6♠️\nA♥️\nK♥️\nQ♥️\nJ♥️\n10♥️\n9♥️\n8♥️\n7♥️\n6♥️\nA♦️\nK♦️\nQ♦️\nJ♦️\n10♦️\n9♦️\n8♦️\n7♦️\nA♣️\nK♣️\nQ♣️\nJ♣️\n10♣️\n9♣️\n8♣️\n7♣️\n鬼王\n小鬼">撲克牌(36)</div>
+            <div class="example-option" data-value="1\n2\n3\n4\n5">數字</div>
+            <div class="example-option" data-value="經國\n大竹\n南崁\n南昌\n中壢\n環東\n桃鶯\n正光\n龜山\n八德\n龍潭\n楊梅\n竹北\n公益\n福科\n崇德\n三峽\n板橋\n新泰\n龍安\n西門\n永和">分店點名</div>
+            <div class="example-option" data-value="一月\n二月\n三月\n四月\n五月\n六月\n七月\n八月\n九月\n十月\n十一月\n十二月">月份</div>
+            <div class="example-option" data-value="大吉\n中吉\n小吉\n末吉\n凶\n大凶">御神籤</div>
+            <div class="example-option" data-value="愚者\n魔術師\n女祭司\n皇后\n皇帝\n教皇\n戀人\n戰車\n力量\n隱者\n命運之輪\n正義\n倒吊人\n死神\n節制\n惡魔\n閃電\n星星\n月亮\n太陽\n審判\n世界">塔羅牌</div>
+            <div class="example-option" data-value="A♠️\nK♠️\nQ♠️\nJ♠️\n10s\n9♠️\n8♠️\n7♠️\n6♠️\n5♠️\n4♠️\n3♠️\n2♠️\nA♥️\nK♥️\nQ♥️\nJ♥️\n10h\n9♥️\n8♥️\n7♥️\n6♥️\n5♥️\n4♥️\n3♥️\n2♥️\nA♦️\nK♦️\nQ♦️\nJ♦️\n10d\n9♦️\n8♦️\n7♦️\n6♦️\n5♦️\n4♦️\n3♦️\n2♦️\nA♣️\nK♣️\nQ♣️\nJ♣️\n10c\n9♣️\n8♣️\n7♣️\n6♣️\n5♣️\n4♣️\n3♣️\n2♣️\n鬼王\n小鬼">poker(54)</div>
+            <div class="example-option" data-value="A♠️\nK♠️\nQ♠️\nJ♠️\n10s\n9♠️\n8♠️\n7♠️\n6♠️\nA♥️\nK♥️\nQ♥️\nJ♥️\n10h\n9♥️\n8♥️\n7♥️\n6♥️\nA♦️\nK♦️\nQ♦️\nJ♦️\n10d\n9♦️\n8♦️\n7♦️\nA♣️\nK♣️\nQ♣️\nJ♣️\n10c\n9♣️\n8♣️\n7♣️\n鬼王\n小鬼">poker(36)</div>
+            <div class="example-option" data-value="A♥️\nK♥️\nQ♥️\nJ♥️\n10h\n9♥️\n8♥️\n7♥️\n6♥️\nA♦️\nK♦️\nQ♦️\nJ♦️\n10d\n9♦️\n8♦️\n7♦️\n鬼王">紅(18)</div>
+            <div class="example-option" data-value="A♠️\nK♠️\nQ♠️\nJ♠️\n10s\n9♠️\n8♠️\n7♠️\n6♠️\nA♣️\nK♣️\nQ♣️\nJ♣️\n10c\n9♣️\n8♣️\n7♣️\n小鬼">黑(18)</div>
         </div>
     </div>
 
@@ -246,6 +350,9 @@
     <script>
         const inputArea = document.getElementById('input-area');
         const cardContainer = document.getElementById('card-container');
+        cardContainer.classList.add('dimmed-container');
+        cardContainer.style.display = 'none';
+        const flipSound = new Audio('m/card.mp3');
         const shuffleBtn = document.getElementById('shuffle-btn');
         const callBtn = document.getElementById('call-btn');
         const clearBtn = document.getElementById('clear-btn');
@@ -254,7 +361,11 @@
         const exampleContainer = document.querySelector('.example-container'); 
 
         exampleBtn.addEventListener('click', () => {
-            exampleOptions.classList.toggle('visible');
+            if (exampleOptions.style.display === 'none' || exampleOptions.style.display === '') {
+                exampleOptions.style.display = 'flex';
+            } else {
+                exampleOptions.style.display = 'none';
+            }
         });
 
         document.querySelectorAll('.example-option').forEach(option => {
@@ -285,57 +396,94 @@
                 card.classList.add('hidden');
                 card.addEventListener('click', () => {
                     card.classList.toggle('hidden');
+                    flipSound.currentTime = 0; 
+                    flipSound.play(); 
                 });
                 cardContainer.appendChild(card);
             });
         });
 
+    const tarotImageMap = {
+        '愚者': 'img/t0.png',
+        '魔術師': 'img/t1.png',
+        '女祭司': 'img/t2.png',
+        '皇后': 'img/t3.png',
+        '皇帝': 'img/t4.png',
+        '教皇': 'img/t5.png',
+        '戀人': 'img/t6.png',
+        '戰車': 'img/t7.png',
+        '正義': 'img/t8.png',
+        '隱者': 'img/t9.png',
+        '命運之輪': 'img/t10.png',
+        '力量': 'img/t11.png',
+        '倒吊人': 'img/t12.png',
+        '死神': 'img/t13.png',
+        '節制': 'img/t14.png',
+        '惡魔': 'img/t15.png',
+        '閃電': 'img/t16.png',
+        '星星': 'img/t17.png',
+        '月亮': 'img/t18.png',
+        '太陽': 'img/t19.png',
+        '審判': 'img/t20.png',
+        '世界': 'img/t21.png',
+        '小鬼': 'img/joker_small.png',
+        '鬼王': 'img/joker_big.png',
+        '大吉': 'img/3g.png',
+        '中吉': 'img/2g.png',
+        '小吉': 'img/1g.png',
+        '末吉': 'img/0g.png',
+        '凶': 'img/1s.png',
+        '大凶': 'img/2s.png',
+        };
+
+    const suitSymbols = {
+        's': '♠️', 
+        'h': '♥️', 
+        'c': '♣️', 
+        'd': '♦️'  
+    };
+
     function generateCardContent(item) {
-        if (item === '小鬼') {
-            return `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                        <img src="img/joker_small.png" style="width: 100%; height: 100%; object-fit: contain;">
-                    </div>`;
-        }
-        if (item === '鬼王') {
-            return `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                        <img src="img/joker_big.png" style="width: 100%; height: 100%; object-fit: contain;">
-                    </div>`;
-        }
-        if (item === '10♠️') {
-            return `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                        <img src="img/10_spades.png" style="width: 100%; height: 100%; object-fit: contain;">
-                    </div>`;
-        }
-        if (item === '10♥️') {
-           return `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                        <img src="img/10_hearts.png" style="width: 100%; height: 100%; object-fit: contain;">
-                    </div>`;
-        }
-        if (item === '10♦️') {
-            return `<div style="width: 100%; height: 100%; display: flex;     align-items: center; justify-content: center;">
-                        <img src="img/10_diamonds.png" style="width: 100%; height: 100%; object-fit: contain;">
-                    </div>`;
-        }
-        if (item === '10♣️') {
-            return `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                        <img src="img/10_clubs.png" style="width: 100%; height: 100%; object-fit: contain;">
-                    </div>`;
+        if (tarotImageMap[item]) {
+            return `
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; 
+                            background-image: url('${tarotImageMap[item]}'); 
+                            background-size: cover; 
+                            background-position: center; 
+                            border-radius: 4px;">
+                </div>`;
+        }       
+        if (/^10[shcd]$/.test(item)) { 
+            const suit = item.charAt(2); 
+            const symbol = suitSymbols[suit]; 
+            return `
+                <div style="position: relative; width: 100%; height: 100%; padding: 5px;">
+                    <div style="position: absolute; top: 5px; left: 5px; font-weight: bold;">
+                        <span style="font-size: 14px; writing-mode: horizontal-tb;">10</span>
+                        <span style="font-size: 16px; writing-mode: vertical-rl;">${symbol}</span>
+                    </div>
+                    <div style="position: absolute; bottom: 5px; right: 5px; font-weight: bold; transform: rotate(180deg);">
+                        <span style="font-size: 14px; writing-mode: horizontal-tb;">10</span>
+                        <span style="font-size: 16px; writing-mode: vertical-rl;">${symbol}</span>
+                    </div>
+                </div>`;
         }
         if (/[♥️♠️♣️♦️]/.test(item)) {
             const symbol = item.match(/[♥️♠️♣️♦️]/)[0];
             const number = item.replace(/[♥️♠️♣️♦️]/, '');
             const displayText = (number === '10') 
-                ? `<span style="display: inline-block;">${item}</span>` 
+                ? `<span style="display: inline-block; font-size: 12px; writing-mode: horizontal-tb !important;">${number}</span>
+                   <span style="display: inline-block; font-size: 16px; writing-mode: vertical-rl;">${symbol}</span>`
                 : `<span style="writing-mode: vertical-rl;">${item}</span>`; 
             return `
                 <div style="position: relative; width: 100%; height: 100%; padding: 5px;">
                     <div style="position: absolute; top: 5px; left: 5px; font-size: 16px; font-weight: bold;">
-                    ${displayText}
+                        ${displayText}
                     </div>
                     <div style="position: absolute; bottom: 5px; right: 5px; font-size: 16px; font-weight: bold; transform: rotate(180deg);">
-                    ${displayText}
+                        ${displayText}
                     </div>
-                </div>`;
+               </div>`;
         }
         return `<div style="text-align: center; font-size: 16px; font-weight: bold;">${item}</div>`;
     }
@@ -351,7 +499,7 @@
             cardContainer.style.display = 'flex';
             cardContainer.innerHTML = '';
             const colorMap = {
-                '#728ee2': ["經國","大竹","南崁","南昌","中壢","環東","桃鶯","正光","八德","龍潭","楊梅"],
+                '#728ee2': ["經國","大竹","南崁","南昌","中壢","環東","桃鶯","正光","八德","龍潭","楊梅","龜山"],
                 '#9bc490': ["竹北"],
                 '#d4b280': ["公益","福科","崇德"],
                 '#b48cc8': ["三峽","板橋","新泰","龍安","西門","永和"]
@@ -378,6 +526,8 @@
                 }
                 card.addEventListener('click', () => {
                     card.classList.toggle('dimmed');
+                    card.classList.remove('hoverable'); 
+                    setTimeout(() => card.classList.add('hoverable'), 10); 
                 });
                 cardContainer.appendChild(card);
             });
@@ -391,6 +541,25 @@
             exampleOptions.style.visibility = 'flex';
             cardContainer.style.display = 'none';
         });
+
+        // 時間顯示函數
+        function updateTime() {
+            const now = new Date(); // 獲取當前時間
+            const year = now.getFullYear(); // 年
+            const month = String(now.getMonth() + 1).padStart(2, '0'); // 月 (補0)
+            const day = String(now.getDate()).padStart(2, '0'); // 日 (補0)
+            const hours = String(now.getHours()).padStart(2, '0'); // 時
+            const minutes = String(now.getMinutes()).padStart(2, '0'); // 分
+            const seconds = String(now.getSeconds()).padStart(2, '0'); // 秒
+
+    // 更新時間顯示內容
+            document.getElementById('time-display').textContent =
+                `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+        }
+        // 每秒更新一次時間
+        setInterval(updateTime, 1000);
+        // 頁面載入時先執行一次時間顯示
+        updateTime();
     </script>
 </body>
 </html>
