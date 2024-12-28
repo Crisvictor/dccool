@@ -9,7 +9,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #222, #111); /* 漸變背景 */
+      background: linear-gradient(135deg, #222, #111);
       color: white;
       margin: 0;
       padding: 0;
@@ -57,7 +57,7 @@
     }
 
     .dot:hover {
-      transform: translateY(-7px); /* 懸浮效果 */
+      transform: translateY(-7px); 
       box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.3); 
     }
 
@@ -113,12 +113,11 @@
       background-color: #444;
       color: white;
       font-size: 16px;
-      box-sizing: border-box; /* 確保不超出 container */
-    }
+      box-sizing: border-box;
 
     .search-container {
-      display: flex;       /* 搜尋框容器內的元素水平排列 */
-      gap: 10px;           /* 搜尋框之間距 */
+      display: flex;    
+      gap: 10px;
     }
 
     #branchSelect, #categorySelect, #employeeIdInput, #employeeNameInput {
@@ -149,7 +148,6 @@
       background-color: #ff4400;
     }
 
-    /* 搜索結果 */
     .results {
       max-height: 350px;
       overflow-y: auto;
@@ -285,7 +283,7 @@
     }
 
     .tooltip::after {
-      content: attr(data-tooltip); /* 提示文字 */
+      content: attr(data-tooltip);
       visibility: hidden;
       opacity: 0;
       width: 70px;
@@ -302,7 +300,6 @@
       transition: opacity 0.3s;
     }
 
-    /* 當懸停時顯示提示框 */
     .tooltip:hover::after {
       visibility: visible;
       opacity: 1;
@@ -478,7 +475,7 @@
     </div>
     <div id="searchCount" class="search-count hidden"></div>
 <footer>
-    <p>當前版本：v20241224<br>
+    <p>當前版本：v20241229<br>
     問題聯繫：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
    <a href="index.html" class="game-button">扣項細則</a>
   <div class="footer-center">
