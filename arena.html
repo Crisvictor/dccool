@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>兩隊制記分板</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: "Noto Sans TC", sans-serif;
+      min-height: 100vh;
+      color: #fff;
+      background-image: 
+        linear-gradient(rgba(0, 25, 43, 0.74), rgba(0, 25, 43, 0.74)),
+        url('Wall.jpg');
+      background-size: cover; 
+      background-position: center;
+      background-repeat: no-repeat;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .scoreboard {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background-color: #404040;
+      padding: 20px;
+      border-radius: 10px;
+      width: 250px;
+      position: relative;
+      color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .title {
+      font-size: 2em;
+      margin-bottom: 0px;
+      text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
+    }
+
+    .score {
+      font-size: 6em;
+      margin: 0px 0;
+      text-shadow: -4px -4px 0 #000, 4px -4px 0 #000, -4px 4px 0 #000, 4px 4px 0 #000;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 15px;
+      gap: 10px;
+    }
+
+    .btn-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      font-size: 2em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      box-shadow: 
+        inset 0px 1px 3px rgba(255, 255, 255, 0.6), 
+        inset 0px -1px 2px rgba(0, 0, 0, 0.3), 
+        0px 4px 6px rgba(0, 0, 0, 0.2); 
+      background: transparent;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-circle:hover {
+      transform: scale(1.1);
+      box-shadow: 
+        inset 0px 2px 4px rgba(255, 255, 255, 0.8), 
+        inset 0px -3px 5px rgba(0, 0, 0, 0.4),
+        0px 8px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-green {
+      background-color: rgba(115, 184, 57, 0.5);
+    }
+
+    .btn-red {
+      background-color: rgba(205, 92, 92, 0.5);
+    }
+
+    .transparent-btn {
+      background: transparent;
+      border-radius: 50%;
+      box-shadow: 
+        inset 0px 1px 3px rgba(255, 255, 255, 0.6), 
+        inset 0px -1px 2px rgba(0, 0, 0, 0.3), 
+        0px 4px 6px rgba(0, 0, 0, 0.2); 
+      color: #fff;
+      padding: 10px;
+      cursor: pointer;
+      border: none;
+      width: 40px;
+      height: 40px;
+      font-size: 1.5em;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+    }
+
+    .transparent-btn:last-child {
+      margin-right: 0;
+    }
+
+    .transparent-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 
+        inset 0px 2px 4px rgba(255, 255, 255, 0.8), 
+        inset 0px -3px 5px rgba(0, 0, 0, 0.4),
+        0px 8px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .timer {
+      font-size: 7em;
+      color: #ffc107;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 15px;
+      border-radius: 20px;
+      display: inline-block;
+      margin: 20px auto 10px auto;
+      text-shadow: -4px -4px 0 rgba(0, 0, 0, 0.7), 4px 4px 0 rgba(255, 255, 255, 0.3);
+      box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.6), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
+    }
+
+    .milliseconds {
+      font-size: 0.7em;
+    }
+
+    .countdown-container {
+      background-color: rgba(0, 0, 0, 0.6);
+      border-radius: 10px;
+      padding: 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .countdown-container input {
+      width: 50px;
+      text-align: center;
+      color: white;
+      background-color: #707070;
+      border: 1px solid black;
+      border-radius: 5px;
+    }
+
+    .countdown-container input::placeholder {
+      color: #8a8a8a;
+    }
+
+    .countdown-container span {
+      color: white;
+      font-size: 1.5em;
+    }
+
+    .control-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .control-buttons button {
+      height: 40px;
+      padding: 0 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 
+        inset 0px 1px 3px rgba(255, 255, 255, 0.6), 
+        inset 0px -1px 2px rgba(0, 0, 0, 0.3), 
+        0px 4px 6px rgba(0, 0, 0, 0.2); 
+    }
+
+    .btn-primary {
+        background-color: #008580 !important;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #00a18a !important;
+    }
+
+    .btn-warning {
+       background-color: #00a558 !important;
+       color: white;
+    }
+
+    .btn-warning:hover {
+       background-color: #33b772 !important;
+       color: white;
+    }
+
+    .btn-warning:focus {
+       color: white !important; 
+    }
+
+    .btn-danger {
+       background-color: #e75925 !important;
+       color: white;
+    }
+
+    .btn-danger:hover {
+       background-color: #f07f45 !important;
+    }
+
+    .color-picker {
+      display: none;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .color-option {
+      width: 25px;
+      height: 25px;
+      display: inline-block;
+      cursor: pointer;
+      border: 1px solid #000;
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>碼錶/記分板</h1>
+
+  <!-- 碼錶 -->
+  <div id="timer" class="timer">00:00<span class="milliseconds">.00</span></div>
+
+  <!-- 倒數計時與功能按鈕列 -->
+  <div class="control-buttons">
+    <div class="countdown-container">
+      <input type="text" id="countdown-minutes" placeholder="分">
+      <span>:</span>
+      <input type="text" id="countdown-seconds" placeholder="秒">
+      <button id="start-countdown" onclick="startCountdown()" class="btn btn-primary" disabled>倒數開始</button>
+    </div>
+      <div class="btn-container">
+       <button onclick="startTimer()" class="btn btn-primary">計時開始</button>
+       <button onclick="pauseTimer()" class="btn btn-warning">暫停</button>
+       <button onclick="resetTimer()" class="btn btn-danger">歸零</button>
+      </div>
+  </div>
+
+  <!-- 記分板 -->
+  <div class="scoreboard">
+    <!-- 主隊 -->
+    <div class="team-container">
+      <div class="card" id="teamA-card">
+        <div id="teamA-name" class="title">黑隊</div>
+        <div id="teamA-score" class="score">0</div>
+        <div class="action-buttons">
+          <button onclick="changeName('teamA')" class="transparent-btn">🔘</button>
+          <button onclick="showColorPicker('teamA')" class="transparent-btn">🎨</button>
+        </div>
+        <div id="teamA-color-picker" class="color-picker"></div>
+      </div>
+      <div class="btn-container">
+        <button onclick="changeScore('teamA', 1)" class="btn-circle btn-green">+</button>
+        <button onclick="changeScore('teamA', -1)" class="btn-circle btn-red">-</button>
+      </div>
+    </div>
+
+    <!-- 客隊 -->
+    <div class="team-container">
+      <div class="card" id="teamB-card">
+        <div id="teamB-name" class="title">紅隊</div>
+        <div id="teamB-score" class="score">0</div>
+        <div class="action-buttons">
+          <button onclick="changeName('teamB')" class="transparent-btn">🔘</button>
+          <button onclick="showColorPicker('teamB')" class="transparent-btn">🎨</button>
+        </div>
+        <div id="teamB-color-picker" class="color-picker"></div>
+      </div>
+      <div class="btn-container">
+        <button onclick="changeScore('teamB', 1)" class="btn-circle btn-green">+</button>
+        <button onclick="changeScore('teamB', -1)" class="btn-circle btn-red">-</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let timer = 0;
+    let timerInterval = null;
+    let countdownActive = false;
+
+    function startTimer() {
+      if (!timerInterval) {
+        timerInterval = setInterval(() => {
+          timer += 10;
+          updateDisplay(timer);
+        }, 10);
+      }
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      timer = 0;
+      countdownActive = false;
+      document.getElementById('timer').style.color = '#ffc107';
+      updateDisplay(timer);
+    }
+
+    function startCountdown() {
+      const minutes = parseInt(document.getElementById('countdown-minutes').value) || 0;
+      const seconds = parseInt(document.getElementById('countdown-seconds').value) || 0;
+
+      if (minutes === 0 && seconds === 0) {
+        alert('請輸入有效的倒數時間！');
+        return;
+      }
+
+      timer = (minutes * 60 + seconds) * 1000;
+      countdownActive = true;
+      updateDisplay(timer);
+
+      if (!timerInterval) {
+        timerInterval = setInterval(() => {
+          if (timer > 0) {
+            timer -= 10;
+            updateDisplay(timer);
+          } else {
+            pauseTimer();
+            document.getElementById('timer').style.color = 'red';
+            alert('倒數結束！');
+          }
+        }, 10);
+      }
+    }
+
+    function updateDisplay(milliseconds) {
+      const totalSeconds = Math.floor(milliseconds / 1000);
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      const ms = String(Math.floor(milliseconds % 1000 / 10)).padStart(2, '0');
+      document.getElementById('timer').innerHTML = `${minutes}:${seconds}<span class="milliseconds">.${ms}</span>`;
+    }
+
+    document.querySelectorAll('#countdown-minutes, #countdown-seconds').forEach(input => {
+      input.addEventListener('input', () => {
+        const minutes = document.getElementById('countdown-minutes').value;
+        const seconds = document.getElementById('countdown-seconds').value;
+        document.getElementById('start-countdown').disabled = !(minutes || seconds);
+      });
+    });
+
+    let scores = { teamA: 0, teamB: 0 };
+
+    function changeName(team) {
+      const newName = prompt('輸入新名稱：');
+      if (newName) document.getElementById(`${team}-name`).innerText = newName;
+    }
+
+    function changeScore(team, delta) {
+      scores[team] += delta;
+      document.getElementById(`${team}-score`).innerText = scores[team];
+    }
+
+    function showColorPicker(team) {
+      const picker = document.getElementById(`${team}-color-picker`);
+      picker.innerHTML = ''; // 清空之前的色盤
+      const colors = ['#404040', '#cd5c5c', '#5e86c1', '#66cdaa', '#73b839', '#daa459'];
+
+      colors.forEach(color => {
+        const colorOption = document.createElement('div');
+        colorOption.className = 'color-option';
+        colorOption.style.backgroundColor = color;
+        colorOption.onclick = () => changeCardColor(team, color);
+        picker.appendChild(colorOption);
+      });
+
+      picker.style.display = picker.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function changeCardColor(team, color) {
+      document.getElementById(`${team}-card`).style.backgroundColor = color;
+    }
+
+  </script>
+
+</body>
+</html>
