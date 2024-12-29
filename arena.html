@@ -1,31 +1,74 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" href="img/ig.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="img/ig.ico" type="image/x-icon">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>兩隊制記分板</title>
+  <title>競技場</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
   <style>
     body {
       font-family: "Noto Sans TC", sans-serif;
-      min-height: 100vh;
+      display: flex;
+      background-color: rgba(10, 10, 10, 1);
       color: #fff;
-      background-image: 
-        linear-gradient(rgba(0, 25, 43, 0.74), rgba(0, 25, 43, 0.74)),
-        url('img/Wall.jpg');
-      background-size: cover; 
-      background-position: center;
-      background-repeat: no-repeat;
-      text-align: center;
+      flex-direction: column;
+      position: relative;
+      min-height: 100vh;
+      align-items: center; 
+      z-index: 1; 
       margin: 0;
       padding: 20px;
     }
 
+    #background-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+    filter: brightness(26%);
+    }
+
     .scoreboard {
       display: flex;
+      min-width: 200px;
       justify-content: center;
       gap: 40px;
       margin-top: 20px;
+    }
+
+    @font-face {
+    font-family: 'Sangyo';
+    src: url('ttf/sangyo-e4ywr.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    }
+
+    .btn {
+      padding: 4px 10px;
+      font-size: 1.2em; 
+      border-radius: 8px;
+      transition: all 0.2s ease; 
+    }
+
+    .header {
+      font-weight: bold;
+      text-align: center;
+      margin-left: -20px; 
+      font-size: 2em; 
+      font-weight: bold;
+    }
+ 
+    .header,
+    .scoreboard,
+    .timer-container {
+      text-align: center; 
+      width: 100%;
     }
 
     .card {
@@ -39,14 +82,15 @@
     }
 
     .title {
+      align-items: center; 
       font-size: 2em;
       margin-bottom: 0px;
       text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
     }
 
     .score {
+      font-family: 'Sangyo', sans-serif;
       font-size: 6em;
-      margin: 0px 0;
       text-shadow: -4px -4px 0 #000, 4px -4px 0 #000, -4px 4px 0 #000, 4px 4px 0 #000;
     }
 
@@ -126,10 +170,10 @@
     }
 
     .timer {
-      font-size: 7em;
+      font-size: 8em;
       color: #ffc107;
       background-color: rgba(0, 0, 0, 0.6);
-      padding: 15px;
+      padding: 10px 50px;
       border-radius: 20px;
       display: inline-block;
       margin: 20px auto 10px auto;
@@ -235,17 +279,152 @@
       border: 1px solid #000;
     }
 
+    .countdown-end {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #972121;
+      background-color: #000000; 
+      border-radius: 10px;
+      padding: 10px 20px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 999;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .action-buttons {
       display: flex;
       justify-content: center;
       gap: 10px;
       margin-top: 10px;
     }
+
+    /* 音樂控制容器 */
+#audio-control-container {
+    position: fixed;
+    top: 15px; 
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+}
+
+/* 音量控制滑桿 */
+#volume-slider {
+    width: 100px;
+    cursor: pointer;
+}
+
+/* BGM 按鈕樣式 */
+.bgm-button {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(79, 101, 121, 0.3);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
+    transition: all 0.2s ease;
+}
+
+/* 按鈕懸停效果 */
+.bgm-button:hover {
+    background-color: rgba(92, 126, 158, 0.6);
+}
+
+.battle {
+    background-color: rgba(255, 127, 51, 0.5); /* battle 音樂按鈕 */
+}
+.battle:hover {
+    background-color: rgba(242, 177, 141, 0.5); /* battle 音樂按鈕 */
+}
+
+.game-music {
+    background-color: rgba(0, 127, 204, 0.5); /* game-music 按鈕 */
+}
+.game-music:hover {
+    background-color: rgba(98, 175, 221, 0.5); /* game-music 按鈕 */
+}
+
+/* 按鈕播放中效果 */
+.bgm-button.active {
+    background-color: rgba(144, 238, 144, 0.8);
+    box-shadow: 0 5px 7px rgba(144, 208, 164, 0.6);
+}
+
+  @media (max-width: 768px) {
+    .btn {
+      padding: 4px 4px; 
+      font-size: 1em;
+    }
+    .card {
+      width: 90%;
+      padding: 15px;
+    }
+    .control-buttons {
+      gap: 5px !important;
+    }
+    .btn-container {
+      flex-wrap: wrap; 
+      gap: 2px;
+    }
+    .btn-circle {
+      width: 50px;
+      height: 50px;
+      font-size: 1.5em;
+    }
+    .timer-btn {
+        display: flex;
+        writing-mode: vertical-rl;
+        white-space: normal;
+        word-wrap: break-word;
+        align-items: center;
+        text-align: center;
+        justify-content: center; 
+        line-height: 1.2;
+        padding: 5px 10px; 
+        font-size: 1em;
+        width: 60px;
+        height: 105px;
+    }
+    .timer {
+      font-size: 5em;
+    }
+
+    .milliseconds {
+      font-size: 0.5em; 
+    }
+
+    .countdown-container input {
+      width: 40px;
+    }
+  }
   </style>
 </head>
 <body>
+  <video id="background-video" autoplay muted loop playsinline>
+    <source src="v/dimo.webm" type="video/webm">
+    您的瀏覽器不支援影片播放
+</video>
 
-  <h1>碼錶/記分板</h1>
+  <h1>競技場</h1>
 
   <!-- 碼錶 -->
   <div id="timer" class="timer">00:00<span class="milliseconds">.00</span></div>
@@ -256,12 +435,12 @@
       <input type="text" id="countdown-minutes" placeholder="分">
       <span>:</span>
       <input type="text" id="countdown-seconds" placeholder="秒">
-      <button id="start-countdown" onclick="startCountdown()" class="btn btn-primary" disabled>倒數開始</button>
+      <button id="start-countdown" onclick="startCountdown()" class="btn btn-primary timer-btn" disabled>倒數開始</button>
     </div>
       <div class="btn-container">
-       <button onclick="startTimer()" class="btn btn-primary">計時開始</button>
-       <button onclick="pauseTimer()" class="btn btn-warning">暫停</button>
-       <button onclick="resetTimer()" class="btn btn-danger">歸零</button>
+        <button id="start-timer" onclick="startTimer()" class="btn btn-primary timer-btn">計時開始</button>
+        <button id="pause-timer" onclick="pauseTimer()" class="btn btn-warning timer-btn">暫停</button>
+        <button id="reset-timer" onclick="resetTimer()" class="btn btn-danger timer-btn">歸零</button>
       </div>
   </div>
 
@@ -279,8 +458,8 @@
         <div id="teamA-color-picker" class="color-picker"></div>
       </div>
       <div class="btn-container">
-        <button onclick="changeScore('teamA', 1)" class="btn-circle btn-green">+</button>
-        <button onclick="changeScore('teamA', -1)" class="btn-circle btn-red">-</button>
+        <button onclick="changeScore('teamA', 1)" class="btn-circle btn-green score-btn">+</button>
+        <button onclick="changeScore('teamA', -1)" class="btn-circle btn-red score-btn">-</button>
       </div>
     </div>
 
@@ -296,18 +475,54 @@
         <div id="teamB-color-picker" class="color-picker"></div>
       </div>
       <div class="btn-container">
-        <button onclick="changeScore('teamB', 1)" class="btn-circle btn-green">+</button>
-        <button onclick="changeScore('teamB', -1)" class="btn-circle btn-red">-</button>
+        <button onclick="changeScore('teamB', 1)" class="btn-circle btn-green score-btn">+</button>
+        <button onclick="changeScore('teamB', -1)" class="btn-circle btn-red score-btn">-</button>
       </div>
     </div>
   </div>
 
+  <div id="countdown-end" class="countdown-end hidden">倒數結束</div>
+  <audio id="clickSound" src="m/click.mp3"></audio>
+  <audio id="scoreSound" src="m/Sou.mp3"></audio>
+  <audio id="alertSound" src="m/alert.mp3"></audio>
+  <div id="audio-control-container">
+    <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5">
+    <button id="bgm-button-1" class="bgm-button battle">♫</button>
+    <button id="bgm-button-2" class="bgm-button game-music">♫</button>
+  </div>
+  <audio id="bgm-audio" loop></audio>
+
   <script>
+    const clickSound = document.getElementById('clickSound');
+    const scoreSound = document.getElementById('scoreSound');
+    const alertSound = document.getElementById('alertSound');
+
+
+    function playClickSound() {
+      clickSound.currentTime = 0; // 重置播放位置
+      clickSound.play().catch(error => console.warn('碼錶按鈕音效失敗:', error));
+    }
+
+    function playScoreSound() {
+      scoreSound.currentTime = 0; // 重置播放位置
+      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
+    }
+document.querySelectorAll('.timer-btn').forEach(button => {
+    button.addEventListener('click', playClickSound);
+});
+document.querySelectorAll('.score-btn').forEach(button => {
+    button.addEventListener('click', playScoreSound);
+});
+
+
     let timer = 0;
     let timerInterval = null;
     let countdownActive = false;
 
     function startTimer() {
+    disableButton('start-countdown'); // 禁用倒數按鈕
+    disableButton('start-timer');     // 禁用計時按鈕
+    document.getElementById('timer').style.color = '#ffc107';
       if (!timerInterval) {
         timerInterval = setInterval(() => {
           timer += 10;
@@ -322,6 +537,8 @@
     }
 
     function resetTimer() {
+      enableButton('start-timer');      // 重啟計時按鈕
+      enableButton('start-countdown');  // 重啟倒數按鈕
       pauseTimer();
       timer = 0;
       countdownActive = false;
@@ -330,6 +547,8 @@
     }
 
     function startCountdown() {
+      disableButton('start-timer');     // 禁用計時按鈕
+      disableButton('start-countdown'); // 禁用倒數按鈕
       const minutes = parseInt(document.getElementById('countdown-minutes').value) || 0;
       const seconds = parseInt(document.getElementById('countdown-seconds').value) || 0;
 
@@ -350,11 +569,36 @@
           } else {
             pauseTimer();
             document.getElementById('timer').style.color = 'red';
-            alert('倒數結束！');
+            showCountdownEnd(); 
+            enableButton('start-timer');
+            enableButton('start-countdown');
           }
         }, 10);
       }
     }
+
+function showCountdownEnd() {
+    const countdownEnd = document.getElementById('countdown-end');
+    countdownEnd.classList.remove('hidden'); // 顯示文字
+    alertSound.currentTime = 0;
+    alertSound.play().catch(error => console.warn('警示音效播放失敗:', error)); 
+ 
+    setTimeout(() => {
+        countdownEnd.classList.add('hidden'); // 3 秒後隱藏
+    }, 3000);
+}
+
+function disableButton(id) {
+    const button = document.getElementById(id);
+    button.classList.add('disabled');
+    button.disabled = true;
+}
+
+function enableButton(id) {
+    const button = document.getElementById(id);
+    button.classList.remove('disabled');
+    button.disabled = false;
+}
 
     function updateDisplay(milliseconds) {
       const totalSeconds = Math.floor(milliseconds / 1000);
@@ -387,7 +631,7 @@
     function showColorPicker(team) {
       const picker = document.getElementById(`${team}-color-picker`);
       picker.innerHTML = ''; // 清空之前的色盤
-      const colors = ['#404040', '#cd5c5c', '#5e86c1', '#66cdaa', '#73b839', '#daa459'];
+      const colors = ['#404040', '#cd5c5c', '#5e86c1', '#e8e8e8', '#73b839', '#daa459','#977bd0'];
 
       colors.forEach(color => {
         const colorOption = document.createElement('div');
@@ -403,6 +647,65 @@
     function changeCardColor(team, color) {
       document.getElementById(`${team}-card`).style.backgroundColor = color;
     }
+
+// BGM 音樂
+const bgmSources = [
+    'https://crisvictor.github.io/dccool/m/battle.mp3',
+    'https://crisvictor.github.io/dccool/m/game-music.mp3'
+];
+
+// 音樂控制變數
+const bgmAudio = document.getElementById('bgm-audio');
+const volumeSlider = document.getElementById('volume-slider');
+const bgmButtons = document.querySelectorAll('.bgm-button');
+
+// 設置初始音量
+bgmAudio.volume = 0.5;
+
+// 播放狀態追蹤
+let currentPlayingIndex = -1;
+
+// 播放或暫停 BGM
+function toggleBGM(index) {
+    if (currentPlayingIndex === index) {
+        // 如果再次點擊同一個按鈕，暫停音樂
+        if (!bgmAudio.paused) {
+            bgmAudio.pause();
+            bgmButtons[index].classList.remove('active'); // 移除播放中效果
+        } else {
+            bgmAudio.play(); // 恢復播放
+            bgmButtons[index].classList.add('active'); // 設置播放狀態
+        }
+    } else {
+        // 切換到新音樂
+        bgmAudio.src = bgmSources[index]; // 更新音樂來源
+        bgmAudio.play().catch(err => console.warn('BGM 播放失敗:', err));
+
+        // 更新按鈕樣式
+        bgmButtons.forEach(btn => btn.classList.remove('active')); // 移除所有播放效果
+        bgmButtons[index].classList.add('active'); // 新按鈕設為播放中
+
+        // 更新當前播放索引
+        currentPlayingIndex = index;
+    }
+}
+
+// 綁定按鈕點擊事件
+bgmButtons.forEach((button, index) => {
+    button.addEventListener('click', () => {
+        toggleBGM(index);
+    });
+});
+
+// 音量控制
+volumeSlider.addEventListener('input', event => {
+    bgmAudio.volume = parseFloat(event.target.value); // 即時調整音量
+});
+
+// 自動暫停按鈕樣式同步 (暫停時恢復原色)
+bgmAudio.addEventListener('pause', () => {
+    bgmButtons.forEach(btn => btn.classList.remove('active'));
+});
 
   </script>
 
