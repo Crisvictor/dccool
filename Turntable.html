@@ -182,8 +182,12 @@
             border: none;
             background-color: rgba(79, 101, 121, 0.3);
             color: white;
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
+            padding: 0; 
+            margin: 0; 
+            line-height: 18px;
             box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
             transition: all 0.2s ease;
         }
@@ -213,7 +217,7 @@
         <div id="time"></div>
       </div>
     </div>
-  
+    
     <div class="options-container">
       <textarea id="optionsInput" placeholder="請輸入抽籤選項，每行一個"></textarea>
       <div class="buttons">
@@ -234,13 +238,16 @@
   <div class="result" id="resultBox"></div>
   <audio id="startSound" src="m/start-sound1.mp3"></audio>
   <audio id="resultSound" src="m/result-sound.mp3"></audio>
-
+  <audio id="gunshotSound" src="m/gunshot.mp3"></audio>
+  <audio id="coinSound" src="m/coin.mp3"></audio>
   <script>
 const wheel = document.getElementById("wheel");
 const spinButton = document.getElementById("spinButton");
 const updateButton = document.getElementById("updateButton");
 const optionsInput = document.getElementById("optionsInput");
 const resultBox = document.getElementById("resultBox");
+const gunshotSound = document.getElementById('gunshotSound');
+const coinSound = document.getElementById('coinSound');
 
 let options = ["1", "2", "3", "4", "5", "6"];
 let spinning = false;
@@ -311,15 +318,20 @@ function drawWheel() {
 }
 
 function spinWheel() {
-  if (spinning) return;
-  spinning = true;
-
-  // 播放開始音效
-    const startSound = document.getElementById('startSound');
-  if (startSound) {
-    startSound.play().catch(error => console.warn('無法播放音效', error));
-  }
-
+    if (spinning) return; // 防止重複執行
+    spinning = true;
+    // 取得輸入項目
+    const items = options;
+    // 檢查是否為擲硬幣項目
+    const isCoinFlip = items.length === 2 && items.includes('人頭(正面)') && items.includes('數字(反面)');
+    // **播放音效判斷邏輯**
+    if (isCoinFlip) {
+        coinSound.currentTime = 0;
+        coinSound.play().catch(error => console.warn('硬幣音效播放失敗:', error));
+    } else {
+        startSound.currentTime = 0;
+        startSound.play().catch(error => console.warn('開始音效播放失敗:', error));
+    }
   // 禁用按鈕並添加淡化效果
   spinButton.disabled = true;
   spinButton.style.opacity = "0.5";
@@ -336,8 +348,6 @@ function spinWheel() {
   // 計算停止的角度，確保停在 12 點鐘方向
   const sliceDegree = 360 / numOptions;
   const targetDegree = 360 - (randomIndex * sliceDegree + sliceDegree / 2);
-
-  // 圈數旋轉設定
   const spinDegree = 360 * 12 + targetDegree;
 
   // 執行旋轉
@@ -350,23 +360,25 @@ function spinWheel() {
       resultBox.textContent = `抽中: ${options[randomIndex]}`;
       resultBox.style.display = "flex";
 
-      // 播放結果音效（加上彩花）
-      const resultSound = document.getElementById('resultSound');
-      if (resultSound) {
-        resultSound.play().catch(error => console.warn('無法播放音效', error));
-      }
-      showConfetti();
+            if (options[randomIndex] === '💥') {
+                gunshotSound.currentTime = 0;
+                gunshotSound.play();
+            } else {
+                resultSound.currentTime = 0;
+                resultSound.play();
+            }
+            showConfetti(); // 播放彩花效果
 
-      // 7 秒後隱藏結果並重置按鈕
-      setTimeout(() => {
-        resultBox.style.display = "none";
-        spinning = false;
-        spinButton.disabled = false;
-        spinButton.style.opacity = "1";
-        spinButton.style.cursor = "pointer";
-      }, 7500);
-    },7500);
-  }, 10);
+            // 3 秒後隱藏結果並重置按鈕
+            setTimeout(() => {
+                resultBox.style.display = "none";
+                spinning = false;
+                spinButton.disabled = false;
+                spinButton.style.opacity = "1";
+                spinButton.style.cursor = "pointer";
+            }, 3000);
+        }, 7500);
+    }, 10);
 }
 
 function describeArc(x, y, radius, startAngle, endAngle) {
@@ -488,8 +500,10 @@ document.getElementById("weekTemplate").addEventListener("click", () => {
 volumeSlider.addEventListener('input', (event) => {
     const volume = parseFloat(event.target.value);
     bgmAudio.volume = volume; // 調整 BGM 音量
-    resultSoundSound.volume = volume; // 同步調整洗牌音效音量
-    startSound.volume = volume;    // 同步調整翻牌音效音量
+    resultSound.volume; 
+    startSound.volume = volume;  
+    gunshotSound.volume =volume; 
+    coinSound.volume =volume;
 });
 
 // 播放/暫停 BGM 按鈕
@@ -506,9 +520,10 @@ bgmButton.addEventListener('click', () => {
 });
 
 // 預設控制音效初始音量
-resultSoundSound.volume = 0.5; // 洗牌音效音量
-startSound.volume = 0.5;    // 翻牌音效音量
-
+resultSound.volume = 0.5; 
+startSound.volume = 0.5;   
+gunshotSound.volume = 0.5; 
+coinSound.volume = 0.6; 
   </script>
 </body>
 </html>
