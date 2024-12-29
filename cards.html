@@ -79,25 +79,27 @@
         }
         .button {
             padding: 10px 20px;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
-            color: #000;
+            color: #fff;
             text-align: center;
             border-radius: 6px;
             cursor: pointer;
             box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.3);
         }
         #shuffle-btn, #call-btn {
-            background-color: #89c6b9;
+            font-weight: bold;
+            background-color: #00505d;
         }
         #shuffle-btn:hover, #call-btn:hover {
-            background-color: #77b2a7;
+            background-color: #006475;
         }
         #clear-btn {
-            background-color: #e95c35;
+            font-weight: bold;
+            background-color: #ce452e;
         }
         #clear-btn:hover {
-            background-color: #d54422;
+            background-color: #eb664f;
         }
         textarea {
             display: block;
@@ -116,14 +118,17 @@
             resize: none;
             overflow-y: auto;
         }
+        #input-area::placeholder {
+            color: #535353;
+        }
         .example-container {
             max-width: 550px;
             width: 90%; 
             margin: 20px auto; 
             padding: 10px;
             border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
-            background-color: rgba(61, 61, 61, 0.6); 
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.7);
+            background-color: rgba(43, 83, 83, 0.7); 
             display: flex;
             flex-direction: column; 
             align-items: flex-start;
@@ -133,7 +138,7 @@
         #example-options {
             display: none;
             flex-wrap: wrap; 
-            gap: 5px; 
+            gap: 8px; 
             padding: 10px;
             width: 100%; 
             max-height: 40vh; 
@@ -148,11 +153,11 @@
             opacity: 1;
         }
         .example-option {
-            font-size: 12px;
+            font-size: 16px;
             text-align: center;
             background-color: #176367;
             color: #fff;
-            padding: 5px 8px;
+            padding: 8px 10px;
             border-radius: 4px;
             cursor: pointer;
             box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.3);
@@ -167,12 +172,12 @@
         #example-btn {
             background-color: #003d40; 
             color: #fff; 
-            padding: 5px 10px; 
-            font-size: 14px; 
+            padding: 8px 14px; 
+            font-size: 18px; 
             font-weight: bold; 
             border-radius: 6px; 
             cursor: pointer; 
-            box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.7);
             text-align: center; 
         }
         #example-btn:hover {
@@ -183,28 +188,29 @@
             width: 100%;
             height: 100%;
             display: none;
-            max-width: 550px;
-            min-height: 100px;
-            max-height: 340px; 
+            max-width: 770px;
+            min-height: 156.55px;
+            max-height: 670px; 
             flex-wrap: wrap;
             justify-content: center;
-            margin: 20px auto;
+            margin: 15px auto;
             padding: 10px;
             overflow-y: auto;
             overflow-x: hidden;
-            background-color: rgba(200, 200, 200, 0.2);
+            background-color: rgba(20, 20, 20, 0.3);
             border-radius: 4px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.7);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(92, 125, 155, 0.4);
             z-index: 1;
         }
         .card {
-            width: 60px;
-            height: 100px;
+            width: 93.75px;
+            height: 156.25px;
             margin: 6px;
             position: relative;
             perspective: 1000px;
             cursor: pointer; 
+            border: 1px solid rgba(0, 0, 0, 0.2)
             z-index: 2;
         }
         .card .inner {
@@ -242,8 +248,8 @@
             transform: rotateY(180deg);
         }
         .shuffle-card {
-            width: 60px;
-            height: 100px;
+            width: 93.75px;
+            height: 156.25px;
             margin: 6px;
             position: absolute;
             background-image: url('img/backcard.png');
@@ -263,14 +269,14 @@
             max-width: 550px;
             margin: 20px auto;
             padding: 10px;
-            background-color: rgba(100, 100, 100, 0.3);
+            background-color: rgba(31, 64, 97, 0.3);
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
-            border: 2px solid rgba(155, 155, 155, 0.3);
-            max-height: 120px;
+            border: 2px solid rgba(92, 125, 155, 0.4);
+            max-height: 210px;
             overflow-y: auto;
             color: #ffffff;
-            font-size: 12px;
+            font-size: 18px;
             text-align: left;
         }
         .dimmed {
@@ -336,6 +342,34 @@
         .hoverable:hover {
             transform: translateY(-2px);
         }        
+        #audio-control-container {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }        
+        #volume-slider {
+            width: 100px;
+            cursor: pointer;
+        }
+        #bgm-button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background-color: rgba(79, 101, 121, 0.3);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
+            transition: all 0.2s ease;
+        }
+        #bgm-button:hover {
+            background-color: rgba(92, 126, 158, 0.3);
+        }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -345,12 +379,13 @@
                 width: 85% !important;
             }
             .card {
-                width: 50px; 
-                height: 80px;
+                width: 93.75px; 
+                height: 156.25px;
                 font-size: 14px;
             }
             .card-container {
                 max-width: 90% !important;
+                max-height: 500.75px !important; 
                 padding: 8px !important;
             }
             #description-box {
@@ -396,6 +431,11 @@
             <div id="time-display"></div>
         </div>
     
+        <div id="audio-control-container">
+            <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5">
+            <button id="bgm-button">♫</button>
+        </div>
+
         <div id="buttons-container">
             <button id="shuffle-btn" class="button">洗牌抽籤</button>
             <button id="call-btn" class="button">啟動點名</button>
@@ -556,8 +596,8 @@ setTimeout(() => {
             const shuffleCards = items.map((_, index) => {
                 const card = document.createElement('div');
                 card.className = 'shuffle-card';
-                card.style.width = '60px';
-                card.style.height = '100px';
+                card.style.width = '93.75px';
+                card.style.height = '156.25px';
                 card.style.margin = '5px';
                 card.style.position = 'absolute';
                 card.style.backgroundImage = "url('img/backcard.png')";
@@ -991,6 +1031,38 @@ setTimeout(() => {
         // 每秒更新一次時間
         setInterval(updateTime, 1000);
         updateTime();
+    // 音效與 BGM 控制
+    const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/lost-in-dreams.mp3');
+    bgmAudio.loop = true; // 設置 BGM 循環播放
+    bgmAudio.volume = 0.5; // 預設音量
+
+    const volumeSlider = document.getElementById('volume-slider');
+    const bgmButton = document.getElementById('bgm-button');
+
+// 控制音量大小
+volumeSlider.addEventListener('input', (event) => {
+    const volume = parseFloat(event.target.value);
+    bgmAudio.volume = volume; // 調整 BGM 音量
+    shuffleSound.volume = volume; // 同步調整洗牌音效音量
+    flipSound.volume = volume;    // 同步調整翻牌音效音量
+});
+
+// 播放/暫停 BGM 按鈕
+let isPlaying = false; // 初始狀態
+bgmButton.addEventListener('click', () => {
+    if (isPlaying) {
+        bgmAudio.pause();
+        bgmButton.textContent = '♫'; // 按鈕恢復播放符號
+    } else {
+        bgmAudio.play();
+        bgmButton.textContent = '❚❚'; // 按鈕改為暫停符號
+    }
+    isPlaying = !isPlaying; // 切換狀態
+});
+
+// 預設控制音效初始音量
+shuffleSound.volume = 0.5; // 洗牌音效音量
+flipSound.volume = 0.5;    // 翻牌音效音量
     </script>
 </body>
 </html>
