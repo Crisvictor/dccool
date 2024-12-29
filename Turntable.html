@@ -161,12 +161,45 @@
     .template-buttons button:hover {
       background-color: #384a91;
     }
-
+    
+         #audio-control-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+        }        
+        #volume-slider {
+            width: 100px;
+            cursor: pointer;
+        }
+        #bgm-button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background-color: rgba(79, 101, 121, 0.3);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
+            transition: all 0.2s ease;
+        }
+        #bgm-button:hover {
+            background-color: rgba(92, 126, 158, 0.3);
+        }
   </style>
 </head>
 <body>
   <h1>抽籤轉盤</h1>
-
+  
+ <div id="audio-control-container">
+    <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5">
+    <button id="bgm-button">♫</button>
+</div>
+  
   <div class="container">
     <div class="wheel-container">
       <div class="arrow"></div>
@@ -442,7 +475,39 @@ document.getElementById("weekTemplate").addEventListener("click", () => {
 
     // 初始化時鐘
     updateClock();
+    
+    // 音效與 BGM 控制
+    const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/groovy-funk.mp3');
+    bgmAudio.loop = true; // 設置 BGM 循環播放
+    bgmAudio.volume = 0.5; // 預設音量
 
+    const volumeSlider = document.getElementById('volume-slider');
+    const bgmButton = document.getElementById('bgm-button');
+
+// 控制音量大小
+volumeSlider.addEventListener('input', (event) => {
+    const volume = parseFloat(event.target.value);
+    bgmAudio.volume = volume; // 調整 BGM 音量
+    resultSoundSound.volume = volume; // 同步調整洗牌音效音量
+    startSound.volume = volume;    // 同步調整翻牌音效音量
+});
+
+// 播放/暫停 BGM 按鈕
+let isPlaying = false; // 初始狀態
+bgmButton.addEventListener('click', () => {
+    if (isPlaying) {
+        bgmAudio.pause();
+        bgmButton.textContent = '♫'; // 按鈕恢復播放符號
+    } else {
+        bgmAudio.play();
+        bgmButton.textContent = '❚❚'; // 按鈕改為暫停符號
+    }
+    isPlaying = !isPlaying; // 切換狀態
+});
+
+// 預設控制音效初始音量
+resultSoundSound.volume = 0.5; // 洗牌音效音量
+startSound.volume = 0.5;    // 翻牌音效音量
 
   </script>
 </body>
