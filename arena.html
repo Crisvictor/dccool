@@ -336,10 +336,45 @@
     z-index: 1000;
 }
 
-/* 音量控制滑桿 */
 #volume-slider {
-    width: 100px;
+    width: 120px;
+    height: 6px; 
     cursor: pointer;
+    appearance: none; 
+    background: rgba(49, 97, 197, 0.3);
+    border-radius: 5px; 
+    outline: none; 
+    transition: all 0.2s ease;
+}
+
+#volume-slider::-webkit-slider-thumb {
+    appearance: none; 
+    width: 15px; 
+    height: 15px;
+    background: #4d80e6; 
+    border: 2px solid #335292;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); 
+    cursor: pointer;
+}
+
+#volume-slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #4d80e6;
+    border: 2px solid #335292;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+#volume-slider:hover {
+    background: rgba(154, 179, 230, 0.5);
+}
+
+#volume-slider:active::-webkit-slider-thumb {
+    background: #546ea2;
+    transform: scale(1.2); 
 }
 
 /* BGM 按鈕樣式 */
