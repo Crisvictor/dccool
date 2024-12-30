@@ -49,6 +49,13 @@
     font-style: normal;
     }
 
+    @font-face {
+      font-family: 'Leslie';
+      src: url('ttf/LESLIE.TTF') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     .btn {
       padding: 4px 10px;
       font-size: 1.2em; 
@@ -75,7 +82,8 @@
       width: 250px;
       position: relative;
       color: #fff;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 5px 8px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(10, 10, 10, 0.9);
     }
 
     .title {
@@ -94,7 +102,7 @@
     .btn-container {
       display: flex;
       justify-content: space-around;
-      margin-top: 15px;
+      margin-top: 7px;
       gap: 10px;
     }
 
@@ -167,15 +175,19 @@
     }
 
     .timer {
-      font-size: 8em;
+      font-family: 'Leslie', sans-serif; 
+      font-size: 8.5em;
       color: #ffc107;
-      background-color: rgba(0, 0, 0, 0.6);
+      background-color: rgba(14, 24, 37, 0.55);
+      width: 535px; 
+      height: 205px; 
       padding: 10px 50px;
       border-radius: 20px;
       display: inline-block;
+      white-space: nowrap;
       margin: 20px auto 10px auto;
-      text-shadow: -4px -4px 0 rgba(0, 0, 0, 0.7), 4px 4px 0 rgba(255, 255, 255, 0.3);
-      box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.6), inset -2px -2px 5px rgba(255, 255, 255, 0.3);
+      text-shadow: -4px -4px 0 rgba(105, 105, 105, 0.2), 4px 4px 0 rgba(0, 0, 0, 0.7);
+      box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.6), inset -2px -6px 5px rgba(255, 255, 255, 0.2);
     }
 
     .milliseconds {
@@ -185,10 +197,12 @@
     .countdown-container {
       background-color: rgba(11, 90, 90, 0.6);
       border-radius: 10px;
-      padding: 2px 15px;
+      padding: 6px 15px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      border: 1px solid rgba(92, 125, 155, 0.4);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
       gap: 5px;
     }
 
@@ -280,18 +294,19 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 1.5em;
+      font-size: 3em;
       font-weight: bold;
       color: #972121;
       background-color: #000000; 
       border-radius: 10px;
       padding: 10px 20px;
       position: fixed;
-      top: 50%;
+      top: 43%;
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 999;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 6px 6px rgba(0, 0, 0, 0.8);
+      border: 5px solid rgba(155, 33, 33, 0.7);
     }
 
     .hidden {
@@ -353,7 +368,7 @@
     background-color: rgba(255, 127, 51, 0.5); /* battle 音樂按鈕 */
 }
 .battle:hover {
-    background-color: rgba(242, 177, 141, 0.5); /* battle 音樂按鈕 */
+    background-color: rgba(255, 177, 67, 0.5); /* battle 音樂按鈕 */
 }
 
 .game-music {
@@ -405,7 +420,11 @@
         height: 45px;
     }
     .timer {
+      width: 335px; 
+      height: 125px; 
+      padding: -20px -10px;
       font-size: 5em;
+      margin: 10px auto 15px auto;
     }
 
     .milliseconds {
