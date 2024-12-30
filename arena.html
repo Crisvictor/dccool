@@ -549,6 +549,7 @@ document.querySelectorAll('.score-btn').forEach(button => {
     function startCountdown() {
       disableButton('start-timer');     // 禁用計時按鈕
       disableButton('start-countdown'); // 禁用倒數按鈕
+      document.getElementById('timer').style.color = '#ffc107';
       const minutes = parseInt(document.getElementById('countdown-minutes').value) || 0;
       const seconds = parseInt(document.getElementById('countdown-seconds').value) || 0;
 
