@@ -518,6 +518,7 @@ document.querySelectorAll('.score-btn').forEach(button => {
     let timer = 0;
     let timerInterval = null;
     let countdownActive = false;
+    let isPaused = false;
 
     function startTimer() {
     disableButton('start-countdown'); // 禁用倒數按鈕
@@ -532,8 +533,40 @@ document.querySelectorAll('.score-btn').forEach(button => {
     }
 
     function pauseTimer() {
-      clearInterval(timerInterval);
-      timerInterval = null;
+        if (!isPaused) {
+            // 暫停計時
+            clearInterval(timerInterval);
+            timerInterval = null;
+            isPaused = true;
+        } else {
+            // 恢復計時或倒數
+            if (countdownActive) {
+                // 恢復倒數
+                if (!timerInterval) {
+                    timerInterval = setInterval(() => {
+                        if (timer > 0) {
+                            timer -= 10;
+                            updateDisplay(timer);
+                        } else {
+                            pauseTimer();
+                            document.getElementById('timer').style.color = 'red';
+                            showCountdownEnd(); 
+                            enableButton('start-timer');
+                            enableButton('start-countdown');
+                        }
+                    }, 10);
+                }
+            } else {
+                // 恢復計時
+                if (!timerInterval) {
+                    timerInterval = setInterval(() => {
+                        timer += 10;
+                        updateDisplay(timer);
+                    }, 10);
+                }
+            }
+            isPaused = false;
+        }
     }
 
     function resetTimer() {
