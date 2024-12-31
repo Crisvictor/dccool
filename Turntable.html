@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,7 @@
   <title>命運抽籤轉盤</title>
   <style>
     body {
-      font-family: "Noto Sans TC", sans-serif;
+      font-family: 'Roboto', sans-serif;
       min-height: 100vh;
       color: #fff;
       background-image: 
@@ -23,12 +24,34 @@
       padding: 20px;
     }
 
+    @font-face {
+      font-family: 'YuPearl';
+      src: url('ttf/YuPearl-Regular.woff2') format('woff2'), 
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Roboto';
+      src: url('ttf/Roboto-Regular.woff2') format('woff2'), 
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'NaniFont-Regular';
+      src: url('ttf/NaniFont-Regular.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     .container {
       display: flex;
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
-      gap: 30px;
+      gap: 50px;
+      margin-top: 40px; 
     }
 
     .wheel-container {
@@ -36,6 +59,7 @@
     }
 
     #wheel {
+      font-family: 'Roboto', sans-serif;
       width: 300px;
       height: 300px;
       border: 4px solid #fff;
@@ -54,14 +78,18 @@
       border-right: 15px solid transparent;
       border-bottom: 30px solid #617dbf;
       transform: translateX(-50%) rotate(180deg); 
-      filter: drop-shadow(0 -8px 3px rgba(0, 0, 0, 0.7));
+      filter: drop-shadow(0 -8px 3px rgba(0, 0, 0, 0.9));
       z-index: 2;
     }
 
     textarea {
+      background-color: rgba(227, 227, 227, 0.75);
+      border: 1px solid #000;
+      border-radius: 3px;
       width: 200px;
       height: 150px;
       resize: none;
+      box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.6), inset -2px -6px 5px rgba(255, 255, 255, 0.4);
     }
 
     .buttons {
@@ -71,13 +99,21 @@
     }
 
     button {
+      font-family: 'Roboto', 'YuPearl', sans-serif;
       padding: 10px 20px;
       border: none;
       border-radius: 10px;
       color: #fff;
-      font-size: 18px;
+      font-size: 20px;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      box-shadow: inset 2px 2px 5px rgba(255, 255, 255, 0.4), inset -2px -6px 5px rgba(0, 0, 0, 0.6);
+    }
+
+    button:active {
+      transform: scale(0.95);
+      box-shadow: 
+        0px 2px 3px rgba(0, 0, 0, 0.4), 
+        inset 0px 1px 3px rgba(0, 0, 0, 0.6); 
     }
 
     #spinButton {
@@ -95,7 +131,15 @@
       line-height: 1.5; 
     }
 
+    @font-face {
+      font-family: 'Sangyo';
+      src: url('ttf/sangyo.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
     #timeDisplay {
+      font-family: 'Sangyo', Arial, sans-serif;
       margin-top: 20px;              
       padding: 10px 20px;
       font-size: 18px; 
@@ -161,49 +205,185 @@
     .template-buttons button:hover {
       background-color: #384a91;
     }
+
+    #page-title {
+      display: flex;
+      justify-content: center;
+      align-items: center; 
+      font-size: 2em;
+      font-weight: bold;
+      padding: 10px;
+      width: 100%;
+      margin: 0 auto; 
+      position: relative;
+    }
     
-         #audio-control-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 1000;
-        }        
-        #volume-slider {
-            width: 100px;
-            cursor: pointer;
-        }
-        #bgm-button {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: none;
-            background-color: rgba(79, 101, 121, 0.3);
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            padding: 0; 
-            margin: 0; 
-            line-height: 18px;
-            box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
-            transition: all 0.2s ease;
-        }
-        #bgm-button:hover {
-            background-color: rgba(92, 126, 158, 0.3);
-        }
+    #audio-control-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: 20px; 
+    }
+
+    #volume-slider {
+      width: 90px;
+      height: 6px;
+      cursor: pointer;
+    }
+
+    #bgm-button {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background-color: rgba(79, 101, 121, 0.3);
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0; 
+      margin: 0; 
+      line-height: 18px;
+      box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
+      transition: all 0.2s ease;
+    }
+
+    #bgm-button:hover {
+      background-color: rgba(92, 126, 158, 0.3);
+      box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
+    }
+
+    .transparent-btn {
+      position: relative; 
+      font-size: 18px! important;
+      background: transparent;
+      border-radius: 50%;
+      box-shadow: 
+        inset 0px 1px 3px rgba(255, 255, 255, 0.4), 
+        inset 0px -1px 2px rgba(0, 0, 0, 0.4), 
+        0px 4px 6px rgba(0, 0, 0, 0.2); 
+      color: #fff;
+      padding: 10px;
+      cursor: pointer;
+      border: none;
+      width: 40px;
+      height: 40px;
+      font-size: 1.5em;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+    }
+
+    .transparent-btn:last-child {
+      margin-right: 0;
+    }
+
+    .transparent-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 
+        inset 0px 2px 4px rgba(255, 255, 255, 0.8), 
+        inset 0px -3px 5px rgba(0, 0, 0, 0.4),
+        0px 8px 10px rgba(0, 0, 0, 0.4);
+    }
+    .transparent-btn:active {
+      transform: scale(0.95);
+      box-shadow: 
+        0px 2px 3px rgba(0, 0, 0, 0.4), 
+        inset 0px 1px 3px rgba(0, 0, 0, 0.6); 
+    }
+
+    .palette-container {
+      position: absolute;
+      top: 100%; 
+      left: 0;
+      margin-top: 5px; 
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      z-index: 1000;
+    }
+
+    .palette-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      padding: 0; 
+      margin: 0; 
+      box-shadow:
+        inset 0px 1px 3px rgba(255, 255, 255, 0.6), 
+        inset 0px -1px 2px rgba(0, 0, 0, 0.3), 
+        0px 4px 6px rgba(0, 0, 0, 0.2); 
+      background: transparent;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .palette-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .palette-btn:active {
+      transform: scale(0.9); /* 按鈕縮小效果 */
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5); /* 按鈕壓入效果 */
+    }
+
+    .palette-btn[data-palette="green"] {
+      background: linear-gradient(135deg, #7cc396, #5aa575); /* 綠色漸層 */
+    }
+
+    .palette-btn[data-palette="pink"] {
+      background: linear-gradient(135deg, #FF60AF, #FFD0FF); /* 粉色漸層 */
+    }
+
+    .palette-btn[data-palette="blue"] {
+      background: linear-gradient(135deg, #81C0C0, #4F9D9D); /* 藍色漸層 */
+    }
+
+    .palette-btn[data-palette="yellow"] {
+      background: linear-gradient(135deg, #FFD700, #FFA500); /* 黃色漸層 */
+    }
+
+    .palette-btn[data-palette="gray"] {
+      background: linear-gradient(135deg, #FFFFFF, #E0E0E0); /* 灰白漸層 */
+    }
+
+    .palette-btn[data-palette="red"] {
+      background: linear-gradient(135deg, #8B0000, #FF0000); /* 血色漸層 */
+    }
+
+    .hidden {
+      display: none; /* 初始隱藏 */
+    }
+
   </style>
 </head>
 <body>
-  <h1>抽籤轉盤</h1>
-  
- <div id="audio-control-container">
+<h1 id="page-title">
+  <!-- 調色盤按鈕與容器 -->
+  <div id="color-palette-wrapper" style="position: relative;">
+    <button id="color-palette-btn" class="transparent-btn">🎨</button>
+    <div id="color-palette-container" class="palette-container hidden">
+      <button class="palette-btn" data-palette="green"></button>
+      <button class="palette-btn" data-palette="pink"></button>
+      <button class="palette-btn" data-palette="blue"></button>
+      <button class="palette-btn" data-palette="yellow"></button>
+      <button class="palette-btn" data-palette="gray"></button>
+      <button class="palette-btn" data-palette="red"></button>
+    </div>
+  </div>
+  抽籤轉盤
+  <div id="audio-control-container">
     <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5">
     <button id="bgm-button">♫</button>
-</div>
-  
+  </div>
+</h1>
+
   <div class="container">
     <div class="wheel-container">
       <div class="arrow"></div>
@@ -239,6 +419,8 @@
   <audio id="startSound" src="m/start-sound1.mp3"></audio>
   <audio id="resultSound" src="m/result-sound.mp3"></audio>
   <audio id="gunshotSound" src="m/gunshot.mp3"></audio>
+  <audio id="clickSound" src="m/click.mp3"></audio>
+  <audio id="scoreSound" src="m/Sou.mp3"></audio>
   <audio id="coinSound" src="m/coin.mp3"></audio>
   <script>
 const wheel = document.getElementById("wheel");
@@ -248,6 +430,8 @@ const optionsInput = document.getElementById("optionsInput");
 const resultBox = document.getElementById("resultBox");
 const gunshotSound = document.getElementById('gunshotSound');
 const coinSound = document.getElementById('coinSound');
+const clickSound = document.getElementById('clickSound');
+const scoreSound = document.getElementById('scoreSound');
 
 let options = ["1", "2", "3", "4", "5", "6"];
 let spinning = false;
@@ -261,60 +445,88 @@ let spinning = false;
       return brightness < 128;
     }
 
+const palettes = {
+    green: ["#7cc396", "#5aa575", "#89b699", "#00a15c", "#2dce89", "#acdcc8", "#8fd9b6", "#6abf9c", "#a1e5d4", "#94d9c4"],
+    pink: ["#FF60AF", "#f8bfdb", "#e37daf", "#f288ac", "#ffd9e6", "#d2abd2", "#dda0dd", "#bf72bf", "#AE57A4", "#f070af"],
+    blue: ["#4798b3", "#7aadbe", "#72b1c7", "#afced8", "#5f9ea0", "#007b92", "#66989a", "#00808c", "#006374", "#0b5d65"],
+    yellow: ["#FFD700", "#FFC125", "#FFB90F", "#FFA500", "#FF8C00", "#FFD39B", "#FFEC8B", "#FFD700", "#FFA54F", "#FFDAB9"],
+    gray: ["#f5f5f5", "#757575", "#cccccc", "#383838", "#d4d4d4", "#4d4d4d", "#606060", "#8f8f8f", "#2e2e2e", "#1c1c1c"],
+    red: ["#8B0000", "#B22222", "#DC143C", "#b81414", "#FF6347", "#FF7F50", "#CD5C5C", "#E9967A", "#F08080", "#FA8072"]
+};
+
+
+// 初始化顏色陣列 (預設為綠色盤)
+let colors = palettes.green;
+
+const colorPaletteBtn = document.getElementById('color-palette-btn');
+const colorPaletteContainer = document.getElementById('color-palette-container');
+const paletteButtons = document.querySelectorAll('.palette-btn');
+
+colorPaletteBtn.addEventListener('click', () => {
+    clickSound.currentTime = 0; // 重置播放位置
+    clickSound.play().catch(error => console.warn('碼錶按鈕音效失敗:', error));
+    colorPaletteContainer.classList.toggle('hidden');
+});
+
+paletteButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        clickSound.currentTime = 0; // 重置播放位置
+        clickSound.play().catch(error => console.warn('碼錶按鈕音效失敗:', error));
+        const selectedPalette = button.getAttribute('data-palette');
+        colors = palettes[selectedPalette]; 
+        drawWheel();
+        colorPaletteContainer.classList.add('hidden'); 
+    });
+});
+
+
 function drawWheel() {
-  wheel.innerHTML = "";
-  const numOptions = options.length;
-  if (numOptions === 0) {
-    alert('請輸入至少一個選項');
-    return;
-  }
-  const angleStep = 360 / numOptions;
-  const colors = ["#7cc396", "#5aa575", "#89b699", "#00a15c", "#2dce89", "#acdcc8", "#8fd9b6", "#6abf9c", "#a1e5d4", "#94d9c4"];
-
-  for (let i = 0; i < numOptions; i++) {
-    const angle = i * angleStep;
-    const color = colors[i % colors.length];
-
-    // 繪製扇形
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("d", describeArc(150, 150, 150, angle, angle + angleStep));
-    path.setAttribute("fill", color);
-    wheel.appendChild(path);
-
-    // 添加文字
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    const textRadius = 110; 
-    const midAngle = angle + angleStep / 2;
-    const x = 150 + textRadius * Math.cos((midAngle - 90) * Math.PI / 180);
-    const y = 150 + textRadius * Math.sin((midAngle - 90) * Math.PI / 180);
-    
-    text.setAttribute("x", x);
-    text.setAttribute("y", y);
-    text.setAttribute("text-anchor", "middle");
-    text.setAttribute("dominant-baseline", "middle");
-
-    // 讓文字的側邊面向圓心
-    text.setAttribute("transform", `rotate(${midAngle + 90}, ${x}, ${y})`);
-
-    // 根據字數和選項數量調整字型大小
-    const optionText = options[i];
-    let fontSize = "24px"; // 預設字型大小
-
-    if (options.length > 17) {
-      fontSize = "14px"; // 如果選項數量超過17個字型調小
-    } else if (optionText.length > 3) {
-      fontSize = "16px"; // 如果字數超過3個字型調小
+    wheel.innerHTML = "";
+    const numOptions = options.length;
+    if (numOptions === 0) {
+        alert('請輸入至少一個選項');
+        return;
     }
+    const angleStep = 360 / numOptions;
 
-    text.style.fontSize = fontSize;
-    text.textContent = optionText;
+    for (let i = 0; i < numOptions; i++) {
+        const angle = i * angleStep;
+        const color = colors[i % colors.length];
 
-    // 設定文字顏色
-    const textColor = isDarkColor(color) ? "#fff" : "#000";
-    text.setAttribute("fill", textColor);
+        // 繪製扇形
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", describeArc(150, 150, 150, angle, angle + angleStep));
+        path.setAttribute("fill", color);
+        wheel.appendChild(path);
 
-    wheel.appendChild(text);
-  }
+        // 添加文字
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        const textRadius = 110; 
+        const midAngle = angle + angleStep / 2;
+        const x = 150 + textRadius * Math.cos((midAngle - 90) * Math.PI / 180);
+        const y = 150 + textRadius * Math.sin((midAngle - 90) * Math.PI / 180);
+
+        text.setAttribute("x", x);
+        text.setAttribute("y", y);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("dominant-baseline", "middle");
+        text.setAttribute("transform", `rotate(${midAngle + 90}, ${x}, ${y})`);
+
+        // 字型大小
+        const optionText = options[i];
+        let fontSize = "28px";
+        if (options.length > 17) fontSize = "20px";
+        else if (optionText.length > 3) fontSize = "24px";
+
+        text.style.fontSize = fontSize;
+        text.style.fontFamily = '"Roboto", "NaniFont-Regular", sans-serif';
+        text.textContent = optionText;
+
+        const textColor = isDarkColor(color) ? "#fff" : "#000";
+        text.setAttribute("fill", textColor);
+
+        wheel.appendChild(text);
+    }
 }
 
 function spinWheel() {
@@ -323,7 +535,7 @@ function spinWheel() {
     // 取得輸入項目
     const items = options;
     // 檢查是否為擲硬幣項目
-    const isCoinFlip = items.length === 2 && items.includes('人頭(正面)') && items.includes('數字(反面)');
+    const isCoinFlip = items.length === 2 && items.includes('正面') && items.includes('反面');
     // **播放音效判斷邏輯**
     if (isCoinFlip) {
         coinSound.currentTime = 0;
@@ -403,7 +615,11 @@ function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
 }
 
 spinButton.addEventListener("click", spinWheel);
+      clickSound.currentTime = 0; // 重置播放位置
+      clickSound.play().catch(error => console.warn('碼錶按鈕音效失敗:', error));
 updateButton.addEventListener("click", () => {
+      clickSound.currentTime = 0; // 重置播放位置
+      clickSound.play().catch(error => console.warn('碼錶按鈕音效失敗:', error));
   const newOptions = optionsInput.value.trim().split("\n").map(opt => opt.trim()).filter(opt => opt);
   if (newOptions.length === 0) {
     alert("請輸入至少一個選項");
@@ -418,9 +634,9 @@ drawWheel();
 
     // 範例設定
     const templates = {
-      coin: ["人頭(正面)", "數字(反面)"],
-      food: ["披薩", "速食", "便利商店", "水餃", "燒烤", "海鮮", "咖啡廳", "麵包", "麵類", "炸物", "港式", "泰式", "飯類", "早餐店", "泡麵", "鍋貼", "西餐"],
-      gun: ["miss", "miss", "miss", "💥", "miss", "miss"],
+      coin: ["正面", "反面"],
+      food: ["披薩", "速食", "便利商店", "水餃", "燒烤", "海鮮", "咖啡廳", "麵包", "麵類", "炸物", "港式", "泰式", "飯類", "早餐店", "泡麵", "鍋貼", "西餐", "火鍋"],
+      gun: ["MISS", "MISS", "MISS", "💥", "MISS", "MISS"],
       dice: ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"],
       play: ["電影院","桌遊之夜","爬山遠足","博物館","露營","溫泉/泳池","餐廳","遊樂園","音樂廳","美術館","DIY勞作體驗","海邊/水族館","咖啡館","運動","烤肉","購物中心","觀光農場","公路旅行","森林公園","歡唱KTV"],
       week: ["星期一","星期二","星期三","星期四","星期五","星期六","星期日"],
@@ -428,31 +644,43 @@ drawWheel();
 
 // 按鈕事件監聽器
 document.getElementById("coinTemplate").addEventListener("click", () => {
+      scoreSound.currentTime = 0; // 重置播放位置
+      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
   options = templates.coin;
   drawWheel();
 });
 
 document.getElementById("foodTemplate").addEventListener("click", () => {
+      scoreSound.currentTime = 0; // 重置播放位置
+      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
   options = templates.food;
   drawWheel();
 });
 
 document.getElementById("gunTemplate").addEventListener("click", () => {
+      scoreSound.currentTime = 0; // 重置播放位置
+      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
   options = templates.gun;
   drawWheel();
 });
 
 document.getElementById("diceTemplate").addEventListener("click", () => {
+      scoreSound.currentTime = 0; // 重置播放位置
+      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
   options = templates.dice;
   drawWheel();
 });
 
 document.getElementById("playTemplate").addEventListener("click", () => {
+      scoreSound.currentTime = 0; // 重置播放位置
+      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
   options = templates.play;
   drawWheel();
 });
 
 document.getElementById("weekTemplate").addEventListener("click", () => {
+      scoreSound.currentTime = 0; // 重置播放位置
+      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
   options = templates.week;
   drawWheel();
 });
@@ -487,43 +715,57 @@ document.getElementById("weekTemplate").addEventListener("click", () => {
 
     // 初始化時鐘
     updateClock();
+
+const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/groovy-funk.mp3');
+bgmAudio.loop = true; // 設置 BGM 循環播放
+bgmAudio.volume = 0.5; // 預設音量
+
+const volumeSlider = document.getElementById('volume-slider');
+const bgmButton = document.getElementById('bgm-button');
+
+const muteIcon = '🔇';
+const playIcon = '♫';
+const pauseIcon = '❚❚';
     
-    // 音效與 BGM 控制
-    const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/groovy-funk.mp3');
-    bgmAudio.loop = true; // 設置 BGM 循環播放
-    bgmAudio.volume = 0.5; // 預設音量
+const soundList = [resultSound, startSound, gunshotSound, coinSound, scoreSound, clickSound];
+soundList.forEach(sound => sound.volume = 0.5);
+coinSound.volume = 0.6;
 
-    const volumeSlider = document.getElementById('volume-slider');
-    const bgmButton = document.getElementById('bgm-button');
-
-// 控制音量大小
+// 控制音量大小與靜音狀態
 volumeSlider.addEventListener('input', (event) => {
     const volume = parseFloat(event.target.value);
+
+    // 更新所有音效的音量
     bgmAudio.volume = volume; // 調整 BGM 音量
-    resultSound.volume; 
-    startSound.volume = volume;  
-    gunshotSound.volume =volume; 
-    coinSound.volume =volume;
+    soundList.forEach(sound => sound.volume = volume);
+
+    // 靜音圖示邏輯
+    if (volume === 0) {
+        bgmButton.textContent = muteIcon; // 顯示靜音符號
+    } else {
+        bgmButton.textContent = isPlaying ? pauseIcon : playIcon; // 顯示播放/暫停符號
+    }
 });
 
 // 播放/暫停 BGM 按鈕
 let isPlaying = false; // 初始狀態
 bgmButton.addEventListener('click', () => {
+    // 音量為 0 時直接返回，不播放音樂
+    if (volumeSlider.value === '0') {
+        alert('音量為零，請先調高音量再播放！');
+        return;
+    }
+
     if (isPlaying) {
         bgmAudio.pause();
-        bgmButton.textContent = '♫'; // 按鈕恢復播放符號
+        bgmButton.textContent = playIcon; // 按鈕恢復播放符號
     } else {
         bgmAudio.play();
-        bgmButton.textContent = '❚❚'; // 按鈕改為暫停符號
+        bgmButton.textContent = pauseIcon; // 按鈕改為暫停符號
     }
     isPlaying = !isPlaying; // 切換狀態
 });
 
-// 預設控制音效初始音量
-resultSound.volume = 0.5; 
-startSound.volume = 0.5;   
-gunshotSound.volume = 0.5; 
-coinSound.volume = 0.6; 
   </script>
 </body>
 </html>
