@@ -34,7 +34,7 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: "Helvetica", "Arial", "LiHei Pro", "黑體-繁", "微軟正黑體", sans-serif;
+            font-family: 'YuPearl', Arial, sans-serif;
             min-height: 100vh;
             height: 100%;
             width: 100%;
@@ -78,9 +78,9 @@
             margin: 10px 0;
         }
         .button {
+            font-family: 'NaniFont-Regular', Arial, sans-serif !important;
             padding: 10px 20px;
             font-size: 18px;
-            font-weight: bold;
             color: #fff;
             text-align: center;
             border-radius: 6px;
@@ -153,6 +153,7 @@
             opacity: 1;
         }
         .example-option {
+            font-family: 'NaniFont-Regular', Arial, sans-serif !important;
             font-size: 16px;
             text-align: center;
             background-color: #176367;
@@ -264,7 +265,32 @@
             overflow-y: auto;
             overflow-x: hidden;
         }
+        @font-face {
+            font-family: 'NaniFont-Regular';
+            src: url('ttf/NaniFont-Regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Sangyo';
+            src: url('ttf/sangyo.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'YuPearl';
+            src: url('ttf/YuPearl-Regular.woff2') format('woff2'), 
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'ThePeakFont';
+            src: url('ttf/ThePeakFont.woff2') format('woff2'), 
+            font-weight: normal;
+            font-style: normal;
+        }
         #description-box {
+            font-family: 'ThePeakFont', Arial, sans-serif !important;
             display: none;
             max-width: 550px;
             margin: 20px auto;
@@ -305,7 +331,7 @@
             border-radius: 5px; 
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5); 
             text-align: center; 
-            font-family: "Helvetica", "Arial", sans-serif; 
+            font-family: "Sangyo", sans-serif !important; 
         }
         textarea::-webkit-scrollbar,
         .dimmed-container::-webkit-scrollbar,
@@ -348,12 +374,45 @@
             left: 15px;
             display: flex;
             align-items: center;
+            margin: 0;
             gap: 10px;
             z-index: 1000;
         }        
         #volume-slider {
-            width: 100px;
+            width: 120px;
+            height: 6px; 
             cursor: pointer;
+            appearance: none; 
+            background: linear-gradient(to right, rgba(49, 97, 197, 0.4), rgba(19, 67, 167, 0.3));
+            border-radius: 5px; 
+            outline: none; 
+            transition: all 0.2s ease;
+        }
+        #volume-slider::-webkit-slider-thumb {
+            appearance: none; 
+            width: 15px; 
+            height: 15px;
+            background: #4d80e6; 
+            border: 2px solid #335292;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); 
+            cursor: pointer;
+        }
+        #volume-slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            background: #4d80e6;
+            border: 2px solid #335292;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+        #volume-slider:hover {
+            background: linear-gradient(to right, rgba(144, 169, 220, 0.4), rgba(19, 67, 167, 0.3));
+        }
+        #volume-slider:active::-webkit-slider-thumb {
+            background: #546ea2;
+            transform: scale(1.2); 
         }
         #bgm-button {
             width: 30px;
@@ -414,6 +473,11 @@
                 gap: 3px;
                 flex-direction: column; 
             }
+            #mute-icon {
+                font-size: 18px;
+                color: #d16f6f;
+                margin-right: 8px;
+            }
         }
     </style>
 </head>
@@ -465,8 +529,22 @@
         <div id="shuffle-animation-container"></div>
         <div id="card-container" class="card-container"></div>
         <div id="description-box"></div>
+        <audio id="clickSound" src="m/click.mp3"></audio>
+        <audio id="scoreSound" src="m/Sou.mp3"></audio>
+
     </div>
     <script>
+    const clickSound = document.getElementById('clickSound');
+    const scoreSound = document.getElementById('scoreSound');
+
+    function playScoreSound() {
+      scoreSound.currentTime = 0; // 重置播放位置
+      scoreSound.play().catch(error => console.warn('範例按鈕音效失敗:', error));
+    }
+    document.querySelectorAll('.example-option').forEach(button => {
+        button.addEventListener('click', playScoreSound);
+    });
+
     const images = [
     'img/t0.png', 'img/t1.png', 'img/t2.png', 'img/t3.png', 'img/t4.png',
     'img/t5.png', 'img/t6.png', 'img/t7.png', 'img/t8.png', 'img/t9.png',
@@ -565,6 +643,8 @@ setTimeout(() => {
 
         //範例功能列
         exampleBtn.addEventListener('click', () => {
+            clickSound.currentTime = 0; // 重置播放位置
+            clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
             if (exampleOptions.style.display === 'none' || exampleOptions.style.display === '') {
                 exampleOptions.style.display = 'flex';
             } else {
@@ -635,6 +715,8 @@ setTimeout(() => {
         }
         // 洗牌抽籤系統
         shuffleBtn.addEventListener('click', () => {
+            clickSound.currentTime = 0; // 重置播放位置
+            clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
             const items = inputArea.value.trim().split('\n').filter(Boolean);
             if (items.length < 2) {
                 alert('請至少輸入兩個項目進行抽籤！');
@@ -960,6 +1042,8 @@ setTimeout(() => {
     }
         // 點名設定
         callBtn.addEventListener('click', () => {
+            clickSound.currentTime = 0; // 重置播放位置
+            clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
             const items = inputArea.value.trim().split('\n').filter(Boolean);
             if (items.length < 1) {
                 alert('請至少輸入一個項目進行點名！');
@@ -1009,6 +1093,8 @@ setTimeout(() => {
         });
 
         clearBtn.addEventListener('click', () => {
+            clickSound.currentTime = 0; // 重置播放位置
+            clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
             inputArea.value = '';
             cardContainer.innerHTML = '';
             inputArea.style.display = 'block';
@@ -1034,38 +1120,65 @@ setTimeout(() => {
         // 每秒更新一次時間
         setInterval(updateTime, 1000);
         updateTime();
+        
     // 音效與 BGM 控制
-    const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/lost-in-dreams.mp3');
-    bgmAudio.loop = true; // 設置 BGM 循環播放
-    bgmAudio.volume = 0.5; // 預設音量
+const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/lost-in-dreams.mp3');
+bgmAudio.loop = true; // 設置 BGM 循環播放
+bgmAudio.volume = 0.5; // 預設音量
 
-    const volumeSlider = document.getElementById('volume-slider');
-    const bgmButton = document.getElementById('bgm-button');
+const volumeSlider = document.getElementById('volume-slider');
+const bgmButton = document.getElementById('bgm-button');
+const muteIcon = document.createElement('span'); 
+muteIcon.id = 'mute-icon';
+muteIcon.textContent = '🔇';
+muteIcon.style.display = 'none';
+volumeSlider.parentElement.insertBefore(muteIcon, volumeSlider); 
 
-// 控制音量大小
+function updateSliderFill() {
+    const value = (volumeSlider.value - volumeSlider.min) / 
+                  (volumeSlider.max - volumeSlider.min) * 100;
+    volumeSlider.style.background = `linear-gradient(to right, 
+        rgba(49, 97, 197, 0.8) ${value}%, 
+        rgba(19, 67, 167, 0.2) ${value}%)`;
+}
+
 volumeSlider.addEventListener('input', (event) => {
     const volume = parseFloat(event.target.value);
-    bgmAudio.volume = volume; // 調整 BGM 音量
-    shuffleSound.volume = volume; // 同步調整洗牌音效音量
-    flipSound.volume = volume;    // 同步調整翻牌音效音量
+    bgmAudio.volume = volume;
+    shuffleSound.volume = volume; 
+    flipSound.volume = volume;   
+    scoreSound.volume = volume;  
+    clickSound.volume = volume;  
+
+    updateSliderFill();
+
+    if (volume === 0) {
+        muteIcon.style.display = 'inline'; 
+        bgmButton.style.backgroundColor = 'rgba(209, 111, 111, 0.3)';
+    } else {
+        muteIcon.style.display = 'none'; 
+        bgmButton.style.backgroundColor = 'rgba(79, 101, 121, 0.3)';
+    }
 });
 
-// 播放/暫停 BGM 按鈕
-let isPlaying = false; // 初始狀態
+let isPlaying = false;
 bgmButton.addEventListener('click', () => {
     if (isPlaying) {
         bgmAudio.pause();
-        bgmButton.textContent = '♫'; // 按鈕恢復播放符號
+        bgmButton.textContent = '♫'; 
     } else {
         bgmAudio.play();
-        bgmButton.textContent = '❚❚'; // 按鈕改為暫停符號
+        bgmButton.textContent = '❚❚'; 
     }
-    isPlaying = !isPlaying; // 切換狀態
+    isPlaying = !isPlaying;
 });
 
-// 預設控制音效初始音量
-shuffleSound.volume = 0.5; // 洗牌音效音量
-flipSound.volume = 0.5;    // 翻牌音效音量
+shuffleSound.volume = 0.5; 
+flipSound.volume = 0.5;  
+scoreSound.volume = 0.5;
+clickSound.volume = 0.5;
+
+updateSliderFill();
     </script>
 </body>
 </html>
