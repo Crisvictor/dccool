@@ -23,6 +23,14 @@
       padding: 20px;
     }
 
+    h1 {
+      font-family: 'YuPearl', Arial, sans-serif;
+      margin: 0;
+      color: #ffffff;
+      margin-left: 150px; 
+      font-size: 2em; 
+    }
+
     #background-video {
     position: fixed;
     top: 0;
@@ -35,6 +43,7 @@
     }
 
     .scoreboard {
+      font-family: 'YuPearl', Arial, sans-serif;
       display: flex;
       min-width: 200px;
       justify-content: center;
@@ -44,31 +53,40 @@
 
     @font-face {
     font-family: 'Sangyo';
-    src: url('ttf/sangyo-e4ywr.ttf') format('truetype');
+    src: url('ttf/sangyo.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
     }
 
     @font-face {
+        font-family: 'YuPearl';
+        src: url('ttf/YuPearl-Regular.woff2') format('woff2'), 
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
       font-family: 'Leslie';
-      src: url('ttf/LESLIE.TTF') format('truetype');
+      src: url('ttf/LESLIE.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'Cubic_11';
+      src: url('ttf/Cubic_11.woff2') format('woff2'), 
       font-weight: normal;
       font-style: normal;
     }
 
     .btn {
+      font-family: 'Cubic_11', Arial, sans-serif;
       padding: 4px 10px;
       font-size: 1.2em; 
       border-radius: 8px;
       transition: all 0.2s ease; 
     }
 
-    .header {
-      margin-left: -80px; 
-      font-size: 2em; 
-      font-weight: bold;
-    }
- 
     .scoreboard,
     .timer-container {
       text-align: center; 
@@ -133,12 +151,27 @@
         0px 8px 10px rgba(0, 0, 0, 0.4);
     }
 
+    .btn-circle:active {
+      transform: scale(0.95);
+      box-shadow: 
+        0px 2px 3px rgba(0, 0, 0, 0.4), 
+        inset 0px 1px 3px rgba(0, 0, 0, 0.6); 
+    }
+
     .btn-green {
       background-color: rgba(115, 184, 57, 0.5);
     }
 
+    .btn-green:active {
+      background-color: rgba(95, 164, 37, 0.6);
+    }
+
     .btn-red {
       background-color: rgba(205, 92, 92, 0.5);
+    }
+
+    .btn-red:active {
+      background-color: rgba(185, 72, 72, 0.5);
     }
 
     .transparent-btn {
@@ -326,14 +359,20 @@
     }
 
     /* 音樂控制容器 */
+#title-container {
+    display: flex; 
+    width: 535px; 
+    align-items: center; 
+    justify-content: space-between;
+    gap: 10px; 
+    padding: 10px;
+}
+
 #audio-control-container {
-    position: fixed;
-    bottom: 15px; 
-    right: 20px;
     display: flex;
     align-items: center;
     gap: 10px;
-    z-index: 1000;
+    z-index: 1000; /* 保持層級優先顯示 */
 }
 
 #volume-slider {
@@ -341,7 +380,7 @@
     height: 6px; 
     cursor: pointer;
     appearance: none; 
-    background: rgba(49, 97, 197, 0.3);
+    background: linear-gradient(to right, rgba(49, 97, 197, 0.4) 50%, rgba(19, 67, 167, 0.2) 50%);
     border-radius: 5px; 
     outline: none; 
     transition: all 0.2s ease;
@@ -369,7 +408,9 @@
 }
 
 #volume-slider:hover {
-    background: rgba(154, 179, 230, 0.5);
+    transform: scale(1.1);
+    box-shadow: 0 6px 6px rgba(0, 0, 0, 0.8);
+    background: linear-gradient(to right, rgba(20, 127, 227, 0.4) 50%, rgba(19, 67, 167, 0.2) 50%);
 }
 
 #volume-slider:active::-webkit-slider-thumb {
@@ -400,10 +441,10 @@
 }
 
 .battle {
-    background-color: rgba(255, 127, 51, 0.5); /* battle 音樂按鈕 */
+    background-color: rgba(255, 127, 51, 0.8); /* battle 音樂按鈕 */
 }
 .battle:hover {
-    background-color: rgba(255, 177, 67, 0.5); /* battle 音樂按鈕 */
+    background-color: rgba(255, 177, 67, 0.8); /* battle 音樂按鈕 */
 }
 
 .game-music {
@@ -419,7 +460,22 @@
     box-shadow: 0 5px 7px rgba(144, 208, 164, 0.6);
 }
 
+.bgm-button.muted {
+    background-color: rgba(255, 99, 71, 0.8); /* 紅色 */
+    box-shadow: 0 5px 7px rgba(255, 99, 71, 0.6);
+}
+
+#mute-icon {
+    font-size: 18px;
+    color: #ff4c4c; 
+    margin-right: 5px;
+    display: none; 
+}
+
   @media (max-width: 768px) {
+    h1 {
+      display: none;
+    }
     .btn {
       padding: 4px 4px; 
       font-size: 1em;
@@ -441,18 +497,26 @@
       font-size: 1.5em;
     }
     .timer-btn {
-        display: flex;
-        writing-mode: vertical-rl;
-        white-space: normal;
-        word-wrap: break-word;
-        align-items: center;
-        text-align: center;
-        justify-content: center; 
-        line-height: 1.2;
-        padding: 5px 10px; 
-        font-size: 0.9em;
-        width: 30px;
-        height: 45px;
+      display: flex;
+      writing-mode: vertical-rl;
+      white-space: normal;
+      word-wrap: break-word;
+      align-items: center;
+      text-align: center;
+      justify-content: center; 
+      line-height: 1.2;
+      padding: 5px 10px; 
+      font-size: 0.9em;
+      width: 30px;
+      height: 45px;
+    }
+    #title-container {
+      width: 335px; 
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    #volume-slider {
+      width: 70px;
     }
     .timer {
       width: 335px; 
@@ -461,11 +525,9 @@
       font-size: 5em;
       margin: 10px auto 15px auto;
     }
-
     .milliseconds {
       font-size: 0.5em; 
     }
-
     .countdown-container input {
       width: 40px;
     }
@@ -478,8 +540,14 @@
     您的瀏覽器不支援影片播放
 </video>
 
-  <h1>競技場</h1>
-
+  <div id="title-container">
+    <h1>競技場</h1>
+    <div id="audio-control-container">
+      <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5">
+      <button id="bgm-button-1" class="bgm-button battle">♫</button>
+      <button id="bgm-button-2" class="bgm-button game-music">♫</button>
+    </div>
+  </div>
   <!-- 碼錶 -->
   <div id="timer" class="timer">00:00<span class="milliseconds">.00</span></div>
 
@@ -539,11 +607,7 @@
   <audio id="clickSound" src="m/click.mp3"></audio>
   <audio id="scoreSound" src="m/Sou.mp3"></audio>
   <audio id="alertSound" src="m/alert.mp3"></audio>
-  <div id="audio-control-container">
-    <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5">
-    <button id="bgm-button-1" class="bgm-button battle">♫</button>
-    <button id="bgm-button-2" class="bgm-button game-music">♫</button>
-  </div>
+
   <audio id="bgm-audio" loop></audio>
 
   <script>
@@ -622,20 +686,20 @@ function pauseTimer() {
 }
 
 function resetTimer() {
-    enableButton('start-timer');      // 重啟計時按鈕
-    enableButton('start-countdown');  // 重啟倒數按鈕
-    clearInterval(timerInterval);    // 清除計時器
-    timerInterval = null;            // 重置計時器狀態
-    timer = 0;                        // 重置計時值
-    countdownActive = false;          // 重置倒數狀態
-    isPaused = false;                 // 重置暫停狀態
+    enableButton('start-timer');    
+    enableButton('start-countdown');
+    clearInterval(timerInterval);   
+    timerInterval = null;       
+    timer = 0;                   
+    countdownActive = false;        
+    isPaused = false;               
     document.getElementById('timer').style.color = '#ffc107';
     updateDisplay(timer);
 }
 
 function startCountdown() {
-    disableButton('start-timer');     // 禁用計時按鈕
-    disableButton('start-countdown'); // 禁用倒數按鈕
+    disableButton('start-timer'); 
+    disableButton('start-countdown'); 
     document.getElementById('timer').style.color = '#ffc107';
 
     const minutes = parseInt(document.getElementById('countdown-minutes').value) || 0;
@@ -656,7 +720,7 @@ function startCountdown() {
                 timer -= 10;
                 updateDisplay(timer);
             } else {
-                pauseTimer(); // 倒數結束，自動暫停
+                pauseTimer();
                 document.getElementById('timer').style.color = 'red';
                 showCountdownEnd();
                 enableButton('start-timer');
@@ -669,12 +733,12 @@ function startCountdown() {
 
 function showCountdownEnd() {
     const countdownEnd = document.getElementById('countdown-end');
-    countdownEnd.classList.remove('hidden'); // 顯示文字
+    countdownEnd.classList.remove('hidden');
     alertSound.currentTime = 0;
     alertSound.play().catch(error => console.warn('警示音效播放失敗:', error)); 
  
     setTimeout(() => {
-        countdownEnd.classList.add('hidden'); // 3 秒後隱藏
+        countdownEnd.classList.add('hidden'); 
     }, 3000);
 }
 
@@ -720,8 +784,8 @@ function enableButton(id) {
 
     function showColorPicker(team) {
       const picker = document.getElementById(`${team}-color-picker`);
-      picker.innerHTML = ''; // 清空之前的色盤
-      const colors = ['#171717', '#cd5c5c', '#5e86c1', '#e8e8e8', '#73b839', '#daa459','#977bd0','#5CADAD'];
+      picker.innerHTML = ''; // 色盤
+      const colors = ['#171717', '#cd5c5c', '#5e86c1', '#e8e8e8', '#73b839', '#daa459','#977bd0'];
 
       colors.forEach(color => {
         const colorOption = document.createElement('div');
@@ -748,9 +812,38 @@ const bgmSources = [
 const bgmAudio = document.getElementById('bgm-audio');
 const volumeSlider = document.getElementById('volume-slider');
 const bgmButtons = document.querySelectorAll('.bgm-button');
+const muteIcon = document.createElement('span'); // 新增靜音圖示
+muteIcon.id = 'mute-icon';
+muteIcon.textContent = '🔇';
+
+volumeSlider.parentElement.insertBefore(muteIcon, volumeSlider);
+
+function checkVolumeStatus() {
+    const volume = parseFloat(volumeSlider.value);
+    if (volume === 0) {
+        muteIcon.style.display = 'inline';
+        bgmButtons.forEach(button => {
+            if (button.classList.contains('active')) {
+                button.classList.add('muted');
+            }
+        });
+    } else {
+        muteIcon.style.display = 'none'; 
+        bgmButtons.forEach(button => {
+            button.classList.remove('muted'); 
+        });
+    }
+    bgmAudio.volume = volume;
+    scoreSound.volume = volume;
+    clickSound.volume = volume;
+}
+volumeSlider.addEventListener('input', checkVolumeStatus);
+checkVolumeStatus();
 
 // 設置初始音量
 bgmAudio.volume = 0.5;
+scoreSound.volume = 0.5;
+clickSound.volume = 0.5;
 
 // 播放狀態追蹤
 let currentPlayingIndex = -1;
@@ -758,24 +851,18 @@ let currentPlayingIndex = -1;
 // 播放或暫停 BGM
 function toggleBGM(index) {
     if (currentPlayingIndex === index) {
-        // 如果再次點擊同一個按鈕，暫停音樂
         if (!bgmAudio.paused) {
             bgmAudio.pause();
-            bgmButtons[index].classList.remove('active'); // 移除播放中效果
+            bgmButtons[index].classList.remove('active'); 
         } else {
-            bgmAudio.play(); // 恢復播放
-            bgmButtons[index].classList.add('active'); // 設置播放狀態
+            bgmAudio.play();
+            bgmButtons[index].classList.add('active');
         }
     } else {
-        // 切換到新音樂
-        bgmAudio.src = bgmSources[index]; // 更新音樂來源
+        bgmAudio.src = bgmSources[index];
         bgmAudio.play().catch(err => console.warn('BGM 播放失敗:', err));
-
-        // 更新按鈕樣式
-        bgmButtons.forEach(btn => btn.classList.remove('active')); // 移除所有播放效果
-        bgmButtons[index].classList.add('active'); // 新按鈕設為播放中
-
-        // 更新當前播放索引
+        bgmButtons.forEach(btn => btn.classList.remove('active')); 
+        bgmButtons[index].classList.add('active');
         currentPlayingIndex = index;
     }
 }
@@ -789,14 +876,25 @@ bgmButtons.forEach((button, index) => {
 
 // 音量控制
 volumeSlider.addEventListener('input', event => {
-    bgmAudio.volume = parseFloat(event.target.value); // 即時調整音量
+    const volume = parseFloat(event.target.value); 
+    bgmAudio.volume = volume; 
+    scoreSound.volume = volume;   
+    clickSound.volume = volume;   
 });
 
-// 自動暫停按鈕樣式同步 (暫停時恢復原色)
 bgmAudio.addEventListener('pause', () => {
     bgmButtons.forEach(btn => btn.classList.remove('active'));
 });
 
+function updateSliderFill() {
+    const value = (volumeSlider.value - volumeSlider.min) / 
+                  (volumeSlider.max - volumeSlider.min) * 100; 
+    volumeSlider.style.background = `linear-gradient(to right, 
+        rgba(49, 97, 197, 0.8) ${value}%, 
+        rgba(19, 67, 167, 0.2)  ${value}%)`;
+}
+volumeSlider.addEventListener('input', () => updateSliderFill());
+updateSliderFill(); 
   </script>
 
 </body>
