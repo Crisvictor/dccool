@@ -807,7 +807,7 @@ setTimeout(() => {
         function showTarotReading(items) {
             // 顯示解說框
             descriptionBox.style.display = 'block';
-            descriptionBox.innerHTML = '<b>請翻開您的命運之牌...</b><br>本系統採時間之流的三張抽牌方式，<br>可依序得出「過去、現在、未來」或「原因、結果、建議」<br>得出問題能夠處理的對策方向，<br>問問題的方式請以自己「想怎麼做？」的想法，<br>搭配「該如何做才能加以實現」這樣的形式對策，<br>才能得到較明確而詳細的回饋。';
+            descriptionBox.innerHTML = '<b>請翻開您的命運之牌...</b><br>本系統採時間之流的三張抽牌方式，<br>可依序得出「過去、現在、未來」或「原因、結果、建議」<br>得出問題能夠處理的對策方向，<br>問問題的方式請以自己「想怎麼做？」的想法，<br>搭配「該如何做才能加以實現」這樣的形式對策，<br>才能得到較明確而詳細的回饋。<br>卡片若是正顯示為"正位"詮釋，是上下顛倒著則"逆位"詮釋';
             cardContainer.classList.add('tarot-mode'); //塔羅模式開啟
             requestAnimationFrame(() => {
                 shuffleAnimation(items);
