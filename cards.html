@@ -248,52 +248,38 @@
             text-orientation: upright;
             transform: rotateY(180deg);
         }
-/* 卡片基礎樣式 */
-.tarot-mode .card {
-    width: 150px;
-    height: 250px;
-    perspective: 1000px; /* 確保 3D 效果 */
-}
-
-/* 內部旋轉設定 */
-.tarot-mode .card .inner {
-    transition: transform 0.5s;
-    transform-style: preserve-3d; /* 保持3D效果 */
-    transform: rotateY(0deg);
-}
-
-/* 翻牌效果 */
-.tarot-mode .card.flipped .inner {
-    transform: rotateY(180deg); /* 翻轉到正面 */
-}
-
-/* 正位樣式 (正面) */
-.tarot-mode .card .front {
-    transform: rotateY(180deg); /* 預設正面朝內 */
-}
-
-/* 背面樣式 */
-.tarot-mode .card .back {
-    transform: rotateY(0deg); /* 背面朝外 */
-}
-
-/* 卡片正面與背面的處理 */
-.tarot-mode .card .front,
-.tarot-mode .card .back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden; /* 隱藏背面 */
-}
-
-/* 逆位樣式 (正面內容旋轉180度) */
-.tarot-mode .card.reversed .front {
-    transform: rotateY(180deg) rotate(180deg); /* 上下顛倒 */
-}
-/* 確保背面顯示效果 */
-.tarot-mode .card.flipped.reversed .back {
-    transform: rotateY(0deg); /* 翻回背面 */
-}
+        .tarot-mode .card {
+            width: 105px;
+            height: 175px;
+            perspective: 1000px;
+        } 
+        .tarot-mode .card .inner {
+            transition: transform 0.5s;
+            transform-style: preserve-3d; 
+            transform: rotateY(0deg);
+        }
+        .tarot-mode .card.flipped .inner {
+            transform: rotateY(180deg); 
+        }
+        .tarot-mode .card .front {
+            transform: rotateY(180deg); 
+        }
+        .tarot-mode .card .back {
+            transform: rotateY(0deg);
+        }
+        .tarot-mode .card .front,
+        .tarot-mode .card .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+        }
+        .tarot-mode .card.reversed .front {
+            transform: rotateY(180deg) rotate(180deg);
+        }
+        .tarot-mode .card.flipped.reversed .back {
+            transform: rotateY(0deg);
+        }
         .shuffle-card {
             width: 93.75px;
             height: 156.25px;
@@ -345,7 +331,7 @@
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
             border: 2px solid rgba(92, 125, 155, 0.4);
-            max-height: 210px;
+            max-height: 230 px;
             overflow-y: auto;
             color: #ffffff;
             font-size: 18px;
@@ -494,7 +480,7 @@
             .card-container {
                 max-width: 90% !important;
                 max-height: 500.75px !important; 
-                padding: 8px !important;
+                margin: 8px auto;
             }
             #description-box {
                 max-width: 90% !important;
@@ -807,7 +793,7 @@ setTimeout(() => {
         function showTarotReading(items) {
             // 顯示解說框
             descriptionBox.style.display = 'block';
-            descriptionBox.innerHTML = '<b>請翻開您的命運之牌...</b><br>本系統採時間之流的三張抽牌方式，<br>可依序得出「過去、現在、未來」或「原因、結果、建議」<br>得出問題能夠處理的對策方向，<br>問問題的方式請以自己「想怎麼做？」的想法，<br>搭配「該如何做才能加以實現」這樣的形式對策，<br>才能得到較明確而詳細的回饋。<br>卡片若是正顯示為"正位"詮釋，<br>是上下顛倒著則"逆位"詮釋';
+            descriptionBox.innerHTML = '<b>請翻開您的命運之牌...</b><br>本系統採時間之流的三張抽牌方式，<br>可依序得出「過去、現在、未來」或「原因、結果、建議」<br>得出問題能夠處理的對策方向，<br>問問題的方式請以自己「想怎麼做？」的想法，<br>搭配「該如何做才能加以實現」這樣的形式對策，<br>才能得到較明確而詳細的回饋。<br>卡片若是正顯示為"正位"詮釋，<br>是上下顛倒著則"逆位"詮釋。';
             cardContainer.classList.add('tarot-mode'); //塔羅模式開啟
             requestAnimationFrame(() => {
                 shuffleAnimation(items);
@@ -832,39 +818,26 @@ setTimeout(() => {
         card.className = 'card';
         const content = generateCardContent(item);
 
-        // 建立內部結構
         card.innerHTML = `<div class="inner">
                             <div class="back"></div>
                             <div class="front">${content}</div>
                           </div>`;
-
-        // 初始設置為背面
-        card.classList.add('hidden'); // 初始背面顯示
-
-        // 設置逆位狀態 (第一次決定後固定)
+        card.classList.add('hidden'); 
         const isReversed = Math.random() < 0.5; // 50%機率逆位
         if (isReversed) {
-            card.classList.add('reversed'); // 加入逆位標籤
+            card.classList.add('reversed');
         }
-
-        let isFlipped = false; // 控制翻牌狀態
-
+        let isFlipped = false; 
         card.addEventListener('click', () => {
             if (isFlipped) {
-                // 翻回背面
-                card.classList.remove('flipped'); // 移除翻轉
+                card.classList.remove('flipped'); 
                 isFlipped = false;
             } else {
-                // 翻到正面，保持逆位或正位狀態
-                card.classList.add('flipped'); // 翻面顯示正面
+                card.classList.add('flipped'); 
                 isFlipped = true;
             }
-
-            // 播放翻牌音效
             flipSound.currentTime = 0;
             flipSound.play();
-
-            // 更新描述框
             descriptionBox.innerHTML = getCardDescription(item);
         });
                     cardContainer.appendChild(card);
