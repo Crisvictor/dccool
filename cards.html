@@ -248,12 +248,12 @@
             text-orientation: upright;
             transform: rotateY(180deg);
         }
-        .tarot-mode .card.reversed .inner {
-            transform: rotateY(0deg) rotate(180deg); /* 逆位卡片 */
-        }
         .tarot-mode .card {
             width: 150px;   
             height: 250px;  
+        }
+        .tarot-mode .card.reversed .inner {
+            transform: rotateY(180deg) rotate(180deg); /* 逆位卡片 */
         }
         .shuffle-card {
             width: 93.75px;
@@ -787,17 +787,17 @@ setTimeout(() => {
                 const cardContainer = document.getElementById('card-container');
                 cardContainer.innerHTML = '';
                 selectedCards.forEach(item => {
+                    const isReversed = Math.random() < 0.5; //逆位率50%
                     const card = document.createElement('div');
                     card.className = 'card';
-                    const isReversed = Math.random() < 0.5; //逆位率50%
+                    if (isReversed) {
+                       card.classList.add('reversed');
+                    }
                     const content = generateCardContent(item);
                     card.innerHTML = `<div class="inner">
                                         <div class="back"></div>
                                         <div class="front">${content}</div>
                                       </div>`;
-                    if (isReversed) {
-                       card.classList.add('reversed');
-                    }
                     card.classList.add('hidden');
                     card.addEventListener('click', () => {
                         card.classList.toggle('hidden');
