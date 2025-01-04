@@ -646,8 +646,10 @@ let countdownActive = false;
 let isPaused = false; // 用於追踪暫停狀態
 
 function startTimer() {
-    disableButton('start-countdown'); // 禁用倒數按鈕
-    disableButton('start-timer');     // 禁用計時按鈕
+    enableButton('pause-timer');
+    resetPauseButton();
+    disableButton('start-countdown');
+    disableButton('start-timer');    
     document.getElementById('timer').style.color = '#ffc107';
 
     if (!timerInterval) {
@@ -656,43 +658,46 @@ function startTimer() {
             updateDisplay(timer);
         }, 10);
     }
-    isPaused = false; // 確保開始後處於非暫停狀態
+    isPaused = false; 
 }
 
 function pauseTimer() {
+    const pauseButton = document.getElementById('pause-timer');
+    if (pauseButton.disabled) return;
     if (timerInterval) {
-        // 暫停計時或倒數
-        clearInterval(timerInterval);
-        timerInterval = null;
-        isPaused = true;
+        clearInterval(timerInterval); 
+        timerInterval = null; 
+        isPaused = true; 
+        pauseButton.textContent = '繼續';
     } else if (isPaused) {
-        // 恢復計時或倒數
         if (countdownActive) {
-            // 恢復倒數
+
             timerInterval = setInterval(() => {
                 if (timer > 0) {
                     timer -= 10;
                     updateDisplay(timer);
                 } else {
-                    pauseTimer(); // 倒數結束，自動暫停
+                    pauseTimer(); 
                     document.getElementById('timer').style.color = 'red';
-                    showCountdownEnd();
+                    showCountdownEnd(); 
                     enableButton('start-timer');
                     enableButton('start-countdown');
                 }
             }, 10);
         } else {
-            // 恢復計時
             timerInterval = setInterval(() => {
                 timer += 10;
                 updateDisplay(timer);
             }, 10);
         }
-        isPaused = false;
+        isPaused = false; 
+        pauseButton.textContent = '暫停';
     }
 }
 
 function resetTimer() {
+    enableButton('pause-timer');
+    resetPauseButton();
     enableButton('start-timer');    
     enableButton('start-countdown');
     clearInterval(timerInterval);   
@@ -705,6 +710,8 @@ function resetTimer() {
 }
 
 function startCountdown() {
+    enableButton('pause-timer');
+    resetPauseButton();
     disableButton('start-timer'); 
     disableButton('start-countdown'); 
     document.getElementById('timer').style.color = '#ffc107';
@@ -735,32 +742,36 @@ function startCountdown() {
             }
         }, 10);
     }
-    isPaused = false; // 確保開始後處於非暫停狀態
+    isPaused = false; 
 }
 
 function showCountdownEnd() {
     const countdownEnd = document.getElementById('countdown-end');
+    disableButton('pause-timer')
     countdownEnd.classList.remove('hidden');
     alertSound.currentTime = 0;
     alertSound.play().catch(error => console.warn('警示音效播放失敗:', error)); 
- 
     setTimeout(() => {
         countdownEnd.classList.add('hidden'); 
     }, 3000);
 }
 
-function disableButton(id) {
-    const button = document.getElementById(id);
+function disableButton(buttonId) {
+    const button = document.getElementById(buttonId);
     button.classList.add('disabled');
     button.disabled = true;
 }
 
-function enableButton(id) {
-    const button = document.getElementById(id);
+function enableButton(buttonId) {
+    const button = document.getElementById(buttonId);
     button.classList.remove('disabled');
     button.disabled = false;
 }
 
+function resetPauseButton() {
+    const pauseButton = document.getElementById('pause-timer');
+    pauseButton.textContent = '暫停';
+}
     function updateDisplay(milliseconds) {
       const totalSeconds = Math.floor(milliseconds / 1000);
       const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
