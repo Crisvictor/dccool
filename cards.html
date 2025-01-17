@@ -249,8 +249,8 @@
             transform: rotateY(180deg);
         }
         .tarot-mode .card {
-            width: 105px;
-            height: 175px;
+            width: 197px;
+            height: 304px;
             perspective: 1000px;
         } 
         .tarot-mode .card .inner {
@@ -265,6 +265,10 @@
             transform: rotateY(180deg); 
         }
         .tarot-mode .card .back {
+            background-image: url('img/tarot-back.png');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
             transform: rotateY(0deg);
         }
         .tarot-mode .card .front,
@@ -481,6 +485,10 @@
                 max-width: 90% !important;
                 max-height: 500.75px !important; 
                 margin: 8px auto;
+            }
+            .tarot-mode .card {
+            width: 105px;
+            height: 175px;
             }
             #description-box {
                 max-width: 90% !important;
