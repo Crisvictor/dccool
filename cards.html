@@ -119,7 +119,7 @@
             overflow-y: auto;
         }
         #input-area::placeholder {
-            color: #535353;
+            color: #3b3b3b;
         }
         .example-container {
             max-width: 550px;
@@ -195,7 +195,7 @@
             flex-wrap: wrap;
             justify-content: center;
             margin: 15px auto;
-            padding: 10px;
+            padding: 8px;
             overflow-y: auto;
             overflow-x: hidden;
             background-color: rgba(20, 20, 20, 0.3);
@@ -211,8 +211,14 @@
             position: relative;
             perspective: 1000px;
             cursor: pointer; 
-            border: 1px solid rgba(0, 0, 0, 0.2)
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             z-index: 2;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8);
+            z-index: 5;
         }
         .card .inner {
             position: relative;
@@ -338,7 +344,7 @@
             max-height: 230 px;
             overflow-y: auto;
             color: #ffffff;
-            font-size: 18px;
+            font-size: 1.5em;
             text-align: left;
         }
         .dimmed {
@@ -484,7 +490,7 @@
             .card-container {
                 max-width: 90% !important;
                 max-height: 500.75px !important; 
-                margin: 8px auto;
+                margin: 6px;
             }
             .tarot-mode .card {
             width: 105px;
@@ -492,6 +498,8 @@
             }
             #description-box {
                 max-width: 90% !important;
+                font-size: 18px;
+            }
             .example-option {
                 left: 25% !important;
                 font-size: 10px; 
@@ -517,6 +525,24 @@
                 font-size: 18px;
                 color: #d16f6f;
                 margin-right: 8px;
+            }
+            #flame-overlay {
+                position: fixed !important;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: none; 
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                overflow: hidden;
+            }
+            #flame-gif {
+                max-width: 900px ;
+                height: auto;
+                pointer-events: none;
             }
         }
     </style>
@@ -564,6 +590,10 @@
                 <div class="example-option" data-value="A♥️\nK♥️\nQ♥️\nJ♥️\n10h\n9♥️\n8♥️\n7♥️\n6♥️\nA♦️\nK♦️\nQ♦️\nJ♦️\n10d\n9♦️\n8♦️\n7♦️\n鬼王">紅(18)</div>
                 <div class="example-option" data-value="A♠️\nK♠️\nQ♠️\nJ♠️\n10s\n9♠️\n8♠️\n7♠️\n6♠️\nA♣️\nK♣️\nQ♣️\nJ♣️\n10c\n9♣️\n8♣️\n7♣️\n小鬼">黑(18)</div>
             </div>
+        </div>
+
+        <div id="flame-overlay">
+            <img src="img/F.gif" id="flame-gif" alt="Fire Animation">
         </div>
 
         <div id="shuffle-animation-container"></div>
@@ -668,11 +698,18 @@ setTimeout(() => {
     document.getElementById('main-content').style.display = 'block';
 }, 3000);
 
+window.addEventListener('DOMContentLoaded', () => {
+    const flameOverlay = document.getElementById('flame-overlay');
+    flameOverlay.style.display = 'none'; 
+    flameOverlay.style.opacity = '0';
+});
+
         const inputArea = document.getElementById('input-area');
         const shuffleAnimationContainer = document.getElementById('shuffle-animation-container');
         const cardContainer = document.getElementById('card-container');
         const flipSound = new Audio('m/card.mp3');
         const shuffleSound = new Audio('m/shuffle.mp3');
+        const fireSound = new Audio('m/F.mp3');
         const shuffleBtn = document.getElementById('shuffle-btn');
         const callBtn = document.getElementById('call-btn');
         const clearBtn = document.getElementById('clear-btn');
@@ -743,16 +780,48 @@ setTimeout(() => {
                     { transform: 'translateX(-50%)' }
                 ], {
                     duration: duration * 0.55,
-                    iterations: 2 // 三次往返
+                    iterations: 2 // 往返
                 });
             });
              // 清理動畫
             Promise.all(
                 shuffleCards.map(card => card.getAnimations()[0].finished)
             ).then(() => {
-                shuffleContainer.remove(); // 移除動畫容器，確保可重複執行
+                shuffleContainer.remove(); 
             });
         }
+        //火焰動畫
+        let flameAnimationActive = false;
+
+        function showFlameAnimation() {
+            const flameOverlay = document.getElementById('flame-overlay');
+            const flameGif = document.getElementById('flame-gif');
+
+            flameOverlay.style.position = 'fixed';
+            flameOverlay.style.opacity = '1'; 
+            flameOverlay.style.top = '0';
+            flameOverlay.style.left = '0';
+            flameOverlay.style.width = '100vw';
+            flameOverlay.style.height = '50vh';
+            flameOverlay.style.display = 'flex'; 
+            flameOverlay.style.justifyContent = 'center';
+            flameOverlay.style.alignItems = 'center';
+            flameOverlay.style.backgroundColor = 'rgba(0, 10, 10, 0.1)';
+            flameOverlay.style.zIndex = '1000';
+            flameGif.style.width = '700px'; 
+            flameGif.style.height = 'auto'; 
+
+            flameGif.src = ''; 
+            flameGif.src = 'img/F.gif';
+
+            setTimeout(() => {
+                flameOverlay.style.opacity = '0'; // 漸隱
+                setTimeout(() => {
+                    flameOverlay.style.display = 'none'; // 完全隱藏
+                }, 300); // 漸隱動畫時間
+            }, 1080); // 顯示時間
+        }
+
         // 洗牌抽籤系統
         shuffleBtn.addEventListener('click', () => {
             clickSound.currentTime = 0; // 重置播放位置
@@ -800,6 +869,9 @@ setTimeout(() => {
         //塔羅牌模式
         function showTarotReading(items) {
             // 顯示解說框
+            showFlameAnimation();
+            fireSound.currentTime = 0; 
+            fireSound.play(); 
             descriptionBox.style.display = 'block';
             descriptionBox.innerHTML = '<b>請翻開您的命運之牌...</b><br>本系統採時間之流的三張抽牌方式，<br>可依序得出「過去、現在、未來」或「原因、結果、建議」<br>得出問題能夠處理的對策方向，<br>問問題的方式請以自己「想怎麼做？」的想法，<br>搭配「該如何做才能加以實現」這樣的形式對策，<br>才能得到較明確而詳細的回饋。<br>卡片若是正顯示為"正位"詮釋，<br>是上下顛倒著則"逆位"詮釋。';
             cardContainer.classList.add('tarot-mode'); //塔羅模式開啟
@@ -1202,6 +1274,7 @@ volumeSlider.addEventListener('input', (event) => {
     const volume = parseFloat(event.target.value);
     bgmAudio.volume = volume;
     shuffleSound.volume = volume; 
+    fireSound.volume = volume; 
     flipSound.volume = volume;   
     scoreSound.volume = volume;  
     clickSound.volume = volume;  
@@ -1230,6 +1303,7 @@ bgmButton.addEventListener('click', () => {
 });
 
 shuffleSound.volume = 0.5; 
+fireSound.volume = 0.5;   
 flipSound.volume = 0.5;  
 scoreSound.volume = 0.5;
 clickSound.volume = 0.5;
