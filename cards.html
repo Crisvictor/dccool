@@ -220,6 +220,12 @@
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8);
             z-index: 5;
         }
+        .card:active {
+            transform: none !important; 
+            box-shadow: 0 0 10px rgba(135, 206, 250, 0.7); 
+            background-color: rgba(135, 206, 250, 0.2);
+            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; 
+        }
         .card .inner {
             position: relative;
             width: 100%;
@@ -495,8 +501,8 @@
                 padding: 5px;
             }
             .tarot-mode .card {
-            width: 105px;
-            height: 175px;
+                width: 105px;
+                height: 175px;
             }
             #description-box {
                 max-width: 90% !important;
