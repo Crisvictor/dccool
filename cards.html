@@ -260,6 +260,12 @@
             text-orientation: upright;
             transform: rotateY(180deg);
         }
+        .card img {
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            user-drag: none;
+        }
         .tarot-mode .card {
             width: 197px;
             height: 304px;
@@ -493,6 +499,8 @@
                 height: 156.25px;
                 font-size: 14px;
                 margin: 3px;
+                transform: none;
+                box-shadow: none;
             }
             .card-container {
                 max-width: 90% !important;
@@ -829,6 +837,15 @@ window.addEventListener('DOMContentLoaded', () => {
                 }, 300); // 漸隱動畫時間
             }, 1080); // 顯示時間
         }
+
+        document.querySelectorAll('.card img').forEach(img => {
+            img.addEventListener('dragstart', event => event.preventDefault()); 
+        });
+        document.addEventListener('contextmenu', event => {
+            if (event.target.closest('.card img')) {
+                event.preventDefault(); // 禁止右鍵選單
+            }
+        });
 
         // 洗牌抽籤系統
         shuffleBtn.addEventListener('click', () => {
