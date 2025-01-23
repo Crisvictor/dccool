@@ -387,6 +387,25 @@
             text-align: center; 
             font-family: "Sangyo", sans-serif !important; 
         }
+        #flame-overlay {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        #flame-gif {
+            max-width: 900px ;
+            height: auto;
+            opacity: 0.4;
+            pointer-events: none;
+        }
         textarea::-webkit-scrollbar,
         .dimmed-container::-webkit-scrollbar,
         .card-container::-webkit-scrollbar {
@@ -541,24 +560,6 @@
                 font-size: 18px;
                 color: #d16f6f;
                 margin-right: 8px;
-            }
-            #flame-overlay {
-                position: fixed !important;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                background-color: rgba(0, 0, 0, 0.5);
-                display: none; 
-                justify-content: center;
-                align-items: center;
-                z-index: 1000;
-                overflow: hidden;
-            }
-            #flame-gif {
-                max-width: 900px ;
-                height: auto;
-                pointer-events: none;
             }
         }
     </style>
@@ -720,318 +721,757 @@ window.addEventListener('DOMContentLoaded', () => {
     flameOverlay.style.opacity = '0';
 });
 
-        const inputArea = document.getElementById('input-area');
-        const shuffleAnimationContainer = document.getElementById('shuffle-animation-container');
-        const cardContainer = document.getElementById('card-container');
-        const flipSound = new Audio('m/card.mp3');
-        const shuffleSound = new Audio('m/shuffle.mp3');
-        const fireSound = new Audio('m/F.mp3');
-        const shuffleBtn = document.getElementById('shuffle-btn');
-        const callBtn = document.getElementById('call-btn');
-        const clearBtn = document.getElementById('clear-btn');
-        const exampleBtn = document.getElementById('example-btn');
-        const exampleOptions = document.getElementById('example-options');
-        const exampleContainer = document.querySelector('.example-container'); 
-        const descriptionBox = document.getElementById('description-box');
+    const inputArea = document.getElementById('input-area');
+    const shuffleAnimationContainer = document.getElementById('shuffle-animation-container');
+    const cardContainer = document.getElementById('card-container');
+    const flipSound = new Audio('m/card.mp3');
+    const shuffleSound = new Audio('m/shuffle.mp3');
+    const fireSound = new Audio('m/F.mp3');
+    const shuffleBtn = document.getElementById('shuffle-btn');
+    const callBtn = document.getElementById('call-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const exampleBtn = document.getElementById('example-btn');
+    const exampleOptions = document.getElementById('example-options');
+    const exampleContainer = document.querySelector('.example-container'); 
+    const descriptionBox = document.getElementById('description-box');
 
         //範例功能列
-        exampleBtn.addEventListener('click', () => {
-            clickSound.currentTime = 0; // 重置播放位置
-            clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
-            if (exampleOptions.style.display === 'none' || exampleOptions.style.display === '') {
-                exampleOptions.style.display = 'flex';
-            } else {
-                exampleOptions.style.display = 'none';
-            }
-        });
-        document.querySelectorAll('.example-option').forEach(option => {
-            option.addEventListener('click', () => {
-                inputArea.value = option.dataset.value.replace(/\\n/g, '\n');
-            });
-        });
-        // 洗牌動畫效果
-        function shuffleAnimation(items) {
-            const shuffleContainer = document.createElement('div');
-            shuffleContainer.id = 'shuffle-animation-container';
-            shuffleContainer.style.position = 'absolute';
-            shuffleContainer.style.top = '50%'; 
-            shuffleContainer.style.left = '0';
-            shuffleContainer.style.width = '100%';
-            shuffleContainer.style.height = '150px';
-            shuffleContainer.style.transform = 'translateY(-50%)';
-            shuffleContainer.style.display = 'flex';
-            shuffleContainer.style.justifyContent = 'center';
-            shuffleContainer.style.alignItems = 'center';
-            shuffleContainer.style.zIndex = '10';
-            shuffleContainer.style.overflow = 'hidden';
-            shuffleContainer.style.pointerEvents = 'none';
-            // 插入到 cardContainer 內部
-            const cardContainer = document.getElementById('card-container');
-            cardContainer.appendChild(shuffleContainer);
-            // 建立卡片動畫
-            const shuffleCards = items.map((_, index) => {
-                const card = document.createElement('div');
-                card.className = 'shuffle-card';
-                card.style.width = '93.75px';
-                card.style.height = '156.25px';
-                card.style.margin = '5px';
-                card.style.position = 'absolute';
-                card.style.backgroundImage = "url('img/backcard.png')";
-                card.style.backgroundSize = 'cover';
-                card.style.borderRadius = '4px';
-                // 初始位置設置在 X 軸
-                card.style.left = '50%';
-                card.style.transform = 'translateX(-50%)';
-                shuffleContainer.appendChild(card);
-                return card;
-            });
-            // 播放動畫
-            shuffleCards.forEach(card => {
-                const duration = 1000;
-                const direction = Math.random() < 0.5 ? -1 : 1; 
-                const translateX = (Math.random() * 150 + 50) * direction; // 移動範圍 ±50px 到 ±200px
-                card.animate([
-                    { transform: 'translateX(-50%)' },
-                    { transform: `translateX(calc(-50% + ${translateX}px))` },
-                    { transform: 'translateX(-50%)' }
-                ], {
-                    duration: duration * 0.55,
-                    iterations: 2 // 往返
-                });
-            });
-             // 清理動畫
-            Promise.all(
-                shuffleCards.map(card => card.getAnimations()[0].finished)
-            ).then(() => {
-                shuffleContainer.remove(); 
-            });
+    exampleBtn.addEventListener('click', () => {
+        clickSound.currentTime = 0; // 重置播放位置
+        clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
+        if (exampleOptions.style.display === 'none' || exampleOptions.style.display === '') {
+            exampleOptions.style.display = 'flex';
+        } else {
+            exampleOptions.style.display = 'none';
         }
+    });
+    document.querySelectorAll('.example-option').forEach(option => {
+        option.addEventListener('click', () => {
+            inputArea.value = option.dataset.value.replace(/\\n/g, '\n');
+        });
+    });
+    // 洗牌動畫效果
+function shuffleAnimation(items) {
+    const shuffleContainer = document.createElement('div');
+        shuffleContainer.id = 'shuffle-animation-container';
+        shuffleContainer.style.position = 'absolute';
+        shuffleContainer.style.top = '50%'; 
+        shuffleContainer.style.left = '0';
+        shuffleContainer.style.width = '100%';
+        shuffleContainer.style.height = '150px';
+        shuffleContainer.style.transform = 'translateY(-50%)';
+        shuffleContainer.style.display = 'flex';
+        shuffleContainer.style.justifyContent = 'center';
+        shuffleContainer.style.alignItems = 'center';
+        shuffleContainer.style.zIndex = '10';
+        shuffleContainer.style.overflow = 'hidden';
+        shuffleContainer.style.pointerEvents = 'none';
+        // 插入到 cardContainer 內部
+        const cardContainer = document.getElementById('card-container');
+        cardContainer.appendChild(shuffleContainer);
+        // 建立卡片動畫
+        const shuffleCards = items.map((_, index) => {
+        const card = document.createElement('div');
+        card.className = 'shuffle-card';
+        card.style.width = '93.75px';
+        card.style.height = '156.25px';
+        card.style.margin = '5px';
+        card.style.position = 'absolute';
+        card.style.backgroundImage = "url('img/backcard.png')";
+        card.style.backgroundSize = 'cover';
+        card.style.borderRadius = '4px';
+        // 初始位置設置在 X 軸
+        card.style.left = '50%';
+        card.style.transform = 'translateX(-50%)';
+        shuffleContainer.appendChild(card);
+        return card;
+    });
+        // 播放動畫
+    shuffleCards.forEach(card => {
+        const duration = 1000;
+        const direction = Math.random() < 0.5 ? -1 : 1; 
+        const translateX = (Math.random() * 150 + 50) * direction; // 移動範圍 ±50px 到 ±200px
+        card.animate([
+            { transform: 'translateX(-50%)' },
+            { transform: `translateX(calc(-50% + ${translateX}px))` },
+            { transform: 'translateX(-50%)' }
+        ], {
+                duration: duration * 0.55,
+                iterations: 2 // 往返
+            });
+    });
+        // 清理動畫
+    Promise.all(
+        shuffleCards.map(card => card.getAnimations()[0].finished)
+        ).then(() => {
+            shuffleContainer.remove(); 
+        });
+    }
         //火焰動畫
-        let flameAnimationActive = false;
+let flameAnimationActive = false;
 
-        function showFlameAnimation() {
-            const flameOverlay = document.getElementById('flame-overlay');
-            const flameGif = document.getElementById('flame-gif');
+function showFlameAnimation() {
+    const flameOverlay = document.getElementById('flame-overlay');
+    const flameGif = document.getElementById('flame-gif');
 
-            flameOverlay.style.position = 'fixed';
-            flameOverlay.style.opacity = '1'; 
-            flameOverlay.style.top = '0';
-            flameOverlay.style.left = '0';
-            flameOverlay.style.width = '100vw';
-            flameOverlay.style.height = '50vh';
-            flameOverlay.style.display = 'flex'; 
-            flameOverlay.style.justifyContent = 'center';
-            flameOverlay.style.alignItems = 'center';
-            flameOverlay.style.backgroundColor = 'rgba(0, 10, 10, 0.1)';
-            flameOverlay.style.zIndex = '1000';
-            flameGif.style.width = '700px'; 
-            flameGif.style.height = 'auto'; 
+    flameOverlay.style.position = 'fixed';
+    flameOverlay.style.opacity = '1'; 
+    flameOverlay.style.top = '0';
+    flameOverlay.style.left = '0';
+    flameOverlay.style.width = '100vw';
+    flameOverlay.style.height = '50vh';
+    flameOverlay.style.display = 'flex'; 
+    flameOverlay.style.justifyContent = 'center';
+    flameOverlay.style.alignItems = 'center';
+    flameOverlay.style.backgroundColor = 'rgba(0, 10, 10, 0.1)';
+    flameOverlay.style.zIndex = '1000';
+    flameGif.style.width = '700px'; 
+    flameGif.style.height = 'auto'; 
 
-            flameGif.src = ''; 
-            flameGif.src = 'img/F.gif';
+    flameGif.src = ''; 
+    flameGif.src = 'img/F.gif';
 
-            setTimeout(() => {
-                flameOverlay.style.opacity = '0'; // 漸隱
-                setTimeout(() => {
-                    flameOverlay.style.display = 'none'; // 完全隱藏
-                }, 300); // 漸隱動畫時間
-            }, 1080); // 顯示時間
+    setTimeout(() => {
+        flameOverlay.style.opacity = '0'; // 漸隱
+        setTimeout(() => {
+            flameOverlay.style.display = 'none'; // 完全隱藏
+        }, 300); // 漸隱動畫時間
+    }, 1080); // 顯示時間
+}
+        //圖片禁止拖曳與右鍵
+    document.querySelectorAll('.card img').forEach(img => {
+        img.addEventListener('dragstart', event => event.preventDefault()); 
+        img.addEventListener('touchstart', event => event.preventDefault())
+    });
+    document.addEventListener('contextmenu', event => {
+        if (event.target.closest('.card img')) {
+            event.preventDefault(); // 禁止右鍵選單
         }
-
-        document.querySelectorAll('.card img').forEach(img => {
-            img.addEventListener('dragstart', event => event.preventDefault()); 
-        });
-        document.addEventListener('contextmenu', event => {
-            if (event.target.closest('.card img')) {
-                event.preventDefault(); // 禁止右鍵選單
-            }
-        });
+    });
 
         // 洗牌抽籤系統
-        shuffleBtn.addEventListener('click', () => {
-            clickSound.currentTime = 0; // 重置播放位置
-            clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
-            const items = inputArea.value.trim().split('\n').filter(Boolean);
-            if (items.length < 2) {
-                alert('請至少輸入兩個項目進行抽籤！');
-                return;
-            }
-                inputArea.style.display = 'none';
-                exampleContainer.style.display = 'none'; 
-                cardContainer.style.display = 'flex';
-                cardContainer.innerHTML = '';
-
-                if (items.includes('命運之輪')) {
-                showTarotReading(items);
-                return;
-                }
-
-            requestAnimationFrame(() => {
-                shuffleAnimation(items);
-                shuffleSound.currentTime = 0; 
-                shuffleSound.play(); 
-            });
-            setTimeout(() => {
-                items.sort(() => Math.random() - 0.5);
-                items.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    const content = generateCardContent(item);
-                     card.innerHTML = `<div class="inner">
-                                        <div class="back"></div>
-                                        <div class="front">${content}</div>
-                                       </div>`;
-                    card.classList.add('hidden');
-                    card.addEventListener('click', () => {
-                        card.classList.toggle('hidden');
-                        flipSound.currentTime = 0; 
-                        flipSound.play(); 
-                    });
-                    cardContainer.appendChild(card);
-                });
-            }, 1010); // 等動畫結束再生成卡片
-        });
-        //塔羅牌模式
-        function showTarotReading(items) {
-            // 顯示解說框
-            showFlameAnimation();
-            fireSound.currentTime = 0; 
-            fireSound.play(); 
-            descriptionBox.style.display = 'block';
-            descriptionBox.innerHTML = '<b>請翻開您的命運之牌...</b><br>本系統採時間之流的三張抽牌方式，<br>可依序得出「過去、現在、未來」或「原因、結果、建議」<br>得出問題能夠處理的對策方向，<br>問問題的方式請以自己「想怎麼做？」的想法，<br>搭配「該如何做才能加以實現」這樣的形式對策，<br>才能得到較明確而詳細的回饋。<br>卡片若是正顯示為"正位"詮釋，<br>是上下顛倒著則"逆位"詮釋。';
-            cardContainer.classList.add('tarot-mode'); //塔羅模式開啟
-            requestAnimationFrame(() => {
-                shuffleAnimation(items);
-                shuffleSound.currentTime = 0; 
-                shuffleSound.play(); 
-            });
-            setTimeout(() => {
-                // 隨機抽取三張牌
-    const selectedCards = [];
-    while (selectedCards.length < 3) {
-        const randomIndex = Math.floor(Math.random() * items.length);
-        if (!selectedCards.includes(items[randomIndex])) {
-            selectedCards.push(items[randomIndex]);
-        }
+shuffleBtn.addEventListener('click', () => {
+    clickSound.currentTime = 0; // 重置播放位置
+    clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
+    const items = inputArea.value.trim().split('\n').filter(Boolean);
+    if (items.length < 2) {
+        alert('請至少輸入兩個項目進行抽籤！');
+        return;
     }
-
-    const cardContainer = document.getElementById('card-container');
+    inputArea.style.display = 'none';
+    exampleContainer.style.display = 'none'; 
+    cardContainer.style.display = 'flex';
     cardContainer.innerHTML = '';
 
-    selectedCards.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        const content = generateCardContent(item);
+    if (items.includes('命運之輪')) {
+        showTarotReading(items);
+        return;
+    }
 
-        card.innerHTML = `<div class="inner">
-                            <div class="back"></div>
-                            <div class="front">${content}</div>
-                          </div>`;
-        card.classList.add('hidden'); 
-        const isReversed = Math.random() < 0.5; // 50%機率逆位
-        if (isReversed) {
-            card.classList.add('reversed');
-        }
-        let isFlipped = false; 
-        card.addEventListener('click', () => {
-            if (isFlipped) {
-                card.classList.remove('flipped'); 
-                isFlipped = false;
-            } else {
-                card.classList.add('flipped'); 
-                isFlipped = true;
-            }
-            flipSound.currentTime = 0;
-            flipSound.play();
-            descriptionBox.innerHTML = getCardDescription(item);
+    requestAnimationFrame(() => {
+        shuffleAnimation(items);
+        shuffleSound.currentTime = 0; 
+        shuffleSound.play(); 
+    });
+    setTimeout(() => {
+        items.sort(() => Math.random() - 0.5);
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const content = generateCardContent(item);
+            card.innerHTML = `<div class="inner">
+                                <div class="back"></div>
+                                <div class="front">${content}</div>
+                                </div>`;
+            card.classList.add('hidden');
+            card.addEventListener('click', () => {
+                card.classList.toggle('hidden');
+                flipSound.currentTime = 0; 
+                flipSound.play(); 
+            });
+            cardContainer.appendChild(card);
         });
-                    cardContainer.appendChild(card);
-                });
-            }, 1010);
+    }, 1010); // 等動畫結束再生成卡片
+});
+        //塔羅牌模式
+function showTarotReading(items) {
+    // 顯示解說框
+    showFlameAnimation();
+    fireSound.currentTime = 0;
+    fireSound.play();
+    descriptionBox.style.display = 'block';
+    descriptionBox.innerHTML = `
+        <b>請翻開您的命運之牌...</b><br>
+        本系統採時間之流的三張抽牌方式，<br>
+        可依序得出「過去、現在、未來」或「原因、結果、建議」<br>
+        得出問題能夠處理的對策方向，<br>
+        問問題的方式請以自己「想怎麼做？」的想法，<br>
+        搭配「該如何做才能加以實現」這樣的形式對策，<br>
+        才能得到較明確而詳細的回饋。<br>
+        卡片若是正顯示為"正位"詮釋，<br>
+        是上下顛倒著則"逆位"詮釋。
+    `;
+
+    cardContainer.classList.add('tarot-mode'); // 開啟塔羅模式
+
+    requestAnimationFrame(() => {
+        shuffleAnimation(items);
+        shuffleSound.currentTime = 0;
+        shuffleSound.play();
+    });
+
+    setTimeout(() => {
+        const selectedCards = [];
+        while (selectedCards.length < 3) {
+            const randomIndex = Math.floor(Math.random() * items.length);
+            if (!selectedCards.includes(items[randomIndex])) {
+                selectedCards.push(items[randomIndex]);
+            }
         }
+
+        const cardContainer = document.getElementById('card-container');
+        cardContainer.innerHTML = '';
+        selectedCards.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const content = generateCardContent(item);
+
+            card.innerHTML = `
+                <div class="inner">
+                    <div class="back"></div>
+                    <div class="front">${content}</div>
+                </div>
+            `;
+
+            card.classList.add('hidden');
+            const isReversed = Math.random() < 0.5; // 50% 機率逆位
+            if (isReversed) {
+                card.classList.add('reversed');
+            }
+            let isFlipped = false;
+
+            // 點擊事件處理
+            card.addEventListener('click', () => {
+                flipSound.currentTime = 0;
+                flipSound.play().catch((error) => {
+                    console.warn('翻牌音效播放失敗:', error);
+                });
+                if (isFlipped) {
+                    card.classList.remove('flipped');
+                    isFlipped = false;
+                } else {
+                    card.classList.add('flipped');
+                    isFlipped = true;
+                }
+
+                // 獲取卡片的描述
+                const cardIsReversed = card.classList.contains('reversed');
+                const description = getCardDescription(item, cardIsReversed);
+                if (description) {
+                    descriptionBox.innerHTML = description;
+                    descriptionBox.style.display = 'block'; // 顯示描述框
+                } else {
+                    console.warn(`未找到卡片 "${item}" 的描述`);
+                }
+            });
+
+            // 添加卡片到容器
+            cardContainer.appendChild(card);
+        });
+    }, 1010); // 確保延遲與動畫時間一致
+}
+
     // **牌義解釋邏輯**
-    function getCardDescription(item) {
-            const descriptions = {
-            '愚者': '愚者 ——<br>新的開始與自由，冒險與無限潛力。<br>正位：象徵純真、開放的心態與勇敢冒險的精神。<br>提醒要信任自己的直覺並擁抱未知旅程，接受生活中的變化與挑戰。<br>代表創新的機會與重新開始的時機，適合迎接未知領域的探索。<br>逆位： 暗示衝動行動、缺乏計劃或天真過度，可能因忽略細節或準備不足而導致失敗。<br>亦可能象徵過度猶豫、不敢踏出第一步，或對未知的恐懼造成停滯。<br>有時代表冒險過度或逃避責任，提醒留意自我欺騙或現實脫節的情況。<br>建議與對策： 平衡冒險與謹慎，確保決策前有足夠的準備。<br>重新審視目標，避免因盲目樂觀而忽略潛在風險，或因恐懼而錯失機會。<br>學習適當信任他人，同時保持對環境的觀察與警覺，讓冒險建立在現實基礎上。',
-            '魔術師': '魔術師 ——<br>創造力與行動的力量，掌握資源與機會。<br>正位：代表能力、溝通與將想法實現為現實的潛力。<br>象徵個人資源與技能的運用，提醒相信自身的才能並積極行動。<br>預示新的開始或機會，適合創造性計劃與項目啟動。<br>逆位： 暗示錯失機會、缺乏自信或欺騙行為，可能過度操控情境或忽視道德界限。<br>也可能顯示技能或計劃準備不足，導致目標無法落實或進展緩慢。<br>在某些情況下，象徵操控或欺騙他人以達成目的的危險行為，需特別警惕操控慾望。<br>建議與對策： 強化計劃與意圖，避免操之過急或依賴虛假手段達成目標。<br>確保動機與手段的正當性，利用已有資源增強自信與技能，避免內耗與浪費機會。',
-            '女祭司': '女祭司 ——<br>智慧與直覺，內在探索與秘密揭露。<br>正位：象徵靈性覺醒、內在智慧與隱藏的知識。<br>提醒傾聽直覺、深入了解真相並信任內心的聲音。<br>適合學習與冥想，探索未知領域並接觸潛意識的訊息。<br>逆位： 暗示壓抑直覺、情感封閉或自我懷疑。<br>可能代表對秘密的誤解或資訊缺失，導致決策失誤或方向模糊。<br>也可能顯示過於依賴表象或外在權威，忽略內心聲音與真實感受。<br>建議與對策： 放慢步調，重視內在聲音並深入挖掘真相。<br>學習分辨資訊的真偽，避免盲目跟隨他人意見。<br>透過冥想或靜心活動增強自我覺察與靈性連結，找回內在平衡與洞見。',
-            '皇后': '皇后 ——<br>豐盛與滋養，創造力與成長的象徵。<br>正位：代表愛、繁榮與母性力量，象徵豐饒與和諧。<br>鼓勵關注感情與家庭關係，培養創造力與滋養內心需求。<br>適合孕育新計劃或深化與他人的連結，強調感性與關懷的力量。<br>逆位： 暗示過度依賴、缺乏自信或情感阻礙。<br>可能顯示愛過度氾濫、保護過頭，導致失衡或壓力增加。<br>也可能表示創造力受阻或無法孕育新的想法與計劃。<br>在某些情況下，可能象徵懶散、逃避責任或物質過度依賴，提醒調整情感與需求的平衡。<br>建議與對策： 均衡自我需求與關懷他人，學會適時放手與信任他人能力。<br>釋放內在創造力，透過自我愛與成長克服內心不安。<br>避免過度依賴物質享受，專注於內在豐盛與精神滿足。',
-           '皇帝': '皇帝 ——<br>權威與穩定，掌控與結構的象徵。<br>正位：象徵領導力、秩序與計劃執行的力量。<br>提醒建立穩固的基礎與長期策略，強調責任感與紀律。<br>適合設定清晰目標並以自信與決心克服挑戰。<br>逆位： 暗示控制過度、專制或缺乏靈活性。<br>可能顯示過分追求權威導致壓迫感或反抗，也可能象徵缺乏秩序與方向。<br>有時代表無法掌控情況或逃避責任的狀態，提醒調整態度與策略。<br>建議與對策： 平衡權威與包容，建立穩健結構的同時保持彈性與適應力。<br>學習信任他人並授權合作，避免獨裁或控制慾過強造成的阻礙。',
-           '教皇': '教皇 ——<br>傳統與智慧，信仰與精神指引的象徵。<br>正位：代表教育、道德與社會規範，象徵學習與遵循傳統的價值觀。<br>提醒尋求指導或遵循某種制度來達到精神與知識的成長。<br>適合建立穩定的信念系統或尋找啟發性的導師。<br>逆位： 暗示教條主義、叛逆或質疑權威。<br>可能象徵拒絕傳統規範或對社會期待感到不滿，導致內心衝突與迷失方向。<br>有時代表過度固執於規矩，忽略創新或與他人脫節。<br>建議與對策： 尋求精神與知識的平衡，避免盲目跟隨或完全排斥傳統。<br>學習適應變化，發展屬於自己的信仰與價值觀，並保持開放與包容的態度。',
-            '戀人': '戀人 ——<br>愛情與選擇，和諧與連結的象徵。<br>正位：代表愛情、關係與合作，象徵情感連結與相互理解。<br>提醒重視信任與溝通，適合建立關係或做出重要選擇。<br>預示情感與道德層面的決策時刻，需權衡內心需求與外在現實。<br>逆位： 暗示分歧、誘惑或優柔寡斷，可能象徵關係破裂或溝通失敗。<br>也可能顯示錯誤選擇帶來的遺憾與情感困惑。<br>提醒注意情感依賴或缺乏承諾造成的不穩定狀態。<br>建議與對策： 誠實面對需求與感受，解決內心衝突並加強信任與溝通。<br>學習從錯誤中成長，勇敢面對抉擇並堅持對自己有利的決定。',
-            '戰車': '戰車 ——<br>意志與勝利，掌控與前進的象徵。<br>正位：代表決心、專注與自信，象徵透過意志力克服障礙並邁向成功。<br>提醒保持紀律與控制力，以實現目標與突破挑戰。<br>適合推進計劃或面對困難時展現勇氣與堅持。<br>逆位： 暗示失控、缺乏方向或內在衝突，可能象徵計劃停滯或對抗失敗。<br>也可能顯示意志動搖或過度操控導致反效果。<br>提醒避免衝動行事或盲目追求結果而忽視平衡。<br>建議與對策： 重新調整方向，強化自律與動力，並確保計劃執行穩健有序。<br>學習在行動與耐心之間取得平衡，避免過度壓迫自己或他人。',
-            '力量': '力量 ——<br>勇氣與耐心，內在力量與同理心的象徵。<br>正位：代表自信、意志力與控制情緒的能力，象徵克服恐懼與挑戰的內在力量。<br>提醒透過耐心與理解而非強硬來解決問題。<br>適合培養自律與情感穩定，增強人際關係的信任與支持。<br>逆位： 暗示缺乏信心、情緒失控或過度衝動。<br>可能象徵壓力過大導致行動力下降或內心脆弱。<br>提醒避免逃避困難，並學習釋放壓力與管理情緒。<br>建議與對策： 專注於內在修煉，學習控制恐懼與焦慮，並以溫和的方式處理衝突與挑戰。',
-            '隱者': '隱者 ——<br>內省與指引，靈性探索與智慧的象徵。<br>正位：代表自我反思、尋找真理與內在指引。<br>提醒透過靜心與學習獲取洞見與智慧。<br>適合進行個人探索與深度思考，以解決內心疑惑或尋找人生方向。<br>逆位： 暗示孤立、迷失方向或拒絕成長。<br>可能象徵對孤獨的恐懼或逃避問題，導致錯失機會與指引。<br>提醒注意與他人的連結，避免過度封閉自己。<br>建議與對策： 坦然接受孤獨的價值，同時保持與他人的溝通與交流，讓內心與外在世界取得平衡。',
-            '命運之輪': '命運之輪 ——<br>循環與改變，命運的轉變與機遇。<br>正位：代表機會與變化，象徵好運降臨、新的循環或命運的轉折點。<br>提醒把握機會並接受改變帶來的挑戰。<br>適合迎接未知挑戰並適應變化，提升靈活性與適應力。<br>逆位： 暗示延遲、計劃受阻或控制權失控。<br>可能象徵命運的反轉或壞運氣，提醒反思是否抗拒必要的改變或過度依賴外部因素。<br>建議與對策： 在困難中尋找教訓與成長機會，探索過去的選擇是否影響當下結果，並調整方向以迎接轉變。',
-            '正義': '正義 ——<br>公平與真理，平衡與責任的象徵。<br>正位：代表誠實、公正與平衡，象徵決策需要理性與道德考量。<br>提醒評估情況並保持誠信與責任感，確保行為符合正義與真理。<br>適合處理法律事務或重要抉擇，以理性分析為基礎做出決定。<br>逆位： 暗示不公正、偏見或逃避責任。<br>可能象徵自欺或對結果缺乏接受能力，導致內心不安或混亂。<br>提醒避免否認錯誤或推卸責任，誠實面對現實並尋求平衡解決方案。<br>建議與對策： 深入檢視情況，客觀分析並糾正錯誤行為。<br>建立公平與透明的原則，並承擔必要的責任以維持內外平衡。',
-            '倒吊人': '倒吊人 ——<br>犧牲與等待，轉變與視角轉換的象徵。<br>正位：代表停滯、靜止與重新評估，提醒透過放下執念來獲得新視角與靈性成長。<br>象徵犧牲短期利益換取更高的目標，適合放慢腳步進行內在反思。<br>逆位： 暗示拒絕改變、拖延或犧牲不值得的事物。<br>可能象徵自我犧牲過度或錯誤投資時間與精力。<br>提醒注意卡在僵局或逃避問題的情況。<br>建議與對策： 放下對控制的渴望，勇於接受變化與新的觀點，從被動中尋找轉機與解脫。',
-            '死神': '死神 ——<br>結束與重生，轉變與蛻變的象徵。<br>正位：代表結束一個階段與全新開始的契機，象徵重生與內在轉化。<br>提醒勇敢面對改變並釋放舊有束縛，適合重新定義目標與方向。<br>逆位： 暗示抗拒改變、停滯或無法放下過去。<br>可能象徵拖延結束或害怕面對失去，導致停滯不前。<br>提醒擁抱必要的結束，以開啟新的成長旅程。<br>建議與對策： 放下恐懼，接受不可避免的改變，並尋找重建與復甦的機會。',
-            '節制': '節制 ——<br>平衡與協調，耐心與調和的象徵。<br>正位：代表和諧與節制，象徵在情感與行動中找到適當的平衡與穩定。<br>提醒耐心調整步伐，避免極端行為或過度消耗。<br>適合建立長期計劃與維持內心平靜。<br>逆位： 暗示失衡、衝動或過度行為。<br>可能象徵耐心不足、缺乏協調或行動過急導致混亂。<br>提醒留意生活或情感的過度投入，尋找恢復平衡的方法。<br>建議與對策： 調整步調與策略，保持耐心與開放心態，並確保各方面需求得到適當滿足。',
-            '惡魔': '惡魔 ——<br>束縛與誘惑，執著與物質欲望的象徵。<br>正位：代表誘惑、成癮與負面影響，象徵過度依賴或無法擺脫某種情境的束縛。<br>提醒警惕物質享受與負面習慣的控制，避免自我欺騙或沉迷。<br>逆位： 暗示掙脫束縛、克服恐懼或擺脫控制。<br>可能象徵突破限制與習慣，尋求自由與解脫。<br>提醒擺脫負面關係或物質依賴，重獲內心主導權。<br>建議與對策： 勇敢面對恐懼與內在陰影，學習辨識與改變不健康模式，透過自律恢復自由與掌控感。',
-            '高塔': '高塔  ——<br>突變與動盪，突然改變與覺醒的象徵。<br>正位：代表突如其來的事件或衝擊，象徵破壞舊有模式並強迫成長與重建。<br>提醒接受變革，將危機轉化為成長的契機。<br>適合打破限制與重新評估生活方向。<br>逆位： 暗示內心恐懼、抗拒變化或難以釋放壓力。<br>可能象徵延遲的危機或對突發事件的逃避。<br>提醒不要過度依賴現有安全感，應主動準備應對挑戰。<br>建議與對策： 勇敢面對不可預測的變化，接受過程帶來的成長，並從混亂中尋找新的機會。',
-            '星星': '星星 ——<br>希望與啟發，治癒與願景的象徵。<br>正位：代表靈感、希望與新方向，象徵療癒與充滿信心的未來。<br>提醒信任宇宙的安排並追隨內心的指引，適合重拾夢想與展望未來。<br>逆位： 暗示失望、信心動搖或缺乏方向感。<br>可能象徵對未來的懷疑或因過去的傷害導致無法前進。<br>提醒重新建立信任與樂觀，避免消極思維阻礙成長。<br>建議與對策： 尋找內心的力量與希望，保持正向思考並逐步實現目標。',
-            '月亮': '月亮 ——<br>幻覺與迷惑，直覺與潛意識的象徵。<br>正位：代表情感波動、不確定性與隱藏的恐懼，提醒探索內在情緒並信任直覺指引。<br>象徵夢境與潛意識的訊息，適合深入分析情感與直覺感受。<br>逆位： 暗示迷失、幻覺破滅或焦慮消除。<br>可能象徵真相逐漸浮現或困惑與恐懼的解除。<br>提醒保持理性分析並克服不必要的恐懼或誤解。<br>建議與對策： 專注於清晰思考，勇敢面對情感陰影並尋求真相，避免被虛假表象所迷惑。',
-            '太陽': '太陽 ——<br>快樂與成功，光明與積極的象徵。<br>正位：代表幸福、成就與活力，象徵內在的快樂與目標實現的機會。<br>提醒保持樂觀並充滿信心地迎接生活挑戰，適合慶祝成就與享受幸福時刻。<br>逆位： 暗示延遲、樂觀不足或過度自信帶來的挫折。<br>可能象徵目標尚未完全實現，提醒保持耐心與努力不懈。<br>提醒不要讓短期挫折阻礙長期目標的達成。<br>建議與對策： 保持積極態度，專注於進步與成果，並相信黑暗終將散去，迎來光明與成功。',
-            '審判': '審判 ——<br>重生與覺醒，反思與救贖的象徵。<br>正位：代表清晰洞見與自我覺醒，象徵釋放過去並迎接新的開始。<br>提醒反思過往經歷並從中學習，適合解決舊問題並開啟新篇章。<br>逆位： 暗示逃避現實、內疚或拒絕改變。<br>可能象徵對過去行為的後悔或無法釋懷，導致停滯與焦慮。<br>提醒面對現實並做出必要的改變，避免自我批判與拖延。<br>建議與對策： 認清自己的責任與選擇，勇敢承擔後果並以積極態度迎接轉變與新生機會。',
-            '世界': '世界 ——<br>完成與成就，圓滿與統合的象徵。<br>正位：代表目標達成、圓滿與成功，象徵實現願望與成就夢想的時刻。<br>提醒慶祝成果並迎接新的旅程，適合將經驗與智慧運用到未來發展中。<br>逆位： 暗示未完成的目標、延遲或缺乏方向感。<br>可能象徵努力仍需持續或對成果不滿意，導致情感上的空虛與焦慮。<br>提醒檢視過去的努力並調整計劃，以克服阻礙並推動最終完成。<br>建議與對策： 評估進度與目標，保持耐心並專注於持續成長與改進，迎接最終的成功與自我統合。',
-            '權杖1': '權杖一 ——<br>新開始與創造力，熱情與動力的象徵。<br>正位：代表靈感、潛力與行動力，象徵新機會與突破性進展。<br>提醒抓住創造性的想法與機會，適合啟動新計劃或冒險挑戰。<br>逆位： 暗示延遲、動力不足或缺乏方向感。<br>可能象徵機會錯失或計劃停滯，提醒重新評估目標與行動策略。<br>建議與對策： 激發熱情與信心，設定明確目標並採取積極行動以實現突破。',
-            '權杖2': '權杖二 ——<br>計劃與遠見，探索與決策的象徵。<br>正位：代表計劃與準備，象徵對未來的展望與策略制定。<br>提醒以長遠視角審視機會與風險，適合做出重大決策與布局行動。<br>逆位： 暗示猶豫不決、準備不足或機會錯失。<br>可能象徵對未來缺乏信心或過於保守，阻礙發展與進步。<br>建議與對策： 克服猶豫與恐懼，大膽踏出舒適圈，勇敢追求目標並堅持行動。',
-            '權杖3': '權杖三 ——<br>擴展與遠景，成長與貿易的象徵。<br>正位：代表機會擴展與成就開端，象徵合作與進展順利。<br>提醒保持耐心與遠見，適合發展長期計劃與探索新市場。<br>逆位： 暗示計劃延遲、合作失敗或期望落空。<br>可能象徵缺乏耐心或準備不足，導致無法抓住機會。<br>建議與對策： 調整策略並重整資源，持續保持信心與靈活應變以推動進展。',
-            '權杖4': '權杖四 ——<br>慶祝與穩定，家庭與團結的象徵。<br>正位：代表成功與穩固基礎，象徵成就的慶祝與關係的和諧。<br>提醒珍惜當下成果並享受歡樂氛圍，適合婚禮、家庭聚會或團隊慶祝活動。<br>逆位： 暗示緊張、不穩定或缺乏安全感。<br>可能象徵家庭或團隊內部的衝突，或未達成期望的穩定與安全。<br>建議與對策： 加強溝通與合作，解決矛盾並重新建立和諧與穩固的基礎。',
-            '權杖5': '權杖五 ——<br>競爭與衝突，挑戰與動力的象徵。<br>正位：代表競爭與衝突，象徵意見分歧或挑戰的出現。<br>提醒保持靈活與合作精神，將競爭視為成長的機會。<br>逆位： 暗示內耗、混亂或難以解決的衝突。<br>可能象徵爭執不休或缺乏合作導致停滯不前。<br>建議與對策： 調解矛盾，促進溝通並尋求雙贏解決方案，避免無意義的競爭與衝突。',
-            '權杖6': '權杖六 ——<br>勝利與認可，自信與成就的象徵。<br>正位：代表成功與榮耀，象徵努力獲得回報與他人肯定。<br>提醒保持謙遜並感恩支持，適合慶祝成就與展現領導力。<br>逆位： 暗示失敗、遲遲未得到認可或自信動搖。<br>可能象徵未完成目標或對成功過於焦慮而失去動力。<br>建議與對策： 調整態度與策略，持續努力克服阻礙，並專注於內在成就而非外在認同。',
-            '權杖7': '權杖七 ——<br>防禦與堅持，保衛與挑戰的象徵。<br>正位：代表堅持立場與克服阻力，象徵抵禦挑戰與維護成果的決心。<br>提醒保持信心並勇敢面對反對意見或壓力。<br>逆位： 暗示防禦過度、疲憊或自信不足。<br>可能象徵壓力過大導致防線崩潰或對抗失敗。<br>建議與對策： 強化內在力量，調整策略並堅持信念，同時注意避免過度防禦與孤立自己。',
-            '權杖8': '權杖八 ——<br>速度與進展，動能與突破的象徵。<br>正位：代表快速發展與行動力，象徵溝通順暢與目標快速實現的機會。<br>提醒把握時機並保持彈性以應對突發狀況。<br>逆位： 暗示延遲、停滯或誤解帶來的阻礙。<br>可能象徵溝通不良或行動計劃失敗，導致無法推動進展。<br>建議與對策： 檢查細節與重新評估計劃，確保資訊準確與溝通順暢，以克服障礙。',
-            '權杖9': '權杖九 ——<br>韌性與防衛，保護與準備的象徵。<br>正位：代表堅持與防禦，象徵過去努力的積累與最後階段的挑戰。<br>提醒保持警覺與耐心，適合堅守立場並準備迎接最後的測試。<br>逆位： 暗示疲憊、疑慮或防禦心理過重。<br>可能象徵害怕失敗或對過去傷害的防禦心態影響未來發展。<br>建議與對策： 保持耐心與信心，注意調整防禦策略並放下不必要的恐懼與疑慮。',
-            '權杖10': '權杖十 ——<br>負擔與責任，壓力與努力的象徵。<br>正位：代表承擔重任與壓力，象徵努力接近成功但需要付出額外精力。<br>提醒合理分配工作與責任，避免過度負荷導致身心疲憊。<br>逆位： 暗示壓力過大、責任難以承擔或無法卸下重擔。<br>可能象徵被困於繁重責任中而失去平衡與動力。<br>建議與對策： 學會尋求幫助與分擔責任，重新評估優先事項並減輕負擔。',
-            '權杖侍者': '權杖侍者 ——<br>探索與冒險，靈感與好奇心的象徵。<br>正位：代表新的機會與創意，象徵熱情與勇於嘗試新事物的精神。<br>提醒保持積極心態與開放心靈，適合接受挑戰與學習新技能。<br>逆位： 暗示計劃不成熟、焦點不明或缺乏行動力。<br>可能象徵過度衝動或準備不足導致機會錯失。<br>建議與對策： 重視準備與計劃，避免倉促行動，並將熱情轉化為穩健的行動計劃。',
-            '權杖騎士': '權杖騎士 ——<br>行動與冒險，自信與激情的象徵。<br>正位：代表快速行動與追求目標，象徵自信與進取心。<br>提醒大膽追求夢想與機會，適合採取主動行動推動進展。<br>逆位： 暗示衝動、缺乏計劃或耐心不足。<br>可能象徵過於急躁或冒險失敗導致挫折與混亂。<br>建議與對策： 控制衝動，保持冷靜並確保計劃周詳，避免草率行動造成損失。',
-            '權杖皇后': '權杖皇后 ——<br>自信與熱情，魅力與創造力的象徵。<br>正位：代表活力與影響力，象徵掌控生活與激勵他人的能力。<br>提醒相信自己的直覺與領導能力，適合激發創造力並推動計劃發展。<br>逆位： 暗示不安全感、控制慾或嫉妒心。<br>可能象徵情感不穩或過度控制導致人際關係緊張。<br>建議與對策： 加強自信與自我價值，避免過度操控或嫉妒，並展現包容與理解的態度。',
-            '權杖國王': '權杖國王 ——<br>領導與願景，自信與成就的象徵。<br>正位：代表權威與影響力，象徵穩健的領導力與長遠的願景。<br>提醒利用智慧與經驗指導他人，並堅持行動推動目標實現。<br>逆位： 暗示專制、過度控制或缺乏遠見。<br>可能象徵自大或自信過頭，導致忽視他人需求與意見。<br>建議與對策： 保持謙虛與靈活性，善用權威與資源，同時促進團隊合作與共識。',
-            '寶劍1': '寶劍一 ——<br>智慧與真相，溝通與突破的象徵。<br>正位：代表清晰的思維與洞察力，象徵新想法或解決問題的突破。<br>提醒保持理性與邏輯分析，適合開始新的計劃或面對挑戰。<br>逆位： 暗示混亂、誤解或缺乏方向感。<br>可能象徵錯誤的判斷或溝通不良導致的挫折。<br>建議與對策： 調整思維模式並重新整理資訊，確保理解清晰並避免誤導。',
-            '寶劍2': '寶劍二 ——<br>選擇與困惑，平衡與抉擇的象徵。<br>正位：代表猶豫與內心衝突，象徵需要冷靜分析並做出決定。<br>提醒避免逃避問題，適合審慎考慮選擇與後果。<br>逆位： 暗示優柔寡斷或因恐懼而推遲決策。<br>可能象徵缺乏信息或對現實的否認，導致錯誤判斷。<br>建議與對策： 勇敢面對抉擇並尋求外部意見，以突破僵局並恢復平衡。',
-            '寶劍3': '寶劍三 ——<br>心碎與悲傷，失望與分離的象徵。<br>正位：代表情感創傷與痛苦，象徵心靈的失落或關係的破裂。<br>提醒承認情感的傷痛並給予自己時間療癒。<br>逆位： 暗示情感傷痛的緩解或逃避面對悲傷。<br>可能象徵抗拒療癒過程或無法放下過去的痛苦。<br>建議與對策： 接納情感傷痛並尋求支持，勇敢面對過去並準備邁向復原之路。',
-            '寶劍4': '寶劍四 ——<br>休息與療癒，沉思與恢復的象徵。<br>正位：代表需要休息與反思，象徵從壓力中暫時抽離以恢復能量。<br>提醒注重心理與身體的休養，適合進行計劃與準備未來行動。<br>逆位： 暗示焦慮、過度勞累或無法得到休息。<br>可能象徵過度壓抑情感或忽略自身需求，導致精力耗盡。<br>建議與對策： 強制休息與自我療癒，設置界限並優先考慮健康與內心平靜。',
-            '寶劍5': '寶劍五 ——<br>衝突與失敗，犧牲與教訓的象徵。<br>正位：代表爭吵、背叛或競爭的勝利，但可能伴隨著損失或內疚。<br>提醒反思勝利的代價與行動的動機，避免過度爭執傷害關係。<br>逆位： 暗示和解、內疚或試圖修復關係。<br>可能象徵對過去行為的悔悟與嘗試彌補損失。<br>建議與對策： 尋求和解並誠實面對問題，以防止未來重蹈覆轍。',
-            '寶劍6': '寶劍六 ——<br>過渡與療癒，離開與前進的象徵。<br>正位：代表離開困難情境並尋求更穩定的環境，象徵內心或外在的旅程。<br>提醒適應變化並相信前方有更好的發展機會。<br>逆位： 暗示逃避問題或無法放下過去的負擔。<br>可能象徵難以擺脫困境或對未來缺乏信心。<br>建議與對策： 勇敢面對挑戰，讓自己走出舒適圈，專注於重建與療癒過程。',
-            '寶劍7': '寶劍七 ——<br>謀略與欺瞞，策略與警覺的象徵。<br>正位：代表機智與策略運用，象徵小心謀劃或躲避衝突的手段。<br>提醒警惕欺騙行為或過於算計導致失敗。<br>逆位： 暗示暴露謊言、誠實或失策的結果。<br>可能象徵行動不當被揭露或錯誤決策導致損失。<br>建議與對策： 重視誠信與透明度，避免欺騙或操控行為，專注於穩健的行動計劃。',
-            '寶劍8': '寶劍八 ——<br>限制與束縛，恐懼與焦慮的象徵。<br>正位：代表被困於困境或心理限制中，象徵缺乏信心與方向感。<br>提醒不要被恐懼束縛，適合尋找突破現狀的方法。<br>逆位： 暗示掙脫束縛與重獲自由，象徵克服恐懼與尋求新方向的突破。<br>可能象徵心態調整或重新掌控生活。<br>建議與對策： 勇敢挑戰限制與恐懼，保持靈活性並尋求外部支持。',
-            '寶劍9': '寶劍九 ——<br>焦慮與恐懼，內心折磨與不安的象徵。<br>正位：代表過度擔憂或心理壓力，象徵失眠、焦慮與負面思想的折磨。<br>提醒正視內心恐懼並尋求解決方法，不讓情緒失控。<br>逆位： 暗示焦慮緩解或逐漸恢復信心，但可能仍存在殘餘不安。<br>提醒關注心理健康並避免過度自我批判。<br>建議與對策： 練習放鬆與自我調整，尋求支持與專業協助，慢慢釋放內在壓力。',
-            '寶劍10': '寶劍十 ——<br>結束與崩潰，背叛與重生的象徵。<br>正位：代表重大挫折與結束，象徵痛苦的終點與新生的開始。<br>提醒接受過去的失敗並從中學習，準備迎接新的希望與重生。<br>逆位： 暗示傷痛的減輕或逐漸恢復，象徵從低谷中重新振作的機會。<br>提醒專注於自我療癒與重新站起來的勇氣。<br>建議與對策： 接受變化與結束的必然性，從經驗中學習並向前邁進，尋找新的希望與方向。',
-            '寶劍侍者': '寶劍侍者 ——<br>觀察與好奇心，洞察與警覺的象徵。<br>正位：代表學習與分析，象徵資訊收集與保持警惕的必要性。<br>提醒細心觀察並準備行動，適合策略規劃與研究探索。<br>逆位： 暗示缺乏信任、誤解或溝通失誤。<br>可能象徵流言蜚語或過度警覺導致焦慮與猜疑。<br>建議與對策： 加強溝通與分析能力，避免過度猜疑或散播未經證實的消息。',
-            '寶劍騎士': '寶劍騎士 ——<br>行動與決心，速度與挑戰的象徵。<br>正位：代表快速行動與果斷決策，象徵勇敢迎接挑戰與追求目標的精神。<br>提醒保持專注並快速應對突發狀況。<br>逆位： 暗示衝動行事、缺乏計劃或行動過於莽撞。<br>可能象徵過於急切導致失敗或衝突。<br>建議與對策： 放慢步調並進行周密規劃，以確保行動穩健且具備成功的基礎。',
-            '寶劍皇后': '寶劍皇后 ——<br>智慧與獨立，洞察與真理的象徵。<br>正位：代表清晰的思維與成熟的判斷力，象徵理智與直言不諱的溝通能力。<br>提醒秉持誠實與公正態度，適合做出理性決策與提供建議。<br>逆位： 暗示冷漠、苛刻或過度批判。<br>可能象徵情感壓抑或對他人的傷害性言語。<br>建議與對策： 在溝通中保持柔和與包容，避免過度理性而忽略他人的感受。',
-            '寶劍國王': '寶劍國王 ——<br>權威與決策，邏輯與秩序的象徵。<br>正位：代表強大的領導力與冷靜分析能力，象徵理性與公平的決策者。<br>提醒利用智慧與邏輯推動目標實現，適合制定長遠計劃與執行策略。<br>逆位： 暗示專制、冷酷或濫用權力。<br>可能象徵缺乏彈性或過於苛刻的領導方式。<br>建議與對策： 保持公平與開放心態，運用智慧與經驗影響他人，同時避免過度控制或忽視他人感受。',
-            '錢幣1': '錢幣一 ——<br>機會與穩定，財富與潛力的象徵。<br>正位：代表新的財務機會與穩定基礎的建立，象徵物質與安全感的起點。<br>提醒把握商業與投資機會，適合啟動新事業或儲蓄計劃。<br>逆位： 暗示財務損失、機會錯失或投資失敗。<br>可能象徵缺乏計劃或資源管理不當，導致經濟困難。<br>建議與對策： 檢查資金狀況並重新規劃財務目標，穩健管理資源並避免冒險投資。',
-            '錢幣2': '錢幣二 ——<br>平衡與管理，適應與靈活性的象徵。<br>正位：代表資源管理與適應變化，象徵靈活應對財務與生活挑戰的能力。<br>提醒維持平衡與穩定，適合同時處理多項任務與資源分配。<br>逆位： 暗示管理不善、壓力過大或資源失衡。<br>可能象徵過度承擔或無法應對變化，導致混亂與焦慮。<br>建議與對策： 優先處理重要事項，重新分配資源並確保管理系統的穩定與效率。',
-            '錢幣3': '錢幣三 ——<br>合作與技能，努力與工藝的象徵。<br>正位：代表團隊合作與技能發展，象徵努力與專業能力得到肯定與成長機會。<br>提醒專注於細節並與他人合作，適合學習新技能或深化專業知識。<br>逆位： 暗示缺乏協作、技能不足或目標不清。<br>可能象徵合作破裂或努力未獲認可，導致進展受阻。<br>建議與對策： 強化技能與團隊溝通，確保計劃周全並提高工作效率與品質。',
-            '錢幣4': '錢幣四 ——<br>控制與安全感，擁有與保護的象徵。<br>正位：代表財務安全與資源保護，象徵穩定與持有現狀的渴望。<br>提醒維持財務穩定但避免過度保守，適合儲蓄與投資計劃。<br>逆位： 暗示貪婪、財務壓力或對安全感的過度依賴。<br>可能象徵因恐懼失去控制而導致壓抑或過度儲蓄。<br>建議與對策： 重新評估資源分配與金錢觀，避免過度控制並學習適度分享與釋放。',
-            '錢幣5': '錢幣五 ——<br>困難與失落，財務與安全挑戰的象徵。<br>正位：代表財務困難、資源短缺或孤立無援的情況，象徵需要克服物質與心理挑戰。<br>提醒尋求支持並相信困境終將過去。<br>逆位： 暗示財務恢復或重新獲得支持，象徵困難結束後的重建與療癒。<br>建議與對策： 尋找外部協助並積極採取行動改善現況，相信希望與改變的可能性。',
-            '錢幣6': '錢幣六 ——<br>慷慨與平衡，分享與回報的象徵。<br>正位：代表慷慨施予與接受支持，象徵資源的分享與公平交換。<br>提醒感恩與適時幫助他人，適合參與慈善活動或支援社會計劃。<br>逆位： 暗示權力不平衡或過度依賴他人。<br>可能象徵施予的操控性或接受幫助時的被動心理。<br>建議與對策： 確保資源分配的平等與透明，避免依賴關係並強化自我獨立性。',
-            '錢幣7': '錢幣七 ——<br>耐心與收成，評估與努力的象徵。<br>正位：代表付出努力後等待成果，象徵耐心與長期規劃的必要性。<br>提醒保持信心並審慎評估進度，適合調整策略以確保未來成長。<br>逆位： 暗示焦慮、急躁或對成果的不滿。<br>可能象徵投資失敗或努力未達預期，提醒重新審視方向與資源管理。<br>建議與對策： 反思當前策略，必要時進行調整，並保持耐心等待適當時機。',
-            '錢幣8': '錢幣八 ——<br>技能與專業，學習與專注的象徵。<br>正位：代表勤奮努力與技能發展，象徵對工藝或事業的專注與精進。<br>提醒持續學習與改進技術，適合培養職業技能或專業知識。<br>逆位： 暗示缺乏專注、技術不足或對工作的厭倦。<br>可能象徵重複錯誤或缺乏進步，提醒重建動力與方向。<br>建議與對策： 回顧工作與學習的目標，確保動機與成果一致，避免偏離方向。',
-            '錢幣9': '錢幣九 ——<br>獨立與享受，成就與物質富足的象徵。<br>正位：代表財務自由與個人成就，象徵自信與物質享受的成果。<br>提醒慶祝成功並感恩當下的豐足，適合規劃長期穩定的生活方式。<br>逆位： 暗示財務依賴、不安全感或享受過度。<br>可能象徵虛榮、自信不足或浪費資源導致的焦慮與不滿。<br>建議與對策： 重視財務規劃與平衡生活方式，保持感恩心態並謹慎管理資源。',
-            '錢幣10': '錢幣十 ——<br>財務穩定與傳承，家庭與成就的象徵。<br>正位：代表長期穩定與物質成就，象徵家庭與財務安全的基礎。<br>提醒享受成果並計劃未來傳承，適合投資與建立長遠資產。<br>逆位： 暗示財務爭端、家庭問題或不穩定的基礎。<br>可能象徵資源浪費或安全感缺失，提醒重新檢視財務管理與家庭關係。<br>建議與對策： 平衡當下享受與未來規劃，解決財務與家庭內部的矛盾。',
-            '錢幣侍者': '錢幣侍者 ——<br>學習與成長，機會與潛力的象徵。<br>正位：代表學習新技能與探索財務機會，象徵計劃的開始與實現潛力。<br>提醒保持專注與耐心，適合投入教育或事業發展。<br>逆位： 暗示缺乏準備或動力不足，可能象徵機會錯失或計劃執行困難。<br>提醒檢查基礎與策略，確保準備充分後再行動。<br>建議與對策： 提升技能與自信，穩步推動計劃並接受成長挑戰。',
-            '錢幣騎士': '錢幣騎士 ——<br>責任與可靠，穩健與執行的象徵。<br>正位：代表勤奮與實際行動，象徵穩健進步與堅持計劃的執行。<br>提醒保持耐心與專注，適合處理細節並穩步推進目標。<br>逆位： 暗示停滯、拖延或過度保守。<br>可能象徵缺乏彈性或行動遲緩導致錯失機會。<br>建議與對策： 調整策略並加強執行力，避免過度拖延或過於謹慎的行為。',
-            '錢幣皇后': '錢幣皇后 ——<br>豐饒與關懷，物質與安全感的象徵。<br>正位：代表財務穩定與實用能力，象徵關懷與培育物質與情感的成長。<br>提醒注重生活品質與財務管理，適合投資家庭與個人成長。<br>逆位： 暗示不安、浪費或過度依賴物質享受。<br>可能象徵缺乏實用計劃或物質失控導致的焦慮。<br>建議與對策： 調整預算並注重內在滿足，避免過度依賴物質帶來的安全感。',
-            '錢幣國王': '錢幣國王 ——<br>權威與成功，穩健與管理的象徵。<br>正位：代表財務掌控與物質成就，象徵穩健與長遠的規劃能力。<br>提醒善用資源並保持領導力，適合管理資產與發展事業。<br>逆位： 暗示貪婪、固執或財務管理失敗。<br>可能象徵過度關注物質利益或忽視他人需求。<br>建議與對策： 保持謙遜並平衡利益與責任，確保決策理性與財務穩定。',
-            '聖杯1': '聖杯一 ——<br>愛與新生，情感與靈感的象徵。<br>正位：代表新的情感開始與愛的機會，象徵幸福、和諧與靈性滿足。<br>提醒敞開心扉並接受愛與情感的滋養，適合建立新關係或深化情感連結。<br>逆位： 暗示情感阻塞、失落或愛的缺乏。<br>可能象徵內心空虛或情感創傷，提醒修復內在情感並學會自我愛護。<br>建議與對策： 專注於內心療癒，重建信任與情感聯繫，並尋找帶來滿足的關係或活動。',
-            '聖杯2': '聖杯二 ——<br>合作與聯結，愛情與夥伴關係的象徵。<br>正位：代表平等的關係與情感聯繫，象徵合作與親密感的和諧發展。<br>提醒重視溝通與信任，適合深化感情或建立穩固的夥伴關係。<br>逆位： 暗示分歧、關係破裂或溝通障礙。<br>可能象徵不平等的互動或感情冷卻，提醒檢視並修復關係中的問題。<br>建議與對策： 誠實溝通並化解誤會，建立穩固的情感基礎，避免忽視彼此需求。',
-            '聖杯3': '聖杯三 ——<br>歡樂與慶祝，友誼與團結的象徵。<br>正位：代表快樂、友情與團體慶祝，象徵社交活動與合作的成功。<br>提醒享受與他人的連結，適合參與活動或慶祝成果。<br>逆位： 暗示過度放縱、社交失衡或孤立感。<br>可能象徵關係緊張或缺乏團隊精神，提醒調整社交平衡並專注於有意義的連結。<br>建議與對策： 重視友誼與合作，避免過度社交或疏遠關係，專注於真實且支持性的互動。',
-            '聖杯4': '聖杯四 ——<br>沉思與不滿，反思與停滯的象徵。<br>正位：代表情感冷淡與對現狀的不滿，象徵缺乏動力與興趣。<br>提醒重新評估情感需求並打破停滯狀態。<br>逆位： 暗示打破冷漠與重新接納機會。<br>可能象徵內心復甦與新的情感動力，提醒關注生活中的機遇並恢復積極態度。<br>建議與對策： 親近內心情感，勇敢突破自我限制，並尋找新的靈感與熱情。',
-            '聖杯5': '聖杯五 ——<br>失落與悔恨，悲傷與學習的象徵。<br>正位：代表情感失落與失望，象徵對過去的傷痛與遺憾。<br>提醒專注於仍然擁有的事物，學習從失敗中汲取經驗並重建希望。<br>逆位： 暗示悲傷的釋放與情感復原，象徵逐漸走出痛苦並尋找新的開始。<br>提醒接受過去並專注於未來的可能性與發展機會。<br>建議與對策： 敞開心扉迎接新機會，將失落視為成長的機會，學會感恩與珍惜現有資源。',
-            '聖杯6': '聖杯六 ——<br>回憶與懷舊，純真與關懷的象徵。<br>正位：代表童年的回憶與情感連結，象徵純真與友誼的溫暖感受。<br>提醒從過去汲取正面能量並保持內心純真。<br>逆位： 暗示過度沉迷於過去或對過去的依戀導致停滯不前。<br>可能象徵難以放下過去的關係或回憶，提醒關注當下並展望未來。<br>建議與對策： 保持對過去的感激，但要向前看，接受新的機會與變化。',
-            '聖杯7': '聖杯七 ——<br>幻想與選擇，誘惑與決策的象徵。<br>正位：代表多重選擇與機會，象徵夢想與想像力的發揮。<br>提醒保持清晰思維，避免被幻想迷惑而失去焦點。<br>逆位： 暗示混亂、現實檢視或錯誤選擇的後果。<br>可能象徵脫離幻想與重新聚焦於實際行動，提醒避免拖延並付諸實踐。<br>建議與對策： 分析選項的可行性，做出理性選擇並將目標轉化為具體行動。',
-            '聖杯8': '聖杯八 ——<br>放下與追尋，轉變與探索的象徵。<br>正位：代表離開熟悉環境並尋找更有意義的方向，象徵內心追求與靈性探索。<br>提醒勇敢放下不再滿足的事物，迎接新的成長機會。<br>逆位： 暗示難以離開或拒絕改變，象徵對現狀的執著與內心糾結。<br>提醒克服恐懼並信任新的方向帶來的可能性。<br>建議與對策： 放手過去並專注於個人成長與探索新的機會，勇敢邁向未知的旅程。',
-            '聖杯9': '聖杯九 ——<br>滿足與願望實現，幸福與享受的象徵。<br>正位：代表情感滿足與願望成真，象徵享受成果與幸福感。<br>提醒珍惜當下的豐盛與快樂，適合慶祝成功與成就。<br>逆位： 暗示過度滿足或自我放縱，象徵空虛感或內在缺乏滿足。<br>可能顯示追求物質享樂而忽略內心需求。<br>建議與對策： 平衡內在與外在需求，保持謙遜與感恩，專注於長期的幸福與滿足感。',
-            '聖杯10': '聖杯十 ——<br>幸福與和諧，家庭與圓滿的象徵。<br>正位：代表情感滿足與家庭幸福，象徵和諧關係與理想生活的實現。<br>提醒珍惜當下並維持家庭與社交的平衡與和諧。<br>逆位： 暗示家庭不和或期待未達成，象徵關係中的失望與衝突。<br>提醒重新審視關係並解決潛在問題。<br>建議與對策： 加強溝通與理解，修復關係並尋求情感上的穩定與和諧。',
-            '聖杯侍者': '聖杯侍者 ——<br>靈感與愛情，純真與情感探索的象徵。<br>正位：代表新的情感或靈感，象徵純真的感受與新的關係開始。<br>提醒保持開放與好奇心，適合探索內心需求與創意發展。<br>逆位： 暗示情感不成熟、逃避或缺乏自信。<br>可能象徵情感依賴或錯誤的情感判斷。<br>建議與對策： 強化自我認知與情感表達，避免幻想過度並保持現實感。',
-            '聖杯騎士': '聖杯騎士 ——<br>浪漫與魅力，追求與邀請的象徵。<br>正位：代表愛情邀請與情感探索，象徵浪漫的行動與夢想的追尋。<br>提醒保持浪漫與激情，適合展開新關係或表達情感。<br>逆位： 暗示情感不穩定或誘惑的危險。<br>可能象徵不切實際的期望或被情感迷惑。<br>建議與對策： 調整情感期望，保持冷靜與現實，避免被情緒帶偏。',
-            '聖杯皇后': '聖杯皇后 ——<br>溫柔與同理心，直覺與照顧的象徵。<br>正位：代表情感豐富與關懷他人，象徵包容與情感的支持。<br>提醒信任直覺並提供情感支持，適合培養親密關係與創意發展。<br>逆位： 暗示情感失衡或過度依賴他人。<br>可能象徵情感操控或忽略自我需求。<br>建議與對策： 注意自我關愛與界限設立，保持情感穩定並避免過度犧牲。',
-            '聖杯國王': '聖杯國王 ——<br>情感成熟與穩定，領導與智慧的象徵。<br>正位：代表同理心與穩定的情感管理，象徵成熟的情感表達與支持能力。<br>提醒理性管理情感並提供可靠的支持與建議。<br>逆位： 暗示情感壓抑或操控，象徵過度情緒化或缺乏同理心的行為。<br>可能反映內心的不安或情緒失控。<br>建議與對策： 平衡理性與情感，控制情緒反應並確保決策公正與穩定。'
+    function getCardDescription(item, isReversed) {
+        const descriptions = {
+            '愚者': {    
+                common:  "<b>愚者 ——</b><br>新的開始與自由，冒險與無限潛力。",
+                upright: "<b>正位：</b>象徵純真、開放的心態與勇敢冒險的精神。<br>提醒要信任自己的直覺並擁抱未知旅程，接受生活中的變化與挑戰。<br>代表創新的機會與重新開始的時機，適合迎接未知領域的探索。<br><b>感情：</b>代表純真的愛情或新的戀愛關係，適合接受心靈上的冒險。<br><b>金錢：</b>可能象徵投資新的機會，或開始與財務相關的冒險。提醒不要衝動，需要謹慎評估。<br><b>事業：</b>意味著新的工作機會或創業，適合嘗試不同的方向，勇敢迎接挑戰。<br><b>靈性：</b>指向靈性旅程的開始，鼓勵探索未知與內在真相，信任直覺。",
+                reversed: "<b>逆位：</b>暗示衝動行動、缺乏計劃或天真過度，可能因忽略細節或準備不足而導致失敗。<br>亦可能象徵過度猶豫、不敢踏出第一步，或對未知的恐懼造成停滯。<br>有時代表冒險過度或逃避責任，提醒留意自我欺騙或現實脫節的情況。<br><b>感情：</b>警示可能因衝動或不成熟而導致情感問題，或過度幻想的愛情觀。<br><b>金錢：</b>可能出現財務上的錯誤或風險，建議避免冒險投資，尤其在計劃不足時。<br><b>事業：</b>暗示準備不足，可能在新工作或計劃中遇到挫折，需重新審視目標。<br><b>靈性：</b>提醒不要盲目追求靈性提升，避免不切實際的期待，需腳踏實地。",
+                advice: "<b>建議與對策：</b> 平衡冒險與謹慎，確保決策前有足夠的準備。重新審視目標，避免因盲目樂觀而忽略潛在風險。",
+            },
+            '魔術師': {    
+                common:  "<b>魔術師 ——</b><br>創造力與行動的力量，掌握資源與機會。",
+                upright: "<b>正位：</b>代表能力、溝通與將想法實現為現實的潛力。<br>象徵個人資源與技能的運用，提醒相信自身的才能並積極行動。<br>預示新的開始或機會，適合創造性計劃與項目啟動。<br><b>感情：</b>暗示關係中的溝通與吸引力增強，亦可能遇到魅力非凡的新對象。<br><b>金錢：</b>代表善於運用資源，成功的財務計劃或收入增長的機會。<br><b>事業：</b>適合施展才華與技能，將創意轉化為實際成果，有貴人相助的可能。<br><b>靈性：</b>提示靈性上的轉化與力量增長，象徵將意圖付諸行動。",
+                reversed: "<b>逆位：</b>暗示錯失機會、缺乏自信或欺騙行為，可能過度操控情境或忽視道德界限。<br>也可能顯示技能或計劃準備不足，導致目標無法落實或進展緩慢。<br>在某些情況下，象徵操控或欺騙他人以達成目的的危險行為，需特別警惕操控慾望。<br><b>感情：</b>可能出現欺騙或誤導，建議小心處理感情中的信任問題。<br><b>金錢：</b>警告財務計劃可能存在誤判或過度自信，需謹慎檢查細節。<br><b>事業：</b>計劃缺乏準備或細節不足，可能導致失敗，避免操之過急。<br><b>靈性：</b>提醒避免自我操控或靈性上的迷失，需重新找回內在平衡。",
+                advice: "<b>建議與對策：</b> 強化計劃與意圖，避免操之過急或依賴虛假手段達成目標。確保動機與手段的正當性，利用已有資源增強自信與技能，避免內耗與浪費機會。",
+            },
+            '女祭司': {    
+                common:  "<b>女祭司 ——</b><br>智慧與直覺，內在探索與秘密揭露。",
+                upright: "<b>正位：</b>象徵靈性覺醒、內在智慧與隱藏的知識。<br>提醒傾聽直覺、深入了解真相並信任內心的聲音。<br>適合學習與冥想，探索未知領域並接觸潛意識的訊息。<br><b>感情：</b>暗示需要深層次的情感聯繫，鼓勵傾聽直覺了解伴侶的需求。<br><b>金錢：</b>財務狀況穩定但需謹慎處理，可能有隱藏的機會需要挖掘。<br><b>事業：</b>適合專注於學習與自我提升，可能面臨需要智慧與策略的挑戰。<br><b>靈性：</b>靈性成長的時期，建議進一步探索內心與潛意識的力量。",
+                reversed: "<b>逆位：</b>暗示壓抑直覺或過度依賴外在的指導，可能迷失於錯誤的資訊中。<br>也可能顯示對內心聲音的忽視，導致決策上的失誤。<br><b>感情：</b>可能出現情感冷淡或溝通障礙，需要重新建立信任與聯繫。<br><b>金錢：</b>提示財務問題可能因隱藏的風險而惡化，建議審慎檢視支出。<br><b>事業：</b>面臨資訊不足或決策失誤的情況，需謹慎處理工作挑戰。<br><b>靈性：</b>提醒不要逃避內心聲音，避免過於依賴外在權威或盲目追求靈性。",
+                advice: "<b>建議與對策：</b> 專注於內在的聲音與直覺，避免過度依賴外部的指引。花時間審視自身需求，並通過冥想或靜心活動增強內在力量。",
+            },
+            '皇后': {    
+                common:  "<b>皇后 ——</b><br>豐饒與自然，母性與滋養的象徵。",
+                upright: "<b>正位：</b>象徵愛、創造力與生命力的蓬勃發展。<br>代表母性關懷與滋養的能量，提醒重視人際關係與自然的聯繫。<br>適合投入創意項目或探索生活中的美好與幸福感。<br><b>感情：</b>感情生活充滿愛與支持，可能有家庭的增長或感情的升華。<br><b>金錢：</b>財務狀況良好，可能通過創造性努力獲得額外收入。<br><b>事業：</b>工作中創造力與團隊合作是成功的關鍵，適合啟動新的項目。<br><b>靈性：</b>提醒關注自然與身心的和諧，探索內心的愛與感恩之情。",
+                reversed: "<b>逆位：</b>可能暗示懶散、過度依賴或情感上的匱乏。<br>也可能顯示創造力受阻或人際關係中的失衡，提醒注意自我照顧與關注。<br><b>感情：</b>感情生活可能因忽視需求或過度依賴而出現問題，需重建平衡。<br><b>金錢：</b>財務狀況可能因過度揮霍或缺乏計劃而惡化，需注意節制。<br><b>事業：</b>工作中可能遇到缺乏動力或創造力的情況，需重新尋找靈感。<br><b>靈性：</b>提醒避免情感上的匱乏影響靈性成長，需重視內心的需求。",
+                advice: "<b>建議與對策：</b> 專注於自我成長與內在平衡，避免過度依附他人或環境。善用創造力與直覺，重新發掘生活的美好與靈感來源。",
+            },
+            '皇帝': {    
+                common:  "<b>皇帝 ——</b><br>權威與結構，穩定與秩序的象徵。",
+                upright: "<b>正位：</b>象徵領導力、穩定性與實現目標的力量。<br>提醒強化規劃與結構，並透過紀律與責任實現成功。<br>預示職業或家庭中的穩定與成就。<br><b>感情：</b>感情關係穩定且安全，可能有長期承諾或婚姻的可能。<br><b>金錢：</b>財務狀況穩定，適合長期投資或制定財務計劃。<br><b>事業：</b>事業發展穩定，適合承擔領導角色或進行規模擴張。<br><b>靈性：</b>靈性成長需要結構化與規律性，平衡內在與外在的力量。",
+                reversed: "<b>逆位：</b>可能顯示權力的濫用或過於控制，亦可能象徵結構過於僵化導致阻礙。<br>提醒尋求靈活性與包容性，以避免過度的壓力與衝突。<br><b>感情：</b>關係中可能存在控制或不平等，需調整動態以達平衡。<br><b>金錢：</b>可能面臨財務問題或投資上的風險，需重新審視策略。<br><b>事業：</b>工作中可能因權威問題或過度規範導致壓力增加，需靈活應對。<br><b>靈性：</b>靈性道路上可能因固執或過度理性而感到受阻，需尋求內在平衡。",
+                advice: "<b>建議與對策：</b> 在掌控局勢的同時保持開放與適應力，避免因過於固執而造成的損失。善用領導能力平衡各方需求，實現穩定與和諧。",
+            },
+            '教皇': {    
+                common:  "<b>教皇 ——</b><br>傳統與道德，靈性指引與智慧的象徵。",
+                upright: "<b>正位：</b>象徵遵循傳統價值觀與倫理道德的重要性，強調團體與教導的力量。<br>適合尋求指導或加入團體，追求精神上的啟發與成長。<br><b>感情：</b>感情中可能強調傳統價值，如婚姻或長期承諾。<br><b>金錢：</b>財務狀況穩定，適合採取保守策略或尋求專業建議。<br><b>事業：</b>事業中適合遵循規範與指導，可能受益於導師或權威人士的協助。<br><b>靈性：</b>靈性道路上需要尋求內外指引，並遵循傳統的智慧與教誨。",
+                reversed: "<b>逆位：</b>暗示對傳統的抗拒或質疑，可能象徵個人價值觀與群體期望間的矛盾。<br>提醒平衡創新與規範，避免完全否定或過度依賴傳統。<br><b>感情：</b>感情中可能出現價值觀或承諾上的分歧，需要坦誠溝通。<br><b>金錢：</b>可能因過度冒險或缺乏策略導致財務困難，需重新審視計劃。<br><b>事業：</b>工作中可能因過於依賴傳統方式而導致瓶頸，需尋找新的解決方法。<br><b>靈性：</b>提醒不盲從靈性權威，需找到自己的道路與真理。",
+                advice: "<b>建議與對策：</b> 尋求平衡傳統與創新，重視他人經驗的同時堅持自我價值。採取謹慎而不僵化的態度，尋求內心與外在的和諧。",
+            },
+            '戀人': {    
+                common:  "<b>戀人 ——</b><br>愛情與選擇，親密關係與和諧的象徵。",
+                upright: "<b>正位：</b>象徵深刻的情感聯繫與和諧的關係，亦可能指向重要的選擇或承諾。<br>提醒需要平衡感情、責任與個人價值觀。<br><b>感情：</b>愛情關係中的和諧與信任，適合建立穩定的長期關係。<br><b>金錢：</b>可能出現財務上的合作或共同決策，適合考慮雙方的利益。<br><b>事業：</b>工作中強調合作與團隊精神，可能涉及重要的事業抉擇。<br><b>靈性：</b>靈性層面上提醒關注內在與外在的平衡，追求愛與和諧。",
+                reversed: "<b>逆位：</b>暗示關係中的不和諧或缺乏平等，亦可能象徵錯誤的選擇或過度依賴他人。<br>提醒重新審視價值觀與決策的平衡性。<br><b>感情：</b>可能面臨感情中的分歧或信任問題，需坦誠溝通。<br><b>金錢：</b>財務問題可能因合作不當或計劃缺乏而出現，需謹慎檢查。<br><b>事業：</b>工作中可能出現團隊不和或錯誤決策，需保持冷靜與理性。<br><b>靈性：</b>提醒避免過度依賴外部關係，需專注於內在平衡與自我成長。",
+                advice: "<b>建議與對策：</b> 專注於誠實溝通與價值觀的統一，重視合作與理解，避免過度依賴或盲目決策。",
+            },
+            '戰車': {    
+                common:  "<b>戰車 ——</b><br>意志與勝利，控制與決心的象徵。",
+                upright: "<b>正位：</b>代表意志力與決心的力量，提醒專注於目標並果斷行動。<br>象徵掌控局勢與克服困難的能力，適合實現重大突破。<br><b>感情：</b>感情中展現堅定與信心，可能克服挑戰並進一步深化關係。<br><b>金錢：</b>財務上取得進展，通過努力與計劃實現財務目標。<br><b>事業：</b>事業中象徵成功與進步，需集中精力並堅持不懈。<br><b>靈性：</b>提醒掌握內在力量，專注於目標的實現與靈性意志的運用。",
+                reversed: "<b>逆位：</b>可能暗示缺乏方向或目標，亦可能因自信不足或過於控制導致失敗。<br>提醒重新審視計劃與方向，避免衝動行動。<br><b>感情：</b>感情中可能出現失控或缺乏平衡，需重新建立信任與穩定。<br><b>金錢：</b>財務上可能出現錯誤或延誤，需調整策略並保持謹慎。<br><b>事業：</b>工作中可能因過度自信或缺乏規劃而出現阻礙，需重新檢討。<br><b>靈性：</b>提醒避免內心混亂，需重新找回內在力量與目標感。",
+                advice: "<b>建議與對策：</b> 保持清晰目標與專注力，避免衝動行動或過度控制。靈活應對挑戰，平衡內在力量與外在需求。",
+            },
+            '力量': {    
+                common:  "<b>力量 ——</b><br>內在力量與勇氣，控制與耐心的象徵。",
+                upright: "<b>正位：</b>象徵內在的平靜與克服困難的能力，提醒通過耐心與慈悲來解決問題。<br>意味著力量來自於平衡情感與理性的智慧。<br><b>感情：</b>感情中展現信任與支持，可能深化關係或解決矛盾。<br><b>金錢：</b>財務狀況穩定，適合長期投資或耐心等待機會。<br><b>事業：</b>工作中需要耐心與持續努力，克服挑戰並贏得成功。<br><b>靈性：</b>提醒探索內在力量與智慧，通過靜心增強靈性成長。",
+                reversed: "<b>逆位：</b>可能暗示缺乏信心或過度控制，亦可能因內在衝突而影響行動力。<br>提醒避免因情緒或恐懼而失去平衡與冷靜。<br><b>感情：</b>感情中可能因缺乏信任或過度控制而出現問題，需調整態度。<br><b>金錢：</b>財務方面可能因衝動或缺乏計劃而面臨損失，需謹慎管理。<br><b>事業：</b>工作中可能因壓力或信心不足而受阻，需重新建立自信與方向。<br><b>靈性：</b>提醒專注於內在平衡，避免被恐懼或外在壓力干擾靈性進步。",
+                advice: "<b>建議與對策：</b> 發掘內在力量並以耐心與慈悲面對挑戰，避免過度控制或衝動行動。專注於平衡情感與理性，從中找到真正的力量來源。",
+            },
+            '隱者': {    
+                common:  "<b>隱者 ——</b><br>內省與智慧，孤獨與指引的象徵。",
+                upright: "<b>正位：</b>象徵尋求內在智慧與真理的過程，適合內省與靜心。<br>意味著需要暫時脫離外在的喧囂，專注於內在的啟發與成長。<br><b>感情：</b>感情中可能需要空間與時間進行自我反思，或重新審視關係的方向。<br><b>金錢：</b>財務方面需謹慎計劃，避免大筆開支或衝動投資。<br><b>事業：</b>工作中可能需要短暫停頓，重新審視目標與策略。<br><b>靈性：</b>靈性層面上意味著深入探索內心與靈性成長，適合冥想或學習。",
+                reversed: "<b>逆位：</b>可能暗示孤立或拒絕尋求幫助，亦可能因過度內省而忽略外在世界。<br>提醒在內省與外界互動間找到平衡。<br><b>感情：</b>可能因過度孤立或情感封閉而導致關係緊張，需尋求溝通。<br><b>金錢：</b>財務上可能因缺乏計劃或過度保守而影響進展，需適當調整。<br><b>事業：</b>工作中可能因過度內省或缺乏行動而停滯，需重新激發動力。<br><b>靈性：</b>提醒不要過於沉迷於靈性探索而忽略現實生活，需平衡內外需求。",
+                advice: "<b>建議與對策：</b> 專注於內在探索的同時保持與外界的聯繫，避免過度孤立或忽視實際需求。尋求平衡內心智慧與外在行動。",
+            },
+            '命運之輪': {    
+                common:  "<b>命運之輪 ——</b><br>變化與循環，命運與機遇的象徵。",
+                upright: "<b>正位：</b>象徵生命的變化與機遇的到來，提醒接受不可預測的命運安排。<br>意味著順應自然的節奏並抓住機會，從變化中尋求成長。<br><b>感情：</b>感情中可能出現新的轉機或階段，需以開放的心態面對變化。<br><b>金錢：</b>財務狀況可能有意想不到的收益或轉折，需靈活應對。<br><b>事業：</b>事業發展可能迎來新機遇或挑戰，適合順勢而為並擁抱變化。<br><b>靈性：</b>提醒接受生命的循環與靈性成長的契機，從經驗中獲得智慧。",
+                reversed: "<b>逆位：</b>可能暗示阻礙或不順的情況，亦可能因抗拒變化而導致困境。<br>提醒重新審視行動與計劃，避免過度依賴外力。<br><b>感情：</b>感情中可能出現停滯或不穩定，需坦誠面對問題並調整方向。<br><b>金錢：</b>財務上可能因不明確的變動而受損，需避免衝動決策。<br><b>事業：</b>工作中可能遇到挫折或失去機會，需重新評估策略並積極行動。<br><b>靈性：</b>提醒不要抗拒靈性上的挑戰，需學會接受生命的波動並從中學習。",
+                advice: "<b>建議與對策：</b> 順應生命的節奏並靈活應對變化，避免抗拒或過度執著於控制局勢。從困難中尋找成長的契機，積極擁抱命運的安排。",
+            },
+            '正義': {    
+                common:  "<b>正義 ——</b><br>平衡與公平，真相與誠實的象徵。",
+                upright: "<b>正位：</b>象徵公正與誠實的原則，提醒以理性與客觀的態度處理問題。<br>意味著對行為的後果負責，強調因果關係與倫理道德的重要性。<br><b>感情：</b>感情中強調誠實與平等，適合坦誠面對彼此的需求與問題。<br><b>金錢：</b>財務狀況需公平處理，可能需要法律或合同方面的支持。<br><b>事業：</b>事業中強調遵循規範與秩序，適合處理法律或行政相關的事務。<br><b>靈性：</b>提醒尋求內外平衡，專注於真理與自我反省。",
+                reversed: "<b>逆位：</b>可能暗示不公或不誠實的情況，亦可能因偏見或錯誤判斷而影響結果。<br>提醒注意行為的後果並重新審視選擇。<br><b>感情：</b>感情中可能因誤解或不公平對待而出現矛盾，需坦誠溝通。<br><b>金錢：</b>財務上可能因不正當的手段或判斷錯誤而受損，需謹慎處理。<br><b>事業：</b>工作中可能因不公平對待或決策失誤而受阻，需保持冷靜並尋求解決方案。<br><b>靈性：</b>提醒避免偏離內心的真理，需重新尋找平衡與誠實。",
+                advice: "<b>建議與對策：</b> 專注於真實與公平，避免偏見或情緒化判斷。坦誠面對問題並追求平衡，從中獲得成長與智慧。",
+            },
+            '倒吊人': {    
+                common:  "<b>倒吊人 ——</b><br>犧牲與等待，視角轉換與啟示的象徵。",
+                upright: "<b>正位：</b>象徵接受現狀並從中獲得新的洞見，提醒透過犧牲或放下來實現突破。<br>意味著需要耐心等待，讓自然發展的節奏帶來改變。<br><b>感情：</b>感情中可能需要更多的耐心與包容，可能涉及犧牲個人需求來促進關係成長。<br><b>金錢：</b>財務方面可能需要暫時的犧牲或延遲收益，適合重新評估目標。<br><b>事業：</b>工作中可能出現停滯，提醒以新的視角看待問題，找到創新的解決方案。<br><b>靈性：</b>靈性層面上鼓勵放下執著，接受靈性啟示並從中尋找新的方向。",
+                reversed: "<b>逆位：</b>可能暗示過度拖延或不願放下，亦可能因抗拒改變而導致困境。<br>提醒重新審視現狀，尋求新的解決方法。<br><b>感情：</b>感情中可能因缺乏行動或溝通而停滯，需主動改變現狀。<br><b>金錢：</b>財務上可能因固執於舊有方式而受損，需尋找新的策略。<br><b>事業：</b>工作中可能因抗拒改變或缺乏行動力而受阻，需接受新的挑戰。<br><b>靈性：</b>提醒避免過度沉迷於內省或靈性追求，需找到實際行動的平衡。",
+                advice: "<b>建議與對策：</b> 接受現狀並學習放下執著，從不同視角尋找突破點。耐心等待自然的發展，同時積極準備未來的行動。",
+            },
+            '死神': {    
+                common:  "<b>死神 ——</b><br>結束與重生，蛻變與釋放的象徵。",
+                upright: "<b>正位：</b>象徵舊有結束與新生開始，提醒接受變化與釋放過去的執著。<br>意味著需要面對不可避免的結局，從中找到新的可能性與重生的機會。<br><b>感情：</b>感情中可能面臨關係的轉變或結束，亦可能是開始新階段的契機。<br><b>金錢：</b>財務上可能需要結束舊有的模式或支出習慣，開創新的理財方式。<br><b>事業：</b>工作中可能結束某段職業階段，為新的發展或方向鋪路。<br><b>靈性：</b>靈性層面上象徵蛻變與釋放，意味著放下過去以迎接內在的重生。",
+                reversed: "<b>逆位：</b>可能暗示抗拒改變或害怕結束，亦可能因無法放下過去而停滯不前。<br>提醒重新審視自己的恐懼並勇敢面對。<br><b>感情：</b>可能因抗拒關係的結束或改變而感到痛苦，需學會釋懷與接受。<br><b>金錢：</b>財務上可能因過度依賴舊有模式而導致問題，需尋找新的解決方法。<br><b>事業：</b>工作中可能因害怕改變或無法放下而陷入困境，需開放心態迎接新機會。<br><b>靈性：</b>提醒不要害怕靈性上的轉變，需學會放下執著並從中成長。",
+                advice: "<b>建議與對策：</b> 接受自然的結束與變化，將注意力放在新的開始與成長上。釋放過去的執著，迎接未來的可能性與內在蛻變。",
+            },
+            '節制': {    
+                common:  "<b>節制 ——</b><br>平衡與和諧，適度與耐心的象徵。",
+                upright: "<b>正位：</b>象徵內外平衡與和諧的達成，提醒以耐心和適度的態度面對挑戰。<br>意味著需要將不同的元素整合，找到最佳的解決方案。<br><b>感情：</b>感情中展現包容與耐心，關係可能因平衡而更加穩定。<br><b>金錢：</b>財務方面提倡適度的花費與儲蓄，需保持平衡的理財習慣。<br><b>事業：</b>工作中強調合作與耐心，適合穩步推進長期計劃。<br><b>靈性：</b>靈性層面上提醒整合內心與外界的需求，找到平靜與和諧。",
+                reversed: "<b>逆位：</b>可能暗示失去平衡或耐心不足，亦可能因過度投入而導致壓力增加。<br>提醒重新調整節奏，避免極端的行為。<br><b>感情：</b>感情中可能因缺乏耐心或不平衡的付出而產生矛盾，需重新調整關係。<br><b>金錢：</b>財務上可能因過度花費或節制不足而出現問題，需審慎管理。<br><b>事業：</b>工作中可能因合作問題或急於成功而受阻，需冷靜應對挑戰。<br><b>靈性：</b>提醒避免極端的靈性追求，需平衡內在與外在的成長需求。",
+                advice: "<b>建議與對策：</b> 尋求內外的平衡與和諧，以耐心與適度的態度處理問題。避免極端行為，專注於長期穩定的發展。",
+            },
+            '惡魔': {    
+                common:  "<b>惡魔 ——</b><br>束縛與誘惑，恐懼與自我限制的象徵。",
+                upright: "<b>正位：</b>象徵物質欲望與限制，提醒警惕過度沉迷於享樂或恐懼中的束縛。<br>意味著需要正視內心的陰影，尋求突破與自由。<br><b>感情：</b>感情中可能因過度依附或控制而失衡，需重新審視彼此的關係模式。<br><b>金錢：</b>財務方面可能因過度消費或追求物質享受而出現問題，需重新規劃。<br><b>事業：</b>工作中可能因外在壓力或內在恐懼而受阻，需突破限制並重拾動力。<br><b>靈性：</b>靈性層面上提醒正視內在的陰影與恐懼，找到自我解放的途徑。",
+                reversed: "<b>逆位：</b>可能暗示擺脫束縛或逃離不健康的狀態，亦可能因抗拒改變而持續受困。<br>提醒勇敢面對恐懼並尋求解脫。<br><b>感情：</b>感情中可能因擺脫控制或過度依附而迎來自由，亦需避免重蹈覆轍。<br><b>金錢：</b>財務狀況可能因重新檢視支出而好轉，需保持理性管理。<br><b>事業：</b>工作中可能因突破困境或擺脫壓力而進展，但需持續警惕不健康的習慣。<br><b>靈性：</b>靈性層面上提醒釋放內心的恐懼與限制，迎接新的自由與成長。",
+                advice: "<b>建議與對策：</b> 正視內在的陰影與恐懼，尋求解放並避免重陷於不健康的模式。學會在物質與精神之間找到平衡，重拾自由與力量。",
+            },
+            '高塔': {    
+                common:  "<b>高塔 ——</b><br>突如其來的變化，毀滅與重建的象徵。",
+                upright: "<b>正位：</b>象徵突然的改變與不可避免的事件，提醒接受毀滅性的結束以迎接新生。<br>意味著需重新評估現狀並適應新的環境，從中找到成長的契機。<br><b>感情：</b>感情中可能經歷衝突或分離，但也能帶來重新認識彼此的機會。<br><b>金錢：</b>財務上可能面臨意外的損失，需保持靈活並迅速調整計劃。<br><b>事業：</b>工作中可能面臨突然的變化或挑戰，需重新定位方向並適應新的局勢。<br><b>靈性：</b>靈性層面上代表舊有信念的瓦解，提醒擁抱真相並接受靈性的重建。",
+                reversed: "<b>逆位：</b>可能暗示抗拒改變或害怕失去，亦可能因無法適應而導致持續困境。<br>提醒重新審視自己的恐懼並勇敢面對變化。<br><b>感情：</b>感情中可能因逃避問題或抗拒改變而加劇矛盾，需坦誠面對現實。<br><b>金錢：</b>財務狀況可能因缺乏準備或忽視風險而惡化，需提前做好規劃。<br><b>事業：</b>工作中可能因抗拒改變或缺乏彈性而受阻，需接受現實並積極調整。<br><b>靈性：</b>靈性層面上提醒放下對舊有信念的執著，接受內在的轉變與啟示。",
+                advice: "<b>建議與對策：</b> 接受改變並學會從中找到新的機會，避免執著於過去的模式或恐懼。從困難中尋求重建的力量，迎接更高層次的成長。",
+            },
+            '星星': {    
+                common:  "<b>星星 ——</b><br>希望與指引，療癒與靈感的象徵。",
+                upright: "<b>正位：</b>象徵希望與治癒的過程，提醒信任宇宙的指引並專注於未來的可能性。<br>意味著靈感與內在的平靜，適合追求心靈上的啟發與幸福。<br><b>感情：</b>感情中展現希望與重新點燃的熱情，關係可能進一步深化。<br><b>金錢：</b>財務狀況逐漸好轉，可能迎來新的機會或回報。<br><b>事業：</b>工作中充滿靈感與創造力，適合實現長期計劃並追求理想。<br><b>靈性：</b>靈性層面上鼓勵連結宇宙的能量，從中找到希望與啟示。",
+                reversed: "<b>逆位：</b>可能暗示失去希望或信心，亦可能因過度理想化而忽略現實的挑戰。<br>提醒重新審視目標並保持務實的態度。<br><b>感情：</b>感情中可能因期望過高或缺乏信任而出現問題，需坦誠溝通。<br><b>金錢：</b>財務方面可能因錯誤的期望或決策而受阻，需保持現實的態度。<br><b>事業：</b>工作中可能因過於追求理想化而忽略實際挑戰，需調整策略。<br><b>靈性：</b>靈性層面上提醒找到內在的平靜並重新建立與宇宙的連結，避免迷失於幻想。",
+                advice: "<b>建議與對策：</b> 專注於未來的可能性並從中找到希望，避免因失望或理想化而影響前進。學會接受現實並平衡理想與務實的需求。",
+            },
+            '月亮': {    
+                common:  "<b>月亮 ——</b><br>直覺與幻象，潛意識與迷茫的象徵。",
+                upright: "<b>正位：</b>象徵潛意識的力量與不確定的道路，提醒信任直覺並留意隱藏的真相。<br>意味著需要接受不確定性並從中找到方向。<br><b>感情：</b>感情中可能存在誤解或隱藏的情感，需以敏感與直覺處理關係。<br><b>金錢：</b>財務狀況可能因不明朗的因素而受影響，需保持謹慎。<br><b>事業：</b>工作中可能面臨模糊或不確定的情況，需憑直覺和耐心找到方向。<br><b>靈性：</b>靈性層面上強調與潛意識的連結，鼓勵探索夢境與內在的象徵。",
+                reversed: "<b>逆位：</b>可能暗示混亂逐漸澄清，或因過於依賴幻象而忽視現實。<br>提醒重新檢視內心的恐懼與幻想，避免迷失。<br><b>感情：</b>感情中可能因誤解解除而關係改善，或因不信任而增加距離。<br><b>金錢：</b>財務狀況逐漸明朗，但需警惕過度依賴直覺而忽視事實。<br><b>事業：</b>工作中可能逐漸清晰目標，但仍需警惕虛假資訊或誤導。<br><b>靈性：</b>靈性層面上提醒專注於現實與潛意識的平衡，避免過度追隨幻想。",
+                advice: "<b>建議與對策：</b> 信任直覺的同時保持理性，避免被幻象或不確定性影響決策。深入探索潛意識並從中找到清晰的方向。",
+            },
+            '太陽': {    
+                common:  "<b>太陽 ——</b><br>成功與歡樂，生命力與光明的象徵。",
+                upright: "<b>正位：</b>象徵成功、快樂與正能量的到來，提醒充滿信心地迎接新的挑戰。<br>意味著成就與幸福的展現，適合享受生活並分享喜悅。<br><b>感情：</b>感情中充滿幸福與和諧，可能迎來新階段或加深關係。<br><b>金錢：</b>財務狀況良好，可能有正面的收益或穩定的增長。<br><b>事業：</b>工作中展現成功與創造力，適合實現目標並追求更高的成就。<br><b>靈性：</b>靈性層面上代表光明與正能量，鼓勵接受宇宙的祝福並分享快樂。",
+                reversed: "<b>逆位：</b>可能暗示短暫的挫折或快樂的延遲，亦可能因過度自信而忽視問題。<br>提醒重新審視自己的目標與態度。<br><b>感情：</b>感情中可能因過度理想化或忽視細節而出現小問題，需溝通解決。<br><b>金錢：</b>財務方面可能因錯誤的期望或過度支出而受損，需審慎管理。<br><b>事業：</b>工作中可能因缺乏準備或過度自信而遇到挑戰，需重新檢討策略。<br><b>靈性：</b>靈性層面上提醒保持內心的光明與積極，但需避免過度追求表面成就。",
+                advice: "<b>建議與對策：</b> 擁抱成功與快樂的同時，保持謙遜與實際。專注於真實的目標，避免被表面現象或過度自信影響判斷。",
+            },
+            '審判': {    
+                common:  "<b>審判 ——</b><br>覺醒與復興，反思與重生的象徵。",
+                upright: "<b>正位：</b>象徵內在的覺醒與反思的時刻，提醒重新審視自己的行為與選擇。<br>意味著重要的決定或轉折點，適合釋放過去並迎接新的開始。<br><b>感情：</b>感情中可能進入新的階段，需以誠實與反思面對彼此的需求。<br><b>金錢：</b>財務狀況可能因過去的努力而獲得回報，適合重新評估資產與投資方向。<br><b>事業：</b>工作中可能出現重要的機會或評估期，需做出關鍵決策。<br><b>靈性：</b>靈性層面上鼓勵接受內在的覺醒與靈性重生，探索更高層次的真理。",
+                reversed: "<b>逆位：</b>可能暗示逃避內在的呼喚或害怕面對改變，亦可能因缺乏反思而陷入困境。<br>提醒勇敢接受現實並作出必要的改變。<br><b>感情：</b>感情中可能因缺乏溝通或逃避問題而導致停滯，需重新建立信任。<br><b>金錢：</b>財務上可能因錯失機會或缺乏計劃而受影響，需重新評估方向。<br><b>事業：</b>工作中可能因未能面對責任或拒絕改變而陷入瓶頸，需坦誠應對挑戰。<br><b>靈性：</b>靈性層面上提醒接受內心的呼喚並放下恐懼，重新發現自己的使命與方向。",
+                advice: "<b>建議與對策：</b> 接受內在的呼喚並勇敢面對現實，釋放過去並擁抱新的開始。專注於自我反省與改變，從中獲得成長與重生的力量。",
+            },
+            '世界': {    
+                common:  "<b>世界 ——</b><br>完成與圓滿，統一與成就的象徵。",
+                upright: "<b>正位：</b>象徵目標的完成與內外和諧的統一，提醒慶祝成就並準備迎接新的旅程。<br>意味著圓滿與滿足的時刻，適合感恩過去的努力並展望未來。<br><b>感情：</b>感情中可能達到圓滿或穩定的階段，充滿愛與和諧。<br><b>金錢：</b>財務狀況穩定且充滿潛力，可能有重大收益或成功的投資。<br><b>事業：</b>工作中展現成就與完成，可能迎來新的機遇或更高的責任。<br><b>靈性：</b>靈性層面上代表與宇宙的連結，象徵完成靈性旅程並達到新的層次。",
+                reversed: "<b>逆位：</b>可能暗示未完成的任務或目標，亦可能因缺乏自信而延遲成功。<br>提醒專注於細節並重新檢視自己的計劃。<br><b>感情：</b>感情中可能因未解決的問題而停滯，需坦誠面對並努力解決。<br><b>金錢：</b>財務上可能因拖延或決策錯誤而受影響，需重新制定策略。<br><b>事業：</b>工作中可能因未達到標準或缺乏動力而受阻，需重新聚焦目標。<br><b>靈性：</b>靈性層面上提醒不要停止探索，需繼續努力以完成內在的使命。",
+                advice: "<b>建議與對策：</b> 慶祝已完成的成就並繼續前行，避免因滿足現狀而停滯不前。專注於目標的完成並接受新的挑戰與機遇。",
+            },
+            '權杖1': {    
+                common:  "<b>權杖一 ——</b><br>創造與熱情，新機會與潛能的象徵。",
+                upright: "<b>正位：</b>象徵新的能量與創造力的爆發，提醒抓住機會並展開行動。<br>意味著適合開始新計劃或追求激情與興趣的時機。<br><b>感情：</b>感情中可能迎來新的開始或重新點燃的熱情，適合深入發展關係。<br><b>金錢：</b>財務狀況可能因創新思維而改善，適合開拓新財源或投資項目。<br><b>事業：</b>工作中展現充沛的能量與創造力，適合啟動新計劃或事業方向。<br><b>靈性：</b>靈性層面上代表新靈感的出現，鼓勵探索內在熱情與潛能。",
+                reversed: "<b>逆位：</b>可能暗示缺乏方向或動力，亦可能因計劃不周而導致停滯。<br>提醒重新檢視目標並專注於行動。<br><b>感情：</b>感情中可能因熱情不足或目標不一致而出現矛盾，需重建關係基礎。<br><b>金錢：</b>財務方面可能因投資失敗或創新不足而受挫，需保持謹慎。<br><b>事業：</b>工作中可能因缺乏熱情或準備不足而停滯，需重新激發創造力。<br><b>靈性：</b>靈性層面上提醒找回內在的熱情與動力，避免陷入無目標的狀態。",
+                advice: "<b>建議與對策：</b> 抓住新機會並專注於行動，避免拖延或猶豫。重新激發熱情與創造力，從中找到實現目標的力量。",
+            },
+            '權杖2': {    
+                common:  "<b>權杖二 ——</b><br>計劃與選擇，視野與可能性的象徵。",
+                upright: "<b>正位：</b>象徵思考與計劃的過程，提醒以遠見和策略進行抉擇。<br>意味著需要考慮長期目標並評估可行性。<br><b>感情：</b>感情中可能需要做出重要的決定或選擇，適合展望未來的發展。<br><b>金錢：</b>財務狀況穩定，適合進行長期投資或規劃新的收入來源。<br><b>事業：</b>工作中強調策略與遠見，可能涉及新的合作或方向的確立。<br><b>靈性：</b>靈性層面上鼓勵探索新的道路並擴展內在的視野，尋找更大的意義。",
+                reversed: "<b>逆位：</b>可能暗示猶豫不決或目標不明，亦可能因缺乏遠見而錯失機會。<br>提醒重新專注於目標並進行有效計劃。<br><b>感情：</b>感情中可能因缺乏方向或承諾而停滯，需坦誠溝通並確定未來。<br><b>金錢：</b>財務方面可能因計劃不足或缺乏決策力而受挫，需審慎行動。<br><b>事業：</b>工作中可能因方向不明或缺乏準備而停滯，需重新評估策略。<br><b>靈性：</b>靈性層面上提醒集中於探索內在目標，避免過度分心或迷失方向。",
+                advice: "<b>建議與對策：</b> 制定清晰的計劃並專注於實現目標，避免猶豫或分心。尋求策略性的行動以發揮自己的潛能。",
+            },
+            '權杖3': {    
+                common:  "<b>權杖三 ——</b><br>擴展與遠見，探索與成長的象徵。",
+                upright: "<b>正位：</b>象徵計劃的實現與拓展，提醒以開放的態度探索新的機會與方向。<br>意味著成功的基礎已建立，適合放眼未來並實施更大的目標。<br><b>感情：</b>感情中可能進一步加深聯繫或共同計劃未來，關係充滿希望與成長。<br><b>金錢：</b>財務方面可能有穩定的增長，適合尋找新的投資機會或擴大收入來源。<br><b>事業：</b>工作中展現進步與成功，適合實現更大的計劃或進行國際合作。<br><b>靈性：</b>靈性層面上鼓勵擴展內心的視野並探索新的靈性旅程，尋找更多的啟發。",
+                reversed: "<b>逆位：</b>可能暗示計劃的延遲或未能實現預期，亦可能因缺乏遠見而受挫。<br>提醒重新評估計劃並調整策略。<br><b>感情：</b>感情中可能因溝通不暢或目標不同而出現問題，需共同努力以解決矛盾。<br><b>金錢：</b>財務方面可能因錯誤的判斷或計劃不足而導致損失，需審慎管理。<br><b>事業：</b>工作中可能因缺乏準備或執行力而延遲進展，需重新制定計劃。<br><b>靈性：</b>靈性層面上提醒避免過於狹隘或分心，專注於內在的成長與目標的實現。",
+                advice: "<b>建議與對策：</b> 保持開放的態度並專注於長期目標，適時調整策略以克服挑戰並實現成功。",
+            },
+            '權杖4': {    
+                common:  "<b>權杖四 ——</b><br>穩定與歡慶，和諧與成就的象徵。",
+                upright: "<b>正位：</b>象徵穩固的基礎與團體的支持，提醒慶祝成就並珍惜關係中的和諧。<br>意味著成功的階段性完成，適合享受成果並鞏固基礎。<br><b>感情：</b>感情中展現穩定與承諾，可能迎來婚姻或共同生活的計劃。<br><b>金錢：</b>財務狀況良好，適合慶祝成就或投資於穩定的項目。<br><b>事業：</b>工作中代表成功與合作的成果，可能涉及團體的支持或項目的圓滿完成。<br><b>靈性：</b>靈性層面上象徵內在的和諧與滿足，鼓勵慶祝靈性上的進步與成長。",
+                reversed: "<b>逆位：</b>可能暗示基礎的不穩定或關係中的問題，亦可能因缺乏支持而感到孤立。<br>提醒重新審視現狀並找到問題的根源。<br><b>感情：</b>感情中可能因缺乏承諾或不穩定因素而受影響，需坦誠溝通並解決問題。<br><b>金錢：</b>財務方面可能因過度開支或不穩定的投資而出現困難，需謹慎行事。<br><b>事業：</b>工作中可能因團隊合作問題或資源不足而延遲進展，需尋求解決方法。<br><b>靈性：</b>靈性層面上提醒避免過度依賴外部支持，需尋找內在的平衡與穩定。",
+                advice: "<b>建議與對策：</b> 專注於鞏固基礎並解決潛在問題，慶祝成功的同時保持穩定與長期規劃的視野。",
+            },
+            '權杖5': {    
+                common:  "<b>權杖五 ——</b><br>競爭與衝突，挑戰與多樣性的象徵。",
+                upright: "<b>正位：</b>象徵多方意見的碰撞與競爭，提醒通過努力與協作來解決分歧。<br>意味著挑戰可以帶來成長與新的機會，需以積極態度面對。<br><b>感情：</b>感情中可能出現衝突或意見不合，需耐心溝通以達成共識。<br><b>金錢：</b>財務方面可能因競爭或意外支出而出現壓力，需積極尋找解決方法。<br><b>事業：</b>工作中可能面臨挑戰或團隊內的分歧，需通過溝通與協作來克服。<br><b>靈性：</b>靈性層面上鼓勵接受挑戰並從中學習，尋找內在的力量與平衡。",
+                reversed: "<b>逆位：</b>可能暗示過度的競爭或無序的衝突，亦可能因逃避問題而導致更大的困境。<br>提醒重新檢視策略並尋求有效的解決方法。<br><b>感情：</b>感情中可能因持續的矛盾或缺乏溝通而惡化，需主動解決問題。<br><b>金錢：</b>財務上可能因不必要的競爭或計劃不周而出現損失，需調整方向。<br><b>事業：</b>工作中可能因過度衝突或缺乏團隊精神而陷入僵局，需重新建立協作。<br><b>靈性：</b>靈性層面上提醒避免內心的混亂與分裂，專注於尋找和諧與解決之道。",
+                advice: "<b>建議與對策：</b> 面對挑戰時保持冷靜與合作精神，避免過度衝突或固執己見。學會從多樣性中吸取智慧並找到創新的解決方法。",
+            },
+            '權杖6': {    
+                common:  "<b>權杖六 ——</b><br>勝利與認可，自信與成就的象徵。",
+                upright: "<b>正位：</b>象徵公開的成功與榮譽，提醒慶祝成就並感恩他人的支持。<br>意味著努力的成果得到認可，適合繼續追求更高的目標。<br><b>感情：</b>感情中充滿自信與滿足，可能達到更穩定的階段或收到伴侶的支持。<br><b>金錢：</b>財務狀況良好，可能因成功的計劃或努力而獲得回報。<br><b>事業：</b>工作中展現明顯的進步與成就，可能受到團隊或上司的表彰。<br><b>靈性：</b>靈性層面上象徵自信與靈性成長，鼓勵分享成功並啟發他人。",
+                reversed: "<b>逆位：</b>可能暗示失去信心或未能實現預期的成果，亦可能因過度自滿而忽視潛在的問題。<br>提醒重新審視目標並保持謙遜。<br><b>感情：</b>感情中可能因缺乏信任或承認而出現不滿，需坦誠溝通並解決分歧。<br><b>金錢：</b>財務方面可能因誤判或過度樂觀而受挫，需謹慎管理資產。<br><b>事業：</b>工作中可能因未能達成目標或缺乏支持而受阻，需重新調整計劃。<br><b>靈性：</b>靈性層面上提醒避免過度驕傲或停滯不前，需專注於持續的成長與探索。",
+                advice: "<b>建議與對策：</b> 慶祝成功的同時保持謙遜與感恩，避免因過度自信或忽視細節而影響長期目標。",
+            },
+            '權杖7': {    
+                common:  "<b>權杖七 ——</b><br>防衛與優勢，堅持與挑戰的象徵。",
+                upright: "<b>正位：</b>象徵面對挑戰時的防衛與堅持，提醒保護自己的立場並勇敢面對困難。<br>意味著雖然面臨壓力，但擁有優勢，適合持續努力。<br><b>感情：</b>感情中可能需要捍衛自己的觀點或努力維護關係的平衡。<br><b>金錢：</b>財務方面可能因外部壓力而需更加謹慎，但仍可保持穩定。<br><b>事業：</b>工作中可能面臨挑戰或競爭，但努力堅持可獲得成功。<br><b>靈性：</b>靈性層面上鼓勵堅持自己的信仰與道路，不受外界影響。",
+                reversed: "<b>逆位：</b>可能暗示因壓力過大而失去信心，亦可能因防衛過度而錯失機會。<br>提醒重新檢視策略並找到內在的力量。<br><b>感情：</b>感情中可能因過度防禦或固執己見而導致問題，需學會妥協與溝通。<br><b>金錢：</b>財務上可能因壓力或過度保守而影響收益，需重新規劃。<br><b>事業：</b>工作中可能因無法應對挑戰或缺乏支持而受阻，需尋求幫助或調整策略。<br><b>靈性：</b>靈性層面上提醒避免因恐懼或外界壓力而放棄內在追求，需重新建立信心。",
+                advice: "<b>建議與對策：</b> 面對挑戰時保持堅定與冷靜，避免過度防禦或自我懷疑。專注於長期目標並尋求適當的支持與策略。",
+            },
+            '權杖8': {    
+                common:  "<b>權杖八 ——</b><br>快速的行動與變化，進展與目標的象徵。",
+                upright: "<b>正位：</b>象徵快速的進展與能量的流動，提醒抓住機會並集中於行動。<br>意味著計劃開始實現並接近成功，適合專注於具體目標。<br><b>感情：</b>感情中可能快速發展或進入新階段，充滿動感與熱情。<br><b>金錢：</b>財務方面可能因迅速的決策或行動而帶來收益，適合抓住即時機會。<br><b>事業：</b>工作中進展迅速，適合集中資源並加快計劃的實施。<br><b>靈性：</b>靈性層面上代表能量的快速轉變，鼓勵抓住靈性上的啟示與機遇。",
+                reversed: "<b>逆位：</b>可能暗示行動受阻或計劃延遲，亦可能因缺乏目標而浪費能量。<br>提醒重新調整方向並專注於重點。<br><b>感情：</b>感情中可能因溝通不暢或行動過快而出現問題，需耐心調整步伐。<br><b>金錢：</b>財務上可能因過度衝動或延遲決策而影響收益，需審慎行動。<br><b>事業：</b>工作中可能因外界阻力或缺乏協調而延緩進展，需重新評估計劃。<br><b>靈性：</b>靈性層面上提醒避免分心或錯失靈感，需專注於當下的啟示與方向。",
+                advice: "<b>建議與對策：</b> 專注於目標並迅速行動，避免因拖延或過度衝動而影響結果。保持靈活性並抓住機會以實現成功。",
+            },
+            '權杖9': {    
+                common:  "<b>權杖九 ——</b><br>堅韌與防衛，經驗與準備的象徵。",
+                upright: "<b>正位：</b>象徵經過挑戰後的堅韌與準備，提醒保持警惕並保護已取得的成果。<br>意味著雖然感到疲憊，但成功即將到來，適合堅持最後的努力。<br><b>感情：</b>感情中可能因過去的經歷而變得防備，但仍有希望改善關係。<br><b>金錢：</b>財務方面提醒謹慎管理資產，可能需要準備應對潛在風險。<br><b>事業：</b>工作中可能面臨最後的挑戰，需堅守崗位並保持耐心與專注。<br><b>靈性：</b>靈性層面上象徵從經驗中獲得智慧，鼓勵繼續探索內在的力量。",
+                reversed: "<b>逆位：</b>可能暗示過度防禦或對成功失去信心，亦可能因疲憊而無法繼續努力。<br>提醒重新評估策略並尋求支持。<br><b>感情：</b>感情中可能因過於防備或懷疑而阻礙關係發展，需打開心扉。<br><b>金錢：</b>財務上可能因過度保守或缺乏行動而影響進展，需適當調整策略。<br><b>事業：</b>工作中可能因壓力或缺乏支持而感到受阻，需尋求協助並重建信心。<br><b>靈性：</b>靈性層面上提醒不要因疲憊而放棄內在追求，需找到新的動力與啟發。",
+                advice: "<b>建議與對策：</b> 堅持自己的目標並保持警惕，避免過度防禦或自我懷疑。尋求支持與策略性的行動以克服最後的挑戰。",
+            },
+            '權杖10': {    
+                common:  "<b>權杖十 ——</b><br>負擔與責任，努力與壓力的象徵。",
+                upright: "<b>正位：</b>象徵肩負重任與努力完成目標的過程，提醒適時釋放壓力並尋求協助。<br>意味著雖然感到疲憊，但成功就在眼前，需堅持到底。<br><b>感情：</b>感情中可能因過多的壓力或責任而影響關係，需尋求平衡與溝通。<br><b>金錢：</b>財務方面可能因過多的責任或債務而感到壓力，需重新規劃。<br><b>事業：</b>工作中可能面臨繁重的任務，但努力完成後會帶來成果與滿足感。<br><b>靈性：</b>靈性層面上提醒釋放不必要的負擔，專注於內在的成長與簡化生活。",
+                reversed: "<b>逆位：</b>可能暗示因負擔過重而感到壓垮，亦可能因逃避責任而無法完成目標。<br>提醒重新審視自己的責任並尋求協助。<br><b>感情：</b>感情中可能因缺乏溝通或過多壓力而出現問題，需共同分擔責任。<br><b>金錢：</b>財務上可能因過度負擔或管理不善而陷入困境，需尋求專業建議。<br><b>事業：</b>工作中可能因壓力過大或分工不均而影響效率，需重新調整。<br><b>靈性：</b>靈性層面上提醒放下過重的負擔，專注於真正重要的內在需求。",
+                advice: "<b>建議與對策：</b> 尋求他人的協助並適時釋放壓力，避免因過度負擔而影響長期目標。專注於優先事項並簡化任務。",
+            },
+            '權杖侍者': {    
+                common:  "<b>權杖侍者 ——</b><br>靈感與好奇，熱情與新開始的象徵。",
+                upright: "<b>正位：</b>象徵熱情與靈感的萌發，提醒抓住新機會並展開探索。<br>意味著新的冒險或創意即將到來，適合擁抱未知並充滿希望。<br><b>感情：</b>感情中可能展現新鮮感與熱情，或有新的情感關係出現。<br><b>金錢：</b>財務方面可能迎來新的收入機會或投資靈感，適合開創性行動。<br><b>事業：</b>工作中展現創造力與動力，適合啟動新項目或嘗試不同的方向。<br><b>靈性：</b>靈性層面上代表新的靈性探索，鼓勵以開放的心態尋求啟發與成長。",
+                reversed: "<b>逆位：</b>可能暗示缺乏方向或過於衝動，亦可能因準備不足而遇到障礙。<br>提醒冷靜評估機會並專注於目標。<br><b>感情：</b>感情中可能因熱情過度或不成熟而出現問題，需學會耐心。<br><b>金錢：</b>財務上可能因草率決定或衝動投資而受挫，需重新計劃。<br><b>事業：</b>工作中可能因缺乏經驗或計劃不足而停滯，需加強學習與準備。<br><b>靈性：</b>靈性層面上提醒避免過度分心或迷失方向，專注於真正重要的追求。",
+                advice: "<b>建議與對策：</b> 擁抱新機會的同時保持冷靜與專注，避免過度衝動或缺乏準備。努力學習與適應，為成功奠定基礎。",
+            },
+            '權杖騎士': {    
+                common:  "<b>權杖騎士 ——</b><br>行動與冒險，熱情與決心的象徵。",
+                upright: "<b>正位：</b>象徵充滿動力與冒險精神的行動，提醒抓住機會並迅速採取行動。<br>意味著對目標充滿熱情與決心，適合全力以赴追求成功。<br><b>感情：</b>感情中可能展現激情與浪漫，或關係進入充滿動感的新階段。<br><b>金錢：</b>財務方面可能因大膽的行動而帶來突破，適合嘗試創新策略。<br><b>事業：</b>工作中展現積極與果斷，適合承擔挑戰並推動項目進展。<br><b>靈性：</b>靈性層面上代表充滿能量的探索，鼓勵勇敢踏上靈性的旅程。",
+                reversed: "<b>逆位：</b>可能暗示過度衝動或行動的方向不明，亦可能因缺乏耐心而導致錯誤。<br>提醒冷靜分析並確保目標的明確性。<br><b>感情：</b>感情中可能因急躁或缺乏穩定性而出現矛盾，需放慢步伐。<br><b>金錢：</b>財務上可能因衝動決策或風險過高而受損，需謹慎行動。<br><b>事業：</b>工作中可能因缺乏計劃或行動過快而導致失誤，需重新審視策略。<br><b>靈性：</b>靈性層面上提醒避免過度追求速度，需專注於內在的穩定與成長。",
+                advice: "<b>建議與對策：</b> 行動時保持冷靜與專注，避免因過度衝動或方向不明而影響成果。制定清晰的計劃並以耐心與決心實現目標。",
+            },
+            '權杖皇后': {    
+                common:  "<b>權杖皇后 ——</b><br>自信與熱情，創造力與領導力的象徵。",
+                upright: "<b>正位：</b>象徵充滿自信與熱情的個性，提醒發揮創造力並帶動他人。<br>意味著適合追求個人目標並展現領導才能的時機。<br><b>感情：</b>感情中充滿熱情與支持，可能迎來更深層次的聯繫或新開始。<br><b>金錢：</b>財務狀況穩定，可能因創意或努力而獲得回報。<br><b>事業：</b>工作中展現強大的領導力與創造力，適合推動重大項目或擔任重要角色。<br><b>靈性：</b>靈性層面上象徵內在的熱情與智慧，鼓勵以行動實現靈性的啟發。",
+                reversed: "<b>逆位：</b>可能暗示缺乏信心或過度掌控，亦可能因情緒化而影響決策。<br>提醒重新平衡熱情與理性，專注於長期目標。<br><b>感情：</b>感情中可能因過度控制或缺乏支持而出現問題，需坦誠溝通。<br><b>金錢：</b>財務上可能因過度自信或缺乏計劃而受挫，需謹慎行事。<br><b>事業：</b>工作中可能因情緒化或過度控制而影響進展，需重新調整策略。<br><b>靈性：</b>靈性層面上提醒找到內在的平衡與穩定，避免因熱情過度而迷失方向。",
+                advice: "<b>建議與對策：</b> 發揮自信與熱情的同時保持冷靜與理性，避免因情緒化或過度掌控而影響目標。專注於長期的成就與和諧發展。",
+            },
+            '權杖國王': {    
+                common:  "<b>權杖國王 ——</b><br>領導與力量，視野與智慧的象徵。",
+                upright: "<b>正位：</b>象徵強大的領導力與遠見，提醒發揮智慧並帶領他人實現共同目標。<br>意味著適合承擔責任並制定長期計劃的時機。<br><b>感情：</b>感情中展現穩定與承諾，可能迎來更成熟或可靠的關係。<br><b>金錢：</b>財務狀況穩定且充滿潛力，適合長期投資與規劃。<br><b>事業：</b>工作中展現領袖風範與決策力，適合推動重大項目或管理團隊。<br><b>靈性：</b>靈性層面上鼓勵發揮內在智慧並帶動他人，共同追求更高層次的成長。",
+                reversed: "<b>逆位：</b>可能暗示濫用權力或缺乏遠見，亦可能因過度控制而導致問題。<br>提醒重新審視自己的動機並尋求平衡。<br><b>感情：</b>感情中可能因過於控制或缺乏承諾而出現矛盾，需坦誠交流。<br><b>金錢：</b>財務上可能因過度冒險或錯誤判斷而受挫，需謹慎行動。<br><b>事業：</b>工作中可能因濫用權力或缺乏方向而受阻，需重新建立清晰的目標。<br><b>靈性：</b>靈性層面上提醒避免過於依賴外在權威，需專注於內在的力量與智慧。",
+                advice: "<b>建議與對策：</b> 展現領導力與智慧的同時保持謙遜與遠見，避免因過度控制或錯誤判斷而影響成果。專注於長期穩定的發展並激勵他人。",
+            },
+            '寶劍1': {    
+                common:  "<b>寶劍一 ——</b><br>智慧與清晰，新想法與真理的象徵。",
+                upright: "<b>正位：</b>象徵清晰的思維與新的開始，提醒以理性與真理的力量解決問題。<br>意味著洞察力的提升與成功的可能性，適合追求知識與行動力。<br><b>感情：</b>感情中可能展現清晰的溝通與真誠的對話，關係進一步深化。<br><b>金錢：</b>財務方面可能因新的計劃或智慧的決策而改善，適合進行分析與行動。<br><b>事業：</b>工作中展現創新與理性的力量，適合啟動新項目或解決複雜問題。<br><b>靈性：</b>靈性層面上象徵智慧與覺醒的開始，鼓勵探索真理與內在的力量。",
+                reversed: "<b>逆位：</b>可能暗示困惑或缺乏清晰的方向，亦可能因過度分析而無法行動。<br>提醒重新集中精力並尋求真相。<br><b>感情：</b>感情中可能因溝通不良或誤解而出現問題，需坦誠面對彼此的需求。<br><b>金錢：</b>財務上可能因缺乏計劃或判斷失誤而受挫，需重新檢視策略。<br><b>事業：</b>工作中可能因目標不明或過度猶豫而停滯，需重新建立方向。<br><b>靈性：</b>靈性層面上提醒放下過度的分析與質疑，專注於真理與內在的啟發。",
+                advice: "<b>建議與對策：</b> 發揮理性與洞察力，專注於清晰的目標並採取行動。避免因猶豫不決或過度分析而錯失良機，努力平衡智慧與行動力。",
+            },
+            '寶劍2': {    
+                common:  "<b>寶劍二 ——</b><br>平衡與抉擇，停滯與猶豫的象徵。",
+                upright: "<b>正位：</b>象徵需要在對立的選擇間找到平衡，提醒以冷靜與客觀的態度面對挑戰。<br>意味著暫時的停滯與反思的時刻，適合進行深思熟慮的決定。<br><b>感情：</b>感情中可能處於停滯或需要做出重要選擇的時刻，需以坦誠的態度溝通。<br><b>金錢：</b>財務方面可能因無法確定方向而停滯，需尋求專業建議並制定計劃。<br><b>事業：</b>工作中可能因選擇困難或壓力而暫時停頓，需重新審視目標與資源。<br><b>靈性：</b>靈性層面上象徵內在的矛盾與平衡的需求，鼓勵以冷靜的心態探索自我。",
+                reversed: "<b>逆位：</b>可能暗示因猶豫不決而錯失機會，亦可能因過度分析而陷入困境。<br>提醒勇敢採取行動並打破僵局。<br><b>感情：</b>感情中可能因逃避問題或缺乏溝通而出現矛盾，需坦誠面對彼此的需求。<br><b>金錢：</b>財務上可能因遲疑或錯誤決策而受影響，需重新檢視計劃並果斷行動。<br><b>事業：</b>工作中可能因缺乏方向或無法決定而停滯，需重新建立目標與行動計劃。<br><b>靈性：</b>靈性層面上提醒面對內在的矛盾並作出選擇，避免因過度猶豫而影響成長。",
+                advice: "<b>建議與對策：</b> 在選擇困難時保持冷靜與專注，避免因猶豫不決而影響進展。勇敢面對挑戰並果斷採取行動，以實現平衡與目標。",
+            },
+            '寶劍3': {    
+                common:  "<b>寶劍三 ——</b><br>痛苦與失落，情感與理智的衝突的象徵。",
+                upright: "<b>正位：</b>象徵情感上的傷痛或失望，提醒接受現實並從中學習成長。<br>意味著需要面對內心的痛苦並努力尋求修復與和解。<br><b>感情：</b>感情中可能面臨分離或衝突，需坦誠面對並處理情感上的問題。<br><b>金錢：</b>財務方面可能因錯誤的決策或損失而感到壓力，需冷靜評估並重新規劃。<br><b>事業：</b>工作中可能因挫折或不和諧而感到失落，需重新審視方向並尋求支持。<br><b>靈性：</b>靈性層面上象徵經歷痛苦後的覺醒，鼓勵從困難中尋找智慧與力量。",
+                reversed: "<b>逆位：</b>可能暗示逐漸癒合的傷痛或持續的情感壓力，亦可能因逃避問題而無法解決困境。<br>提醒正視內心的需求並努力尋求平靜。<br><b>感情：</b>感情中可能因未解決的問題而導致持續的不滿，需坦誠溝通並修復關係。<br><b>金錢：</b>財務上可能因損失或錯誤判斷而感到困惑，需專注於長期的恢復策略。<br><b>事業：</b>工作中可能因壓力或人際衝突而受阻，需尋求協助並重新建立信心。<br><b>靈性：</b>靈性層面上提醒從困難中尋找內心的平靜，避免持續壓抑情感或忽視問題。",
+                advice: "<b>建議與對策：</b> 面對痛苦時保持冷靜並尋求支持，避免因逃避或壓抑情感而影響成長。專注於修復與和解，從中獲得智慧與力量。",
+            },
+            '寶劍4': {    
+                common:  "<b>寶劍四 ——</b><br>休息與內省，恢復與平靜的象徵。",
+                upright: "<b>正位：</b>象徵休息與恢復的需求，提醒暫時遠離壓力並專注於內在的平靜。<br>意味著需要停下腳步，進行反思與自我照顧的時刻。<br><b>感情：</b>感情中可能需要暫時的距離或冷靜期，適合反思彼此的需求與未來方向。<br><b>金錢：</b>財務方面適合穩步推進並避免冒險，專注於保持穩定與計劃長期發展。<br><b>事業：</b>工作中可能需要短暫的休息或調整策略，適合重新聚焦於核心目標。<br><b>靈性：</b>靈性層面上象徵內在的反思與修復，鼓勵透過靜心與冥想找到平衡。",
+                reversed: "<b>逆位：</b>可能暗示難以放鬆或過度壓力，亦可能因缺乏計劃而影響恢復的過程。<br>提醒專注於內在的需求並適時調整步伐。<br><b>感情：</b>感情中可能因無法解決問題或過度壓抑情感而影響進展，需重新建立溝通。<br><b>金錢：</b>財務上可能因缺乏計劃或過於焦慮而受影響，需專注於穩定的目標。<br><b>事業：</b>工作中可能因過度壓力或缺乏休息而影響效率，需尋求平衡並適時調整。<br><b>靈性：</b>靈性層面上提醒避免過度緊張或失去焦點，需專注於靜心與恢復內在的能量。",
+                advice: "<b>建議與對策：</b> 給自己時間進行恢復與反思，避免因過度壓力或焦慮影響成長。專注於內在的平靜與平衡，從中找到力量與方向。",
+            },
+            '寶劍5': {    
+                common:  "<b>寶劍五 ——</b><br>衝突與失敗，教訓與策略的象徵。",
+                upright: "<b>正位：</b>象徵因爭執或衝突而帶來的失落，提醒以策略與智慧應對挑戰。<br>意味著需要重新評估自己的目標與方法，避免無謂的對抗。<br><b>感情：</b>感情中可能因誤解或衝突而出現矛盾，需坦誠溝通以修復關係。<br><b>金錢：</b>財務方面可能因錯誤的判斷或策略不當而受損，需重新審視計劃。<br><b>事業：</b>工作中可能因人際關係緊張或競爭加劇而感到壓力，需尋求合作與解決之道。<br><b>靈性：</b>靈性層面上象徵內在的衝突與不安，鼓勵透過反思找到內心的平靜。",
+                reversed: "<b>逆位：</b>可能暗示試圖化解衝突或因逃避問題而導致更大的困境，亦可能因過度妥協而犧牲自身利益。<br>提醒找到平衡並勇敢面對挑戰。<br><b>感情：</b>感情中可能因溝通不足或過度妥協而影響關係，需重建信任與理解。<br><b>金錢：</b>財務上可能因不當的妥協或逃避責任而受影響，需果斷行動以挽回局面。<br><b>事業：</b>工作中可能因人際問題或過度依賴他人而受阻，需加強自身的主動性與判斷力。<br><b>靈性：</b>靈性層面上提醒接受內心的矛盾並努力尋求和諧，避免因逃避而延遲成長。",
+                advice: "<b>建議與對策：</b> 面對衝突時保持冷靜與智慧，避免無謂的對抗或妥協過多。專注於長期目標並採取策略性的行動，從中學習並成長。",
+            },
+            '寶劍6': {    
+                common:  "<b>寶劍六 ——</b><br>過渡與轉變，平靜與前行的象徵。",
+                upright: "<b>正位：</b>象徵離開困難的處境並朝向新的方向，提醒接受變化並專注於未來的可能性。<br>意味著內心或外在的旅程，適合放下過去並專注於成長。<br><b>感情：</b>感情中可能因經歷困難後的理解與和解而迎來新的開始，關係更趨穩定。<br><b>金錢：</b>財務方面可能因理性的調整與策略的改變而改善，適合進行新的規劃。<br><b>事業：</b>工作中可能因變動或轉換而帶來新的機遇，需積極適應變化並尋求成長。<br><b>靈性：</b>靈性層面上象徵內在的平靜與轉變，鼓勵放下過去並探索新的靈性道路。",
+                reversed: "<b>逆位：</b>可能暗示拒絕改變或難以放下過去，亦可能因害怕失敗而猶豫不前。<br>提醒勇敢接受變化並專注於未來的成長。<br><b>感情：</b>感情中可能因無法放下過去的問題或害怕改變而影響關係，需坦誠溝通。<br><b>金錢：</b>財務上可能因錯誤的策略或猶豫不決而停滯，需重新制定計劃並果斷行動。<br><b>事業：</b>工作中可能因抗拒變化或缺乏適應力而受阻，需重新調整心態並尋求機會。<br><b>靈性：</b>靈性層面上提醒避免過度執著於過去，需專注於內在的轉變與未來的發展。",
+                advice: "<b>建議與對策：</b> 接受改變並勇敢邁向新的方向，避免因害怕或執著於過去而影響成長。專注於未來的可能性並努力實現平靜與成長。",
+            },
+            '寶劍7': {    
+                common:  "<b>寶劍七 ——</b><br>策略與秘密，計劃與逃避的象徵。",
+                upright: "<b>正位：</b>象徵謹慎與策略性行動，提醒通過智慧與計劃解決問題。<br>意味著需要靈活應對挑戰，適合採用創新的方式實現目標。<br><b>感情：</b>感情中可能需要隱藏真實感受或謹慎處理關係中的問題，需坦誠與敏感並存。<br><b>金錢：</b>財務方面可能因策略性的行動而獲得成功，適合探索新方法或計劃。<br><b>事業：</b>工作中可能需要靈活應對挑戰或避免不必要的衝突，適合在背後默默推進計劃。<br><b>靈性：</b>靈性層面上象徵內在的智慧與計劃性，鼓勵探索新的靈性道路並保持謹慎。",
+                reversed: "<b>逆位：</b>可能暗示策略的失敗或過度秘密導致的問題，亦可能因缺乏誠實而受到影響。<br>提醒重新審視自己的行動並專注於正直與誠信。<br><b>感情：</b>感情中可能因缺乏坦誠或隱瞞而出現矛盾，需重新建立信任。<br><b>金錢：</b>財務上可能因缺乏計劃或過度冒險而受損，需謹慎行動並重新規劃。<br><b>事業：</b>工作中可能因不當的策略或缺乏透明度而受阻，需重新檢視目標並建立合作。<br><b>靈性：</b>靈性層面上提醒避免過度複雜或分心，需專注於內在的誠實與簡單化。",
+                advice: "<b>建議與對策：</b> 採取策略性的行動並保持誠實與透明，避免因隱瞞或不當行為而影響進展。專注於長期的目標並以智慧解決挑戰。",
+            },
+            '寶劍8': {    
+                common:  "<b>寶劍八 ——</b><br>限制與困境，自我設限與突破的象徵。",
+                upright: "<b>正位：</b>象徵因外在壓力或內在恐懼而感到受限，提醒需要打破束縛並重新尋找自由。<br>意味著需要克服內心的恐懼與不安，適合勇敢面對挑戰並尋求解放。<br><b>感情：</b>感情中可能因溝通問題或情感上的限制而停滯，需努力突破僵局。<br><b>金錢：</b>財務方面可能因外在條件的限制或自我設限而影響發展，需尋找新的方法突破困境。<br><b>事業：</b>工作中可能因局限的環境或思維方式而受阻，需重新評估策略並尋求支持。<br><b>靈性：</b>靈性層面上象徵內在的困惑與恐懼，鼓勵通過勇氣與智慧尋求自由與平靜。",
+                reversed: "<b>逆位：</b>可能暗示逐漸解脫束縛或仍然陷於自我設限中，亦可能因抗拒改變而延遲進步。<br>提醒放下恐懼並積極尋求改變的途徑。<br><b>感情：</b>感情中可能因打破限制而迎來新的機會，或因逃避問題而持續困擾。<br><b>金錢：</b>財務上可能因找到新的方法或放下舊有模式而改善，需保持開放的心態。<br><b>事業：</b>工作中可能因接受改變而突破限制，但需避免因猶豫或抗拒而影響進展。<br><b>靈性：</b>靈性層面上提醒放下內在的恐懼並專注於自我成長，避免因自我懷疑而停滯不前。",
+                advice: "<b>建議與對策：</b> 勇敢面對內外的限制並尋求突破，避免因恐懼或猶豫而錯失良機。專注於解放與成長，實現內心的自由與平靜。",
+            },
+            '寶劍9': {    
+                common:  "<b>寶劍九 ——</b><br>焦慮與恐懼，內心的掙扎與反思的象徵。",
+                upright: "<b>正位：</b>象徵深夜的煩惱與內心的壓力，提醒正視恐懼並尋求解決之道。<br>意味著需要面對內在的陰影，適合進行反思與尋求支持。<br><b>感情：</b>感情中可能因擔憂或不安全感而影響關係，需坦誠交流以化解誤解。<br><b>金錢：</b>財務方面可能因壓力或擔憂而陷入困境，需冷靜分析並制定策略。<br><b>事業：</b>工作中可能因過度焦慮或壓力而影響效率，需尋求方法減輕負擔。<br><b>靈性：</b>靈性層面上象徵內心的掙扎與反思，鼓勵面對恐懼並尋找平靜。",
+                reversed: "<b>逆位：</b>可能暗示逐漸釋放壓力或深陷於焦慮中，亦可能因忽視問題而延續困境。<br>提醒尋求幫助並積極處理內心的問題。<br><b>感情：</b>感情中可能因誤解或缺乏溝通而加重壓力，需努力重建信任與聯繫。<br><b>金錢：</b>財務上可能因持續的擔憂或缺乏計劃而受挫，需果斷行動以扭轉局面。<br><b>事業：</b>工作中可能因過度壓力或不安而停滯，需尋求支持並調整目標。<br><b>靈性：</b>靈性層面上提醒釋放內心的焦慮並專注於內在的平靜，避免陷入過度的自我懷疑。",
+                advice: "<b>建議與對策：</b> 正視內心的恐懼並積極尋求支持，避免因壓抑或逃避而影響成長。專注於解決問題並從中找到平靜與力量。"
+            },
+            '寶劍10': {    
+                common:  "<b>寶劍十 ——</b><br>結束與重生，痛苦的完成與希望的開始的象徵。",
+                upright: "<b>正位：</b>象徵一個階段的結束，提醒接受現實並從困難中尋找重生的機會。<br>意味著需要放下過去並為新的開始做好準備。<br><b>感情：</b>感情中可能面臨關係的結束或重大變化，需接受現實並尋求新的方向。<br><b>金錢：</b>財務方面可能因損失或結束某些投資而感到痛苦，需重新制定計劃。<br><b>事業：</b>工作中可能因失敗或項目的結束而感到壓力，適合尋找新的機遇並重新出發。<br><b>靈性：</b>靈性層面上象徵從痛苦中獲得啟發，鼓勵接受變化並展望新的開始。",
+                reversed: "<b>逆位：</b>可能暗示從困境中逐漸恢復或抗拒結束帶來的改變，亦可能因過度依附而阻礙成長。<br>提醒放下過去並專注於未來的發展。<br><b>感情：</b>感情中可能因未能徹底放下過去而影響新關係的發展，需努力釋懷並展望未來。<br><b>金錢：</b>財務上可能因逐漸恢復或找到新的機會而改善，需專注於長期目標。<br><b>事業：</b>工作中可能因抗拒改變而停滯，需接受現實並主動尋求新的方向。<br><b>靈性：</b>靈性層面上提醒釋放舊有的束縛並專注於新的靈性旅程，避免過度依附於過去。",
+                advice: "<b>建議與對策：</b> 接受結束與改變的過程，避免因抗拒或執著於過去而影響未來的發展。專注於新的機會並從困難中找到重生的力量。",
+            },
+            '寶劍侍者': {    
+                common:  "<b>寶劍侍者 ——</b><br>觀察與學習，好奇與警覺的象徵。",
+                upright: "<b>正位：</b>象徵對新事物的興趣與求知欲，提醒以觀察與分析的態度面對挑戰。<br>意味著探索與學習的時刻，適合開拓新領域並提高技能。<br><b>感情：</b>感情中可能出現新的理解與探索，需謹慎觀察並坦誠交流。<br><b>金錢：</b>財務方面可能因新的知識或技能而提升，適合進行研究與謹慎決策。<br><b>事業：</b>工作中可能因學習新技能或探索新方向而取得進展，需保持開放的心態。<br><b>靈性：</b>靈性層面上象徵智慧的萌芽與好奇心的驅使，鼓勵學習新的靈性觀念。",
+                reversed: "<b>逆位：</b>可能暗示過度謹慎或缺乏計劃，亦可能因好奇心過度而陷入不必要的麻煩。<br>提醒專注於目標並避免分心。<br><b>感情：</b>感情中可能因過度猜測或缺乏信任而出現問題，需坦誠溝通並建立理解。<br><b>金錢：</b>財務上可能因欠缺研究或不切實際的期望而受挫，需重新評估計劃。<br><b>事業：</b>工作中可能因缺乏專注或不成熟的策略而受阻，需加強計劃與行動力。<br><b>靈性：</b>靈性層面上提醒避免淺嘗輒止，需深入研究並專注於內在的啟發與成長。",
+                advice: "<b>建議與對策：</b> 保持開放與好奇的心態，但需專注於目標並避免分心。努力學習與探索，從中找到新的成長機會與智慧。",
+            },
+            '寶劍騎士': {    
+                common:  "<b>寶劍騎士 ——</b><br>行動與決心，目標與速度的象徵。",
+                upright: "<b>正位：</b>象徵果斷與快速行動的能力，提醒以堅定的決心追求目標。<br>意味著時機成熟，適合迅速採取行動並迎接挑戰。<br><b>感情：</b>感情中可能展現迅速的進展或熱情，需謹慎保持平衡與耐心。<br><b>金錢：</b>財務方面可能因快速的決策或行動而受益，適合把握即時的機會。<br><b>事業：</b>工作中展現果斷與效率，適合推動項目或迎接挑戰。<br><b>靈性：</b>靈性層面上象徵行動的力量與精神的決心，鼓勵專注於內心的目標並快速實現。",
+                reversed: "<b>逆位：</b>可能暗示衝動或缺乏計劃，亦可能因行動過快而忽略細節。<br>提醒冷靜分析並確保策略的正確性。<br><b>感情：</b>感情中可能因急躁或溝通不良而出現問題，需耐心處理並重新調整。<br><b>金錢：</b>財務上可能因過度冒險或衝動決策而受損，需謹慎行動並制定計劃。<br><b>事業：</b>工作中可能因計劃不足或行動過快而導致錯誤，需重新評估策略並調整方向。<br><b>靈性：</b>靈性層面上提醒避免過度衝動，需平衡行動與內心的穩定。",
+                advice: "<b>建議與對策：</b> 在行動中保持冷靜與理性，避免因衝動或缺乏計劃而影響結果。專注於目標並以穩健的步伐實現長期成功。",
+            },
+            '寶劍皇后': {    
+                common:  "<b>寶劍皇后 ——</b><br>智慧與獨立，真理與公正的象徵。",
+                upright: "<b>正位：</b>象徵理性與智慧的力量，提醒以獨立與公正的態度面對挑戰。<br>意味著清晰的思維與果斷的行動，適合追求目標並堅持原則。<br><b>感情：</b>感情中可能展現誠實與直率的交流，需以理性看待關係並解決問題。<br><b>金錢：</b>財務方面可能因清晰的計劃與理性的決策而受益，適合專注於長期目標。<br><b>事業：</b>工作中可能因智慧與領導力而成功，適合承擔責任並指導他人。<br><b>靈性：</b>靈性層面上象徵內在智慧的覺醒，鼓勵專注於真理與內心的成長。",
+                reversed: "<b>逆位：</b>可能暗示冷漠或過於苛刻，亦可能因過度依賴理性而忽略情感需求。<br>提醒尋求平衡並保持開放的心態。<br><b>感情：</b>感情中可能因缺乏情感表達或過度理性而出現距離，需重新建立理解與連結。<br><b>金錢：</b>財務上可能因計劃不周或過度保守而受挫，需重新評估策略並尋求改進。<br><b>事業：</b>工作中可能因苛求完美或過於控制而影響進展，需放鬆心態並加強合作。<br><b>靈性：</b>靈性層面上提醒避免過度依賴理性，需重新建立情感與智慧的平衡。",
+                advice: "<b>建議與對策：</b> 發揮智慧與理性的同時保持同理心與包容，避免因過於冷漠或苛刻而影響他人。專注於長期的成就並保持內外的平衡。",
+            },
+            '寶劍國王': {    
+                common:  "<b>寶劍國王 ——</b><br>領導與權威，理性與真理的象徵。",
+                upright: "<b>正位：</b>象徵強大的領導力與理性的決策能力，提醒以智慧與公平的態度面對挑戰。<br>意味著掌控局勢並堅守原則的時刻，適合制定計劃並推動成功。<br><b>感情：</b>感情中可能展現成熟與穩定，關係中充滿理性與相互尊重。<br><b>金錢：</b>財務方面可能因理性的規劃與果斷的行動而受益，適合長期投資與策略性決策。<br><b>事業：</b>工作中可能因領導能力與清晰的目標而取得成功，適合承擔責任並帶領團隊。<br><b>靈性：</b>靈性層面上象徵內在智慧與權威的覺醒，鼓勵以真理與理性追求更高的成長。",
+                reversed: "<b>逆位：</b>可能暗示濫用權力或過於苛求，亦可能因缺乏靈活性而導致問題。<br>提醒重新審視自己的動機並尋求平衡。<br><b>感情：</b>感情中可能因缺乏情感表達或過度控制而出現矛盾，需加強溝通並重新建立理解。<br><b>金錢：</b>財務上可能因錯誤的判斷或過度冒險而受挫，需重新規劃並加強分析。<br><b>事業：</b>工作中可能因過於強勢或缺乏靈活性而影響進展，需重新調整策略並尋求合作。<br><b>靈性：</b>靈性層面上提醒避免過度依賴外在權威，需專注於內在智慧與平衡的追求。",
+                advice: "<b>建議與對策：</b> 發揮領導力與智慧的同時保持謙遜與靈活，避免因過度控制或缺乏包容而影響結果。專注於公平與真理，實現穩定與成功。",
+            },
+            '錢幣1': {    
+                common:  "<b>錢幣一 ——</b><br>新的機會，物質與穩定的象徵。",
+                upright: "<b>正位：</b>象徵財務或物質上的新開始，提醒抓住實際的機會並付諸實行。<br>意味著繁榮與穩定的潛力，適合啟動新的計劃或投資。<br><b>感情：</b>感情中可能展現實際與穩定的關係，或有具體的承諾與發展。<br><b>金錢：</b>財務方面可能迎來新的收入來源或穩定的增長，適合開始新的投資或存儲計劃。<br><b>事業：</b>工作中可能有新的機會或資源支持，適合抓住機會並專注於長期目標。<br><b>靈性：</b>靈性層面上象徵物質與精神的平衡，鼓勵尋求穩定的基礎並展開新的旅程。",
+                reversed: "<b>逆位：</b>可能暗示機會的錯失或缺乏計劃，亦可能因過度專注於物質而忽略其他需求。<br>提醒重新專注於核心目標並避免浪費資源。<br><b>感情：</b>感情中可能因缺乏實際承諾或物質問題而受挫，需重新建立信任與目標。<br><b>金錢：</b>財務上可能因錯誤的判斷或浪費而受損，需重新評估策略並加強計劃。<br><b>事業：</b>工作中可能因資源不足或缺乏行動力而受阻，需重新檢視計劃並果斷行動。<br><b>靈性：</b>靈性層面上提醒避免過度追求物質而忽略內在需求，需尋求內外的平衡。",
+                advice: "<b>建議與對策：</b> 抓住新的機會並專注於實際行動，避免因猶豫或錯誤判斷而影響進展。努力平衡物質與精神的需求，實現穩定與成功。",
+            },
+            '錢幣2': {    
+                common:  "<b>錢幣二 ——</b><br>平衡與適應，選擇與管理的象徵。",
+                upright: "<b>正位：</b>象徵在多重責任中尋找平衡，提醒靈活應對並合理分配資源。<br>意味著需要專注於管理與適應的能力，適合多任務處理與調整計劃。<br><b>感情：</b>感情中可能需要平衡彼此的需求與現實條件，適合共同努力解決問題。<br><b>金錢：</b>財務方面可能需靈活應對變化或調整預算，適合保持穩健的管理方式。<br><b>事業：</b>工作中可能面臨多項挑戰或責任，需專注於計劃與效率的提升。<br><b>靈性：</b>靈性層面上象徵內外平衡的需求，鼓勵以彈性的態度面對變化與挑戰。",
+                reversed: "<b>逆位：</b>可能暗示過度壓力或無法應對多重責任，亦可能因缺乏計劃而感到混亂。<br>提醒重新評估目標並專注於核心任務。<br><b>感情：</b>感情中可能因時間或精力分配不均而出現問題，需坦誠溝通並建立平衡。<br><b>金錢：</b>財務上可能因過度消費或管理不善而受損，需重新制定計劃並理性應對。<br><b>事業：</b>工作中可能因過於分心或缺乏效率而影響進展，需重新聚焦並合理分配資源。<br><b>靈性：</b>靈性層面上提醒避免過度追求外在成功，需專注於內在的穩定與平衡。",
+                advice: "<b>建議與對策：</b> 靈活應對挑戰並專注於資源的管理，避免因過度壓力或分心而影響進展。努力平衡內外需求，實現穩定與成長。",
+            },
+            '錢幣3': {    
+                common:  "<b>錢幣三 ——</b><br>合作與技能，努力與成果的象徵。",
+                upright: "<b>正位：</b>象徵團隊合作與專業技能的展現，提醒通過努力與協作實現目標。<br>意味著成功源於計劃與合作，適合專注於提升能力並與他人協同工作。<br><b>感情：</b>感情中可能因共同的努力或目標而增進關係，需重視溝通與理解。<br><b>金錢：</b>財務方面可能因合作或專業能力的提升而受益，適合投資於自我成長。<br><b>事業：</b>工作中可能因團隊合作與技能的發揮而取得進展，適合尋求指導或提供幫助。<br><b>靈性：</b>靈性層面上象徵與他人或更高力量的聯繫，鼓勵通過共同努力提升內在智慧。",
+                reversed: "<b>逆位：</b>可能暗示合作中的困難或技能不足，亦可能因缺乏計劃而影響成果。<br>提醒重新審視目標並加強溝通與技能的提升。<br><b>感情：</b>感情中可能因缺乏共同努力或溝通不良而出現矛盾，需重建信任與合作。<br><b>金錢：</b>財務上可能因計劃不當或缺乏合作而受挫，需重新制定策略並積極行動。<br><b>事業：</b>工作中可能因團隊問題或技能不足而影響進展，需尋求指導並加強能力。<br><b>靈性：</b>靈性層面上提醒避免孤立或自滿，需專注於與他人的聯繫與共同成長。",
+                advice: "<b>建議與對策：</b> 發揮技能與合作的力量，避免因溝通不良或計劃不足而影響進展。專注於目標並努力實現長期成功。",
+            },
+            '錢幣4': {    
+                common:  "<b>錢幣四 ——</b><br>穩定與控制，保護與限制的象徵。",
+                upright: "<b>正位：</b>象徵財務或資源上的穩定，提醒珍惜現有的成果並謹慎管理資源。<br>意味著保護自己的利益與安全感，適合專注於維持現狀或積累財富。<br><b>感情：</b>感情中可能展現保護與穩定，但需避免過度控制或缺乏開放。<br><b>金錢：</b>財務方面可能因謹慎管理而保持穩定，適合專注於儲蓄與長期規劃。<br><b>事業：</b>工作中可能因專注於現有的資源與目標而取得穩定進展，需保持紀律。<br><b>靈性：</b>靈性層面上象徵內在的穩定與安全感，鼓勵反思並珍惜已有的智慧與資源。",
+                reversed: "<b>逆位：</b>可能暗示過度控制或對變化的抗拒，亦可能因固守現狀而錯失機會。<br>提醒尋求平衡並適應外界的需求與挑戰。<br><b>感情：</b>感情中可能因過於保守或缺乏信任而出現問題，需重新建立開放與理解。<br><b>金錢：</b>財務上可能因過度保守或缺乏靈活性而影響增長，需適時調整策略。<br><b>事業：</b>工作中可能因缺乏創新或過度依賴現有模式而停滯，需尋求新的方向或靈感。<br><b>靈性：</b>靈性層面上提醒避免過度依附於物質或現狀，需專注於內在的成長與探索。",
+                advice: "<b>建議與對策：</b> 保持穩定與安全感的同時尋求靈活性，避免因過度控制或抗拒改變而影響進展。努力平衡現狀與未來需求，實現長期的成功與滿足。",
+            },
+            '錢幣5': {    
+                common:  "<b>錢幣五 ——</b><br>貧困與挑戰，損失與希望的象徵。",
+                upright: "<b>正位：</b>象徵財務或物質上的困難，提醒專注於解決問題並尋找支持。<br>意味著逆境中的堅持與希望，適合重新評估資源並尋求幫助。<br><b>感情：</b>感情中可能因困難或缺乏支持而出現矛盾，需共同努力克服挑戰。<br><b>金錢：</b>財務方面可能因損失或不足而感到壓力，需制定新的計劃並謹慎行事。<br><b>事業：</b>工作中可能面臨資源短缺或挑戰，需積極尋求合作與創新的解決方法。<br><b>靈性：</b>靈性層面上象徵內在的掙扎與成長，鼓勵從困難中尋找力量與智慧。",
+                reversed: "<b>逆位：</b>可能暗示困境的逐漸改善或對支持的拒絕，亦可能因缺乏信心而延遲恢復。<br>提醒重新建立希望並積極行動。<br><b>感情：</b>感情中可能因缺乏溝通或持續的困難而影響關係，需重新建立信任與支持。<br><b>金錢：</b>財務上可能因找到新的資源或策略而改善，但需避免過度依賴他人。<br><b>事業：</b>工作中可能因適應新環境或克服挑戰而取得進展，需保持積極的態度。<br><b>靈性：</b>靈性層面上提醒從困難中尋找內在的平靜與力量，避免因逃避而影響成長。",
+                advice: "<b>建議與對策：</b> 面對困難時保持冷靜與積極，尋求支持並專注於長期的解決方案。從挑戰中學習並尋找新的方向，實現穩定與成長。",
+            },
+            '錢幣6': {    
+                common:  "<b>錢幣六 ——</b><br>慷慨與平衡，分享與回報的象徵。",
+                upright: "<b>正位：</b>象徵資源與支持的流動，提醒分享與感恩的重要性。<br>意味著慷慨與回饋的時刻，適合幫助他人或接受支持。<br><b>感情：</b>感情中可能展現平衡與和諧，彼此的付出與回報達成一致。<br><b>金錢：</b>財務方面可能因慷慨或合作而獲得回報，適合進行合理的資源分配。<br><b>事業：</b>工作中可能因團隊支持或資源共享而取得進展，適合參與合作與貢獻。<br><b>靈性：</b>靈性層面上象徵與他人的連結與分享，鼓勵以慷慨的心態促進內在成長。",
+                reversed: "<b>逆位：</b>可能暗示資源分配的不均或慷慨的濫用，亦可能因欠缺平衡而影響關係。<br>提醒重新評估付出與回報的關係並尋求平衡。<br><b>感情：</b>感情中可能因付出過多或得到的回報不足而感到失望，需重新調整平衡。<br><b>金錢：</b>財務上可能因錯誤的分配或過度慷慨而受損，需重新制定策略並加強管理。<br><b>事業：</b>工作中可能因分工不均或資源不足而受阻，需加強溝通並調整計劃。<br><b>靈性：</b>靈性層面上提醒避免過度付出或忽略自己的需求，需專注於內外的平衡與和諧。",
+                advice: "<b>建議與對策：</b> 在分享與支持中保持平衡，避免因過度慷慨或缺乏規劃而影響穩定。努力建立互惠互利的關係，實現內外的和諧與成長。",
+            },
+            '錢幣7': {    
+                common:  "<b>錢幣七 ——</b><br>耐心與努力，評估與等待的象徵。",
+                upright: "<b>正位：</b>象徵對長期目標的專注與投入，提醒以耐心與反思迎接未來的收穫。<br>意味著需要審視現狀並做出合理的調整，適合專注於努力與計劃的過程。<br><b>感情：</b>感情中可能處於需要耐心與培養的階段，適合共同努力改善關係。<br><b>金錢：</b>財務方面可能處於儲蓄或投資的累積期，需耐心等待並避免衝動行動。<br><b>事業：</b>工作中可能因專注於長期目標而進步，適合反思策略並持續努力。<br><b>靈性：</b>靈性層面上象徵對內心成長的專注與耐心，鼓勵以平和的心態迎接變化。",
+                reversed: "<b>逆位：</b>可能暗示對進展的不滿或耐心的喪失，亦可能因錯誤的方向而影響成果。<br>提醒重新檢視目標並調整計劃。<br><b>感情：</b>感情中可能因缺乏耐心或方向不明而受阻，需坦誠溝通並重新努力。<br><b>金錢：</b>財務上可能因錯誤的選擇或急於獲利而受損，需重新評估策略並加強計劃。<br><b>事業：</b>工作中可能因目標不明或對進展的焦慮而停滯，需重新專注並耐心付出。<br><b>靈性：</b>靈性層面上提醒避免過於急躁或失去目標，需專注於內在的穩定與成長。",
+                advice: "<b>建議與對策：</b> 保持耐心並專注於長期目標，避免因焦慮或急躁而影響進展。重新審視目標並做出適當調整，實現穩定的成長與成功。",
+            },
+            '錢幣8': {    
+                common:  "<b>錢幣八 ——</b><br>專注與學習，技能與奉獻的象徵。",
+                upright: "<b>正位：</b>象徵對專業技能的精進與努力，提醒通過勤奮與專注實現目標。<br>意味著成長與進步的時刻，適合投入學習與提升能力。<br><b>感情：</b>感情中可能展現共同努力與奉獻的精神，適合深入了解與改善關係。<br><b>金錢：</b>財務方面可能因專注於技能提升或工作而帶來穩定增長，適合長期規劃。<br><b>事業：</b>工作中可能因專業技能的提升而取得成功，適合投入更多精力於專業發展。<br><b>靈性：</b>靈性層面上象徵對內在智慧的探索與提升，鼓勵通過學習實現靈性成長。",
+                reversed: "<b>逆位：</b>可能暗示缺乏專注或過度工作，亦可能因方向不明而浪費努力。<br>提醒重新專注於核心目標並調整步伐。<br><b>感情：</b>感情中可能因缺乏投入或努力方向不明而出現問題，需重新溝通並調整關係。<br><b>金錢：</b>財務上可能因懶散或不當決策而影響收益，需專注於提高技能並重新規劃。<br><b>事業：</b>工作中可能因專注力不足或過於分散而影響進展，需重新聚焦於重要目標。<br><b>靈性：</b>靈性層面上提醒避免半途而廢或缺乏目標，需專注於內在的學習與成長。",
+                advice: "<b>建議與對策：</b> 投入更多時間與精力於專業技能的提升與學習，避免因懶散或分心而影響成果。專注於長期目標並努力實現進步與成長。",
+            },
+            '錢幣9': {    
+                common:  "<b>錢幣九 ——</b><br>獨立與成功，享受與自信的象徵。",
+                upright: "<b>正位：</b>象徵物質與精神的豐盛，提醒享受努力後的成果並感恩現有的幸福。<br>意味著獨立與自信的時刻，適合專注於自我成長與滿足。<br><b>感情：</b>感情中可能展現穩定與成熟，或表現出對個人空間的重視與尊重。<br><b>金錢：</b>財務方面可能因持續的努力與明智的投資而帶來豐厚的回報，適合享受成果並計劃未來。<br><b>事業：</b>工作中可能因自信與能力的展現而取得成功，適合專注於個人成就與提升。<br><b>靈性：</b>靈性層面上象徵內在的豐富與平靜，鼓勵享受當下並深化靈性覺察。",
+                reversed: "<b>逆位：</b>可能暗示過度追求物質或孤立自我，亦可能因缺乏自信而影響成長。<br>提醒重新評估目標並尋求平衡。<br><b>感情：</b>感情中可能因過度重視個人需求或缺乏投入而影響關係，需重新建立平衡與信任。<br><b>金錢：</b>財務上可能因過度消費或管理不善而受挫，需重新調整策略並專注於長期計劃。<br><b>事業：</b>工作中可能因缺乏專注或自信不足而影響進展，需尋求支持並重新聚焦於目標。<br><b>靈性：</b>靈性層面上提醒避免過度依附於外在成功，需專注於內在的和諧與成長。",
+                advice: "<b>建議與對策：</b> 享受成功與幸福的同時保持謙遜與感恩，避免因過度自我中心或忽略他人需求而影響和諧。專注於內外平衡，實現長期的穩定與成長。",
+            },
+            '錢幣10': {    
+                common:  "<b>錢幣十 ——</b><br>家族與傳承，繁榮與穩定的象徵。",
+                upright: "<b>正位：</b>象徵家庭的和諧與繁榮，提醒珍視長期的成功與穩定的基礎。<br>意味著對未來的保障與傳承，適合專注於建立穩定的家庭或財務基礎。<br><b>感情：</b>感情中可能展現穩定與承諾，或迎來家庭的結合與長期的幸福。<br><b>金錢：</b>財務方面可能因家族或長期投資而受益，適合專注於安全的計劃與傳承的安排。<br><b>事業：</b>工作中可能因長期的努力而獲得穩定的回報，適合專注於團隊合作與長期目標。<br><b>靈性：</b>靈性層面上象徵與家族或更高力量的連結，鼓勵以穩定的信念面對未來。",
+                reversed: "<b>逆位：</b>可能暗示家庭或財務方面的問題，亦可能因過度追求穩定而忽略靈活性。<br>提醒重新專注於核心價值並加強與家人或團隊的連結。<br><b>感情：</b>感情中可能因家族或外在壓力而出現問題，需坦誠溝通並尋求解決方案。<br><b>金錢：</b>財務上可能因錯誤的投資或過度保守而受挫，需重新檢視策略並調整計劃。<br><b>事業：</b>工作中可能因缺乏靈活性或團隊問題而影響進展，需加強溝通與合作。<br><b>靈性：</b>靈性層面上提醒避免過度依附於外在的安全感，需專注於內在的成長與穩定。",
+                advice: "<b>建議與對策：</b> 珍惜家庭與團隊的支持，避免因過度追求安全而失去靈活性。專注於長期的穩定與繁榮，同時保持內在的和諧與成長。",
+            },
+            '錢幣侍者': {    
+                common:  "<b>錢幣侍者 ——</b><br>學習與成長，實踐與機會的象徵。",
+                upright: "<b>正位：</b>象徵學習與專注的時刻，提醒抓住新的機會並努力實現目標。<br>意味著技能的提升與計劃的實踐，適合開始新的學習或實際行動。<br><b>感情：</b>感情中可能展現實際與真誠的態度，或面臨新的關係發展。<br><b>金錢：</b>財務方面可能因學習新技能或探索新機會而改善，適合長期規劃與穩步推進。<br><b>事業：</b>工作中可能有學習或實踐的機會，需以專注的態度投入並展現潛力。<br><b>靈性：</b>靈性層面上象徵學習與探索的起點，鼓勵以開放的心態迎接新的靈性旅程。",
+                reversed: "<b>逆位：</b>可能暗示懶散或缺乏專注，亦可能因錯失機會而影響成長。<br>提醒重新專注於目標並付諸行動。<br><b>感情：</b>感情中可能因缺乏投入或過於實際而影響關係，需重新建立平衡與理解。<br><b>金錢：</b>財務上可能因錯誤的計劃或懶散而受損，需重新審視策略並加強行動力。<br><b>事業：</b>工作中可能因專注力不足或缺乏計劃而停滯，需重新聚焦並努力提升技能。<br><b>靈性：</b>靈性層面上提醒避免拖延或缺乏方向，需專注於學習與內在的成長。",
+                advice: "<b>建議與對策：</b> 抓住學習與成長的機會，避免因懶散或分心而錯失良機。努力專注於實際行動並提升技能，實現長期的穩定與成功。",
+            },
+            '錢幣騎士': {    
+                common:  "<b>錢幣騎士 ——</b><br>穩健與耐心，努力與奉獻的象徵。",
+                upright: "<b>正位：</b>象徵踏實與穩定的努力，提醒專注於長期目標並耐心推進。<br>意味著腳踏實地的行動與負責任的態度，適合進行細緻的計劃與實現。<br><b>感情：</b>感情中可能展現穩定與忠誠，或進一步的承諾與責任感。<br><b>金錢：</b>財務方面可能因持續的努力與謹慎的決策而帶來穩定增長，適合進行長期投資。<br><b>事業：</b>工作中可能因穩健與負責任的態度而獲得信任與成功，適合專注於目標並穩步推進。<br><b>靈性：</b>靈性層面上象徵穩定與堅持的力量，鼓勵通過耐心的努力實現內在的平靜與成長。",
+                reversed: "<b>逆位：</b>可能暗示過於固執或缺乏靈活性，亦可能因懶散而影響進展。<br>提醒重新審視行動方向並調整態度。<br><b>感情：</b>感情中可能因缺乏熱情或過於保守而影響關係，需重新注入活力並加強溝通。<br><b>金錢：</b>財務上可能因固守舊有模式或缺乏計劃而受挫，需重新制定策略並靈活應對。<br><b>事業：</b>工作中可能因懶散或過於死板的態度而影響進展，需重新評估方向並加強行動力。<br><b>靈性：</b>靈性層面上提醒避免過度依賴現狀或缺乏探索，需尋求新的靈感與成長的機會。",
+                advice: "<b>建議與對策：</b> 堅持穩健與耐心的態度，但需避免過於固執或缺乏靈活性。努力平衡穩定與變化，實現長期的穩定與成長。",
+            },
+            '錢幣皇后': {    
+                common:  "<b>錢幣皇后 ——</b><br>豐饒與關懷，實際與養育的象徵。",
+                upright: "<b>正位：</b>象徵物質與精神的豐盛，提醒以實際的方式關懷自己與他人。<br>意味著對生活的掌控與滋養的力量，適合專注於創造穩定與幸福的環境。<br><b>感情：</b>感情中可能展現溫暖與支持，關係中充滿關懷與穩定。<br><b>金錢：</b>財務方面可能因精明的管理與實際的計劃而取得成果，適合專注於長期的穩定增長。<br><b>事業：</b>工作中可能因實際的態度與細心的管理而成功，適合專注於細節與團隊合作。<br><b>靈性：</b>靈性層面上象徵與自然與內在的聯繫，鼓勵以實際的方式實現內心的平靜與豐盛。",
+                reversed: "<b>逆位：</b>可能暗示過度依賴或物質的匱乏，亦可能因忽視自我需求而感到失衡。<br>提醒重新專注於內在需求並尋求平衡。<br><b>感情：</b>感情中可能因過度依附或忽視關懷而出現問題，需重新建立平等與尊重。<br><b>金錢：</b>財務上可能因管理不當或過於焦慮而受挫，需重新制定計劃並加強管理。<br><b>事業：</b>工作中可能因忽視細節或過度控制而受阻，需重新調整策略並專注於目標。<br><b>靈性：</b>靈性層面上提醒避免過度關注外在或忽略內在的需求，需專注於自我成長與平衡。",
+                advice: "<b>建議與對策：</b> 發揮實際與關懷的力量，避免過度依賴或忽視自己的需求。專注於平衡內外的需求，實現長期的穩定與幸福。",
+            },
+            '錢幣國王': {    
+                common:  "<b>錢幣國王 ——</b><br>權威與豐盛，安全與責任的象徵。",
+                upright: "<b>正位：</b>象徵對物質與財務的掌控，提醒以負責與穩健的態度追求成功。<br>意味著財務的安全感與長期的成就，適合專注於管理資源與實現目標。<br><b>感情：</b>感情中可能展現穩定與可靠的承諾，或充滿保護與支持的關係。<br><b>金錢：</b>財務方面可能因穩健的管理與負責的態度而取得成功，適合專注於安全的投資與計劃。<br><b>事業：</b>工作中可能因領導力與實際的能力而取得進展，適合承擔責任並專注於長期目標。<br><b>靈性：</b>靈性層面上象徵內在的力量與穩定，鼓勵以務實的態度探索靈性成長。",
+                reversed: "<b>逆位：</b>可能暗示過度專注於物質或缺乏靈活性，亦可能因濫用權威而影響和諧。<br>提醒重新平衡物質與精神的需求並加強自我反思。<br><b>感情：</b>感情中可能因過度保護或控制而出現問題，需重新建立平等與理解。<br><b>金錢：</b>財務上可能因過度自信或不當的管理而受損，需重新評估策略並調整計劃。<br><b>事業：</b>工作中可能因過於僵化或忽視他人意見而受阻，需尋求靈活性並加強合作。<br><b>靈性：</b>靈性層面上提醒避免過度依附於物質或權威，需專注於內在的平衡與成長。",
+                advice: "<b>建議與對策：</b> 發揮領導力與責任感的同時保持靈活與謙遜，避免因過度自信或專注於物質而影響平衡。專注於長期的穩定與和諧，實現全面的成功與成長。",
+            },
+            '聖杯1': {    
+                common:  "<b>聖杯一 ——</b><br>愛與滿足，情感與靈性的新開始的象徵。",
+                upright: "<b>正位：</b>象徵愛與情感的豐沛，提醒擁抱新的情感或靈性機會。<br>意味著幸福、喜悅與情感滿足的到來，適合開始一段新的旅程。<br><b>感情：</b>感情中可能迎來新的愛情或深化現有關係，充滿溫暖與關懷。<br><b>金錢：</b>財務方面可能因合作或人際關係而受益，適合採取分享與慷慨的態度。<br><b>事業：</b>工作中可能因創造性或情感投入而取得成功，適合啟動新的計劃。<br><b>靈性：</b>靈性層面上象徵內在的和諧與啟發，鼓勵連結宇宙的愛與能量。",
+                reversed: "<b>逆位：</b>可能暗示情感上的閉塞或錯失機會，亦可能因情緒失衡而影響判斷。<br>提醒重新檢視內心的需求並重建平衡。<br><b>感情：</b>感情中可能因缺乏溝通或情感冷漠而出現問題，需主動改善關係。<br><b>金錢：</b>財務上可能因情緒化決策或過度依賴他人而出現困難，需理性管理。<br><b>事業：</b>工作中可能因情感上的阻礙或缺乏熱情而影響進展，需重新激發動力。<br><b>靈性：</b>靈性層面上提醒打開內心並接納愛與能量，避免陷入孤立或疏離感。",
+                advice: "<b>建議與對策：</b> 擁抱新的情感與靈性機會，避免因情緒化或冷漠而錯失良機。專注於內心的滿足並與他人建立深刻的聯繫。",
+            },
+            '聖杯2': {    
+                common:  "<b>聖杯二 ——</b><br>和諧的夥伴關係，愛與聯繫的象徵。",
+                upright: "<b>正位：</b>象徵深刻的情感聯繫與和諧的關係，提醒重視彼此的理解與支持。<br>意味著感情、友情或合作的成功，適合建立長期的夥伴關係。<br><b>感情：</b>感情中可能展現和諧與平等，關係進一步深化或達成承諾。<br><b>金錢：</b>財務方面可能因合作或夥伴關係而受益，適合尋求雙贏的方案。<br><b>事業：</b>工作中可能建立良好的合作關係或團隊精神，適合共同努力實現目標。<br><b>靈性：</b>靈性層面上象徵與他人或宇宙的深刻連結，鼓勵以愛與理解為基礎的成長。",
+                reversed: "<b>逆位：</b>可能暗示關係中的不和或誤解，亦可能因缺乏溝通而導致分歧。<br>提醒重新建立信任並解決潛在問題。<br><b>感情：</b>感情中可能因不平等或誤解而出現矛盾，需坦誠面對並解決分歧。<br><b>金錢：</b>財務上可能因合作不順或利益衝突而受損，需重新評估合作條件。<br><b>事業：</b>工作中可能因團隊問題或缺乏協作而影響效率，需加強溝通與理解。<br><b>靈性：</b>靈性層面上提醒避免疏離感或對他人的排斥，需重新建立內外的聯繫。",
+                advice: "<b>建議與對策：</b> 重視關係中的和諧與溝通，避免因誤解或缺乏支持而影響聯繫。努力建立相互信任與尊重的基礎，實現共同成長。",
+            },
+            '聖杯3': {    
+                common:  "<b>聖杯三 ——</b><br>慶祝與友情，團體的和諧與快樂的象徵。",
+                upright: "<b>正位：</b>象徵友誼與團體的支持，提醒享受與他人共度的時光並慶祝成功。<br>意味著合作與和諧的結果帶來滿足，適合參與團體活動或共享喜悅。<br><b>感情：</b>感情中可能充滿歡樂與支持，關係穩定且富有活力。<br><b>金錢：</b>財務方面可能因團體或合作的努力而取得成功，適合慶祝成果。<br><b>事業：</b>工作中展現合作精神與團隊成果，適合共同分享榮譽與成就。<br><b>靈性：</b>靈性層面上象徵與他人的深刻連結，提醒感恩並珍惜彼此的關係。",
+                reversed: "<b>逆位：</b>可能暗示團體中的分歧或孤立感，亦可能因過度慶祝而影響進展。<br>提醒重新檢視關係並找到問題的根源。<br><b>感情：</b>感情中可能因外界因素或過度依賴群體而出現問題，需重建親密感。<br><b>金錢：</b>財務上可能因合作失敗或誤解而受損，需謹慎處理團體利益。<br><b>事業：</b>工作中可能因缺乏協作或溝通不良而影響成果，需重新強化團隊精神。<br><b>靈性：</b>靈性層面上提醒避免過度依賴外界支持，需專注於內在的和諧與穩定。",
+                advice: "<b>建議與對策：</b> 享受團體的支持與快樂的同時，保持專注於長期目標。避免過度依賴他人或沉迷於短暫的喜悅，尋找內外的平衡。",
+            },
+            '聖杯4': {    
+                common:  "<b>聖杯四 ——</b><br>沉思與不滿，反思與機會的象徵。",
+                upright: "<b>正位：</b>象徵情感上的疲憊或不滿，提醒重新審視自己內心的需求並關注周圍的機會。<br>意味著停滯與反思的時刻，適合重新尋找目標與方向。<br><b>感情：</b>感情中可能因冷漠或缺乏激情而停滯，需重新激發彼此的連結。<br><b>金錢：</b>財務方面可能因缺乏動力或不滿現狀而陷入困境，需尋找新的方向。<br><b>事業：</b>工作中可能因缺乏興趣或目標而停滯，需重新評估職業道路。<br><b>靈性：</b>靈性層面上提醒專注於內在需求並重新點燃對生活的熱情與希望。",
+                reversed: "<b>逆位：</b>可能暗示重新關注周圍的機會或走出情感上的停滯，亦可能因無法正視內心而錯失成長。<br>提醒勇敢接受新的挑戰並行動。<br><b>感情：</b>感情中可能迎來新的動力或機會，但需克服過去的冷漠或疏離感。<br><b>金錢：</b>財務上可能因積極的行動而改善，但需避免過於保守或拖延決策。<br><b>事業：</b>工作中可能因重新發現目標或方向而進步，但需避免猶豫不決。<br><b>靈性：</b>靈性層面上提醒抓住新的啟示與靈感，避免過度內省或逃避行動。",
+                advice: "<b>建議與對策：</b> 專注於內心的需求並重新審視周圍的機會，避免因情緒低落或冷漠而錯失良機。勇敢行動以突破停滯狀態並實現新的成長。",
+            },
+            '聖杯5': {    
+                common:  "<b>聖杯五 ——</b><br>失落與悔恨，接受與希望的象徵。",
+                upright: "<b>正位：</b>象徵對過去的失落或錯誤的悔恨，提醒專注於未來的可能性並放下過去。<br>意味著經歷情感上的挫折後的反思與成長，適合尋求重建的機會。<br><b>感情：</b>感情中可能因分手或失望而感到痛苦，需重新審視並尋找新的方向。<br><b>金錢：</b>財務方面可能因過去的損失而影響現狀，需調整策略並尋求恢復的途徑。<br><b>事業：</b>工作中可能因失敗或挫折而失去信心，但仍有改進的空間與機會。<br><b>靈性：</b>靈性層面上象徵從痛苦中尋找智慧與希望，鼓勵接受教訓並繼續前行。",
+                reversed: "<b>逆位：</b>可能暗示逐漸放下過去的傷痛或仍陷於悔恨之中，亦可能因逃避現實而無法進步。<br>提醒面對現實並尋求新的方向。<br><b>感情：</b>感情中可能因和解或自我療癒而逐漸走出痛苦，但需避免重蹈覆轍。<br><b>金錢：</b>財務上可能因重新規劃而改善，但需避免因過度保守而錯失機會。<br><b>事業：</b>工作中可能因重拾信心或找到新目標而進步，需積極面對挑戰。<br><b>靈性：</b>靈性層面上提醒從過去的錯誤中學習並尋求內心的和解，避免陷於自我懲罰中。",
+                advice: "<b>建議與對策：</b> 接受過去的失敗並將注意力轉向未來的機會，避免因悔恨而停滯不前。專注於重建與成長，從中找到新的希望與方向。",
+            },
+            '聖杯6': {    
+                common:  "<b>聖杯六 ——</b><br>回憶與童真，懷舊與幸福的象徵。",
+                upright: "<b>正位：</b>象徵童年或過去的美好回憶，提醒珍惜純真的情感並從中獲得快樂。<br>意味著關於過去的反思與情感的重拾，適合重新連結與分享幸福。<br><b>感情：</b>感情中可能重新連結過去的戀情或找到熟悉感，充滿溫暖與和諧。<br><b>金錢：</b>財務方面可能因過去的投資或努力而獲益，適合延續穩定的策略。<br><b>事業：</b>工作中可能涉及過去的合作夥伴或項目，適合重新建立聯繫並追求成功。<br><b>靈性：</b>靈性層面上象徵從過去的經驗中尋找智慧與啟發，鼓勵以純真的心態面對當下。",
+                reversed: "<b>逆位：</b>可能暗示過度沉溺於過去或難以放下舊有的束縛，亦可能因拒絕回憶而錯失成長的機會。<br>提醒重新平衡過去與現在的關係。<br><b>感情：</b>感情中可能因執著於過去的傷痛或期待而影響現有關係，需專注於當下。<br><b>金錢：</b>財務上可能因舊有的習慣或投資方式而受限制，需尋求新的策略。<br><b>事業：</b>工作中可能因過去的失敗或人際問題而受影響，需重新建立信任與動力。<br><b>靈性：</b>靈性層面上提醒釋放對過去的執著，專注於當下的靈性成長與啟發。",
+                advice: "<b>建議與對策：</b> 珍惜過去的回憶與教訓，但避免過度沉溺或執著。專注於當下的幸福與成長，從中尋找內心的和諧與滿足。",
+            },
+            '聖杯7': {    
+                common:  "<b>聖杯七 ——</b><br>幻想與選擇，迷茫與可能性的象徵。",
+                upright: "<b>正位：</b>象徵充滿選擇與可能性的時刻，提醒慎重考慮並選擇最適合的道路。<br>意味著需要平衡幻想與現實，專注於實現的計劃。<br><b>感情：</b>感情中可能面臨多重選擇或幻想，需理性看待現狀並作出清晰的決定。<br><b>金錢：</b>財務方面可能因過多的選擇或不切實際的期望而感到迷茫，需專注於可行的策略。<br><b>事業：</b>工作中可能面臨多種機會，需避免分心並專注於一個清晰的目標。<br><b>靈性：</b>靈性層面上鼓勵探索內心的渴望，但提醒避免過度沉迷於幻想或不實際的追求。",
+                reversed: "<b>逆位：</b>可能暗示選擇的混亂或缺乏方向，亦可能因脫離幻想而重新找到目標。<br>提醒專注於現實並作出實際的行動。<br><b>感情：</b>感情中可能因過多的期望或幻想破滅而感到失落，需重新審視關係的基礎。<br><b>金錢：</b>財務上可能因決策不當或目標模糊而受損，需謹慎行動並重新聚焦。<br><b>事業：</b>工作中可能因缺乏計劃或優先級而停滯，需重新整理方向並確定目標。<br><b>靈性：</b>靈性層面上提醒放下過度的幻想並回歸現實，專注於真正重要的內在成長。",
+                advice: "<b>建議與對策：</b> 面對多種選擇時保持冷靜與專注，避免因過度幻想或分心而錯失機會。選擇最可行的目標並付諸實際行動。",
+            },
+            '聖杯8': {    
+                common:  "<b>聖杯八 ——</b><br>放下與追尋，變化與自我探索的象徵。",
+                upright: "<b>正位：</b>象徵放下不再滿足的事物並追尋更高的目標，提醒接受變化並勇敢踏出舒適區。<br>意味著離開現有的狀態以追求內在的滿足與成長。<br><b>感情：</b>感情中可能因失去滿足或關係的終結而選擇離開，尋求新的可能性。<br><b>金錢：</b>財務方面可能需重新調整目標或放棄無效的計劃，適合尋找新的方向。<br><b>事業：</b>工作中可能因缺乏滿足或目標不符而選擇轉換方向，適合探索新的機會。<br><b>靈性：</b>靈性層面上象徵追求更深層次的意義，鼓勵放下過去的束縛並進一步探索內心。",
+                reversed: "<b>逆位：</b>可能暗示害怕改變或難以放下，亦可能因逃避現實而陷入困境。<br>提醒重新審視自己的目標並勇敢行動。<br><b>感情：</b>感情中可能因不滿或缺乏進展而猶豫不決，需坦誠面對並作出選擇。<br><b>金錢：</b>財務上可能因固守舊有模式或拒絕改變而受影響，需考慮新的策略。<br><b>事業：</b>工作中可能因恐懼失敗或抗拒改變而停滯，需重新審視方向並勇敢嘗試。<br><b>靈性：</b>靈性層面上提醒放下對過去的執著，專注於內在的探索與成長。",
+                advice: "<b>建議與對策：</b> 接受變化並勇敢追求內心的滿足，避免因恐懼或執著而停滯不前。專注於長期的成長與新的機會，尋求內外的和諧。",
+            },
+            '聖杯9': {    
+                common:  "<b>聖杯九 ——</b><br>願望實現，滿足與幸福的象徵。",
+                upright: "<b>正位：</b>象徵內心願望的實現與滿足，提醒享受生活並感恩當下的幸福。<br>意味著充滿成就感與快樂的時刻，適合慶祝成功並放鬆自己。<br><b>感情：</b>感情中可能達到和諧與滿足，關係穩定且充滿愛意。<br><b>金錢：</b>財務方面可能有豐厚的回報或穩定的增長，適合享受成果。<br><b>事業：</b>工作中展現成功與成就，適合慶祝努力的成果並規劃下一步。<br><b>靈性：</b>靈性層面上象徵內在的平靜與滿足，鼓勵感恩生命中的美好。",
+                reversed: "<b>逆位：</b>可能暗示對現狀的不滿或因過度追求享樂而忽視真正的需求。<br>提醒重新審視內心的願望並專注於長期目標。<br><b>感情：</b>感情中可能因過度滿足自我或忽視對方需求而出現問題，需重新建立平衡。<br><b>金錢：</b>財務上可能因過度消費或不切實際的期望而受挫，需謹慎管理資產。<br><b>事業：</b>工作中可能因自滿或缺乏進一步的目標而停滯，需重新激發動力。<br><b>靈性：</b>靈性層面上提醒避免過度關注外在成就，需專注於內在的真實滿足。",
+                advice: "<b>建議與對策：</b> 享受成功與幸福的同時保持謙遜與感恩，避免過度滿足或自滿影響長期的目標。專注於內外的平衡與成長。",
+            },
+            '聖杯10': {    
+                common:  "<b>聖杯十 ——</b><br>家庭的幸福，和諧與圓滿的象徵。",
+                upright: "<b>正位：</b>象徵情感上的圓滿與和諧，提醒珍惜家庭與人際關係中的愛與支持。<br>意味著幸福與滿足的高峰，適合享受穩定的生活與和諧的環境。<br><b>感情：</b>感情中充滿愛與承諾，可能迎來婚姻或共同生活的計劃。<br><b>金錢：</b>財務方面穩定且充滿安全感，可能因家族或團隊的支持而受益。<br><b>事業：</b>工作中可能達到穩定與和諧的狀態，適合專注於團隊合作與長期目標。<br><b>靈性：</b>靈性層面上象徵內外的和諧與統一，鼓勵感恩生命中的愛與幸福。",
+                reversed: "<b>逆位：</b>可能暗示情感上的不滿或家庭中的矛盾，亦可能因過於理想化而忽視現實。<br>提醒重新專注於愛與和諧並解決潛在問題。<br><b>感情：</b>感情中可能因期望過高或缺乏溝通而出現問題，需坦誠面對並解決矛盾。<br><b>金錢：</b>財務上可能因過度依賴家庭或缺乏獨立性而受挫，需重新規劃。<br><b>事業：</b>工作中可能因缺乏目標或團隊問題而停滯，需加強協作與方向感。<br><b>靈性：</b>靈性層面上提醒避免忽略內在的平靜與和諧，需重新專注於家庭與內在的關係。",
+                advice: "<b>建議與對策：</b> 珍惜家庭與人際關係中的愛與支持，避免過度依賴或理想化影響現實。專注於建立穩定與和諧的基礎，從中找到持續的幸福與滿足。",
+            },
+            '聖杯侍者': {    
+                common:  "<b>聖杯侍者 ——</b><br>純真的情感，靈感與創意的象徵。",
+                upright: "<b>正位：</b>象徵新情感的萌發或創意的出現，提醒以開放的心態迎接新的情感體驗。<br>意味著純真與熱情的時刻，適合探索新的愛情或靈感。<br><b>感情：</b>感情中可能展現溫柔與純真的情感，或迎來新的愛情機會。<br><b>金錢：</b>財務方面可能因創新的點子或合作而獲得收益，適合開放心態接受建議。<br><b>事業：</b>工作中可能有新的靈感或創意方案出現，適合投入創造性項目。<br><b>靈性：</b>靈性層面上象徵內在情感的純淨與靈感的萌發，鼓勵深入探索內心的渴望。",
+                reversed: "<b>逆位：</b>可能暗示情感上的幼稚或不成熟，亦可能因缺乏專注而錯失機會。<br>提醒平衡情感與理性，避免過度幻想或依賴。<br><b>感情：</b>感情中可能因幼稚或缺乏承諾而出現問題，需坦誠溝通並建立穩定的關係。<br><b>金錢：</b>財務上可能因輕率或不成熟的決策而受影響，需謹慎行事。<br><b>事業：</b>工作中可能因不切實際的想法或缺乏經驗而受阻，需加強專業能力。<br><b>靈性：</b>靈性層面上提醒避免過度沉迷於幻想，需專注於真實的靈性成長與探索。",
+                advice: "<b>建議與對策：</b> 擁抱新的情感與創意，但需保持成熟與理性，避免因過度理想化而影響決策。努力平衡感性與實際，實現內在與外在的統一。",
+            },
+            '聖杯騎士': {    
+                common:  "<b>聖杯騎士 ——</b><br>浪漫與追求，情感與行動的象徵。",
+                upright: "<b>正位：</b>象徵積極追求情感與理想的時刻，提醒以誠意與熱情行動。<br>意味著浪漫與理想主義的表現，適合投入情感或創造性活動。<br><b>感情：</b>感情中可能展現浪漫與承諾，或迎來熱情的追求者。<br><b>金錢：</b>財務方面可能因創意計劃或合作而獲得收益，適合抓住機會。<br><b>事業：</b>工作中展現情感投入與積極行動，適合推動新項目或表達創意。<br><b>靈性：</b>靈性層面上象徵情感與靈性的融合，鼓勵以熱情追求內在的啟發與平靜。",
+                reversed: "<b>逆位：</b>可能暗示過度幻想或缺乏實際行動，亦可能因情緒化而導致問題。<br>提醒平衡理想與現實，專注於目標的實現。<br><b>感情：</b>感情中可能因不穩定或缺乏承諾而受挫，需重新審視關係的基礎。<br><b>金錢：</b>財務上可能因草率的決策或過度樂觀而受損，需謹慎行事。<br><b>事業：</b>工作中可能因情緒化或缺乏計劃而影響進展，需加強理性與專注。<br><b>靈性：</b>靈性層面上提醒避免過度追求幻想，需專注於真實的靈性探索與內心的成長。",
+                advice: "<b>建議與對策：</b> 積極追求情感與理想，但需保持務實與理性，避免因過度情緒化而影響進展。努力平衡情感與行動，實現穩定與成功。",
+            },
+            '聖杯皇后': {    
+                common:  "<b>聖杯皇后 ——</b><br>情感與直覺，溫柔與滋養的象徵。",
+                upright: "<b>正位：</b>象徵溫柔與感性的力量，提醒以愛與理解滋養自己和他人。<br>意味著深刻的情感連結與直覺的引導，適合傾聽內心並表達感受。<br><b>感情：</b>感情中展現溫暖與支持，可能達到穩定且充滿愛的關係。<br><b>金錢：</b>財務方面可能因創意與關懷而獲益，適合專注於具有情感價值的項目。<br><b>事業：</b>工作中可能因情感智慧與直覺而成功，適合投入創意或人際相關的工作。<br><b>靈性：</b>靈性層面上象徵與內心的深刻連結，鼓勵透過直覺與感性尋求靈性啟發。",
+                reversed: "<b>逆位：</b>可能暗示情感上的壓抑或依賴，亦可能因過度敏感而受影響。<br>提醒重新平衡情感與理性，避免過度內耗。<br><b>感情：</b>感情中可能因情緒化或缺乏自信而出現問題，需坦誠溝通並建立信任。<br><b>金錢：</b>財務上可能因情感上的決策或缺乏計劃而受挫，需理性管理資產。<br><b>事業：</b>工作中可能因情緒影響或缺乏專業性而受阻，需重新專注於目標與計劃。<br><b>靈性：</b>靈性層面上提醒避免過度沉迷於感性，需找到內心的平衡與穩定。",
+                advice: "<b>建議與對策：</b> 擁抱情感的力量並以溫柔與直覺引導行動，但需避免過度情緒化或依賴他人。努力平衡感性與理性，實現內外的和諧。",
+            },
+            '聖杯國王': {    
+                common:  "<b>聖杯國王 ——</b><br>穩定的情感，智慧與同理心的象徵。",
+                upright: "<b>正位：</b>象徵穩定與成熟的情感表達，提醒以智慧與同理心領導他人。<br>意味著情感的掌控與內心的平靜，適合以平衡的態度面對挑戰。<br><b>感情：</b>感情中展現深厚與可靠的關係，可能迎來穩定且有承諾的聯繫。<br><b>金錢：</b>財務方面可能因冷靜與穩健的決策而獲益，適合專注於長期計劃。<br><b>事業：</b>工作中可能因情感智慧與領導力而成功，適合承擔負責或管理的角色。<br><b>靈性：</b>靈性層面上象徵內在的平靜與智慧，鼓勵以情感的穩定與理解促進靈性成長。",
+                reversed: "<b>逆位：</b>可能暗示情感上的不穩或控制過度，亦可能因情緒失控而導致問題。<br>提醒重新審視自己的內心狀態並尋求平衡。<br><b>感情：</b>感情中可能因情感壓抑或缺乏信任而出現問題，需坦誠溝通並解決矛盾。<br><b>金錢：</b>財務上可能因情緒化決策或過度保守而受挫，需重新規劃。<br><b>事業：</b>工作中可能因情緒影響或控制過多而影響進展，需放鬆心態並加強合作。<br><b>靈性：</b>靈性層面上提醒避免過度內省或情緒波動，需專注於內在的平衡與智慧的運用。",
+                advice: "<b>建議與對策：</b> 以穩定與成熟的態度面對情感與挑戰，避免因過度情緒化或控制欲影響結果。努力以智慧與同理心引導自己與他人，共同實現和諧與成功。",
+            },
         };
-            return descriptions[item] || '沒有此牌，所以無詳細解說';
+
+        const card = descriptions[item];
+            if (!card) {
+            console.error(`描述未找到: "${item}"`);
+            return `<b>未找到 "${item}" 的描述。</b>`;
+        }
+
+        const { common, upright, reversed, advice } = card;
+        const positionDescription = isReversed ? reversed : upright;
+        if (!positionDescription) {
+            console.warn(`"${item}" 缺少對應的 ${isReversed ? '逆位' : '正位'}描述`);
+            return `<b>"${item}" 缺少對應的描述。</b>`;
+        }
+
+        return `
+        ${common}<br>
+        ${positionDescription}<br><br>
+        ${advice || ''}
+        `;
     }
     // 卡圖設定
     const tarotImageMap = {
