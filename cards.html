@@ -387,6 +387,20 @@
             text-align: center; 
             font-family: "Sangyo", sans-serif !important; 
         }
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            font-family: 'ThePeakFont', Arial, sans-serif !important;
+            color: white;
+            font-size: 1.2em;
+            padding: 5px 10px;
+            border-radius: 5px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none;
+            z-index: 1000;
+        }        
         #flame-overlay {
             position: fixed !important;
             top: 0;
@@ -708,12 +722,12 @@ window.addEventListener('load', () => {
     preloadVideo();
 });
 
-// 設置5 秒超時保護
+// 設置4 秒超時保護
 setTimeout(() => {
     console.warn('資源載入超時，自動切換到主畫面！');
     document.getElementById('loading-screen').style.display = 'none';
     document.getElementById('main-content').style.display = 'block';
-}, 3000);
+}, 4000);
 
 window.addEventListener('DOMContentLoaded', () => {
     const flameOverlay = document.getElementById('flame-overlay');
@@ -935,6 +949,7 @@ function showTarotReading(items) {
             const position = positions[index];
             const card = document.createElement('div');
             card.className = 'card';
+            card.setAttribute("data-name", item);
             const content = generateCardContent(item);
 
             card.innerHTML = `
@@ -2740,6 +2755,59 @@ function showTarotReading(items) {
         }
         return `<div style="text-align: center; font-size: 16px; font-weight: bold;">${item}</div>`;
     }
+
+// 建立 Tooltip 元素
+document.addEventListener("DOMContentLoaded", () => {
+    const tooltip = document.createElement("div");
+    tooltip.className = "tooltip";
+    document.body.appendChild(tooltip);
+
+    document.getElementById("card-container").addEventListener("mouseover", function (event) {
+        const card = event.target.closest(".card");
+        if (card) {
+            const cardName = card.classList.contains("flipped") 
+                ? card.getAttribute("data-name") 
+                : "???";  
+            
+            tooltip.textContent = cardName;
+            tooltip.style.opacity = "1";
+            tooltip.style.left = `${event.pageX + 10}px`;
+            tooltip.style.top = `${event.pageY + 10}px`;
+        }
+    });
+
+    document.getElementById("card-container").addEventListener("mousemove", function (event) {
+        if (event.target.closest(".card")) {
+            tooltip.style.left = `${event.pageX + 10}px`;
+            tooltip.style.top = `${event.pageY + 10}px`;
+        }
+    });
+
+    document.getElementById("card-container").addEventListener("mouseout", function (event) {
+        if (event.target.closest(".card")) {
+            tooltip.style.opacity = "0";
+        }
+    });
+
+    // 針對手機點擊，短暫顯示
+    document.getElementById("card-container").addEventListener("click", function (event) {
+        if (event.target.closest(".card")) {
+            const card = event.target.closest(".card");
+            const cardName = card.getAttribute("data-name");
+            if (cardName) {
+                tooltip.textContent = cardName;
+                tooltip.style.opacity = "1";
+                tooltip.style.left = `${event.pageX + 10}px`;
+                tooltip.style.top = `${event.pageY + 10}px`;
+
+                setTimeout(() => {
+                    tooltip.style.opacity = "0";
+                }, 1500);
+            }
+        }
+    });
+});
+
         // 點名設定
         callBtn.addEventListener('click', () => {
             clickSound.currentTime = 0; // 重置播放位置
