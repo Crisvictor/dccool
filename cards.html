@@ -400,7 +400,13 @@
             transition: opacity 0.2s ease-in-out;
             pointer-events: none;
             z-index: 1000;
-        }        
+        }
+        .card[data-name]:after {
+            display: none;
+        }
+        .tarot-mode .card[data-name]:hover:after {
+            display: block;
+        }
         #flame-overlay {
             position: fixed !important;
             top: 0;
@@ -617,9 +623,10 @@
                 <div class="example-option" data-value="大吉\n中吉\n小吉\n末吉\n凶\n大凶">御神籤</div>
                 <div class="example-option" data-value="愚者\n魔術師\n女祭司\n皇后\n皇帝\n教皇\n戀人\n戰車\n力量\n隱者\n命運之輪\n正義\n倒吊人\n死神\n節制\n惡魔\n高塔\n星星\n月亮\n太陽\n審判\n世界\n權杖1\n權杖2\n權杖3\n權杖4\n權杖5\n權杖6\n權杖7\n權杖8\n權杖9\n權杖10\n權杖侍者\n權杖騎士\n權杖皇后\n權杖國王\n寶劍1\n寶劍2\n寶劍3\n寶劍4\n寶劍5\n寶劍6\n寶劍7\n寶劍8\n寶劍9\n寶劍10\n寶劍侍者\n寶劍騎士\n寶劍皇后\n寶劍國王\n錢幣1\n錢幣2\n錢幣3\n錢幣4\n錢幣5\n錢幣6\n錢幣7\n錢幣8\n錢幣9\n錢幣10\n錢幣侍者\n錢幣騎士\n錢幣皇后\n錢幣國王\n聖杯1\n聖杯2\n聖杯3\n聖杯4\n聖杯5\n聖杯6\n聖杯7\n聖杯8\n聖杯9\n聖杯10\n聖杯侍者\n聖杯騎士\n聖杯皇后\n聖杯國王">塔羅牌</div>
                 <div class="example-option" data-value="A♠️\nK♠️\nQ♠️\nJ♠️\n10s\n9♠️\n8♠️\n7♠️\n6♠️\n5♠️\n4♠️\n3♠️\n2♠️\nA♥️\nK♥️\nQ♥️\nJ♥️\n10h\n9♥️\n8♥️\n7♥️\n6♥️\n5♥️\n4♥️\n3♥️\n2♥️\nA♦️\nK♦️\nQ♦️\nJ♦️\n10d\n9♦️\n8♦️\n7♦️\n6♦️\n5♦️\n4♦️\n3♦️\n2♦️\nA♣️\nK♣️\nQ♣️\nJ♣️\n10c\n9♣️\n8♣️\n7♣️\n6♣️\n5♣️\n4♣️\n3♣️\n2♣️\n鬼王\n小鬼">poker(54)</div>
-                <div class="example-option" data-value="A♠️\nK♠️\nQ♠️\nJ♠️\n10s\n9♠️\n8♠️\n7♠️\n6♠️\nA♥️\nK♥️\nQ♥️\nJ♥️\n10h\n9♥️\n8♥️\n7♥️\n6♥️\nA♦️\nK♦️\nQ♦️\nJ♦️\n10d\n9♦️\n8♦️\n7♦️\nA♣️\nK♣️\nQ♣️\nJ♣️\n10c\n9♣️\n8♣️\n7♣️\n鬼王\n小鬼">poker(36)</div>
-                <div class="example-option" data-value="A♥️\nK♥️\nQ♥️\nJ♥️\n10h\n9♥️\n8♥️\n7♥️\n6♥️\nA♦️\nK♦️\nQ♦️\nJ♦️\n10d\n9♦️\n8♦️\n7♦️\n鬼王">紅(18)</div>
-                <div class="example-option" data-value="A♠️\nK♠️\nQ♠️\nJ♠️\n10s\n9♠️\n8♠️\n7♠️\n6♠️\nA♣️\nK♣️\nQ♣️\nJ♣️\n10c\n9♣️\n8♣️\n7♣️\n小鬼">黑(18)</div>
+                <div class="example-option" data-value="執行\n否決\n再想想\n不建議\n看情況">決策幫手</div>
+                <div class="example-option" data-value="報告統整\n貨料清點\n傳每日回報\n報修追蹤\n訓練安排\n調訂貨追蹤\n承件整理\n保留件整理\n清理工作區域">每日任務</div>
+                <div class="example-option" data-value="銷售區\n櫃台\n磨片室\n吸菸區\n鏡框陳架\n精品櫃\n員休室\n驗光室\n廁所\n兒童遊戲區\n飲料休憩區\n倉庫\n外牆玻璃\n戶外招牌\n信箱">環境巡查</div>
+                <div class="example-option" data-value="10分鐘內完成一個小任務\n15分鐘內專注工作\n30分鐘內統計一件事情\n45分鐘內完成一個進度\n60分鐘內學習一項新知識">限時挑戰</div>
             </div>
         </div>
 
@@ -2597,38 +2604,38 @@ function showTarotReading(items) {
     }
 
     // 卡圖設定
-    const tarotImageMap = {
-        '愚者': 'img/t0.png',
-        '魔術師': 'img/t1.png',
-        '女祭司': 'img/t2.png',
-        '皇后': 'img/t3.png',
-        '皇帝': 'img/t4.png',
-        '教皇': 'img/t5.png',
-        '戀人': 'img/t6.png',
-        '戰車': 'img/t7.png',
-        '正義': 'img/t8.png',
-        '隱者': 'img/t9.png',
-        '命運之輪': 'img/t10.png',
-        '力量': 'img/t11.png',
-        '倒吊人': 'img/t12.png',
-        '死神': 'img/t13.png',
-        '節制': 'img/t14.png',
-        '惡魔': 'img/t15.png',
-        '高塔': 'img/t16.png',
-        '星星': 'img/t17.png',
-        '月亮': 'img/t18.png',
-        '太陽': 'img/t19.png',
-        '審判': 'img/t20.png',
-        '世界': 'img/t21.png',
-        '小鬼': 'img/joker_small.png',
-        '鬼王': 'img/joker_big.png',
-        '大吉': 'img/3g.png',
-        '中吉': 'img/2g.png',
-        '小吉': 'img/1g.png',
-        '末吉': 'img/0g.png',
-        '凶': 'img/1s.png',
-        '大凶': 'img/2s.png',
-            // 聖杯 (W)
+const tarotImageMap = {
+    '愚者': 'img/t0.png',
+    '魔術師': 'img/t1.png',
+    '女祭司': 'img/t2.png',
+    '皇后': 'img/t3.png',
+    '皇帝': 'img/t4.png',
+    '教皇': 'img/t5.png',
+    '戀人': 'img/t6.png',
+    '戰車': 'img/t7.png',
+    '正義': 'img/t8.png',
+    '隱者': 'img/t9.png',
+    '命運之輪': 'img/t10.png',
+    '力量': 'img/t11.png',
+    '倒吊人': 'img/t12.png',
+    '死神': 'img/t13.png',
+    '節制': 'img/t14.png',
+    '惡魔': 'img/t15.png',
+    '高塔': 'img/t16.png',
+    '星星': 'img/t17.png',
+    '月亮': 'img/t18.png',
+    '太陽': 'img/t19.png',
+    '審判': 'img/t20.png',
+    '世界': 'img/t21.png',
+    '小鬼': 'img/joker_small.png',
+    '鬼王': 'img/joker_big.png',
+    '大吉': 'img/3g.png',
+    '中吉': 'img/2g.png',
+    '小吉': 'img/1g.png',
+    '末吉': 'img/0g.png',
+    '凶': 'img/1s.png',
+    '大凶': 'img/2s.png',
+    // 聖杯 (W)
     '聖杯1': 'img/W1.png',
     '聖杯2': 'img/W2.png',
     '聖杯3': 'img/W3.png',
@@ -2643,7 +2650,6 @@ function showTarotReading(items) {
     '聖杯騎士': 'img/W12.png',
     '聖杯皇后': 'img/W13.png',
     '聖杯國王': 'img/W14.png',
-
     // 權杖 (F)
     '權杖1': 'img/F1.png',
     '權杖2': 'img/F2.png',
@@ -2659,7 +2665,6 @@ function showTarotReading(items) {
     '權杖騎士': 'img/F12.png',
     '權杖皇后': 'img/F13.png',
     '權杖國王': 'img/F14.png',
-
     // 寶劍 (S)
     '寶劍1': 'img/S1.png',
     '寶劍2': 'img/S2.png',
@@ -2675,7 +2680,6 @@ function showTarotReading(items) {
     '寶劍騎士': 'img/S12.png',
     '寶劍皇后': 'img/S13.png',
     '寶劍國王': 'img/S14.png',
-
     // 錢幣 (C)
     '錢幣1': 'img/C1.png',
     '錢幣2': 'img/C2.png',
@@ -2691,15 +2695,14 @@ function showTarotReading(items) {
     '錢幣騎士': 'img/C12.png',
     '錢幣皇后': 'img/C13.png',
     '錢幣國王': 'img/C14.png'
-        };
-    // 縮寫替換符號
+};
+    // 撲克系統縮寫符號
     const suitSymbols = {
         's': '♠️', 
         'h': '♥️', 
         'c': '♣️', 
         'd': '♦️'  
     };
-    // 縮寫替換符號設定
     function formatCardName(name) {
         const match = name.match(/^(\d+|[AKQJ])([shcd])$/); 
         if (match) {
@@ -2761,35 +2764,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const tooltip = document.createElement("div");
     tooltip.className = "tooltip";
     document.body.appendChild(tooltip);
-
     document.getElementById("card-container").addEventListener("mouseover", function (event) {
         const card = event.target.closest(".card");
-        if (card) {
-            const cardName = card.classList.contains("flipped") 
-                ? card.getAttribute("data-name") 
-                : "???";  
-            
-            tooltip.textContent = cardName;
-            tooltip.style.opacity = "1";
-            tooltip.style.left = `${event.pageX + 10}px`;
-            tooltip.style.top = `${event.pageY + 10}px`;
+        if (card && card.classList.contains("flipped")) {  
+            const cardName = card.getAttribute("data-name");
+            if (cardName) {
+                tooltip.textContent = cardName;
+                tooltip.style.opacity = "1";
+                tooltip.style.left = `${event.pageX + 10}px`;
+                tooltip.style.top = `${event.pageY + 10}px`;
+            }
         }
     });
-
     document.getElementById("card-container").addEventListener("mousemove", function (event) {
         if (event.target.closest(".card")) {
             tooltip.style.left = `${event.pageX + 10}px`;
             tooltip.style.top = `${event.pageY + 10}px`;
         }
     });
-
     document.getElementById("card-container").addEventListener("mouseout", function (event) {
         if (event.target.closest(".card")) {
             tooltip.style.opacity = "0";
         }
     });
-
-    // 針對手機點擊，短暫顯示
     document.getElementById("card-container").addEventListener("click", function (event) {
         if (event.target.closest(".card")) {
             const card = event.target.closest(".card");
@@ -2799,7 +2796,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 tooltip.style.opacity = "1";
                 tooltip.style.left = `${event.pageX + 10}px`;
                 tooltip.style.top = `${event.pageY + 10}px`;
-
                 setTimeout(() => {
                     tooltip.style.opacity = "0";
                 }, 1500);
