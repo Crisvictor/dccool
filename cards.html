@@ -165,6 +165,14 @@
         }
         .example-option:hover {
             background-color: #277377;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8);
+            z-index: 5;
+        }
+        .example-option:active {
+            background-color: #0d4d50; 
+            transform: translateY(1px); 
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.5); 
         }
         .example-container, #example-options {
             writing-mode: unset;
@@ -206,7 +214,7 @@
         }
         .card {
             width: 93.75px;
-            height: 156.25px;
+            height: 151px;
             margin: 6px;
             position: relative;
             perspective: 1000px;
@@ -249,8 +257,9 @@
         }
         .card .back {
             background-image: url('img/backcard.png');
-            background-content: center;
+            background-position: center;
             background-size: cover;
+            background-repeat: no-repeat;
         }
         .card .front {
             background-color: #e4dbcf;
@@ -619,7 +628,7 @@
             <div id="example-options" class="horizontal-options">
                 <div class="example-option" data-value="1\n2\n3\n4\n5">數字</div>
                 <div class="example-option" data-value="經國\n大竹\n南崁\n南昌\n中壢\n環東\n桃鶯\n正光\n龜山\n八德\n龍潭\n楊梅\n竹北\n公益\n福科\n崇德\n三峽\n板橋\n新泰\n龍安\n西門\n永和">分店點名</div>
-                <div class="example-option" data-value="一月\n二月\n三月\n四月\n五月\n六月\n七月\n八月\n九月\n十月\n十一月\n十二月">月份</div>
+                <div class="example-option" data-value="一月 JAN\n二月 FEB\n三月 MAR\n四月 APR\n五月 MAY\n六月 JUN\n七月 JUL\n八月 AUG\n九月 SEP\n十月 OCT\n十一月 NOV\n十二月 DEC">月份</div>
                 <div class="example-option" data-value="大吉\n中吉\n小吉\n末吉\n凶\n大凶">御神籤</div>
                 <div class="example-option" data-value="愚者\n魔術師\n女祭司\n皇后\n皇帝\n教皇\n戀人\n戰車\n力量\n隱者\n命運之輪\n正義\n倒吊人\n死神\n節制\n惡魔\n高塔\n星星\n月亮\n太陽\n審判\n世界\n權杖1\n權杖2\n權杖3\n權杖4\n權杖5\n權杖6\n權杖7\n權杖8\n權杖9\n權杖10\n權杖侍者\n權杖騎士\n權杖皇后\n權杖國王\n寶劍1\n寶劍2\n寶劍3\n寶劍4\n寶劍5\n寶劍6\n寶劍7\n寶劍8\n寶劍9\n寶劍10\n寶劍侍者\n寶劍騎士\n寶劍皇后\n寶劍國王\n錢幣1\n錢幣2\n錢幣3\n錢幣4\n錢幣5\n錢幣6\n錢幣7\n錢幣8\n錢幣9\n錢幣10\n錢幣侍者\n錢幣騎士\n錢幣皇后\n錢幣國王\n聖杯1\n聖杯2\n聖杯3\n聖杯4\n聖杯5\n聖杯6\n聖杯7\n聖杯8\n聖杯9\n聖杯10\n聖杯侍者\n聖杯騎士\n聖杯皇后\n聖杯國王">塔羅牌</div>
                 <div class="example-option" data-value="A♠️\nK♠️\nQ♠️\nJ♠️\n10s\n9♠️\n8♠️\n7♠️\n6♠️\n5♠️\n4♠️\n3♠️\n2♠️\nA♥️\nK♥️\nQ♥️\nJ♥️\n10h\n9♥️\n8♥️\n7♥️\n6♥️\n5♥️\n4♥️\n3♥️\n2♥️\nA♦️\nK♦️\nQ♦️\nJ♦️\n10d\n9♦️\n8♦️\n7♦️\n6♦️\n5♦️\n4♦️\n3♦️\n2♦️\nA♣️\nK♣️\nQ♣️\nJ♣️\n10c\n9♣️\n8♣️\n7♣️\n6♣️\n5♣️\n4♣️\n3♣️\n2♣️\n鬼王\n小鬼">poker(54)</div>
@@ -627,6 +636,7 @@
                 <div class="example-option" data-value="報告統整\n物料清點\n備品盤點\n傳每日回報\n報修追蹤\n訓練安排\n調訂貨追蹤\n承件整理\n保留件整理\n三聯單整理\n飲料區整理\n打單進度\n垃圾清運\n清理工作區域">每日任務</div>
                 <div class="example-option" data-value="銷售區\n櫃台\n磨片室\n吸菸區\n鏡框陳架\n精品櫃\n員休室\n驗光室\n廁所\n兒童遊戲區\n飲料休憩區\n倉庫\n外牆玻璃\n戶外招牌\n信箱">環境巡查</div>
                 <div class="example-option" data-value="10分鐘內完成一個小任務\n15分鐘內專注工作\n30分鐘內統計一件事情\n45分鐘內完成一個進度\n60分鐘內學習一項新知識">限時挑戰</div>
+                <div class="example-option" data-value="1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50\n51\n52\n53\n54\n55\n56\n57\n58\n59\n60\n61\n62\n63\n64\n65\n66\n67\n68\n69\n70\n71\n72\n73\n74\n75\n76\n77\n78\n79\n80\n81\n82\n83\n84\n85\n86\n87\n88\n89\n90\n91\n92\n93\n94\n95\n96\n97\n98\n99\n100">幸運號碼(100)</div>
             </div>
         </div>
 
@@ -795,11 +805,13 @@ function shuffleAnimation(items) {
         const card = document.createElement('div');
         card.className = 'shuffle-card';
         card.style.width = '93.75px';
-        card.style.height = '156.25px';
+        card.style.height = '151px';
         card.style.margin = '5px';
         card.style.position = 'absolute';
         card.style.backgroundImage = "url('img/backcard.png')";
         card.style.backgroundSize = 'cover';
+        card.style.backgroundposition = 'center';
+        card.style.backgroundrepeat = 'no-repeat';
         card.style.borderRadius = '4px';
         // 初始位置設置在 X 軸
         card.style.left = '50%';
