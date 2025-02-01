@@ -322,6 +322,25 @@
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
             z-index: 2;
         }
+        .draw-card {
+            position: absolute;
+            width: 93.75px;
+            height: 151px;
+            background-image: url('img/backcard.png');
+            background-size: cover;
+            border-radius: 4px;
+            transition: transform 0.2s ease;
+            transform: rotate(var(--rotate));
+            z-index: 2;
+        }
+        .draw-card:hover {
+            transform: translateY(-30px) rotate(var(--rotate));
+        }
+        .draw-card.selected {
+            transform: translateY(-55px) scale(1.2);
+            box-shadow: 0 0 10px rgba(83, 157, 236, 0.8);
+            z-index: 1;
+        }
         .container {
             max-width: 800px; 
             width: 90%; 
@@ -560,6 +579,10 @@
                 width: 105px;
                 height: 175px;
             }
+            .draw-card {
+                width: 70px;
+                height: 112px;
+            }
             #description-box {
                 max-width: 90% !important;
                 font-size: 18px;
@@ -635,7 +658,7 @@
                 <div class="example-option" data-value="執行\n否決\n再想想\n不建議\n看情況">決策幫手</div>
                 <div class="example-option" data-value="報告統整\n物料清點\n備品盤點\n傳每日回報\n報修追蹤\n訓練安排\n調訂貨追蹤\n承件整理\n保留件整理\n三聯單整理\n飲料區整理\n打單進度\n垃圾清運\n清理工作區域">每日任務</div>
                 <div class="example-option" data-value="銷售區\n櫃台\n磨片室\n吸菸區\n鏡框陳架\n精品櫃\n員休室\n驗光室\n廁所\n兒童遊戲區\n飲料休憩區\n倉庫\n外牆玻璃\n戶外招牌\n信箱">環境巡查</div>
-                <div class="example-option" data-value="驗光滿額\n末班車\n包包會員\n精品框\n績效加扣項">月底統計</div>
+                <div class="example-option" data-value="10分鐘內完成一個小任務\n15分鐘內專注工作\n30分鐘內統計一件事情\n45分鐘內完成一個進度\n60分鐘內學習一項新知識">限時挑戰</div>
                 <div class="example-option" data-value="1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47\n48\n49\n50\n51\n52\n53\n54\n55\n56\n57\n58\n59\n60\n61\n62\n63\n64\n65\n66\n67\n68\n69\n70\n71\n72\n73\n74\n75\n76\n77\n78\n79\n80\n81\n82\n83\n84\n85\n86\n87\n88\n89\n90\n91\n92\n93\n94\n95\n96\n97\n98\n99\n100">幸運號碼(100)</div>
             </div>
         </div>
@@ -758,6 +781,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const flipSound = new Audio('m/card.mp3');
     const shuffleSound = new Audio('m/shuffle.mp3');
     const fireSound = new Audio('m/F.mp3');
+    const drawSound = new Audio('m/draw.mp3');
+    const cutSound = new Audio('m/cut.mp3');
     const shuffleBtn = document.getElementById('shuffle-btn');
     const callBtn = document.getElementById('call-btn');
     const clearBtn = document.getElementById('clear-btn');
@@ -852,7 +877,7 @@ function showFlameAnimation() {
     flameOverlay.style.top = '0';
     flameOverlay.style.left = '0';
     flameOverlay.style.width = '100vw';
-    flameOverlay.style.height = '50vh';
+    flameOverlay.style.height = '60vh';
     flameOverlay.style.display = 'flex'; 
     flameOverlay.style.justifyContent = 'center';
     flameOverlay.style.alignItems = 'center';
@@ -882,25 +907,32 @@ function showFlameAnimation() {
         }
     });
 
-        // 洗牌抽籤系統
+let tarotItems = [];
+let drawnCards = [];
+
+// 洗牌抽籤系統
 shuffleBtn.addEventListener('click', () => {
-    clickSound.currentTime = 0; // 重置播放位置
+    clickSound.currentTime = 0; 
     clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
+    
     const items = inputArea.value.trim().split('\n').filter(Boolean);
     if (items.length < 2) {
         alert('請至少輸入兩個項目進行抽籤！');
         return;
     }
+    descriptionBox.innerHTML = '';
+    descriptionBox.style.display = 'none';
     inputArea.style.display = 'none';
     exampleContainer.style.display = 'none'; 
     cardContainer.style.display = 'flex';
     cardContainer.innerHTML = '';
-
+    
     if (items.includes('命運之輪')) {
-        showTarotReading(items);
+        tarotItems = items; 
+        initTarotInteractiveDraw(items);
         return;
     }
-
+    
     requestAnimationFrame(() => {
         shuffleAnimation(items);
         shuffleSound.currentTime = 0; 
@@ -924,99 +956,156 @@ shuffleBtn.addEventListener('click', () => {
             });
             cardContainer.appendChild(card);
         });
-    }, 1010); // 等動畫結束再生成卡片
+    }, 1010); 
 });
-        //塔羅牌模式
-function showTarotReading(items) {
-    // 顯示解說框
+
+// ======================================
+// 塔羅牌模式
+
+// 1. 初始化互動抽牌階段
+function initTarotInteractiveDraw(items) {
+    requestAnimationFrame(() => {
+    shuffleAnimation(items);
+    shuffleSound.currentTime = 0; 
+    shuffleSound.play(); 
+    });
+    setTimeout(() => {
+        // 顯示說明文字
+        descriptionBox.style.display = 'block';
+        descriptionBox.innerHTML = `
+            <b>請從牌堆中選擇三張牌...</b><br>
+            本系統採「時間之流」的三張抽牌方式，<br>
+            請依序選擇代表「過去、現在、未來」的牌。<br>
+            請點選三張牌進行選擇。<br>
+            <br>
+            問問題的方式請以自己「想怎麼做？」的想法，<br>
+            搭配「該如何做才能加以實現」這樣的形式對策，<br>
+            可依序得出「過去、現在、未來」<br>
+            或者「原因、結果、建議」來得到較明確的回饋。<br>
+        `;
+        cardContainer.classList.add('tarot-mode');
+        drawnCards = [];
+        startDrawPhase(items);
+    }, 1010);
+}
+
+// 2. 扇形牌列
+function startDrawPhase(items) {
     showFlameAnimation();
     fireSound.currentTime = 0;
     fireSound.play();
-    descriptionBox.style.display = 'block';
-    descriptionBox.innerHTML = `
-        <b>...請翻開您的命運之牌...</b><br>
-        本系統採時間之流的三張抽牌方式，<br>
-        可依序得出「過去、現在、未來」<br>
-        或者「原因、結果、建議」<br>
-        得出問題能夠處理的對策方向，<br>
-        問問題的方式請以自己「想怎麼做？」的想法，<br>
-        搭配「該如何做才能加以實現」這樣的形式對策，<br>
-        才能得到較明確而詳細的回饋。<br>
-    `;
+    const totalCards = 78;
+    const drawContainer = document.createElement('div');
+    drawContainer.id = 'draw-phase-container';
+    drawContainer.style.position = 'relative';
+    drawContainer.style.width = '100%';
+    drawContainer.style.height = window.innerWidth < 768 ? '150px' : '318px';
+    cardContainer.innerHTML = '';
+    cardContainer.appendChild(drawContainer);
 
-    cardContainer.classList.add('tarot-mode'); // 開啟塔羅模式
+    // 動態調整卡牌尺寸與重疊量
+    const isMobile = window.innerWidth < 768;
+    const cardWidth = isMobile ? 70 : 93.75;
+    const overlap = isMobile ? 65 : 85.75;
+    const containerWidth = drawContainer.clientWidth || window.innerWidth;
+    const totalWidth = cardWidth + (totalCards - 1) * (cardWidth - overlap);
+    const startX = (containerWidth - totalWidth) / 2;
+    const baseY = 130; 
+    const maxArcHeight = 40;   
+    const centerX = containerWidth / 2;
+    const halfTotalWidth = totalWidth / 2;
+    
+    // 微扇形效果：
+    const angleStart = -15;
+    const angleEnd = 15;
+    const angleStep = (angleEnd - angleStart) / (totalCards - 1);
+    
+    for (let i = 0; i < totalCards; i++) {
+        const x = startX + i * (cardWidth - overlap);
+        const cardCenterX = x + cardWidth / 2;
+        const distanceFromCenter = Math.abs(cardCenterX - centerX);
+        const offset = maxArcHeight * (1 - Math.pow(distanceFromCenter / halfTotalWidth, 2));
+        const cardY = baseY - offset; 
+        const card = document.createElement('div');
+        card.className = 'draw-card';
+        card.style.position = 'absolute';
+        card.style.left = `${x}px`;
+        card.style.top = `${cardY}px`;
+        const angle = angleStart + i * angleStep;
+        card.style.setProperty('--rotate', `${angle}deg`);
+        card.addEventListener('click', onDrawCardClick);
+        drawContainer.appendChild(card);
+    }
+}
 
-    requestAnimationFrame(() => {
-        shuffleAnimation(items);
-        shuffleSound.currentTime = 0;
-        shuffleSound.play();
-    });
+// 3. 抽牌
+function onDrawCardClick(event) {
+    const card = event.currentTarget;
+    drawSound.currentTime = 0;
+    drawSound.play().catch(error => console.warn("抽牌音效播放失敗:", error));
+    if (card.classList.contains('selected')) return;
+    card.classList.add('selected'); 
+    drawnCards.push(card);
+    if (drawnCards.length === 3) {
+        setTimeout(() => {
+            finishTarotInteractiveDraw(drawnCards, tarotItems);
+        }, 300); 
+    }
+}
 
-    setTimeout(() => {
-        const selectedCards = [];
-        while (selectedCards.length < 3) {
-            const randomIndex = Math.floor(Math.random() * items.length);
-            if (!selectedCards.includes(items[randomIndex])) {
-                selectedCards.push(items[randomIndex]);
-            }
+// 4. 塔羅牌解讀階段
+function finishTarotInteractiveDraw(selectedCards, items) {
+    // 移除抽牌階段畫面
+    const drawContainer = document.getElementById('draw-phase-container');
+    if (drawContainer) {
+        drawContainer.remove();
+    }
+    cardContainer.innerHTML = '';
+    const positions = ['past', 'present', 'future'];
+    const selectedItems = items.slice().sort(() => Math.random() - 0.5).slice(0, 3);
+    selectedItems.forEach((item, index) => {
+        const position = positions[index];
+        const newCard = document.createElement('div');
+        newCard.className = 'card';
+        newCard.setAttribute('data-name', item);
+        const content = generateCardContent(item);
+        newCard.innerHTML = `
+            <div class="inner">
+                <div class="back"></div>
+                <div class="front">${content}</div>
+            </div>
+        `;
+        newCard.classList.add('hidden');
+        const isReversed = Math.random() < 0.5; // 50% 機率逆位
+        if (isReversed) {
+            newCard.classList.add('reversed');
         }
-
-        const positions = ['past', 'present', 'future'];
-        const cardContainer = document.getElementById('card-container');
-        cardContainer.innerHTML = '';
-        selectedCards.forEach((item, index) => {
-            const position = positions[index];
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.setAttribute("data-name", item);
-            const content = generateCardContent(item);
-
-            card.innerHTML = `
-                <div class="inner">
-                    <div class="back"></div>
-                    <div class="front">${content}</div>
-                </div>
-            `;
-
-            card.classList.add('hidden');
-            const isReversed = Math.random() < 0.5; // 50% 機率逆位
-            if (isReversed) {
-                card.classList.add('reversed');
-            }
-            let isFlipped = false;
-
-            // 點擊事件處理
-            card.addEventListener('click', () => {
-                flipSound.currentTime = 0;
-                flipSound.play().catch((error) => {
-                    console.warn('翻牌音效播放失敗:', error);
-                });
-                if (isFlipped) {
-                    card.classList.remove('flipped');
-                    isFlipped = false;
-                } else {
-                    card.classList.add('flipped');
-                    isFlipped = true;
-                }
-
-                // 獲取卡片的描述
-                const cardIsReversed = card.classList.contains('reversed');
-                const description = getCardDescription(item, isReversed, position);
-                if (description) {
-                    descriptionBox.innerHTML = description;
-                        descriptionBox.querySelectorAll('b').forEach(b => {
-                            b.style.color = '#add8e6';
-                        });
-                    descriptionBox.style.display = 'block'; // 顯示描述框
-                } else {
-                    console.warn(`未找到卡片 "${item}" 的描述`);
-                }
+        let isFlipped = false;
+        newCard.addEventListener('click', () => {
+            flipSound.currentTime = 0;
+            flipSound.play().catch((error) => {
+                console.warn('翻牌音效播放失敗:', error);
             });
-
-            // 添加卡片到容器
-            cardContainer.appendChild(card);
+            if (isFlipped) {
+                newCard.classList.remove('flipped');
+                isFlipped = false;
+            } else {
+                newCard.classList.add('flipped');
+                isFlipped = true;
+            }
+            const description = getCardDescription(item, isReversed, position);
+            if (description) {
+                descriptionBox.innerHTML = description;
+                descriptionBox.querySelectorAll('b').forEach(b => {
+                    b.style.color = '#add8e6';
+                });
+                descriptionBox.style.display = 'block';
+            } else {
+                console.warn(`未找到卡片 "${item}" 的描述`);
+            }
         });
-    }, 1010); // 確保延遲與動畫時間一致
+        cardContainer.appendChild(newCard);
+    });
 }
 
     // **牌義解釋邏輯**
@@ -2860,6 +2949,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
                 card.addEventListener('click', () => {
+                    cutSound.currentTime = 0;
+                    cutSound.play();
                     card.classList.toggle('dimmed');
                     card.classList.remove('hoverable'); 
                     setTimeout(() => card.classList.add('hoverable'), 10); 
@@ -2926,7 +3017,9 @@ volumeSlider.addEventListener('input', (event) => {
     fireSound.volume = volume; 
     flipSound.volume = volume;   
     scoreSound.volume = volume;  
-    clickSound.volume = volume;  
+    clickSound.volume = volume; 
+    cutSound.volume = volume;  
+    drawSound.volume = volume; 
 
     updateSliderFill();
 
@@ -2952,7 +3045,9 @@ bgmButton.addEventListener('click', () => {
 });
 
 shuffleSound.volume = 0.5; 
-fireSound.volume = 0.5;   
+fireSound.volume = 0.5;  
+cutSound.volume = 0.5; 
+drawSound.volume = 0.5;
 flipSound.volume = 0.5;  
 scoreSound.volume = 0.5;
 clickSound.volume = 0.5;
