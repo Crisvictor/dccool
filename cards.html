@@ -331,15 +331,15 @@
             border-radius: 4px;
             transition: transform 0.2s ease;
             transform: rotate(var(--rotate));
-            z-index: 2;
+            z-index: 1;
         }
         .draw-card:hover {
-            transform: translateY(-30px) rotate(var(--rotate));
+            transform: translateY(-30px) scale(1.1) rotate(var(--rotate));
         }
         .draw-card.selected {
-            transform: translateY(-55px) scale(1.2);
+            transform: translateY(60px) scale(1.45);
             box-shadow: 0 0 10px rgba(83, 157, 236, 0.8);
-            z-index: 1;
+            z-index: 2;
         }
         .container {
             max-width: 800px; 
@@ -1010,7 +1010,7 @@ function startDrawPhase(items) {
     const containerWidth = drawContainer.clientWidth || window.innerWidth;
     const totalWidth = cardWidth + (totalCards - 1) * (cardWidth - overlap);
     const startX = (containerWidth - totalWidth) / 2;
-    const baseY = 130; 
+    const baseY = 80; 
     const maxArcHeight = 40;   
     const centerX = containerWidth / 2;
     const halfTotalWidth = totalWidth / 2;
