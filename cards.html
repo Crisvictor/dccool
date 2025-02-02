@@ -982,6 +982,10 @@ function initTarotInteractiveDraw(items) {
     });
     setTimeout(() => {
         // 顯示說明文字
+        let extraInstruction = "";
+        if (window.innerWidth < 768) {
+            extraInstruction = "<br><b>※建議手機用戶橫屏啟動抽卡※</b>";
+        }
         descriptionBox.style.display = 'block';
         descriptionBox.innerHTML = `
             <b>請從牌堆中選擇三張牌...</b><br>
@@ -993,6 +997,7 @@ function initTarotInteractiveDraw(items) {
             搭配「該如何做才能加以實現」這樣的形式對策，<br>
             可依序得出「過去、現在、未來」<br>
             或者「原因、結果、建議」來得到較明確的回饋。<br>
+            ${extraInstruction}
         `;
         cardContainer.classList.add('tarot-mode');
         drawnCards = [];
