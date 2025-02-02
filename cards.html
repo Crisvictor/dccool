@@ -337,7 +337,7 @@
             transform: translateY(-30px) scale(1.1) rotate(var(--rotate));
         }
         .draw-card.selected {
-            transform: translateY(60px) scale(1.45);
+            transform: translateY(60px) scale(1.5);
             box-shadow: 0 0 10px rgba(83, 157, 236, 0.8);
             z-index: 2;
         }
@@ -535,6 +535,12 @@
             background: #546ea2;
             transform: scale(1.2); 
         }
+        .content-chinese {
+          writing-mode: vertical-rl;
+        }
+        .content-arabic {
+          writing-mode: horizontal-tb;
+        }
         #bgm-button {
             width: 30px;
             height: 30px;
@@ -562,22 +568,22 @@
                 width: 85% !important;
             }
             .card {
-                width: 93.75px; 
+                width: 94.5px; 
                 height: 156.25px;
                 font-size: 14px;
-                margin: 3px;
+                margin: 1px;
                 transform: none;
                 box-shadow: none;
             }
             .card-container {
-                max-width: 90% !important;
+                max-width: 95% !important;
                 max-height: 500.75px !important; 
                 margin: 6px auto;
-                padding: 5px;
+                padding: 3px;
             }
             .tarot-mode .card {
-                width: 105px;
-                height: 175px;
+                width: 115px;
+                height: 178px;
             }
             .draw-card {
                 width: 70px;
@@ -986,7 +992,7 @@ function initTarotInteractiveDraw(items) {
         cardContainer.classList.add('tarot-mode');
         drawnCards = [];
         startDrawPhase(items);
-    }, 1010);
+    }, 1090);
 }
 
 // 2. 扇形牌列
@@ -994,6 +1000,7 @@ function startDrawPhase(items) {
     showFlameAnimation();
     fireSound.currentTime = 0;
     fireSound.play();
+
     const totalCards = 78;
     const drawContainer = document.createElement('div');
     drawContainer.id = 'draw-phase-container';
@@ -1020,22 +1027,39 @@ function startDrawPhase(items) {
     const angleEnd = 15;
     const angleStep = (angleEnd - angleStart) / (totalCards - 1);
     
+    let finalPositions = [];
     for (let i = 0; i < totalCards; i++) {
         const x = startX + i * (cardWidth - overlap);
         const cardCenterX = x + cardWidth / 2;
         const distanceFromCenter = Math.abs(cardCenterX - centerX);
         const offset = maxArcHeight * (1 - Math.pow(distanceFromCenter / halfTotalWidth, 2));
         const cardY = baseY - offset; 
+        const angle = angleStart + i * angleStep;
+        finalPositions.push({ left: x, top: cardY, angle: angle });
+    }
+    
+    let cards = [];
+    for (let i = 0; i < totalCards; i++) {
         const card = document.createElement('div');
         card.className = 'draw-card';
         card.style.position = 'absolute';
-        card.style.left = `${x}px`;
-        card.style.top = `${cardY}px`;
-        const angle = angleStart + i * angleStep;
-        card.style.setProperty('--rotate', `${angle}deg`);
+        card.style.left = `${centerX - cardWidth / 2}px`;
+        card.style.top = `${baseY}px`;
+        card.style.setProperty('--rotate', `0deg`);
+        card.style.transition = 'all 0.5s ease-out';
         card.addEventListener('click', onDrawCardClick);
         drawContainer.appendChild(card);
+        cards.push(card);
     }
+    setTimeout(() => {
+        for (let i = 0; i < totalCards; i++) {
+            const pos = finalPositions[i];
+            const card = cards[i];
+            card.style.left = `${pos.left}px`;
+            card.style.top = `${pos.top}px`;
+            card.style.setProperty('--rotate', `${pos.angle}deg`);
+        }
+    }, 100); 
 }
 
 // 3. 抽牌
@@ -1055,11 +1079,49 @@ function onDrawCardClick(event) {
 
 // 4. 塔羅牌解讀階段
 function finishTarotInteractiveDraw(selectedCards, items) {
-    // 移除抽牌階段畫面
     const drawContainer = document.getElementById('draw-phase-container');
     if (drawContainer) {
-        drawContainer.remove();
+        const containerRect = drawContainer.getBoundingClientRect();
+        const containerWidth = containerRect.width;
+        const containerHeight = containerRect.height;
+        const isMobile = window.innerWidth < 768;
+        const targetSize = isMobile ? { width: 110, height: 175 } : { width: 197, height: 304 };
+        const targetPositions = [
+            { left: containerWidth * 0.25, top: containerHeight / 2 },
+            { left: containerWidth * 0.50, top: containerHeight / 2 },
+            { left: containerWidth * 0.75, top: containerHeight / 2 }
+        ];
+        drawnCards.forEach((card, index) => {
+            if (index < 3) {
+                card.style.transition = 'all 0.5s ease-out';
+                const target = targetPositions[index];
+                card.style.left = `${target.left - targetSize.width / 2}px`;
+                card.style.top = `${target.top - targetSize.height / 2}px`;
+                card.style.width = `${targetSize.width}px`;
+                card.style.height = `${targetSize.height}px`;
+                card.style.transform = 'scale(1)';
+                card.style.opacity = '1';
+            }
+        });
+        const allCards = drawContainer.querySelectorAll('.draw-card');
+        allCards.forEach(card => {
+            if (!card.classList.contains('selected')) {
+                card.style.transition = 'all 0.5s ease-out';
+                card.style.left = `${containerWidth / 2 - card.offsetWidth / 2}px`;
+                card.style.top = `${containerHeight / 2 - card.offsetHeight / 2}px`;
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0)';
+            }
+        });
+        setTimeout(() => {
+            drawContainer.remove();
+            generateTarotReadingCards(items);
+        }, 500);
+    } else {
+        generateTarotReadingCards(items);
     }
+}
+function generateTarotReadingCards(items) {
     cardContainer.innerHTML = '';
     const positions = ['past', 'present', 'future'];
     const selectedItems = items.slice().sort(() => Math.random() - 0.5).slice(0, 3);
@@ -2814,51 +2876,58 @@ const tarotImageMap = {
         return name; 
     }
 
-    // 撲克牌面造型設定
-    function generateCardContent(item) {
-        if (tarotImageMap[item]) {
-            return `
-                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; 
-                            background-image: url('${tarotImageMap[item]}'); 
-                            background-size: cover; 
-                            background-position: center; 
-                            border-radius: 4px;">
-                </div>`;
-        }       
-        if (/^10[shcd]$/.test(item)) { 
-            const suit = item.charAt(2); 
-            const symbol = suitSymbols[suit]; 
-            return `
-                <div style="position: relative; width: 100%; height: 100%; padding: 5px;">
-                    <div style="position: absolute; top: 5px; left: 5px; font-weight: bold;">
-                        <span style="font-size: 14px; writing-mode: horizontal-tb;">10</span>
-                        <span style="font-size: 16px; writing-mode: vertical-rl;">${symbol}</span>
-                    </div>
-                    <div style="position: absolute; bottom: 5px; right: 5px; font-weight: bold; transform: rotate(180deg);">
-                        <span style="font-size: 14px; writing-mode: horizontal-tb;">10</span>
-                        <span style="font-size: 16px; writing-mode: vertical-rl;">${symbol}</span>
-                    </div>
-                </div>`;
-        }
-        if (/[♥️♠️♣️♦️]/.test(item)) {
-            const symbol = item.match(/[♥️♠️♣️♦️]/)[0];
-            const number = item.replace(/[♥️♠️♣️♦️]/, '');
-            const displayText = (number === '10') 
-                ? `<span style="display: inline-block; font-size: 12px; writing-mode: horizontal-tb !important;">${number}</span>
-                   <span style="display: inline-block; font-size: 16px; writing-mode: vertical-rl;">${symbol}</span>`
-                : `<span style="writing-mode: vertical-rl;">${item}</span>`; 
-            return `
-                <div style="position: relative; width: 100%; height: 100%; padding: 5px;">
-                    <div style="position: absolute; top: 5px; left: 5px; font-size: 16px; font-weight: bold;">
-                        ${displayText}
-                    </div>
-                    <div style="position: absolute; bottom: 5px; right: 5px; font-size: 16px; font-weight: bold; transform: rotate(180deg);">
-                        ${displayText}
-                    </div>
-               </div>`;
-        }
-        return `<div style="text-align: center; font-size: 16px; font-weight: bold;">${item}</div>`;
+    // 一般翻牌設定
+function generateCardContent(item) {
+    if (tarotImageMap[item]) {
+        return `
+            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; 
+                        background-image: url('${tarotImageMap[item]}'); 
+                        background-size: cover; 
+                        background-position: center; 
+                        border-radius: 4px;">
+            </div>`;
+    }       
+    if (/^10[shcd]$/.test(item)) { 
+        const suit = item.charAt(2); 
+        const symbol = suitSymbols[suit]; 
+        return `
+            <div style="position: relative; width: 100%; height: 100%; padding: 5px;">
+                <div style="position: absolute; top: 5px; left: 5px; font-weight: bold;">
+                    <span style="font-size: 14px; writing-mode: horizontal-tb;">10</span>
+                    <span style="font-size: 16px; writing-mode: vertical-rl;">${symbol}</span>
+                </div>
+                <div style="position: absolute; bottom: 5px; right: 5px; font-weight: bold; transform: rotate(180deg);">
+                    <span style="font-size: 14px; writing-mode: horizontal-tb;">10</span>
+                    <span style="font-size: 16px; writing-mode: vertical-rl;">${symbol}</span>
+                </div>
+            </div>`;
     }
+    if (/[♥️♠️♣️♦️]/.test(item)) {
+        const symbol = item.match(/[♥️♠️♣️♦️]/)[0];
+        const number = item.replace(/[♥️♠️♣️♦️]/, '');
+        const displayText = (number === '10') 
+            ? `<span style="display: inline-block; font-size: 12px; writing-mode: horizontal-tb !important;">${number}</span>
+               <span style="display: inline-block; font-size: 16px; writing-mode: vertical-rl;">${symbol}</span>`
+            : `<span style="writing-mode: vertical-rl;">${item}</span>`; 
+        return `
+            <div style="position: relative; width: 100%; height: 100%; padding: 5px;">
+                <div style="position: absolute; top: 5px; left: 5px; font-size: 16px; font-weight: bold;">
+                    ${displayText}
+                </div>
+                <div style="position: absolute; bottom: 5px; right: 5px; font-size: 16px; font-weight: bold; transform: rotate(180deg);">
+                    ${displayText}
+                </div>
+           </div>`;
+    }
+    
+    if (/^[0-9\s]+$/.test(item)) {
+        return `<div style="text-align: center; font-size: 26px; font-weight: bold; writing-mode: horizontal-tb;">${item}</div>`;
+    } else if (/[\u4e00-\u9fa5]/.test(item)) {
+        return `<div style="text-align: center; font-size: 20px; font-weight: bold; writing-mode: vertical-rl;">${item}</div>`;
+    } else {
+        return `<div style="text-align: center; font-size: 20px; font-weight: bold; writing-mode: horizontal-tb;">${item}</div>`;
+    }
+}
 
 // 建立 Tooltip 元素
 document.addEventListener("DOMContentLoaded", () => {
@@ -3003,55 +3072,47 @@ muteIcon.style.display = 'none';
 volumeSlider.parentElement.insertBefore(muteIcon, volumeSlider); 
 
 function updateSliderFill() {
-    const value = (volumeSlider.value - volumeSlider.min) / 
-                  (volumeSlider.max - volumeSlider.min) * 100;
-    volumeSlider.style.background = `linear-gradient(to right, 
-        rgba(49, 97, 197, 0.8) ${value}%, 
-        rgba(19, 67, 167, 0.2) ${value}%)`;
+  const value = ((volumeSlider.value - volumeSlider.min) / (volumeSlider.max - volumeSlider.min)) * 100;
+  volumeSlider.style.background = `linear-gradient(to right, rgba(49, 97, 197, 0.8) ${value}%, rgba(19, 67, 167, 0.2) ${value}%)`;
+}
+
+function setAllVolumes(vol) {
+  const audios = [bgmAudio, shuffleSound, fireSound, flipSound, scoreSound, clickSound, cutSound, drawSound];
+  audios.forEach(audio => {
+    if (audio) {
+      audio.volume = vol;
+    }
+  });
 }
 
 volumeSlider.addEventListener('input', (event) => {
-    const volume = parseFloat(event.target.value);
-    bgmAudio.volume = volume;
-    shuffleSound.volume = volume; 
-    fireSound.volume = volume; 
-    flipSound.volume = volume;   
-    scoreSound.volume = volume;  
-    clickSound.volume = volume; 
-    cutSound.volume = volume;  
-    drawSound.volume = volume; 
+  const volume = parseFloat(event.target.value);
+  setAllVolumes(volume);
+  updateSliderFill();
 
-    updateSliderFill();
-
-    if (volume === 0) {
-        muteIcon.style.display = 'inline'; 
-        bgmButton.style.backgroundColor = 'rgba(209, 111, 111, 0.3)';
-    } else {
-        muteIcon.style.display = 'none'; 
-        bgmButton.style.backgroundColor = 'rgba(79, 101, 121, 0.3)';
-    }
+  if (volume === 0) {
+    muteIcon.style.display = 'inline';
+    bgmButton.style.backgroundColor = 'rgba(209, 111, 111, 0.3)';
+  } else {
+    muteIcon.style.display = 'none';
+    bgmButton.style.backgroundColor = 'rgba(79, 101, 121, 0.3)';
+  }
 });
 
 let isPlaying = false;
 bgmButton.addEventListener('click', () => {
-    if (isPlaying) {
-        bgmAudio.pause();
-        bgmButton.textContent = '♫'; 
-    } else {
-        bgmAudio.play();
-        bgmButton.textContent = '❚❚'; 
-    }
-    isPlaying = !isPlaying;
+  if (isPlaying) {
+    bgmAudio.pause();
+    bgmButton.textContent = '♫';
+  } else {
+    bgmAudio.play();
+    bgmButton.textContent = '❚❚';
+  }
+  isPlaying = !isPlaying;
 });
 
-shuffleSound.volume = 0.5; 
-fireSound.volume = 0.5;  
-cutSound.volume = 0.5; 
-drawSound.volume = 0.5;
-flipSound.volume = 0.5;  
-scoreSound.volume = 0.5;
-clickSound.volume = 0.5;
-
+// 初始化：設定所有音效預設音量為 0.5 並更新滑桿背景
+setAllVolumes(0.5);
 updateSliderFill();
     </script>
 </body>
