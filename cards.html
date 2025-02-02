@@ -456,31 +456,36 @@
         }
         textarea::-webkit-scrollbar,
         .dimmed-container::-webkit-scrollbar,
-        .card-container::-webkit-scrollbar {
-            width: 8px;
+        .card-container::-webkit-scrollbar,
+        #draw-phase-container::-webkit-scrollbar {
+            width: 10px;
         }
         textarea::-webkit-scrollbar-track,
         .dimmed-container::-webkit-scrollbar-track,
-        .card-container::-webkit-scrollbar-track {
+        .card-container::-webkit-scrollbar-track,
+        #draw-phase-container::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.3); 
-            border-radius: 10px; 
+            border-radius: 12px; 
         }
         textarea::-webkit-scrollbar-thumb,
         .dimmed-container::-webkit-scrollbar-thumb,
-        .card-container::-webkit-scrollbar-thumb {
-            background: rgba(137, 198, 185, 0.8);
+        .card-container::-webkit-scrollbar-thumb,
+        #draw-phase-container::-webkit-scrollbar-thumb {
+            background: rgba(110, 157, 209, 0.3);
             border-radius: 10px; 
-            border: 2px solid rgba(119, 136, 153, 0.5);
+            border: 2px solid rgba(0, 30, 30, 0.2);
             cursor: pointer; 
         }
         textarea::-webkit-scrollbar-thumb:hover,
         .dimmed-container::-webkit-scrollbar-thumb:hover,
-        .card-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(77, 160, 140, 0.9); 
+        .card-container::-webkit-scrollbar-thumb:hover,
+        #draw-phase-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(75, 125, 180, 0.5); 
         }
         textarea::-webkit-scrollbar-corner,
         .dimmed-container::-webkit-scrollbar-corner,
-        .card-container::-webkit-scrollbar-corner {
+        .card-container::-webkit-scrollbar-corner,
+        #draw-phase-container::-webkit-scrollbar-corner {
             background: transparent;
         }
         .hoverable {
@@ -1007,6 +1012,10 @@ function startDrawPhase(items) {
     drawContainer.style.position = 'relative';
     drawContainer.style.width = '100%';
     drawContainer.style.height = window.innerWidth < 768 ? '150px' : '318px';
+    if (window.innerWidth < 768) {
+        drawContainer.style.overflowX = 'auto';
+        drawContainer.style.whiteSpace = 'nowrap';
+    }
     cardContainer.innerHTML = '';
     cardContainer.appendChild(drawContainer);
 
@@ -1113,6 +1122,10 @@ function finishTarotInteractiveDraw(selectedCards, items) {
                 card.style.transform = 'scale(0)';
             }
         });
+        if (window.innerWidth < 768) {
+            drawContainer.style.overflowX = 'hidden';
+            drawContainer.style.whiteSpace = 'normal';
+        }
         setTimeout(() => {
             drawContainer.remove();
             generateTarotReadingCards(items);
