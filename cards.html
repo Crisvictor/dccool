@@ -387,6 +387,22 @@
             font-size: 1.5em;
             text-align: left;
         }
+        .guideBtn {
+            font-family: 'ThePeakFont', Arial, sans-serif !important;
+            background-color: #003d40;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .guideBtn:hover {
+            background-color: #084548;
+            transform: scale(1.05);
+        }
         .dimmed {
             background-color: rgba(100, 100, 100, 0.1) !important;
             backdrop-filter: blur(4px); 
@@ -974,31 +990,88 @@ shuffleBtn.addEventListener('click', () => {
 // 塔羅牌模式
 
 // 1. 初始化互動抽牌階段
+function showUserGuideInitial(extraInstruction) {
+    descriptionBox.style.display = 'block';
+    descriptionBox.innerHTML = `
+        <b>請從牌堆中選擇三張牌...</b><br>
+        本系統採「時間之流」的三張抽牌方式，<br>
+        請依序選擇代表「過去、現在、未來」的牌。<br>
+        請點選三張牌進行選擇。<br>
+        <br>
+        問問題的方式請以自己「想怎麼做？」的想法，<br>
+        搭配「該如何做才能加以實現」這樣的形式對策，<br>
+        可依序得出「過去、現在、未來」<br>
+        或者「原因、結果、建議」來得到較明確的回饋。<br>
+        ${extraInstruction}
+        <br><br>
+        <button class="guideBtn" id="btnGuide">時間之流使用說明</button>
+    `;
+    document.getElementById('btnGuide').addEventListener('click', showUserGuideDetails);
+}
+
+function showUserGuideDetails() {
+    descriptionBox.innerHTML = `
+        <b>問塔羅牌問題的訣竅</b><br>
+        請參考下列四種建議：<br><br>
+        <button class="guideBtn" data-guide="specific">明確具體</button><br>
+        <button class="guideBtn" data-guide="open">開放式提問</button><br>
+        <button class="guideBtn" data-guide="growth">針對自我成長</button><br>
+        <button class="guideBtn" data-guide="flexible">保持彈性和開放心態</button>
+        <br><br>
+        <button class="guideBtn" id="btnBackToInitial">返回</button>
+    `;
+    document.querySelectorAll('.guideBtn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            showGuideExplanation(btn.getAttribute('data-guide'));
+        });
+    });
+    document.getElementById('btnBackToInitial').addEventListener('click', function() {
+        showUserGuideInitial("");
+    });
+}
+
+function showGuideExplanation(type) {
+    const explanations = {
+        specific: `<b>明確具體：</b><br>
+                   不要問那種像「我的未來會怎樣？」<br>
+                   這類太籠統的問題。<br>
+                   試著聚焦到具體的情境或目標上，<br>
+                   例如「我該如何改善現狀以迎接新的職業機會？」`,
+        open: `<b>開放式提問：</b><br>
+               避免只會得到「是」或「否」答案的問題，<br>
+               問一些能引導你深入思考的問題，<br>
+               例如「我如何能夠突破目前的困境？」`,
+        growth: `<b>針對自我成長：</b><br>
+                 塔羅牌更像是一面鏡子，能反映出你內在的狀態。<br>
+                 多問一些關於如何提升自我或找到解決方案的問題，<br>
+                 而不是完全依賴預測未來。`,
+        flexible: `<b>保持彈性和開放心態：</b><br>
+                   塔羅牌給出的答案可能不會完全符合你的預期，<br>
+                   但它們往往能啟發你看到潛藏的可能性。<br>
+                   接受這種模糊性和多元性，<br>
+                   從中找到對自己有意義的啟示。`
+    };
+    descriptionBox.innerHTML = `
+        ${explanations[type]}<br><br>
+        <button class="guideBtn" id="btnReturnToGuide">返回</button>
+    `;
+    document.getElementById('btnReturnToGuide').addEventListener('click', function() {
+        showUserGuideInitial("");
+    });
+}
+
 function initTarotInteractiveDraw(items) {
     requestAnimationFrame(() => {
-    shuffleAnimation(items);
-    shuffleSound.currentTime = 0; 
-    shuffleSound.play(); 
+        shuffleAnimation(items);
+        shuffleSound.currentTime = 0; 
+        shuffleSound.play(); 
     });
     setTimeout(() => {
-        // 顯示說明文字
         let extraInstruction = "";
         if (window.innerWidth < 768) {
             extraInstruction = "<br><b>※建議手機用戶橫屏啟動抽卡※</b>";
         }
-        descriptionBox.style.display = 'block';
-        descriptionBox.innerHTML = `
-            <b>請從牌堆中選擇三張牌...</b><br>
-            本系統採「時間之流」的三張抽牌方式，<br>
-            請依序選擇代表「過去、現在、未來」的牌。<br>
-            請點選三張牌進行選擇。<br>
-            <br>
-            問問題的方式請以自己「想怎麼做？」的想法，<br>
-            搭配「該如何做才能加以實現」這樣的形式對策，<br>
-            可依序得出「過去、現在、未來」<br>
-            或者「原因、結果、建議」來得到較明確的回饋。<br>
-            ${extraInstruction}
-        `;
+        showUserGuideInitial(extraInstruction);
         cardContainer.classList.add('tarot-mode');
         drawnCards = [];
         startDrawPhase(items);
