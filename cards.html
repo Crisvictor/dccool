@@ -240,10 +240,13 @@
             height: 100%;
             transform-style: preserve-3d;
             transition: transform 0.6s;
+            transform: rotateY(0deg);
+        }
+        .card.flipped .inner {
             transform: rotateY(180deg);
         }
-        .card.hidden .inner {
-            transform: rotateY(0deg);
+        .card.fishing-hidden {
+            visibility: hidden;
         }
         .card .back, .card .front {
             position: absolute;
@@ -387,7 +390,8 @@
             font-size: 1.5em;
             text-align: left;
         }
-        .guideBtn {
+        .guideBtn,
+        .playerCountBtn {
             font-family: 'ThePeakFont', Arial, sans-serif !important;
             background-color: #003d40;
             color: #fff;
@@ -399,7 +403,8 @@
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
-        .guideBtn:hover {
+        .guideBtn:hover,
+        .playerCountBtn:hover {
             background-color: #084548;
             transform: scale(1.05);
         }
@@ -699,6 +704,8 @@
         <div id="description-box"></div>
         <audio id="clickSound" src="m/click.mp3"></audio>
         <audio id="scoreSound" src="m/Sou.mp3"></audio>
+        <audio id="coin1Sound" src="m/coin1.mp3"></audio>
+        <audio id="levelwinSound" src="m/levelwin.mp3"></audio>
 
     </div>
     <script>
@@ -810,6 +817,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const fireSound = new Audio('m/F.mp3');
     const drawSound = new Audio('m/draw1.mp3');
     const cutSound = new Audio('m/cut1.mp3');
+    const coin1Sound = new Audio('m/coin1.mp3');
+    const levelwinSound = new Audio('m/levelwin.mp3');
     const shuffleBtn = document.getElementById('shuffle-btn');
     const callBtn = document.getElementById('call-btn');
     const clearBtn = document.getElementById('clear-btn');
@@ -959,7 +968,10 @@ shuffleBtn.addEventListener('click', () => {
         initTarotInteractiveDraw(items);
         return;
     }
-    
+    if (items.includes("K♠️")) {
+        initPokerFishingGame(items);
+        return;
+    }
     requestAnimationFrame(() => {
         shuffleAnimation(items);
         shuffleSound.currentTime = 0; 
@@ -975,9 +987,8 @@ shuffleBtn.addEventListener('click', () => {
                                 <div class="back"></div>
                                 <div class="front">${content}</div>
                                 </div>`;
-            card.classList.add('hidden');
             card.addEventListener('click', () => {
-                card.classList.toggle('hidden');
+                card.classList.toggle('flipped');
                 flipSound.currentTime = 0; 
                 flipSound.play(); 
             });
@@ -1006,7 +1017,10 @@ function showUserGuideInitial(extraInstruction) {
         <br><br>
         <button class="guideBtn" id="btnGuide">時間之流使用說明</button>
     `;
-    document.getElementById('btnGuide').addEventListener('click', showUserGuideDetails);
+    document.getElementById('btnGuide').addEventListener('click', function() {
+        playScoreSound();
+        showUserGuideDetails();
+    });
 }
 
 function showUserGuideDetails() {
@@ -1023,10 +1037,12 @@ function showUserGuideDetails() {
     document.querySelectorAll('.guideBtn').forEach(function(btn) {
         btn.addEventListener('click', function() {
             showGuideExplanation(btn.getAttribute('data-guide'));
+            playScoreSound();
         });
     });
     document.getElementById('btnBackToInitial').addEventListener('click', function() {
         showUserGuideInitial("");
+        playScoreSound();
     });
 }
 
@@ -1057,6 +1073,7 @@ function showGuideExplanation(type) {
     `;
     document.getElementById('btnReturnToGuide').addEventListener('click', function() {
         showUserGuideInitial("");
+        playScoreSound();
     });
 }
 
@@ -3020,6 +3037,7 @@ function generateCardContent(item) {
     }
 }
 
+
 // 建立 Tooltip 元素
 document.addEventListener("DOMContentLoaded", () => {
     const tooltip = document.createElement("div");
@@ -3064,6 +3082,297 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+// ----------------------
+// 撲克牌釣魚模式
+
+// 1. 初始化遊戲
+function initPokerFishingGame(items) { 
+    requestAnimationFrame(() => {
+        shuffleAnimation(items);
+        shuffleSound.currentTime = 0; 
+        shuffleSound.play(); 
+    });
+    setTimeout(() => {
+        items.sort(() => Math.random() - 0.5);
+        // 生成牌（這部分與一般模式一致）
+        cardContainer.innerHTML = '';
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const content = generateCardContent(item);
+            card.innerHTML = `<div class="inner">
+                                <div class="back"></div>
+                                <div class="front">${content}</div>
+                              </div>`;
+            card.addEventListener('click', () => {
+                card.classList.toggle('flipped');
+                flipSound.currentTime = 0; 
+                flipSound.play(); 
+            });
+            cardContainer.appendChild(card);
+        });
+        descriptionBox.style.display = 'block';
+        descriptionBox.innerHTML = `
+            <button class="guideBtn" id="startFishingBtn">點擊啟動-釣魚遊戲</button><br>
+            <br>
+            <b>釣魚遊戲規則：</b><br>
+            一次翻閱兩張牌，若兩張牌數字不同則蓋牌；<br>
+            翻到對子則得分消除。<br>
+            一般對子=1分，A對=2分，Joker對=5分<br>
+            支持1~4人遊玩，每位玩家輪流翻兩張牌，<br>
+            得分則該玩家可繼續翻兩張牌，<br>
+            直至未得分換玩家操作。<br>
+        `;
+        document.getElementById('startFishingBtn').addEventListener('click',function() {
+           showPlayerSelection();
+           playScoreSound();
+        });
+    }, 1010);
+}
+
+// 2. 選擇遊玩人數
+function showPlayerSelection() {
+    cardContainer.innerHTML = '';
+    descriptionBox.innerHTML = `
+        <b>遊玩人數：</b><br>
+        <button class="playerCountBtn" data-count="1">1人</button>
+        <button class="playerCountBtn" data-count="2">2人</button>
+        <button class="playerCountBtn" data-count="3">3人</button>
+        <button class="playerCountBtn" data-count="4">4人</button>
+    `;
+    document.querySelectorAll('.playerCountBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const count = parseInt(this.getAttribute('data-count'));
+            startPokerGame(count);
+            playScoreSound();
+        });
+    });
+}
+
+// 3. 開始撲克牌釣魚遊戲
+function startPokerGame(playerCount) {
+    descriptionBox.innerHTML = '';
+    createScoreboard(playerCount);
+
+    let deck = generatePokerDeck();
+    deck = shuffleArray(deck);
+    cardContainer.innerHTML = '';
+    deck.forEach(cardData => {
+        const cardElem = createCardElement(cardData);
+        cardContainer.appendChild(cardElem);
+    });
+
+    window.pokerGame = {
+        deck: deck,
+        flippedCards: [],
+        currentPlayer: 0,
+        playerCount: playerCount,
+        scores: Array(playerCount).fill(0)
+    };
+    attachPokerCardHandlers();
+    updateScoreboardDisplay();
+    highlightCurrentPlayer();
+}
+
+function generatePokerDeck() {
+    const deck = [];
+    const suits = [
+        { symbol: '♠️', tenSuffix: 's' },
+        { symbol: '♥️', tenSuffix: 'h' },
+        { symbol: '♦️', tenSuffix: 'd' },
+        { symbol: '♣️', tenSuffix: 'c' }
+    ];
+    const order = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
+    for (let suit of suits) {
+        for (let rank of order) {
+            if (rank === '10') {
+                deck.push('10' + suit.tenSuffix);
+            } else {
+                deck.push(`${rank}${suit.symbol}`);
+            }
+        }
+    }
+    deck.push('鬼王');
+    deck.push('小鬼');
+    return deck;
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function createCardElement(cardData) {
+    const cardElem = document.createElement('div');
+    cardElem.className = 'card poker-card';
+    cardElem.innerHTML = `
+        <div class="inner">
+            <div class="back"></div>
+            <div class="front">${generateCardContent(cardData)}</div>
+        </div>
+    `;
+    cardElem.dataset.value = cardData;
+    return cardElem;
+}
+
+function extractRank(val) {
+    val = val.trim().normalize('NFKC');
+    if (val.startsWith("10")) {
+        return "10";
+    }
+    if (val === '鬼王' || val === '小鬼') {
+        return val;
+    }
+    const match = val.match(/^(\d+|[AKQJ])/);
+    return match ? match[1] : "";
+}
+
+function isMatchingPair(val1, val2) {
+    if ((val1 === '鬼王' && val2 === '小鬼') || (val1 === '小鬼' && val2 === '鬼王')) {
+         return true;
+    }
+    if (val1 === '鬼王' || val1 === '小鬼' || val2 === '鬼王' || val2 === '小鬼') {
+         return false;
+    }
+    return extractRank(val1) === extractRank(val2);
+}
+
+function isSpecialPair(val1, val2) {
+    return ( (val1 === '鬼王' && val2 === '小鬼') || (val1 === '小鬼' && val2 === '鬼王') );
+}
+
+function attachPokerCardHandlers() {
+    const allCards = document.querySelectorAll('.poker-card');
+    allCards.forEach(card => {
+        card.addEventListener('click', onPokerCardClick);
+    });
+}
+
+function onPokerCardClick(event) {
+    if (window.pokerGame.flippedCards.length >= 2) return;
+    const card = event.currentTarget;
+    if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+    flipPokerCard(card);
+    window.pokerGame.flippedCards.push(card);
+    if (window.pokerGame.flippedCards.length === 2) {
+        setTimeout(checkPokerMatch, 500);
+    }
+}
+
+function flipPokerCard(card) {
+    card.classList.add('flipped');
+    flipSound.currentTime = 0; 
+    flipSound.play(); 
+}
+
+function checkPokerMatch() {
+    const [card1, card2] = window.pokerGame.flippedCards;
+    const val1 = card1.dataset.value;
+    const val2 = card2.dataset.value;
+    
+    console.log("檢測配對：", val1, val2);
+    console.log("提取 Rank：", extractRank(val1), extractRank(val2));
+    console.log("匹配結果：", isMatchingPair(val1, val2));
+    
+    if (isMatchingPair(val1, val2)) {
+        let score = 1; 
+        if (isSpecialPair(val1, val2)) {
+            score = 5;
+        }
+        else if (extractRank(val1) === "A") {
+            score = 2;
+        }
+        window.pokerGame.scores[window.pokerGame.currentPlayer] += score;
+        card1.classList.add('matched');
+        card2.classList.add('matched');
+        setTimeout(() => {
+            card1.style.visibility = 'hidden';
+            card2.style.visibility = 'hidden';
+            coin1Sound.currentTime = 0;
+            coin1Sound.play();
+        }, 400);
+    } else {
+        flipBackPokerCard(card1);
+        flipBackPokerCard(card2);
+        window.pokerGame.currentPlayer = (window.pokerGame.currentPlayer + 1) % window.pokerGame.playerCount;
+    }
+    window.pokerGame.flippedCards = [];
+    updateScoreboardDisplay();
+    highlightCurrentPlayer();
+    if (isPokerGameOver()) {
+        endPokerGame();
+    }
+}
+
+function flipBackPokerCard(card) {
+    card.classList.remove('flipped');
+    flipSound.currentTime = 0; 
+    flipSound.play(); 
+}
+
+function updateScoreboardDisplay() {
+    const scoreboard = document.getElementById('scoreboard');
+    if (!scoreboard) return;
+    const playerNames = ["玩家A", "玩家B", "玩家C", "玩家D"];
+    const scores = window.pokerGame.scores;
+    let html = '<h3>記分板</h3><ul style="list-style:none; padding:0;">';
+    const colors = ["#ff6666", "#66cc66", "#66ccff", "#ffcc66"];
+    for (let i = 0; i < scores.length; i++) {
+        html += `<li id="playerScore${i}" style="color:${colors[i]}; font-weight:bold; margin:4px 0;">${playerNames[i]}: ${scores[i]} 分</li>`;
+    }
+    html += '</ul>';
+    scoreboard.innerHTML = html;
+}
+
+function highlightCurrentPlayer() {
+    const scores = window.pokerGame.scores;
+    for (let i = 0; i < scores.length; i++) {
+        const li = document.getElementById(`playerScore${i}`);
+        if (li) {
+            li.style.backgroundColor = (i === window.pokerGame.currentPlayer) ? 'rgba(255,255,0,0.3)' : 'transparent';
+        }
+    }
+}
+
+function createScoreboard(playerCount) {
+    const colors = ["#ff6666", "#66cc66", "#66ccff", "#ffcc66"];
+    const playerNames = ["玩家A", "玩家B", "玩家C", "玩家D"];
+    let html = '<h3>記分板</h3><ul style="list-style: none; padding: 0;">';
+    for (let i = 0; i < playerCount; i++) {
+        html += `<li id="playerScore${i}" style="color: ${colors[i]}; font-weight: bold; margin: 4px 0;">${playerNames[i]}: 0 分</li>`;
+    }
+    html += '</ul>';
+    const scoreboardContainer = document.createElement('div');
+    scoreboardContainer.id = 'scoreboard';
+    scoreboardContainer.innerHTML = html;
+    descriptionBox.innerHTML = '';
+    descriptionBox.appendChild(scoreboardContainer);
+}
+
+function isPokerGameOver() {
+    return document.querySelectorAll('.poker-card:not(.matched)').length === 0;
+}
+
+function endPokerGame() {
+    cardContainer.innerHTML = '';
+    levelwinSound.currentTime = 0;
+    levelwinSound.play();
+    const playerNames = ["玩家A", "玩家B", "玩家C", "玩家D"];
+    let scoreText = '<b>遊戲結束！</b><br>最終得分：<br>';
+    for (let i = 0; i < window.pokerGame.scores.length; i++) {
+        scoreText += `${playerNames[i]}: ${window.pokerGame.scores[i]} 分<br>`;
+    }
+    scoreText += `<br><button class="guideBtn" id="startFishingBtn">重新啟動-釣魚遊戲</button><br>`;
+    descriptionBox.innerHTML = scoreText;
+    document.getElementById('startFishingBtn').addEventListener('click', function() {
+        showPlayerSelection();
+        playScoreSound();
+    });
+}
 
         // 點名設定
         callBtn.addEventListener('click', () => {
@@ -3168,7 +3477,7 @@ function updateSliderFill() {
 }
 
 function setAllVolumes(vol) {
-  const audios = [bgmAudio, shuffleSound, fireSound, flipSound, scoreSound, clickSound, cutSound, drawSound];
+  const audios = [bgmAudio, shuffleSound, fireSound, flipSound, scoreSound, clickSound, cutSound, coin1Sound, drawSound, levelwinSound];
   audios.forEach(audio => {
     if (audio) {
       audio.volume = vol;
