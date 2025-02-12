@@ -3,18 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>擲錢卜卦</title>
+  <title>易經卜卦-卦象生成</title>
   <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
+  <!-- 3D 畫面容器 -->
   <div id="container"></div>
-
+  
+  <!-- 控制面板：擲銭與重置 -->
   <div id="controls">
-    <button id="throwButton">擲出三枚錢幣</button>
+    <button id="throwButton">擲出錢幣</button>
+    <button id="resetButton">重置卜卦</button>
   </div>
-
+  
+  <!-- 結果顯示區域 -->
+  <div id="result">
+    <h2>擲銭結果：</h2>
+    <pre id="coinResults">等待擲幣...</pre>
+    <h2>卦象：</h2>
+    <pre id="hexagramResult">等待累積六爻...</pre>
+    <h2>變卦：</h2>
+    <pre id="transformedHexagram">等待變卦...</pre>
+  </div>
+  
+  <!-- 載入 Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://threejs.org/examples/js/loaders/GLTFLoader.js"></script>
-  <script src="js/main.js"></script>
+  <!-- 載入 Cannon.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+  <!-- 主程式碼 -->
+  <script src="./js/main.js"></script>
 </body>
 </html>
