@@ -65,6 +65,26 @@ canvas {
   display: none;
 }
 
+#explanationUI::-webkit-scrollbar {
+    width: 10px;
+}
+
+#explanationUI::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3); 
+  border-radius: 12px; 
+}
+
+#explanationUI::-webkit-scrollbar-thumb {
+  background: rgba(209, 186, 110, 0.651);
+  border-radius: 10px; 
+  border: 2px solid rgba(30, 11, 0, 0.2);
+  cursor: pointer; 
+}
+
+#explanationUI::-webkit-scrollbar-thumb:hover {
+  background: rgba(180, 143, 75, 0.5); 
+}
+
 /* 右側結果區 */
 #result {
   flex: 0 0 306px;

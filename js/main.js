@@ -203,7 +203,7 @@ function tossCoins() {
   coinBodies.forEach(body => {
     body.velocity.set(
       (Math.random() - 0.5) * 10, //X
-      1 + Math.random() * 2,     //y
+      10 + Math.random() * 2,     //y
       (Math.random() - 0.5) * 3  //z
     );
     body.angularVelocity.set(
