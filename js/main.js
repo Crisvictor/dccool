@@ -2,7 +2,7 @@
 let hexagramData = null;
 
 function loadHexagramData() {
-  return fetch("/hexagrams.json")
+  return fetch("hexagrams.json")
     .then(response => response.json())
     .then(data => {
       hexagramData = data;
@@ -93,7 +93,7 @@ world.addBody(groundBody);
 // ==============================
 const textureLoader = new THREE.TextureLoader();
 const headsTexture = textureLoader.load(
-  "/assets/textures/heads.png",
+  "assets/textures/heads.png",
   function () {
     console.log("heads.png 載入成功");
   },
@@ -104,7 +104,7 @@ const headsTexture = textureLoader.load(
 );
 
 const tailsTexture = textureLoader.load(
-  "/assets/textures/tails.png",
+  "assets/textures/tails.png",
   function () {
     console.log("tails.png 載入成功");
   },
@@ -203,7 +203,7 @@ function tossCoins() {
   coinBodies.forEach(body => {
     body.velocity.set(
       (Math.random() - 0.5) * 10, //X
-      10 + Math.random() * 2,     //y
+      1 + Math.random() * 2,     //y
       (Math.random() - 0.5) * 3  //z
     );
     body.angularVelocity.set(
@@ -399,7 +399,7 @@ function updateHexagramDisplay() {
     throwButton.disabled = true;
     throwButton.style.opacity = 0.5;
     throwButton.style.cursor = "default";
-    
+  
     let transformedArray = hexagram.map(line => {
       if (line.isChanging) {
         if (line.type.indexOf("陽") > -1) { 
@@ -420,6 +420,7 @@ function updateHexagramDisplay() {
     });
     
     let transformedText = "";
+    const positions = ["初", "二", "三", "四", "五", "上"];
     for (let i = transformedArray.length - 1; i >= 0; i--) {
       const line = transformedArray[i];
       const isYang = line.type.indexOf("陽") > -1;
@@ -432,28 +433,33 @@ function updateHexagramDisplay() {
       }
       transformedText += `${positions[i]}爻： ${displayText} ${line.type} ${line.symbol}<br>`;
     }
+    
     let changedCount = hexagram.filter(line => line.isChanging).length;
     let extraText = "";
-    if (changedCount < 2) {
-      document.getElementById("transformedHexagram").style.display = "none";
+    if (changedCount < 1) {
+      document.getElementById("coinResultsTransformed").style.display = "none";
+    } else if (changedCount === 1) {
+      extraText = "<span style='color:rgba(255, 197, 158, 0.95);'>以本卦的變爻解卦</span>";
     } else if (changedCount === 2) {
-      extraText = "以本卦的兩個變爻解卦，上爻為主。";
+      extraText = "<span style='color:rgba(255, 197, 158, 0.95);'>以本卦的兩個變爻解卦，上爻為主</span>";
     } else if (changedCount === 3) {
-      extraText = "以兩卦卦義解卦，變卦為主。";
+      extraText = "<span style='color:rgba(255, 197, 158, 0.95);'>以兩卦卦義解卦，變卦為主</span>";
     } else if (changedCount === 4) {
-      extraText = "以變卦未變的兩爻解卦，下爻為主。";
+      extraText = "<span style='color:rgba(255, 197, 158, 0.95);'>以變卦未變的兩爻解卦，下爻為主</span>";
     } else if (changedCount === 5) {
-      extraText = "以變卦未變的一爻解卦。";
+      extraText = "<span style='color:rgba(255, 197, 158, 0.95);'>以變卦未變的一爻解卦</span>";
     } else if (changedCount === 6) {
-      extraText = "乾卦為『用九』，坤卦為『用六』。餘卦六二卦以變卦卦義解卦。";
+      extraText = "<span style='color:rgba(255, 197, 158, 0.95);'>乾卦為『用九』，坤卦為『用六』<br>餘卦六二卦以變卦卦義解卦</span>";
     }
-    if (changedCount >= 2) {
-      document.getElementById("transformedHexagram").style.display = "block";
-      document.getElementById("transformedHexagram").innerHTML = transformedText +
-        `<br><strong>變卦相應凶吉:</strong><br>${extraText}`;
+  
+    if (changedCount >= 1) {
+      document.getElementById("coinResultsTransformed").style.display = "block";
+      let finalTransformedHTML = transformedText +
+        `<br><strong>變卦解卦 ——</strong><br>${extraText}`;
+      document.getElementById("transformedHexagram").innerHTML = finalTransformedHTML;
     }
     
-    // 凶吉判定：
+    // 凶吉判定原卦：
     function pairResult(indexA, indexB) {
       const isYangA = hexagram[indexA].type.indexOf("陽") > -1;
       const isYangB = hexagram[indexB].type.indexOf("陽") > -1;
@@ -463,13 +469,9 @@ function updateHexagramDisplay() {
     const pair2 = pairResult(4, 1);
     const pair3 = pairResult(3, 0);
     const pairSummary = `<span style='color:rgba(255,229,158,0.95);'><br>上爻：${pair1}<br>中爻：${pair2}<br>下爻：${pair3}</span>`;
-    function pairResultTransformed(indexA, indexB) {
-      const isYangA = transformedArray[indexA].type.indexOf("陽") > -1;
-      const isYangB = transformedArray[indexB].type.indexOf("陽") > -1;
-      return (isYangA !== isYangB) ? "吉" : "凶";
-    }
+    document.getElementById("hexagramResult").innerHTML += `<br><strong>本卦相應凶吉 ——</strong> ${pairSummary}`;
     
-    document.getElementById("transformedHexagram").innerHTML = transformedText;
+    // 變卦凶吉判定：
     function pairResultTransformed(indexA, indexB) {
       const isYangA = transformedArray[indexA].type.indexOf("陽") > -1;
       const isYangB = transformedArray[indexB].type.indexOf("陽") > -1;
@@ -478,16 +480,14 @@ function updateHexagramDisplay() {
     const tPair1 = pairResultTransformed(5, 2);
     const tPair2 = pairResultTransformed(4, 1);
     const tPair3 = pairResultTransformed(3, 0);
-  
     function getPairDescription(pairName, result) {
       return pairName + result;
     }
-    const tPairSummary = "<br><span style='color:rgba(255,229,158,0.95);'>" + getPairDescription("上爻：", tPair1) + "<br>" +
+    const tPairSummary = "<br><span style='color:rgba(255,229,158,0.95);'>" + 
+                          getPairDescription("上爻：", tPair1) + "<br>" +
                           getPairDescription("中爻：", tPair2) + "<br>" +
-                          getPairDescription("下爻：", tPair3) + "</span>" ;
-    
-    document.getElementById("hexagramResult").innerHTML += `<br><strong>本卦相應凶吉——</strong> ${pairSummary}`;
-    document.getElementById("transformedHexagram").innerHTML += `<br><strong>變卦相應凶吉——</strong> ${tPairSummary}`;
+                          getPairDescription("下爻：", tPair3) + "</span>";
+    document.getElementById("transformedHexagram").innerHTML += `<br><strong>變卦相應凶吉 ——</strong> ${tPairSummary}`;
   }
 }
 
@@ -505,7 +505,7 @@ function interpretHexagram(baseHexagram) {
 }
 
 function getHexagramInterpretation(baseHexagram) {
-  fetch("/hexagrams.json")
+  fetch("hexagrams.json")
     .then(response => response.json())
     .then(data => {
       const hexagramInfo = data[baseHexagram];
