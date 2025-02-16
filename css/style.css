@@ -67,12 +67,12 @@ canvas {
 
 /* 右側結果區 */
 #result {
-  flex: 0 0 300px;
+  flex: 0 0 306px;
   background: rgba(253, 198, 146, 0.1);
   border: 2px solid rgba(255, 207, 168, 0.3);
   color: #fff;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 8px;
   font-family: 'ThePeakFont', Arial, sans-serif !important;
   font-size: 20px;
   overflow-y: auto;
@@ -81,6 +81,12 @@ canvas {
 
 #hexagramResult, #coinResults, #transformedHexagram {
   font-family: 'ThePeakFont', Arial, sans-serif !important;
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  padding: 5px;
+  overflow: visible;
+  height: auto;
 }
 
 #coinResultsTransformed {
