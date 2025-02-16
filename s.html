@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+  <link rel="icon" href="img/bagua.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="img/bagua.ico" type="image/x-icon">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>易經卜卦-卦象生成</title>
+  <title>易經卜卦-金錢問卦</title>
   <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
@@ -12,18 +14,32 @@
   
   <!-- 控制面板：擲銭與重置 -->
   <div id="controls">
-    <button id="throwButton">擲出錢幣</button>
+    <button id="throwButton">擲錢問卜</button>
     <button id="resetButton">重置卜卦</button>
   </div>
   
   <!-- 結果顯示區域 -->
-  <div id="result">
-    <h2>擲銭結果：</h2>
-    <pre id="coinResults">等待擲幣...</pre>
-    <h2>卦象：</h2>
-    <pre id="hexagramResult">等待累積六爻...</pre>
-    <h2>變卦：</h2>
-    <pre id="transformedHexagram">等待變卦...</pre>
+  <div id="uiContainer">
+    <div id="explanationUI">
+      <div id="interpretation"></div>
+      <div id="explanationList"></div>
+      <div id="explanationDetail"></div>
+      <div id="transformedInterpretation"></div>
+      <div id="transformedExplanationList"></div>
+      <div id="transformedExplanationDetail"></div>
+    </div>
+    <div id="result">
+      <div id="coinResultsContainer">
+        <h2>擲錢結果：</h2>
+        <pre id="coinResults">等待擲幣...</pre>
+      </div>
+      <h2>本卦：</h2>
+      <pre id="hexagramResult">等待累積六爻...</pre>
+      <div id="coinResultsTransformed"></div>
+        <h2>變卦：</h2>
+        <pre id="transformedHexagram">等待變卦...</pre>
+      </div>
+    </div>
   </div>
   
   <!-- 載入 Three.js -->
