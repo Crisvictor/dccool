@@ -604,8 +604,8 @@ function showTransformedExplanation(aspect, text) {
 }
 
 //3D音效
-const coinClinkSound = new Audio("sounds/coinClink.mp3");
-const coinHitSound = new Audio("sounds/coinHitSurface.mp3");
+const coinClinkSound = new Audio("m/coinClink.mp3");
+const coinHitSound = new Audio("m/coinHitSurface.mp3");
 
 coinBody.addEventListener("collide", function(event) {
   if (event.body === groundBody) {
