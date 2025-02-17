@@ -171,22 +171,96 @@ function createCoins() {
       (Math.random() - 0.5) * Math.PI
     );
     console.log("coinBody:", coinBody);
-  
     world.addBody(coinBody);
     coinBodies.push(coinBody);
-  
     coinMesh.userData.physicsBody = coinBody;
-
     // 物理屬性
     coinBody.material = new CANNON.Material();
     coinBody.material.restitution = 0.9; // 反彈
     coinBody.material.friction = 0.5;    // 摩擦
     coinBody.linearDamping = 0.2;        // 線性阻力
     coinBody.angularDamping = 0.05;       // 角阻力
-
   }
 createCoins();
 }
+
+//3D音效
+const coinClinkSound = new Audio("m/coinClink.mp3");
+const coinHitSound = new Audio("m/coinHitSurface.mp3");
+
+coinBody.addEventListener("collide", function(event) {
+  if (event.body === groundBody) {
+    // 錢與地面相撞
+    coinHitSound.currentTime = 0; 
+    coinHitSound.play();
+  } else if (event.body && event.body.mass > 0) {
+    // 假設 mass > 0 的其他剛體可以視為其他錢幣
+    coinClinkSound.currentTime = 0;
+    coinClinkSound.play();
+  }
+});
+//音效防抖機制
+let lastCollisionTime = 0;
+const collisionDebounceInterval = 200; // 200 毫秒內不重複播放
+coinBody.addEventListener("collide", function(event) {
+  const currentTime = performance.now();
+  if (currentTime - lastCollisionTime < collisionDebounceInterval) {
+    return; 
+  }
+  lastCollisionTime = currentTime;
+  if (event.body === groundBody) {
+    coinHitSound.currentTime = 0;
+    coinHitSound.play();
+  } else if (event.body && event.body.mass > 0) {
+    coinClinkSound.currentTime = 0;
+    coinClinkSound.play();
+  }
+});
+//音效控制器
+const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/groovy-funk.mp3');
+bgmAudio.loop = true; // 設置 BGM 循環播放
+bgmAudio.volume = 0.5; // 預設音量
+
+const volumeSlider = document.getElementById('volume-slider');
+const bgmButton = document.getElementById('bgm-button');
+const muteIcon = '🔇';
+const playIcon = '♫';
+const pauseIcon = '❚❚';
+
+const soundList = [coinClinkSound, coinHitSound /*, 其他音效 */ ];
+soundList.forEach(sound => sound.volume = 0.5);
+coinClinkSound.volume = 0.6;
+coinHitSound.volume = 0.6;
+
+volumeSlider.addEventListener('input', (event) => {
+    const volume = parseFloat(event.target.value);
+    // 調整 BGM 音量
+    bgmAudio.volume = volume;
+    // 更新所有音效音量
+    soundList.forEach(sound => sound.volume = volume);
+    if (volume === 0) {
+        bgmButton.textContent = muteIcon;
+    } else {
+        bgmButton.textContent = isPlaying ? pauseIcon : playIcon;
+    }
+});
+
+let isPlaying = false;
+bgmButton.addEventListener('click', () => {
+    if (volumeSlider.value === '0') {
+        alert('音量為零，請先調高音量再播放！');
+        return;
+    }
+    if (isPlaying) {
+        bgmAudio.pause();
+        bgmButton.textContent = playIcon;
+    } else {
+        bgmAudio.play();
+        bgmButton.textContent = pauseIcon;
+    }
+    isPlaying = !isPlaying;
+});
+
 // ==============================
 // 5. 擲幣操作與結果判斷
 // ==============================
@@ -374,7 +448,6 @@ function updateHexagramDisplay() {
     } else {
       displayText = yinYangText + positions[i];
     }
-    
     hexagramText += `${positions[i]}爻： ${displayText} ${line.type} ${line.symbol}<br>`;
   }
   
@@ -603,84 +676,6 @@ function showTransformedExplanation(aspect, text) {
   });
   detailDiv.appendChild(backBtn);
 }
-
-//3D音效
-const coinClinkSound = new Audio("m/coinClink.mp3");
-const coinHitSound = new Audio("m/coinHitSurface.mp3");
-
-coinBody.addEventListener("collide", function(event) {
-  if (event.body === groundBody) {
-    // 錢與地面相撞
-    coinHitSound.currentTime = 0; 
-    coinHitSound.play();
-  } else if (event.body && event.body.mass > 0) {
-    // 假設 mass > 0 的其他剛體可以視為其他錢幣
-    coinClinkSound.currentTime = 0;
-    coinClinkSound.play();
-  }
-});
-//音效防抖機制
-let lastCollisionTime = 0;
-const collisionDebounceInterval = 200; // 200 毫秒內不重複播放
-coinBody.addEventListener("collide", function(event) {
-  const currentTime = performance.now();
-  if (currentTime - lastCollisionTime < collisionDebounceInterval) {
-    return; 
-  }
-  lastCollisionTime = currentTime;
-  if (event.body === groundBody) {
-    coinHitSound.currentTime = 0;
-    coinHitSound.play();
-  } else if (event.body && event.body.mass > 0) {
-    coinClinkSound.currentTime = 0;
-    coinClinkSound.play();
-  }
-});
-//音效控制器
-const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/groovy-funk.mp3');
-bgmAudio.loop = true; // 設置 BGM 循環播放
-bgmAudio.volume = 0.5; // 預設音量
-
-const volumeSlider = document.getElementById('volume-slider');
-const bgmButton = document.getElementById('bgm-button');
-
-const muteIcon = '🔇';
-const playIcon = '♫';
-const pauseIcon = '❚❚';
-
-const soundList = [coinClinkSound, coinHitSound /*, 其他音效 */ ];
-soundList.forEach(sound => sound.volume = 0.5);
-coinClinkSound.volume = 0.6;
-coinHitSound.volume = 0.6;
-
-volumeSlider.addEventListener('input', (event) => {
-    const volume = parseFloat(event.target.value);
-    // 調整 BGM 音量
-    bgmAudio.volume = volume;
-    // 更新所有音效音量
-    soundList.forEach(sound => sound.volume = volume);
-    if (volume === 0) {
-        bgmButton.textContent = muteIcon;
-    } else {
-        bgmButton.textContent = isPlaying ? pauseIcon : playIcon;
-    }
-});
-
-let isPlaying = false;
-bgmButton.addEventListener('click', () => {
-    if (volumeSlider.value === '0') {
-        alert('音量為零，請先調高音量再播放！');
-        return;
-    }
-    if (isPlaying) {
-        bgmAudio.pause();
-        bgmButton.textContent = playIcon;
-    } else {
-        bgmAudio.play();
-        bgmButton.textContent = pauseIcon;
-    }
-    isPlaying = !isPlaying;
-});
 
 // ==============================
 // 6. 動畫循環與物理步進
