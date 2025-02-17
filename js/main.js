@@ -142,6 +142,9 @@ const coinMaterials = [edgeMaterial, headsMaterial, tailsMaterial];
 // ==============================
 // 4. 建立硬幣模型與物理剛體
 // ==============================
+const coinClinkSound = new Audio("m/coinClink.mp3");
+const coinHitSound = new Audio("m/coinHitSurface.mp3");
+
 const coinGeometry = new THREE.CylinderGeometry(coinRadius, coinRadius, coinThickness, 32);
 coinGeometry.translate(coinThickness / 2 ,0 , 0); 
 
@@ -174,48 +177,33 @@ function createCoins() {
     world.addBody(coinBody);
     coinBodies.push(coinBody);
     coinMesh.userData.physicsBody = coinBody;
+    
     // 物理屬性
     coinBody.material = new CANNON.Material();
     coinBody.material.restitution = 0.9; // 反彈
     coinBody.material.friction = 0.5;    // 摩擦
     coinBody.linearDamping = 0.2;        // 線性阻力
     coinBody.angularDamping = 0.05;       // 角阻力
+
+    // 將碰撞事件監聽器（包含防抖）
+    coinBody.addEventListener("collide", function(event) {
+      const currentTime = performance.now();
+      if (currentTime - lastCollisionTime < collisionDebounceInterval) {
+        return; 
+      }
+      lastCollisionTime = currentTime;
+      if (event.body === groundBody) {
+        coinHitSound.currentTime = 0;
+        coinHitSound.play();
+      } else if (event.body && event.body.mass > 0) {
+        coinClinkSound.currentTime = 0;
+        coinClinkSound.play();
+      }
+    });
   }
-createCoins();
 }
+createCoins();
 
-//3D音效
-const coinClinkSound = new Audio("m/coinClink.mp3");
-const coinHitSound = new Audio("m/coinHitSurface.mp3");
-
-coinBody.addEventListener("collide", function(event) {
-  if (event.body === groundBody) {
-    // 錢與地面相撞
-    coinHitSound.currentTime = 0; 
-    coinHitSound.play();
-  } else if (event.body && event.body.mass > 0) {
-    // 假設 mass > 0 的其他剛體可以視為其他錢幣
-    coinClinkSound.currentTime = 0;
-    coinClinkSound.play();
-  }
-});
-//音效防抖機制
-let lastCollisionTime = 0;
-const collisionDebounceInterval = 200; // 200 毫秒內不重複播放
-coinBody.addEventListener("collide", function(event) {
-  const currentTime = performance.now();
-  if (currentTime - lastCollisionTime < collisionDebounceInterval) {
-    return; 
-  }
-  lastCollisionTime = currentTime;
-  if (event.body === groundBody) {
-    coinHitSound.currentTime = 0;
-    coinHitSound.play();
-  } else if (event.body && event.body.mass > 0) {
-    coinClinkSound.currentTime = 0;
-    coinClinkSound.play();
-  }
-});
 //音效控制器
 const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/groovy-funk.mp3');
 bgmAudio.loop = true; // 設置 BGM 循環播放
@@ -244,7 +232,6 @@ volumeSlider.addEventListener('input', (event) => {
         bgmButton.textContent = isPlaying ? pauseIcon : playIcon;
     }
 });
-
 let isPlaying = false;
 bgmButton.addEventListener('click', () => {
     if (volumeSlider.value === '0') {
