@@ -203,9 +203,72 @@ z-index: 5;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8);
 }
 
-#moveGroundButton {
-  position: absolute;
-  bottom: 20px;
-  left: 150px;
-  z-index: 2100;
+#volume-slider {
+  width: 90px;
+  height: 6px;
+  cursor: pointer;
+}
+
+#bgm-button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(79, 101, 121, 0.3);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0; 
+  margin: 0; 
+  line-height: 18px;
+  box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
+  transition: all 0.2s ease;
+}
+
+#bgm-button:hover {
+  background-color: rgba(92, 126, 158, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
+}
+
+.transparent-btn {
+  position: relative; 
+  font-size: 18px! important;
+  background: transparent;
+  border-radius: 50%;
+  box-shadow: 
+    inset 0px 1px 3px rgba(255, 255, 255, 0.4), 
+    inset 0px -1px 2px rgba(0, 0, 0, 0.4), 
+    0px 4px 6px rgba(0, 0, 0, 0.2); 
+  color: #fff;
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5em;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+
+.transparent-btn:last-child {
+  margin-right: 0;
+}
+
+.transparent-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 
+    inset 0px 2px 4px rgba(255, 255, 255, 0.8), 
+    inset 0px -3px 5px rgba(0, 0, 0, 0.4),
+    0px 8px 10px rgba(0, 0, 0, 0.4);
+}
+
+.transparent-btn:active {
+  transform: scale(0.95);
+  box-shadow: 
+    0px 2px 3px rgba(0, 0, 0, 0.4), 
+    inset 0px 1px 3px rgba(0, 0, 0, 0.6); 
 }
