@@ -25,6 +25,9 @@ let coins = [];
 let coinBodies = [];  
 let tossInProgress = false;
 let restTimer = 0;
+let lastCollisionTime = 0;
+const collisionDebounceInterval = 100;  // 100 毫秒內不重複播放
+const impactThreshold = 2.0 // 撞擊音效衝擊速度閾值
 const restThreshold = 1.3;
 const timeStep = 1 / 60; 
 const hexagram = []; 
@@ -41,18 +44,11 @@ camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight,
 camera.position.set(0, 5, 6);
 camera.lookAt(0, 0, 0);
 
-renderer = new THREE.WebGLRenderer({ antialias: false });
-renderer.setPixelRatio(0.85); // 降低渲染負擔
-renderer.setSize(window.innerWidth / 1.2, window.innerHeight / 1.2); // 降低解析度
+renderer = new THREE.WebGLRenderer({ antialias: true }); //消除鋸齒
+renderer.setSize(window.innerWidth, window.innerHeight); //解析度
 document.getElementById("container").appendChild(renderer.domElement);
 
 // 燈光
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
-scene.add(ambientLight);
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
-directionalLight.position.set(5, 10, 7.5);
-scene.add(directionalLight);
-//聚光燈
 const spotLight = new THREE.SpotLight(0xffffff, 1);
 spotLight.position.set(0, 20, -9);
 spotLight.angle = Math.PI / 8;       // 聚光燈的光束角度
@@ -64,17 +60,29 @@ spotLight.castShadow = true;
 spotLight.shadow.mapSize.width = 1024;
 spotLight.shadow.mapSize.height = 1024;
 spotLight.shadow.camera.near = 5;
-spotLight.shadow.camera.far = 50;
+spotLight.shadow.camera.far = 40;
 
 scene.add(spotLight);
 
-// 建立地板（Three.js）
-const groundGeometry = new THREE.PlaneGeometry(20, 20);
-const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x5c0b0b });
+// 建立地面貼圖
+const textureLoader = new THREE.TextureLoader();
+const texture = textureLoader.load('img/Tebo1.png');
+texture.wrapS = THREE.ClampToEdgeWrapping;
+texture.wrapT = THREE.ClampToEdgeWrapping;
+texture.repeat.set(1.8, 1.8);
+texture.offset.set(-0.4, -0.4);
+// 建立地面材質
+const groundMaterial = new THREE.MeshStandardMaterial({
+    color: 0x5c0b0b, // 保持原本的顏色
+    map: texture, // 貼圖
+    transparent: false, // 確保透明部分可見
+    premultipliedAlpha: false, // 避免透明部分變黑
+});
+// 創建地面
+const groundGeometry = new THREE.PlaneGeometry(20, 20); // 地面大小
 const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
 groundMesh.rotation.x = -Math.PI / 2;
 scene.add(groundMesh);
-
 // ==============================
 // 2. Cannon.js 物理世界初始化
 // ==============================
@@ -92,7 +100,6 @@ world.addBody(groundBody);
 // ==============================
 // 3. 貼圖與硬幣材質 (多材質)
 // ==============================
-const textureLoader = new THREE.TextureLoader();
 const headsTexture = textureLoader.load(
   "assets/textures/heads.png",
   function () {
@@ -125,12 +132,16 @@ const edgeMaterial = new THREE.MeshStandardMaterial({
 // 正面與反面材質
 const headsMaterial = new THREE.MeshStandardMaterial({
   map: headsTexture,
+  transparent: true, 
+  alphaTest: 0.5,
   color: 0xffffff, 
   metalness: 0.5,
   roughness: 0.4,
 });
 const tailsMaterial = new THREE.MeshStandardMaterial({
   map: tailsTexture,
+  transparent: true, 
+  alphaTest: 0.5,
   color: 0xffffff,
   metalness: 0.5,
   roughness: 0.4,
@@ -185,13 +196,21 @@ function createCoins() {
     coinBody.linearDamping = 0.2;        // 線性阻力
     coinBody.angularDamping = 0.05;       // 角阻力
 
-    // 將碰撞事件監聽器（包含防抖）
+    // 音效-碰撞事件監聽器
     coinBody.addEventListener("collide", function(event) {
       const currentTime = performance.now();
       if (currentTime - lastCollisionTime < collisionDebounceInterval) {
-        return; 
+        return;
       }
       lastCollisionTime = currentTime;
+      let impactVelocity = 0;
+      if (event.contact && typeof event.contact.getImpactVelocityAlongNormal === "function") {
+        impactVelocity = event.contact.getImpactVelocityAlongNormal();
+      }
+      if (impactVelocity < impactThreshold) {
+        return;
+      }
+            lastCollisionTime = currentTime;
       if (event.body === groundBody) {
         coinHitSound.currentTime = 0;
         coinHitSound.play();
@@ -205,9 +224,9 @@ function createCoins() {
 createCoins();
 
 //音效控制器
-const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/groovy-funk.mp3');
+const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/47.mp3');
 bgmAudio.loop = true; // 設置 BGM 循環播放
-bgmAudio.volume = 0.5; // 預設音量
+bgmAudio.volume = 0.4; // 預設音量
 
 const volumeSlider = document.getElementById('volume-slider');
 const bgmButton = document.getElementById('bgm-button');
