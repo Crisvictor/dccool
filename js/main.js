@@ -173,10 +173,10 @@ function createCoins() {
     
     // 物理屬性
     coinBody.material = new CANNON.Material();
-    coinBody.material.restitution = 0.8; // 反彈
-    coinBody.material.friction = 0.4;    // 摩擦
-    coinBody.linearDamping = 0.1;        // 線性阻力
-    coinBody.angularDamping = 0.1;       // 角阻力
+    coinBody.material.restitution = 0.9; // 反彈
+    coinBody.material.friction = 0.5;    // 摩擦
+    coinBody.linearDamping = 0.2;        // 線性阻力
+    coinBody.angularDamping = 0.05;       // 角阻力
     
     world.addBody(coinBody);
     coinBodies.push(coinBody);
@@ -241,17 +241,14 @@ function isHeads(coin) {
   localUp.applyQuaternion(coin.quaternion);
   return localUp.y > 0.5;
 }
-
 function checkTossResult(delta) {
   if (!tossInProgress) return;
-  
   let allAtRest = true;
   coinBodies.forEach(body => {
     if (!isCoinAtRest(body)) {
       allAtRest = false;
     }
   });
-  
   if (allAtRest) {
     restTimer += delta;
     if (restTimer >= restThreshold) {
@@ -259,15 +256,6 @@ function checkTossResult(delta) {
       tossInProgress = false;
       restTimer = 0;
     }
-  } else {
-    const currentTime = performance.now();
-    if (currentTime - tossStartTime >= 1000 && !moveButtonCreated) {
-      createMoveGroundButton();
-    }
-  }
-  
-  if (!allAtRest) {
-    removeMoveButton();
   }
 }
 
@@ -283,7 +271,6 @@ function triggerResult() {
   });
   resultText += `正面數量: ${headsCount}\n`;
   document.getElementById("coinResults").innerText = resultText;
-  
   let lineResult;
   if (headsCount === 3) {
     lineResult = { 
@@ -312,7 +299,6 @@ function triggerResult() {
   }
   hexagram.push(lineResult);
   updateHexagramDisplay();
-  
   if (hexagram.length === 6) {
     let baseHexagram = "";
     for (let i = 0; i < 6; i++) {
@@ -323,7 +309,6 @@ function triggerResult() {
     getHexagramInterpretation(baseHexagram);
     document.getElementById("coinResultsContainer").style.display = "none";
     document.getElementById("explanationUI").style.display = "block";
-    
     let transformedArray = hexagram.map(line => {
       if (line.isChanging) {
         if (line.type.indexOf("陽") > -1) {
@@ -347,7 +332,6 @@ function triggerResult() {
       transformedHexagramKey = (transformedArray[i].type.indexOf("陽") > -1 ? "1" : "0") + transformedHexagramKey;
     }
     console.log("transformedHexagramKey:", transformedHexagramKey);
-    
     if (transformedHexagramKey === globalBaseHexagram) {
       document.getElementById("transformedInterpretation").innerText = "本卦無變卦";
       document.getElementById("transformedExplanationList").style.display = "none";
@@ -619,48 +603,83 @@ function showTransformedExplanation(aspect, text) {
   detailDiv.appendChild(backBtn);
 }
 
-let moveButtonCreated = false;
+//3D音效
+const coinClinkSound = new Audio("sounds/coinClink.mp3");
+const coinHitSound = new Audio("sounds/coinHitSurface.mp3");
 
-function createMoveGroundButton() {
-  if (moveButtonCreated) return;
-  const button = document.createElement("button");
-  button.id = "moveGroundButton";
-  button.innerText = "乾坤挪移";
-  button.style.marginLeft = "10px";
-  button.style.opacity = 1;
-  button.style.cursor = "pointer";
-  button.addEventListener("click", shakeGround);
-  document.getElementById("controls").appendChild(button);
-  moveButtonCreated = true;
-}
-
-function removeMoveButton() {
-  const button = document.getElementById("moveGroundButton");
-  if (button) {
-    button.parentElement.removeChild(button);
+coinBody.addEventListener("collide", function(event) {
+  if (event.body === groundBody) {
+    // 錢與地面相撞
+    coinHitSound.currentTime = 0; 
+    coinHitSound.play();
+  } else if (event.body && event.body.mass > 0) {
+    // 假設 mass > 0 的其他剛體可以視為其他錢幣
+    coinClinkSound.currentTime = 0;
+    coinClinkSound.play();
   }
-  moveButtonCreated = false;
-}
+});
+//音效防抖機制
+let lastCollisionTime = 0;
+const collisionDebounceInterval = 200; // 200 毫秒內不重複播放
+coinBody.addEventListener("collide", function(event) {
+  const currentTime = performance.now();
+  if (currentTime - lastCollisionTime < collisionDebounceInterval) {
+    return; 
+  }
+  lastCollisionTime = currentTime;
+  if (event.body === groundBody) {
+    coinHitSound.currentTime = 0;
+    coinHitSound.play();
+  } else if (event.body && event.body.mass > 0) {
+    coinClinkSound.currentTime = 0;
+    coinClinkSound.play();
+  }
+});
+//音效控制器
+const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/groovy-funk.mp3');
+bgmAudio.loop = true; // 設置 BGM 循環播放
+bgmAudio.volume = 0.5; // 預設音量
 
-function shakeGround() {
-  const offsetX = (Math.random() - 0.5) * 0.4; // -0.2 ~ 0.2
-  const offsetZ = (Math.random() - 0.5) * 0.4;
-  
-  groundMesh.position.x += offsetX;
-  groundMesh.position.z += offsetZ;
+const volumeSlider = document.getElementById('volume-slider');
+const bgmButton = document.getElementById('bgm-button');
 
-  groundBody.position.x += offsetX;
-  groundBody.position.z += offsetZ;
+const muteIcon = '🔇';
+const playIcon = '♫';
+const pauseIcon = '❚❚';
 
-  setTimeout(() => {
-    groundMesh.position.x -= offsetX;
-    groundMesh.position.z -= offsetZ;
-    groundBody.position.x -= offsetX;
-    groundBody.position.z -= offsetZ;
-    restTimer = 0;
-    removeMoveButton();
-  }, 500);
-}
+const soundList = [coinClinkSound, coinHitSound /*, 其他音效 */ ];
+soundList.forEach(sound => sound.volume = 0.5);
+coinClinkSound.volume = 0.6;
+coinHitSound.volume = 0.6;
+
+volumeSlider.addEventListener('input', (event) => {
+    const volume = parseFloat(event.target.value);
+    // 調整 BGM 音量
+    bgmAudio.volume = volume;
+    // 更新所有音效音量
+    soundList.forEach(sound => sound.volume = volume);
+    if (volume === 0) {
+        bgmButton.textContent = muteIcon;
+    } else {
+        bgmButton.textContent = isPlaying ? pauseIcon : playIcon;
+    }
+});
+
+let isPlaying = false;
+bgmButton.addEventListener('click', () => {
+    if (volumeSlider.value === '0') {
+        alert('音量為零，請先調高音量再播放！');
+        return;
+    }
+    if (isPlaying) {
+        bgmAudio.pause();
+        bgmButton.textContent = playIcon;
+    } else {
+        bgmAudio.play();
+        bgmButton.textContent = pauseIcon;
+    }
+    isPlaying = !isPlaying;
+});
 
 // ==============================
 // 6. 動畫循環與物理步進
