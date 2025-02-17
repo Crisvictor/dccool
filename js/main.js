@@ -170,22 +170,23 @@ function createCoins() {
       (Math.random() - 0.5) * Math.PI,
       (Math.random() - 0.5) * Math.PI
     );
-    
+    console.log("coinBody:", coinBody);
+  
+    world.addBody(coinBody);
+    coinBodies.push(coinBody);
+  
+    coinMesh.userData.physicsBody = coinBody;
+
     // 物理屬性
     coinBody.material = new CANNON.Material();
     coinBody.material.restitution = 0.9; // 反彈
     coinBody.material.friction = 0.5;    // 摩擦
     coinBody.linearDamping = 0.2;        // 線性阻力
     coinBody.angularDamping = 0.05;       // 角阻力
-    
-    world.addBody(coinBody);
-    coinBodies.push(coinBody);
 
-    coinMesh.userData.physicsBody = coinBody;
   }
-}
 createCoins();
-
+}
 // ==============================
 // 5. 擲幣操作與結果判斷
 // ==============================
