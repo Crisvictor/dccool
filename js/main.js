@@ -42,8 +42,8 @@ camera.position.set(0, 5, 6);
 camera.lookAt(0, 0, 0);
 
 renderer = new THREE.WebGLRenderer({ antialias: false });
-renderer.setPixelRatio(0.75); // 降低渲染負擔
-renderer.setSize(window.innerWidth / 1.5, window.innerHeight / 1.5); // 降低解析度
+renderer.setPixelRatio(0.85); // 降低渲染負擔
+renderer.setSize(window.innerWidth / 1.2, window.innerHeight / 1.2); // 降低解析度
 document.getElementById("container").appendChild(renderer.domElement);
 
 // 燈光
