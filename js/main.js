@@ -38,6 +38,9 @@ const coinThickness = 0.05;
 // ==============================
 scene = new THREE.Scene();
 camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: false });
+renderer.setPixelRatio(0.75); // 降低渲染負擔
+renderer.setSize(window.innerWidth / 1.5, window.innerHeight / 1.5); // 降低解析度
 camera.position.set(0, 5, 6);
 camera.lookAt(0, 0, 0);
 
