@@ -16,21 +16,24 @@ function loadHexagramData() {
 document.addEventListener("DOMContentLoaded", () => {
   loadHexagramData();
 });
+
 // ==============================
 // 全域變數定義
 // ==============================
 let scene, camera, renderer;
 let world;
-let coins = [];     
-let coinBodies = [];  
+let coins = [];
+let coinBodies = [];
 let tossInProgress = false;
 let restTimer = 0;
+let globalHexagramInfo = null;
+let globalTransformedInfo = null;
 let lastCollisionTime = 0;
 const collisionDebounceInterval = 100;  // 100 毫秒內不重複播放
-const impactThreshold = 2.0 // 撞擊音效衝擊速度閾值
+const impactThreshold = 0.3;              // 撞擊音效衝擊速度閾值
 const restThreshold = 1.3;
-const timeStep = 1 / 60; 
-const hexagram = []; 
+const timeStep = 1 / 60;
+const hexagram = [];
 
 // 硬幣參數
 const coinRadius = 0.5;
@@ -44,45 +47,45 @@ camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight,
 camera.position.set(0, 5, 6);
 camera.lookAt(0, 0, 0);
 
-renderer = new THREE.WebGLRenderer({ antialias: true }); //消除鋸齒
-renderer.setSize(window.innerWidth, window.innerHeight); //解析度
+renderer = new THREE.WebGLRenderer({ antialias: true }); // 消除鋸齒
+renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById("container").appendChild(renderer.domElement);
 
-// 燈光
+// 燈光 - 使用聚光燈
 const spotLight = new THREE.SpotLight(0xffffff, 1);
 spotLight.position.set(0, 20, -9);
-spotLight.angle = Math.PI / 8;       // 聚光燈的光束角度
-spotLight.penumbra = 0.8;            // 邊緣柔和程度 (0~1，越高越柔和)
-spotLight.decay = 1;                 // 光線衰減
+spotLight.angle = Math.PI / 8;       // 聚光燈光束角度
+spotLight.penumbra = 0.8;            // 邊緣柔和程度
+spotLight.decay = 1;                 // 衰減
 spotLight.distance = 50;             // 有效距離
-// 陰影 
 spotLight.castShadow = true;
 spotLight.shadow.mapSize.width = 1024;
 spotLight.shadow.mapSize.height = 1024;
 spotLight.shadow.camera.near = 5;
 spotLight.shadow.camera.far = 40;
-
 scene.add(spotLight);
 
-// 建立地面貼圖
+// ------------------------------
+// 地面 (Three.js)
+// ------------------------------
 const textureLoader = new THREE.TextureLoader();
 const texture = textureLoader.load('img/Tebo1.png');
 texture.wrapS = THREE.ClampToEdgeWrapping;
 texture.wrapT = THREE.ClampToEdgeWrapping;
 texture.repeat.set(1.8, 1.8);
 texture.offset.set(-0.4, -0.4);
-// 建立地面材質
-const groundMaterial = new THREE.MeshStandardMaterial({
-    color: 0x5c0b0b, // 保持原本的顏色
-    map: texture, // 貼圖
-    transparent: false, // 確保透明部分可見
-    premultipliedAlpha: false, // 避免透明部分變黑
+
+const groundMeshMaterial = new THREE.MeshStandardMaterial({
+  color: 0x5c0b0b,
+  map: texture,
+  transparent: false,
+  premultipliedAlpha: false,
 });
-// 創建地面
-const groundGeometry = new THREE.PlaneGeometry(20, 20); // 地面大小
-const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
+const groundGeometry = new THREE.PlaneGeometry(20, 20);
+const groundMesh = new THREE.Mesh(groundGeometry, groundMeshMaterial);
 groundMesh.rotation.x = -Math.PI / 2;
 scene.add(groundMesh);
+
 // ==============================
 // 2. Cannon.js 物理世界初始化
 // ==============================
@@ -91,15 +94,21 @@ world.gravity.set(0, -9.82, 0);
 world.broadphase = new CANNON.NaiveBroadphase();
 world.solver.iterations = 10;
 
+// 建立 Cannon.js 地面材質（物理用）
+let groundPhysMaterial = new CANNON.Material("groundPhysMaterial");
+
+// 建立地面物理形狀與剛體
 const groundShape = new CANNON.Plane();
-const groundBody = new CANNON.Body({ mass: 0 });
+const groundBody = new CANNON.Body({ mass: 0, material: groundPhysMaterial });
 groundBody.addShape(groundShape);
 groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
 world.addBody(groundBody);
+console.log("Ground Body:", groundBody);
 
 // ==============================
 // 3. 貼圖與硬幣材質 (多材質)
 // ==============================
+// 載入銅錢正反面貼圖
 const headsTexture = textureLoader.load(
   "assets/textures/heads.png",
   function () {
@@ -124,40 +133,58 @@ const tailsTexture = textureLoader.load(
 
 // 側面材質 (金屬質感)
 const edgeMaterial = new THREE.MeshStandardMaterial({
-  color: 0xbdb76b,
-  metalness: 0.8,
-  roughness: 0.3,
+  color: 0xb5b073,
+  metalness: 0.4,
+  roughness: 0.5,
 });
 
 // 正面與反面材質
 const headsMaterial = new THREE.MeshStandardMaterial({
   map: headsTexture,
-  transparent: true, 
-  alphaTest: 0.5,
-  color: 0xffffff, 
-  metalness: 0.5,
-  roughness: 0.4,
-});
-const tailsMaterial = new THREE.MeshStandardMaterial({
-  map: tailsTexture,
-  transparent: true, 
+  transparent: true,
   alphaTest: 0.5,
   color: 0xffffff,
   metalness: 0.5,
   roughness: 0.4,
 });
-
-// CylinderGeometry 預設群組順序：0-側面、1-上面、2-下面
+const tailsMaterial = new THREE.MeshStandardMaterial({
+  map: tailsTexture,
+  transparent: true,
+  alphaTest: 0.5,
+  color: 0xffffff,
+  metalness: 0.5,
+  roughness: 0.4,
+});
 const coinMaterials = [edgeMaterial, headsMaterial, tailsMaterial];
+
+// ------------------------------
+// 為硬幣建立物理材質 (全域)
+// ------------------------------
+let coinMaterial = new CANNON.Material("coinMaterial");
+
+// 建立硬幣接觸材質： coin 與 ground
+const coinGroundContactMaterial = new CANNON.ContactMaterial(
+  coinMaterial,
+  groundPhysMaterial,
+  {
+    friction: 0.3,     // 摩擦
+    restitution: 0.4,  // 反彈
+  }
+);
+world.addContactMaterial(coinGroundContactMaterial);
 
 // ==============================
 // 4. 建立硬幣模型與物理剛體
 // ==============================
 const coinClinkSound = new Audio("m/coinClink.mp3");
-const coinHitSound = new Audio("m/coinHitSurface.mp3");
+const coinHitSoft = new Audio("m/coinHitSoft.mp3");
+const coinHitSoft1 = new Audio("m/coinHitSoft1.mp3");
+const coinHitMedium = new Audio("m/coinHitMedium.mp3");
+const coinHitHard = new Audio("m/coinHitHard.mp3");
 
+// 建立硬幣幾何
 const coinGeometry = new THREE.CylinderGeometry(coinRadius, coinRadius, coinThickness, 32);
-coinGeometry.translate(coinThickness / 2 ,0 , 0); 
+coinGeometry.translate(coinThickness / 2, 0, 0);
 
 function createCoins() {
   coins.forEach(coin => scene.remove(coin));
@@ -171,13 +198,12 @@ function createCoins() {
     scene.add(coinMesh);
     coins.push(coinMesh);
     
-    const coinBody = new CANNON.Body({ mass: 5 });
+    const coinBody = new CANNON.Body({ mass: 5, material: coinMaterial }); 
     const coinShape = new CANNON.Cylinder(coinRadius, coinRadius, coinThickness, 32);
     const shapeOffset = new CANNON.Vec3(0, 0, 0);
     const shapeOrientation = new CANNON.Quaternion();
     shapeOrientation.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
     coinBody.addShape(coinShape, shapeOffset, shapeOrientation);
-    
     coinBody.position.set(coinMesh.position.x, coinMesh.position.y, coinMesh.position.z);
     coinBody.quaternion.setFromEuler(
       (Math.random() - 0.5) * Math.PI,
@@ -189,20 +215,21 @@ function createCoins() {
     coinBodies.push(coinBody);
     coinMesh.userData.physicsBody = coinBody;
     
-    // 物理屬性
-    coinBody.material = new CANNON.Material();
-    coinBody.material.restitution = 0.9; // 反彈
-    coinBody.material.friction = 0.5;    // 摩擦
-    coinBody.linearDamping = 0.2;        // 線性阻力
-    coinBody.angularDamping = 0.05;       // 角阻力
-
-    // 音效-碰撞事件監聽器
+    // 其他物理屬性
+    coinBody.material.restitution = 0.2; // 反彈
+    coinBody.material.friction = 0.8;    // 摩擦
+    coinBody.linearDamping = 0.1;       // 線性阻尼
+    coinBody.angularDamping = 0.1;       // 旋力阻尼
+    coinBody.allowSleep = true;
+    
+    // 加入碰撞事件監聽器 (包含防抖與撞擊閾值)
     coinBody.addEventListener("collide", function(event) {
       const currentTime = performance.now();
       if (currentTime - lastCollisionTime < collisionDebounceInterval) {
         return;
       }
       lastCollisionTime = currentTime;
+      
       let impactVelocity = 0;
       if (event.contact && typeof event.contact.getImpactVelocityAlongNormal === "function") {
         impactVelocity = event.contact.getImpactVelocityAlongNormal();
@@ -210,11 +237,21 @@ function createCoins() {
       if (impactVelocity < impactThreshold) {
         return;
       }
-            lastCollisionTime = currentTime;
       if (event.body === groundBody) {
-        coinHitSound.currentTime = 0;
-        coinHitSound.play();
-      } else if (event.body && event.body.mass > 0) {
+        if (impactVelocity < 1) {
+          coinHitSoft.currentTime = 0;
+          coinHitSoft.play();
+        } else if (impactVelocity < 2) {
+          coinHitSoft1.currentTime = 0;
+          coinHitSoft1.play();
+        } else if (impactVelocity < 4) {
+          coinHitMedium.currentTime = 0;
+          coinHitMedium.play();
+        } else { 
+          coinHitHard.currentTime = 0;
+          coinHitHard.play();
+        }
+      } else if (event.body && event.body !== groundBody && event.body.mass > 0) {
         coinClinkSound.currentTime = 0;
         coinClinkSound.play();
       }
@@ -234,16 +271,16 @@ const muteIcon = '🔇';
 const playIcon = '♫';
 const pauseIcon = '❚❚';
 
-const soundList = [coinClinkSound, coinHitSound /*, 其他音效 */ ];
+const soundList = [coinClinkSound, coinHitHard, coinHitMedium, coinHitSoft];
 soundList.forEach(sound => sound.volume = 0.5);
 coinClinkSound.volume = 0.6;
-coinHitSound.volume = 0.6;
+coinHitHard.volume = 0.6;
+coinHitMedium.volume = 0.6;
+coinHitSoft.volume = 0.6;
 
 volumeSlider.addEventListener('input', (event) => {
     const volume = parseFloat(event.target.value);
-    // 調整 BGM 音量
     bgmAudio.volume = volume;
-    // 更新所有音效音量
     soundList.forEach(sound => sound.volume = volume);
     if (volume === 0) {
         bgmButton.textContent = muteIcon;
@@ -305,12 +342,13 @@ function resetToss() {
   document.getElementById("transformedHexagram").innerText = "";
   const throwButton = document.getElementById("throwButton");
   document.getElementById("explanationUI").style.display = "none";
-  document.getElementById("coinResultsContainer").style.display = "block";
+  document.getElementById("coinResultsTransformed").style.display = "none";
+  document.getElementById("coinResults1").style.display = "none";
+  document.getElementById("coinResults").style.display = "block";
   throwButton.disabled = false;
   throwButton.style.opacity = 1;
   throwButton.style.cursor = "pointer";
   hexagram.length = 0;
-  removeMoveButton();
 }
 
 function isCoinAtRest(body) {
@@ -345,12 +383,12 @@ let globalBaseHexagram = "";
 function triggerResult() {
   let headsCount = 0;
   let resultText = "";
+  const coinNumbers = ["壹", "貳", "叁"]; 
   coins.forEach((coin, i) => {
-    const result = isHeads(coin) ? "正面" : "反面";
+    const result = isHeads(coin) ? "正" : "反";
     if (isHeads(coin)) headsCount++;
-    resultText += `硬幣 ${i + 1}: ${result}\n`;
+    resultText += `銅錢 ${coinNumbers[i]} 為 ${result}\n`;
   });
-  resultText += `正面數量: ${headsCount}\n`;
   document.getElementById("coinResults").innerText = resultText;
   let lineResult;
   if (headsCount === 3) {
@@ -388,7 +426,6 @@ function triggerResult() {
     globalBaseHexagram = baseHexagram;
     console.log("baseHexagram:", baseHexagram);
     getHexagramInterpretation(baseHexagram);
-    document.getElementById("coinResultsContainer").style.display = "none";
     document.getElementById("explanationUI").style.display = "block";
     let transformedArray = hexagram.map(line => {
       if (line.isChanging) {
@@ -420,12 +457,15 @@ function triggerResult() {
     } else {
       if (hexagramData && hexagramData[transformedHexagramKey]) {
         const transformedInfo = hexagramData[transformedHexagramKey];
+        globalTransformedInfo = transformedInfo;
         document.getElementById("transformedInterpretation").innerHTML =
           "變卦 —— " + transformedInfo.name + " (" + transformedInfo.pinyin + ")<br>" +
           "<span style='color:rgba(255,229,158,0.95); font-weight: normal;'>" + transformedInfo.summary + "</span><br><br>" +
           "<span style='color:rgb(255,202,158); font-weight: normal;'>" + transformedInfo.detailed + "</span><br>";
         initTransformedExplanationUI(transformedInfo);
+        getHexagramInterpretation(globalBaseHexagram, globalTransformedInfo);
       } else {
+        getHexagramInterpretation(globalBaseHexagram, null);
         document.getElementById("transformedInterpretation").innerText = "找不到對應的變卦資料";
         document.getElementById("transformedExplanationList").style.display = "none";
         document.getElementById("transformedExplanationDetail").style.display = "none";
@@ -504,23 +544,23 @@ function updateHexagramDisplay() {
     if (changedCount < 1) {
       document.getElementById("coinResultsTransformed").style.display = "none";
     } else if (changedCount === 1) {
-      extraText = "<span style='color:rgba(255, 197, 158, 0.95);'>以本卦的變爻解卦</span>";
+      extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以本卦的變爻解卦</span>";
     } else if (changedCount === 2) {
-      extraText = "<span style='color:rgba(255, 197, 158, 0.95);'>以本卦的兩個變爻解卦，上爻為主</span>";
+      extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以本卦的兩個變爻解卦，上爻為主</span>";
     } else if (changedCount === 3) {
-      extraText = "<span style='color:rgba(255, 197, 158, 0.95);'>以兩卦卦義解卦，變卦為主</span>";
+      extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以兩卦卦義解卦，變卦為主</span>";
     } else if (changedCount === 4) {
-      extraText = "<span style='color:rgba(255, 197, 158, 0.95);'>以變卦未變的兩爻解卦，下爻為主</span>";
+      extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以變卦未變的兩爻解卦，下爻為主</span>";
     } else if (changedCount === 5) {
-      extraText = "<span style='color:rgba(255, 197, 158, 0.95);'>以變卦未變的一爻解卦</span>";
+      extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以變卦未變的一爻解卦</span>";
     } else if (changedCount === 6) {
-      extraText = "<span style='color:rgba(255, 197, 158, 0.95);'>乾卦為『用九』，坤卦為『用六』<br>餘卦六二卦以變卦卦義解卦</span>";
+      extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>乾卦為『用九』，坤卦為『用六』<br>餘卦六二卦以變卦卦義解卦</span>";
     }
   
     if (changedCount >= 1) {
       document.getElementById("coinResultsTransformed").style.display = "block";
       let finalTransformedHTML = transformedText +
-        `<br><strong>變卦解卦 ——</strong><br>${extraText}`;
+        `<br><strong>解卦 ——</strong><br>${extraText}`;
       document.getElementById("transformedHexagram").innerHTML = finalTransformedHTML;
     }
     
@@ -533,8 +573,8 @@ function updateHexagramDisplay() {
     const pair1 = pairResult(5, 2);
     const pair2 = pairResult(4, 1);
     const pair3 = pairResult(3, 0);
-    const pairSummary = `<span style='color:rgba(255,229,158,0.95);'><br>上爻：${pair1}<br>中爻：${pair2}<br>下爻：${pair3}</span>`;
-    document.getElementById("hexagramResult").innerHTML += `<br><strong>本卦相應凶吉 ——</strong> ${pairSummary}`;
+    const pairSummary = `<span style='color:rgba(255,229,158,0.95); font-size: 16px;'><br>上爻：${pair1}<br>中爻：${pair2}<br>下爻：${pair3}</span>`;
+    document.getElementById("hexagramResult").innerHTML += `<br><strong>本卦爻位相應凶吉 ——</strong> ${pairSummary}`;
     
     // 變卦凶吉判定：
     function pairResultTransformed(indexA, indexB) {
@@ -548,11 +588,11 @@ function updateHexagramDisplay() {
     function getPairDescription(pairName, result) {
       return pairName + result;
     }
-    const tPairSummary = "<br><span style='color:rgba(255,229,158,0.95);'>" + 
+    const tPairSummary = "<br><span style='color:rgba(255,229,158,0.95); font-size: 16px;'>" + 
                           getPairDescription("上爻：", tPair1) + "<br>" +
                           getPairDescription("中爻：", tPair2) + "<br>" +
                           getPairDescription("下爻：", tPair3) + "</span>";
-    document.getElementById("transformedHexagram").innerHTML += `<br><strong>變卦相應凶吉 ——</strong> ${tPairSummary}`;
+    document.getElementById("transformedHexagram").innerHTML += `<br><strong>變卦爻位相應凶吉 ——</strong> ${tPairSummary}`;
   }
 }
 
@@ -569,7 +609,7 @@ function interpretHexagram(baseHexagram) {
   }
 }
 
-function getHexagramInterpretation(baseHexagram) {
+function getHexagramInterpretation(baseHexagram, globalTransformedInfo) {
   fetch("hexagrams.json")
     .then(response => response.json())
     .then(data => {
@@ -579,7 +619,14 @@ function getHexagramInterpretation(baseHexagram) {
           "本卦 —— " + hexagramInfo.name + " (" + hexagramInfo.pinyin + ")<br>" +
           "<span style='color:rgba(255, 229, 158, 0.95); font-weight: normal;'>" + hexagramInfo.summary + "</span><br><br>" +
           "<span style='color:rgb(255, 202, 158); font-weight: normal;'>" + hexagramInfo.detailed + "</span><br>";
-          initExplanationUI(hexagramInfo);
+        initExplanationUI(hexagramInfo);
+        let displayText = hexagramInfo.name;
+        if (globalTransformedInfo) {
+          displayText += " 之 " + globalTransformedInfo.name;
+        }
+        document.getElementById("coinResults").style.display = "none";
+        document.getElementById("coinResults1").style.display = "block";
+        document.getElementById("coinResults1").innerHTML = `<span style="color:rgb(255, 214, 100);">${displayText}</span>`;
       } else {
         console.error("找不到對應的卦象資料");
       }

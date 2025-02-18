@@ -11,12 +11,13 @@ html, body {
 }
 
 h2 {
-  font-size: 26px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  top: 10px;
-  left: 10px;
-  margin: 6px;
+  color: #ffec95ab;
+  font-size: 24px;
+  margin-bottom: 2px;
+  text-align: center;
+  top: 1px;
+  left: 1px;
+  margin: 4px 5px;
 }
 
 #container {
@@ -96,15 +97,15 @@ canvas {
 
 /* 右側結果區 */
 #result {
-  flex: 0 0 306px;
+  flex: 0 0 300px;
   background: rgba(253, 198, 146, 0.1);
   border: 2px solid rgba(255, 207, 168, 0.3);
   color: #fff;
   padding: 10px;
   border-radius: 8px;
   font-family: 'ThePeakFont', Arial, sans-serif !important;
-  font-size: 20px;
-  height: 82%;
+  font-size: 18px;
+  max height: 82%;
   overflow-y: auto;
   align-self: flex-start;
 }
@@ -130,7 +131,7 @@ background: rgba(180, 143, 75, 0.5);
 }
 
 
-#hexagramResult, #coinResults, #transformedHexagram {
+#hexagramResult, #coinResults, #coinResults1, #transformedHexagram {
   font-family: 'ThePeakFont', Arial, sans-serif !important;
   background: rgba(0, 0, 0, 0.2);
   border: 2px solid rgba(0, 0, 0, 0.2);
@@ -140,8 +141,27 @@ background: rgba(180, 143, 75, 0.5);
   height: auto;
 }
 
+#coinResults1 {
+  display: none;
+  font-size: 28px;
+  margin: 4px 0;
+  text-align: center;
+}
+
 #coinResultsTransformed {
   display: none;
+}
+
+#coinResultsContainer {
+  margin-bottom: 4px 19px;
+}
+
+#hexagramResult,
+#coinResults,
+#transformedHexagram {
+  margin: 4px 5px;   
+  padding: 4px;   
+  font-size: 20px;
 }
 
 #interpretation, #transformedInterpretation {
@@ -149,17 +169,17 @@ background: rgba(180, 143, 75, 0.5);
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;
-  top: 50px;
+  top: 20px;
   left: 10px;
-  margin: 6px;
+  margin: 4px 0;
 }
 
 #explanationList, #transformedExplanationList {
   width: 93%;
   font-size: 24px;
-  top: 120px;
+  top: 20px;
   left: 10px;
-  margin: 6px;
+  margin: 4px 0;
 }
 
 #transformedExplanationList, #transformedExplanationDetail {
@@ -169,10 +189,10 @@ background: rgba(180, 143, 75, 0.5);
 #explanationDetail, #transformedExplanationDetail {
   width: 93%;
   font-size: 24px;
-  top: 120px;
+  top: 20px;
   left: 10px;
   display: none;
-  margin: 6px;
+  margin: 4px 0;
 }
 
 #controls {
@@ -197,6 +217,7 @@ background: rgba(180, 143, 75, 0.5);
   margin-right: 40px;
   cursor: pointer;
   z-index: 1100;
+  color: #111;
   font-size: 18px;
   text-align: center;
   border-radius: 6px;
@@ -221,6 +242,7 @@ z-index: 5;
 
 #explanationUI button {
   font-family: 'ThePeakFont', Arial, sans-serif !important;
+  color: #111;
   font-size: 24px;
   border-radius: 6px;
   padding: 8px 8px;

@@ -34,19 +34,22 @@
     </div>
     <div id="result">
       <div id="coinResultsContainer">
-        <h2>擲錢結果：</h2>
         <pre id="coinResults">等待擲幣...</pre>
+        <pre id="coinResults1"></pre>
       </div>
-      <h2>本卦：</h2>
+      <h2>——— 本卦 ———</h2>
       <pre id="hexagramResult">等待累積六爻...</pre>
-      <div id="coinResultsTransformed" style="display:none;">
-        <h2>變卦：</h2>
+      <div id="coinResultsTransformed">
+        <h2>——— 變卦 ———</h2>
         <pre id="transformedHexagram">等待變卦...</pre>
       </div>
     </div>
   </div>
   <audio id="coinClinkSound" src="m/coinClink.mp3" preload="auto"></audio>
-  <audio id="coinHitSound" src="m/coinHitSurface.mp3" preload="auto"></audio>
+  <audio id="coinHitSoftSound" src="m/coinHitSoft.mp3" preload="auto"></audio>
+  <audio id="coinHitSoftSound" src="m/coinHitSoft1.mp3" preload="auto"></audio>
+  <audio id="coinHitMediumSound" src="m/coinHitMedium.mp3" preload="auto"></audio>
+  <audio id="coinHitHardSound" src="m/coinHitHard.mp3" preload="auto"></audio>
   <!-- 載入 Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- 載入 Cannon.js -->
