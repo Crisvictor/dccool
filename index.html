@@ -609,7 +609,7 @@ for (var i = 0; i < fishCount; i++) {
     fishes.push({
         x: Math.random() * fishCanvas.width,
         y: Math.random() * fishCanvas.height,
-        size: Math.random() * 20 + 10,
+        size: Math.random() * 25 + 10,
         speedX: (Math.random() - 0.5) * 2,
         speedY: (Math.random() - 0.5) * 2
     });
@@ -620,7 +620,7 @@ function drawFish(fish) {
     fishCtx.arc(fish.x, fish.y, fish.size, 0, 2 * Math.PI);
     fishCtx.fillStyle = 'rgba(68, 68, 68, 0.3)';
     fishCtx.shadowBlur = fish.size * 1.5;
-    fishCtx.shadowColor = 'rgba(38, 38, 38, 0.6)';
+    fishCtx.shadowColor = 'rgba(68, 68, 68, 0.6)';
     fishCtx.fill();
     fishCtx.shadowBlur = 0;
 }
