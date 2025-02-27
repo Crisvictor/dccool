@@ -618,8 +618,11 @@ for (var i = 0; i < fishCount; i++) {
 function drawFish(fish) {
     fishCtx.beginPath();
     fishCtx.arc(fish.x, fish.y, fish.size, 0, 2 * Math.PI);
-    fishCtx.fillStyle = 'rgba(68, 68, 68, 0.4)';
+    fishCtx.fillStyle = 'rgba(68, 68, 68, 0.3)';
+    fishCtx.shadowBlur = fish.size * 1.5;
+    fishCtx.shadowColor = 'rgba(38, 38, 38, 0.6)';
     fishCtx.fill();
+    fishCtx.shadowBlur = 0;
 }
 
 function updateFishes() {
