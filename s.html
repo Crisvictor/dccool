@@ -27,10 +27,12 @@
     <div id="explanationUI">
       <div id="interpretation"></div>
       <div id="explanationList"></div>
-      <div id="explanationDetail"></div>
+      <div id="explanationDetail" class="preformatted"></div>
+      <div id="YaoInterpretation" class="preformatted"></div>
       <div id="transformedInterpretation"></div>
       <div id="transformedExplanationList"></div>
-      <div id="transformedExplanationDetail"></div>
+      <div id="transformedExplanationDetail" class="preformatted"></div>
+      <div id="transformedYaoInterpretation" class="preformatted"></div>
     </div>
     <div id="result">
       <div id="coinResultsContainer">
@@ -43,6 +45,10 @@
         <h2>——— 變卦 ———</h2>
         <pre id="transformedHexagram">等待變卦...</pre>
       </div>
+      <div id="illustrateButtonContainer">
+        <button id="illustrateButton">卜卦說明</button>
+      </div>
+      <div id="illustrateBox"></div>
     </div>
   </div>
   <audio id="coinClinkSound" src="m/coinClink.mp3" preload="auto"></audio>

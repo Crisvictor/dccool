@@ -26,10 +26,11 @@ let coins = [];
 let coinBodies = [];
 let tossInProgress = false;
 let restTimer = 0;
+let globalBaseHexagram = "";
 let globalHexagramInfo = null;
 let globalTransformedInfo = null;
 let lastCollisionTime = 0;
-const collisionDebounceInterval = 100;  // 100 毫秒內不重複播放
+const collisionDebounceInterval = 50;  // 50 毫秒內不重複播放
 const impactThreshold = 0.3;              // 撞擊音效衝擊速度閾值
 const restThreshold = 1.3;
 const timeStep = 1 / 60;
@@ -103,7 +104,6 @@ const groundBody = new CANNON.Body({ mass: 0, material: groundPhysMaterial });
 groundBody.addShape(groundShape);
 groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
 world.addBody(groundBody);
-console.log("Ground Body:", groundBody);
 
 // ==============================
 // 3. 貼圖與硬幣材質 (多材質)
@@ -112,22 +112,22 @@ console.log("Ground Body:", groundBody);
 const headsTexture = textureLoader.load(
   "assets/textures/heads.png",
   function () {
-    console.log("heads.png 載入成功");
+    console.log("正圖像載入成功");
   },
   undefined,
   function (error) {
-    console.error("heads.png 載入錯誤", error);
+    console.error("正圖像載入錯誤", error);
   }
 );
 
 const tailsTexture = textureLoader.load(
   "assets/textures/tails.png",
   function () {
-    console.log("tails.png 載入成功");
+    console.log("背圖像載入成功");
   },
   undefined,
   function (error) {
-    console.error("tails.png 載入錯誤", error);
+    console.error("背圖像載入成功", error);
   }
 );
 
@@ -167,8 +167,8 @@ const coinGroundContactMaterial = new CANNON.ContactMaterial(
   coinMaterial,
   groundPhysMaterial,
   {
-    friction: 0.3,     // 摩擦
-    restitution: 0.4,  // 反彈
+    friction: 0.1,     // 摩擦
+    restitution: 0.15,  // 反彈
   }
 );
 world.addContactMaterial(coinGroundContactMaterial);
@@ -198,7 +198,7 @@ function createCoins() {
     scene.add(coinMesh);
     coins.push(coinMesh);
     
-    const coinBody = new CANNON.Body({ mass: 5, material: coinMaterial }); 
+    const coinBody = new CANNON.Body({ mass: 9, material: coinMaterial }); // 質量 
     const coinShape = new CANNON.Cylinder(coinRadius, coinRadius, coinThickness, 32);
     const shapeOffset = new CANNON.Vec3(0, 0, 0);
     const shapeOrientation = new CANNON.Quaternion();
@@ -210,15 +210,14 @@ function createCoins() {
       (Math.random() - 0.5) * Math.PI,
       (Math.random() - 0.5) * Math.PI
     );
-    console.log("coinBody:", coinBody);
     world.addBody(coinBody);
     coinBodies.push(coinBody);
     coinMesh.userData.physicsBody = coinBody;
     
     // 其他物理屬性
-    coinBody.material.restitution = 0.2; // 反彈
-    coinBody.material.friction = 0.8;    // 摩擦
-    coinBody.linearDamping = 0.1;       // 線性阻尼
+    coinBody.material.restitution = 0.3; // 反彈
+    coinBody.material.friction = 0.2;    // 摩擦
+    coinBody.linearDamping = 0.05;       // 線性阻尼
     coinBody.angularDamping = 0.1;       // 旋力阻尼
     coinBody.allowSleep = true;
     
@@ -318,7 +317,8 @@ function tossCoins() {
   throwButton.disabled = true;
   throwButton.style.opacity = 0.5;
   throwButton.style.cursor = "default";
-
+  document.getElementById("illustrateButtonContainer").style.display = "none";
+  document.getElementById("illustrateBox").style.display = "none";
   coinBodies.forEach(body => {
     body.velocity.set(
       (Math.random() - 0.5) * 10, //X
@@ -345,6 +345,8 @@ function resetToss() {
   document.getElementById("coinResultsTransformed").style.display = "none";
   document.getElementById("coinResults1").style.display = "none";
   document.getElementById("coinResults").style.display = "block";
+  document.getElementById("illustrateButtonContainer").style.display = "block";
+  document.getElementById("illustrateButton").style.display = "block";
   throwButton.disabled = false;
   throwButton.style.opacity = 1;
   throwButton.style.cursor = "pointer";
@@ -360,6 +362,101 @@ function isHeads(coin) {
   localUp.applyQuaternion(coin.quaternion);
   return localUp.y > 0.5;
 }
+
+//說明系統
+function showTopLevelMenu() {
+  illustrateBox.innerHTML = "";
+  const topMenuDiv = document.createElement("div");
+  topMenuDiv.id = "topMenu";
+
+  const btnQuestion = document.createElement("button");
+  btnQuestion.classList.add("menu-btn");
+  btnQuestion.textContent = "卜卦問法";
+  btnQuestion.setAttribute("data-type", "question");
+  topMenuDiv.appendChild(btnQuestion);
+
+  const btnKnowledge = document.createElement("button");
+  btnKnowledge.classList.add("menu-btn");
+  btnKnowledge.textContent = "卦象須知";
+  btnKnowledge.setAttribute("data-type", "knowledge");
+  topMenuDiv.appendChild(btnKnowledge);
+
+  const btnInterpretation = document.createElement("button");
+  btnInterpretation.classList.add("menu-btn");
+  btnInterpretation.textContent = "解卦須知";
+  btnInterpretation.setAttribute("data-type", "interpretation");
+  topMenuDiv.appendChild(btnInterpretation);
+
+  const returnBtn = document.createElement("button");
+  returnBtn.id = "closeMenu";
+  returnBtn.classList.add("menu-btn");
+  returnBtn.textContent = "退出說明";
+  topMenuDiv.appendChild(returnBtn);
+
+  illustrateBox.appendChild(topMenuDiv);
+  returnBtn.addEventListener("click", () => {
+    illustrateBox.style.display = "none";
+    illustrateButton.style.display = "block";
+  });
+  const menuButtons = topMenuDiv.querySelectorAll(".menu-btn[data-type]");
+  menuButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const type = btn.getAttribute("data-type");
+      showDetail(type);
+    });
+  });
+}
+
+const illustrateButton = document.getElementById("illustrateButton");
+const illustrateBox = document.getElementById("illustrateBox");
+function showTopLevelMenu() {
+  illustrateBox.innerHTML = `
+  <div id="topMenu">
+    <button class="menu-btn" data-type="question">卜卦問法</button>
+    <button class="menu-btn" data-type="knowledge">爻象須知</button>
+    <button class="menu-btn" data-type="interpretation">解卦須知</button>
+    <br>
+    <button id="closeMenu" class="menu-btn">退出說明</button>
+  </div>
+  `;
+  document.getElementById("closeMenu").addEventListener("click", () => {
+    illustrateBox.style.display = "none";
+    illustrateButton.style.display = "block";
+  });
+  const menuButtons = document.querySelectorAll("#topMenu .menu-btn");
+  menuButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      let type = btn.getAttribute("data-type");
+      showDetail(type);
+    });
+  });
+}
+function showDetail(type) {
+  let content = "";
+  if (type === "question") {
+    content = "◆ 誠心與靜心冥想你的問題，心唸弟子某某某，何事問卦...。(擲出六爻求出卦象解卦)<br>◆ 若問某事吉凶可如此提問：所問何事，弟子欲做何選擇 / 決定，想問吉凶....<h4>◆ 一事不二問。</h4>〔也不可以同一件事用不同問法重覆問，這是褻瀆〕<br>◆ 重要事情請先齊戒沐浴〔或可於沐浴後〕；平時問卜，如廁之後請先洗手，並稍候再卜<br>◆ 卜卦是與自己以及天地的交流對話，不是要讓人迷信、推卸責任。<br>◆ 卜問者要有理性及自我負責的心態，不要期待它可以告訴你所有未知之事，<h4>卜卦不準是常有的事。</h4>"; 
+  } else if (type === "knowledge") {
+    content = "◆ 在成卦過程中，每一卦都是一爻一爻依「由下而上」（或由內而外）<br>的順序推算出來的，這也是爻的生成順序。<br>所以最下面一爻的位置稱為「初」爻，再往上為「二」，<br>然後是三、四、五，最上面不稱「六」而是「上」。<br>終始為時間的概念，以初爻為時間上的開始，上爻為結束，故第一爻取名為初。<br><br><h4>◆ 爻位稱九與六分別代表陽與陰。</h4>由於六爻的陰陽符是由數字卦演變而來，其中陽爻其實就是數字卦「筮數」的一，<br>一在長期演變過程中後來用來替代九。陰爻其實就是「筮數」六。<br><br>◆ 掛象為三或六爻組成，三畫卦是陰陽未分的三才之道，上爻為天，中爻為人，下爻為地。<br>因天道有陰陽，地道有柔剛，人道有仁義，因此三畫分別重之而成六爻。<h4>六畫卦：初與二爻象徵地道的剛與柔，三與四爻為人道之仁與義，<br>五與上為天道之陰與陽。</h4><h4>初與四為上下卦的下爻，二與五為中爻，三與上為上爻</h4><br>◆ 六爻位本身有一個吉凶架構：初難定，二多譽，三多憂，四多懼，五多功、六極端。<br>最基本的就是六爻所含的不同時空訊息。還可從時空引申出各種更為複雜與多樣的概念。<br>例如就空間上來說，初爻為近，上爻為遠。時間來說，初爻為初期，上爻為晚期"; 
+  } else if (type === "interpretation") {
+    content = "◆ 《易經》經文有一定架構，每一卦都有七段文字：第一段是「卦辭」，<br>後面六段就是依照爻位順序來寫的「爻辭」。<h4>卦辭統論一卦的吉凶與脈絡。<br>爻辭則分別記載六爻的吉凶，以及在卦義脈絡下的不同時機、階段，<br>或是相對位置等諸多變化。所以想全面的解掛要也需依靠爻辭詮譯。</h4><br>◆ 三爻成一卦，卦分八種「乾、坤、震、巽、坎、離、艮、兌」(也就是桌面所畫之八卦)<br>●人倫類象：乾，天也，故稱乎父。坤，地也，故稱乎母。<br>震，一索而得男，故謂之長男。巽，一索而得女，故謂之長女。<br>坎，再索而得男，故謂之中男。離，再索而得女，故謂之中女。<br>艮，三索而得男，故謂之少男。兌，三索而得女，故謂之少女。<br>●身體類象：乾為首，坤為腹，震為足，巽為股，坎為耳，離為目，艮為手，兌為口。<br>●五行類象：乾天金，坤地土，震雷木，巽風木，坎溝水，離明火，艮山土，兌澤金。<br>●方位類象：乾西北，坤西南，震東，巽東南，坎北，離南，艮東北，兌西。<br>●卦德類象：乾健也，坤順也，震動也，巽入也，坎陷也，離麗也，艮止也，兌說也。<br>●自然力類象：雷以動之，風以散之，雨以潤之，日以烜之，艮以止之，兌以說之，乾以君之，坤以藏之。<br><br>◆八卦卦象的思維方式和我們使用的象形文字很像，同時，易經做為文化載體，<br>很多文字演變的資訊也存留在卦名與卦象裡。因此文字的假借與聯想在卦象是很重要的。<br>以上基礎理解後，再藉由推理或聯想等各種方式將相關類象補充完整。<br>但由於解卦都有聯想、想像的參入，因此主觀性很強，每人想出的都不一，這是必然的。<br>如何處理這些不一樣？一是多用經文的義理來驗證。二是多落實在實際的占解來去驗證，<br>或可再多與易友溝通交流，久而久之就可建立起屬於自己一套的八卦系統。";
+  }
+  illustrateBox.innerHTML = `
+    <div id="detailContent">
+      ${content}
+      <br>
+      <button id="returnToMenu">返回</button>
+    </div>
+  `;
+  document.getElementById("returnToMenu").addEventListener("click", () => {
+    showTopLevelMenu();
+  });
+}
+illustrateButton.addEventListener("click", () => {
+  illustrateButton.style.display = "none";
+  illustrateBox.style.display = "block";
+  showTopLevelMenu();
+});
+
 function checkTossResult(delta) {
   if (!tossInProgress) return;
   let allAtRest = true;
@@ -377,8 +474,6 @@ function checkTossResult(delta) {
     }
   }
 }
-
-let globalBaseHexagram = "";
 
 function triggerResult() {
   let headsCount = 0;
@@ -424,7 +519,7 @@ function triggerResult() {
       baseHexagram = (hexagram[i].type.indexOf("陽") > -1 ? "1" : "0") + baseHexagram;
     }
     globalBaseHexagram = baseHexagram;
-    console.log("baseHexagram:", baseHexagram);
+    console.log("本卦:", baseHexagram);
     getHexagramInterpretation(baseHexagram);
     document.getElementById("explanationUI").style.display = "block";
     let transformedArray = hexagram.map(line => {
@@ -449,7 +544,7 @@ function triggerResult() {
     for (let i = 0; i < 6; i++) {
       transformedHexagramKey = (transformedArray[i].type.indexOf("陽") > -1 ? "1" : "0") + transformedHexagramKey;
     }
-    console.log("transformedHexagramKey:", transformedHexagramKey);
+    console.log("變卦:", transformedHexagramKey);
     if (transformedHexagramKey === globalBaseHexagram) {
       document.getElementById("transformedInterpretation").innerText = "本卦無變卦";
       document.getElementById("transformedExplanationList").style.display = "none";
@@ -464,6 +559,7 @@ function triggerResult() {
           "<span style='color:rgb(255,202,158); font-weight: normal;'>" + transformedInfo.detailed + "</span><br>";
         initTransformedExplanationUI(transformedInfo);
         getHexagramInterpretation(globalBaseHexagram, globalTransformedInfo);
+        initYaoExplanationUI(transformedInfo, "transformedYaoInterpretation");
       } else {
         getHexagramInterpretation(globalBaseHexagram, null);
         document.getElementById("transformedInterpretation").innerText = "找不到對應的變卦資料";
@@ -471,6 +567,7 @@ function triggerResult() {
         document.getElementById("transformedExplanationDetail").style.display = "none";
       }
     }
+    updateHexagramDisplay(transformedArray);
   } else {
     const throwButton = document.getElementById("throwButton");
     throwButton.disabled = false;
@@ -479,25 +576,24 @@ function triggerResult() {
   }
 }
 
-function updateHexagramDisplay() {
+function updateHexagramDisplay(_transformedArray) { 
+  //本卦顯示
+  let originalLines = [];
   const positions = ["初", "二", "三", "四", "五", "上"];
-  let hexagramText = "";
-  
-  for (let i = hexagram.length - 1; i >= 0; i--) {
+  for (let i = 0; i < hexagram.length; i++) {
     const line = hexagram[i];
     const isYang = line.type.indexOf("陽") > -1;
     const yinYangText = isYang ? "九" : "六";
-    
     let displayText = "";
     if (i === 0 || i === hexagram.length - 1) {
       displayText = positions[i] + yinYangText;
     } else {
       displayText = yinYangText + positions[i];
     }
-    hexagramText += `${positions[i]}爻： ${displayText} ${line.type} ${line.symbol}<br>`;
+    originalLines.push(`${positions[i]}爻： ${displayText} ${line.type} ${line.symbol}<br>`);
   }
-  
-  document.getElementById("hexagramResult").innerHTML = hexagramText;
+  let originalText = originalLines.reverse().join("");
+  document.getElementById("hexagramResult").innerHTML = originalText;
   
   if (hexagram.length === 6) {
     const throwButton = document.getElementById("throwButton");
@@ -523,77 +619,130 @@ function updateHexagramDisplay() {
       }
       return line;
     });
-    
-    let transformedText = "";
-    const positions = ["初", "二", "三", "四", "五", "上"];
-    for (let i = transformedArray.length - 1; i >= 0; i--) {
-      const line = transformedArray[i];
-      const isYang = line.type.indexOf("陽") > -1;
-      const yinYangText = isYang ? "九" : "六";
-      let displayText = "";
-      if (i === 0 || i === transformedArray.length - 1) {
-        displayText = positions[i] + yinYangText;
-      } else {
-        displayText = yinYangText + positions[i];
+    //變卦顯示
+    if (_transformedArray && Array.isArray(_transformedArray)) {
+      let transformedLines = [];
+      for (let i = 0; i < _transformedArray.length; i++) {
+        const line = _transformedArray[i];
+        const isYang = line.type.indexOf("陽") > -1;
+        const yinYangText = isYang ? "九" : "六";
+        let displayText = "";
+        if (i === 0 || i === _transformedArray.length - 1) {
+          displayText = positions[i] + yinYangText;
+        } else {
+          displayText = yinYangText + positions[i];
+        }
+        transformedLines.push(`${positions[i]}爻： ${displayText} ${line.type} ${line.symbol}<br>`);
       }
-      transformedText += `${positions[i]}爻： ${displayText} ${line.type} ${line.symbol}<br>`;
+      let transformedText = transformedLines.reverse().join("");
+      // 解卦說明
+      let changedCount = hexagram.filter(line => line.isChanging).length;
+      let extraText = "";
+      if (changedCount < 1) {
+        document.getElementById("coinResultsTransformed").style.display = "none";
+      } else if (changedCount === 1) {
+        extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以本卦的變爻解卦</span>";
+      } else if (changedCount === 2) {
+        extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以本卦的兩個變爻解卦，上爻為主</span>";
+      } else if (changedCount === 3) {
+        extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以兩卦卦義解卦，變卦為主</span>";
+      } else if (changedCount === 4) {
+        extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以變卦未變的兩爻解卦，下爻為主</span>";
+      } else if (changedCount === 5) {
+        extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以變卦未變的一爻解卦</span>";
+      } else if (changedCount === 6) {
+        extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>乾卦為『用九』，坤卦為『用六』<br>餘卦六二卦以變卦卦義解卦</span>";
+      }
+      if (changedCount >= 1) {
+        document.getElementById("coinResultsTransformed").style.display = "block";
+        let finalTransformedHTML = transformedText +
+          `<br><strong>解卦 ——</strong><br>${extraText}`;
+        document.getElementById("transformedHexagram").innerHTML = finalTransformedHTML;
+      }
+      // 爻位凶吉判定原卦
+      function pairResult(indexA, indexB) {
+        const isYangA = hexagram[indexA].type.indexOf("陽") > -1;
+        const isYangB = hexagram[indexB].type.indexOf("陽") > -1;
+        return (isYangA !== isYangB) ? "吉" : "凶";
+      }
+      const pair1 = pairResult(5, 2);
+      const pair2 = pairResult(4, 1);
+      const pair3 = pairResult(3, 0);
+      const pairSummary = `<span style='color:rgba(255,229,158,0.95); font-size: 16px;'><br>上爻：${pair1}<br>中爻：${pair2}<br>下爻：${pair3}</span>`;
+      document.getElementById("hexagramResult").innerHTML += `<br><strong>本卦爻位相應凶吉 ——</strong> ${pairSummary}`; 
+      // 爻位變卦凶吉判定
+      function pairResultTransformed(indexA, indexB) {
+        const isYangA = transformedArray[indexA].type.indexOf("陽") > -1;
+        const isYangB = transformedArray[indexB].type.indexOf("陽") > -1;
+        return (isYangA !== isYangB) ? "吉" : "凶";
+      }
+      const tPair1 = pairResultTransformed(5, 2);
+      const tPair2 = pairResultTransformed(4, 1);
+      const tPair3 = pairResultTransformed(3, 0);
+      function getPairDescription(pairName, result) {
+        return pairName + result;
+      }
+      const tPairSummary = "<br><span style='color:rgba(255,229,158,0.95); font-size: 16px;'>" + 
+                            getPairDescription("上爻：", tPair1) + "<br>" +
+                            getPairDescription("中爻：", tPair2) + "<br>" +
+                            getPairDescription("下爻：", tPair3) + "</span>";
+      document.getElementById("transformedHexagram").innerHTML += `<br><strong>變卦爻位相應凶吉 ——</strong> ${tPairSummary}`;
     }
-    
-    let changedCount = hexagram.filter(line => line.isChanging).length;
-    let extraText = "";
-    if (changedCount < 1) {
-      document.getElementById("coinResultsTransformed").style.display = "none";
-    } else if (changedCount === 1) {
-      extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以本卦的變爻解卦</span>";
-    } else if (changedCount === 2) {
-      extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以本卦的兩個變爻解卦，上爻為主</span>";
-    } else if (changedCount === 3) {
-      extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以兩卦卦義解卦，變卦為主</span>";
-    } else if (changedCount === 4) {
-      extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以變卦未變的兩爻解卦，下爻為主</span>";
-    } else if (changedCount === 5) {
-      extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以變卦未變的一爻解卦</span>";
-    } else if (changedCount === 6) {
-      extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>乾卦為『用九』，坤卦為『用六』<br>餘卦六二卦以變卦卦義解卦</span>";
-    }
-  
-    if (changedCount >= 1) {
-      document.getElementById("coinResultsTransformed").style.display = "block";
-      let finalTransformedHTML = transformedText +
-        `<br><strong>解卦 ——</strong><br>${extraText}`;
-      document.getElementById("transformedHexagram").innerHTML = finalTransformedHTML;
-    }
-    
-    // 凶吉判定原卦：
-    function pairResult(indexA, indexB) {
-      const isYangA = hexagram[indexA].type.indexOf("陽") > -1;
-      const isYangB = hexagram[indexB].type.indexOf("陽") > -1;
-      return (isYangA !== isYangB) ? "吉" : "凶";
-    }
-    const pair1 = pairResult(5, 2);
-    const pair2 = pairResult(4, 1);
-    const pair3 = pairResult(3, 0);
-    const pairSummary = `<span style='color:rgba(255,229,158,0.95); font-size: 16px;'><br>上爻：${pair1}<br>中爻：${pair2}<br>下爻：${pair3}</span>`;
-    document.getElementById("hexagramResult").innerHTML += `<br><strong>本卦爻位相應凶吉 ——</strong> ${pairSummary}`;
-    
-    // 變卦凶吉判定：
-    function pairResultTransformed(indexA, indexB) {
-      const isYangA = transformedArray[indexA].type.indexOf("陽") > -1;
-      const isYangB = transformedArray[indexB].type.indexOf("陽") > -1;
-      return (isYangA !== isYangB) ? "吉" : "凶";
-    }
-    const tPair1 = pairResultTransformed(5, 2);
-    const tPair2 = pairResultTransformed(4, 1);
-    const tPair3 = pairResultTransformed(3, 0);
-    function getPairDescription(pairName, result) {
-      return pairName + result;
-    }
-    const tPairSummary = "<br><span style='color:rgba(255,229,158,0.95); font-size: 16px;'>" + 
-                          getPairDescription("上爻：", tPair1) + "<br>" +
-                          getPairDescription("中爻：", tPair2) + "<br>" +
-                          getPairDescription("下爻：", tPair3) + "</span>";
-    document.getElementById("transformedHexagram").innerHTML += `<br><strong>變卦爻位相應凶吉 ——</strong> ${tPairSummary}`;
   }
+}
+
+//爻辭
+function initYaoExplanationUI(hexagramInfo, targetId) {
+  const container = document.getElementById(targetId);
+  container.innerHTML = "";
+  const title = document.createElement("div");
+  title.innerText = "爻辭:";
+  title.style.fontWeight = "bold";
+  title.style.marginBottom = "16px";
+  container.appendChild(title);
+  const btnContainer = document.createElement("div");
+  btnContainer.id = targetId + "Buttons";
+  btnContainer.style.display = "flex";
+  btnContainer.style.flexDirection = "row";
+  btnContainer.style.justifyContent = "center";
+  btnContainer.style.gap = "5px";
+  for (let key in hexagramInfo.yaoInterpretation) {
+    if (hexagramInfo.yaoInterpretation.hasOwnProperty(key)) {
+      const btn = document.createElement("button");
+      btn.classList.add("menu-btn");
+      btn.textContent = key;
+      btn.style.fontSize = "18px";
+      btn.style.margin = "3px";
+      btn.addEventListener("click", () => {
+        showYaoExplanation(key, hexagramInfo.yaoInterpretation[key], targetId);
+      });
+      btnContainer.appendChild(btn);
+    }
+  }
+  container.appendChild(btnContainer);
+}
+
+function showYaoExplanation(key, text, targetId) {
+  const container = document.getElementById(targetId);
+  const btnContainer = document.getElementById(targetId + "Buttons");
+  if (btnContainer) {
+    btnContainer.style.display = "none";
+  }
+  let detailContainer = document.getElementById(targetId + "Detail");
+  if (!detailContainer) {
+    detailContainer = document.createElement("div");
+    detailContainer.id = targetId + "Detail";
+    detailContainer.style.marginTop = "10px";
+    container.appendChild(detailContainer);
+  }
+  detailContainer.innerHTML = `
+    <p style="margin: 8px 0;">${text}</p>
+    <button id="${targetId}BackBtn" class="menu-btn">返回</button>
+  `;
+  document.getElementById(targetId + "BackBtn").addEventListener("click", () => {
+    detailContainer.innerHTML = "";
+    btnContainer.style.display = "flex";
+  });
 }
 
 function interpretHexagram(baseHexagram) {
@@ -627,6 +776,7 @@ function getHexagramInterpretation(baseHexagram, globalTransformedInfo) {
         document.getElementById("coinResults").style.display = "none";
         document.getElementById("coinResults1").style.display = "block";
         document.getElementById("coinResults1").innerHTML = `<span style="color:rgb(255, 214, 100);">${displayText}</span>`;
+        initYaoExplanationUI(hexagramInfo, "YaoInterpretation");
       } else {
         console.error("找不到對應的卦象資料");
       }
@@ -642,7 +792,7 @@ function initExplanationUI(hexagramInfo) {
   const title = document.createElement("div");
   title.innerText = "卜問解卦:";
   title.style.fontWeight = "bold";
-  title.style.marginBottom = "16px";
+  title.style.marginBottom = "6px";
   explanationList.appendChild(title);
 
   const aspects = hexagramInfo.explanations;
