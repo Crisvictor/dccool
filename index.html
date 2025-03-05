@@ -8,7 +8,6 @@
     <title>大倉酷扣項細則</title>
     <video autoplay muted loop playsinline id="background-video">
     <source src="v/HexUp.webm" type="video/webm">
-    很抱歉，您的瀏覽器不支援 HTML5 視訊，有點爛喔。
     </video>
     <style>
         body {
@@ -57,13 +56,12 @@
         .search-result {
             margin-top: 20px;
         }
-        /* 新增 canvas 相關樣式 */
         html, body {
             height: 100%;
             padding: 0;
             overflow: auto; 
             margin: 0; 
-	}
+		    }
         #fishCanvas {
             position: absolute;
             top: 0;
@@ -94,7 +92,7 @@
             background-color: rgba(10, 92, 92, 0.2);
             border: 1px solid #ddd;
             border-radius: 6px; 
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3];); 
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); 
             display: inline-block; 
         }
         .article p:hover {
@@ -113,24 +111,24 @@
 	  filter: brightness(0.3);
         }
 	.game-button {
-    	  position: relative; 
-    	  padding: 5px 10px;
+  	  position: relative; 
+   	  padding: 5px 10px;
    	  background-color: #3a865b; 
   	  color: #fff; 
  	  border: none;
   	  border-radius: 5px;
  	  text-decoration: none;
  	  font-size: 14px;
-          margin-right: 10px; 
-          margin-top: 10px; 
+    	  margin-right: 10px; 
+    	  margin-top: 10px; 
  	  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
  	  transition: background-color 0.3s;
   	  display: inline-block; 
+   	  z-index: 10;
 	}
         .game-button:hover {
           background-color: #6bbf91; 
         }
-	 
         .tags-container {
           display: flex;
           gap: 10px;
@@ -138,9 +136,8 @@
           margin: 20px; 
           margin-bottom: 20px;
         }
-
         .tag {
-          background-color: #0f433f; /* 背景 */
+          background-color: #0e3835; /* 背景 */
           color: white; /* 白色文字 */
           font-size: 20px;
           border: none;
@@ -148,9 +145,11 @@
           border-radius: 8px;
           cursor: pointer;
           transition: background-color 0.3s;
+          border: 1px solid #0a0c0c;
+          z-index: 11;
         }
         .tag:hover {
-          background-color: #0a5c56; 
+          background-color: #07615b; 
           transform: translateY(-2px); 
           box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
         }
@@ -170,6 +169,7 @@
           transform: translateY(-2px);
           box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4); 
         }
+
 	@media (max-width: 768px) {
         body {
           font-size: 14px;
@@ -184,6 +184,11 @@
         .tag {
           font-size: 18.7px;
         }
+        .game-button {
+          font-size: 12px; 
+          padding: 5px 8px;
+        }
+    }
     </style>
 </head>
 <body>
@@ -591,9 +596,16 @@ function filterArticles() {
     article.style.display = shouldShow ? "block" : "none";
   });
 }
-// 背景魚動畫相關代碼
+
+// 背景畫布
 var fishCanvas = document.getElementById('fishCanvas');
 var fishCtx = fishCanvas.getContext('2d');
+var fishes = [];
+var fishCount = 10;
+var time = 0;
+var ripples = [];
+var maxRippleSize = 80; 
+var rippleSpawnRate = 0.0035; 
 fishCanvas.width = window.innerWidth;
 fishCanvas.height = window.innerHeight;
 
@@ -601,9 +613,6 @@ window.addEventListener('resize', function() {
     fishCanvas.width = window.innerWidth;
     fishCanvas.height = window.innerHeight;
 });
-
-var fishes = [];
-var fishCount = 10;
 
 for (var i = 0; i < fishCount; i++) {
     fishes.push({
@@ -616,36 +625,84 @@ for (var i = 0; i < fishCount; i++) {
 }
 
 function drawFish(fish) {
+    var gradient = fishCtx.createRadialGradient(fish.x, fish.y, fish.size * 0.3, fish.x, fish.y, fish.size);
+    gradient.addColorStop(0, 'rgba(38, 68, 68, 0.6)');
+    gradient.addColorStop(1, 'rgba(38, 68, 68, 0.06)');
+
     fishCtx.beginPath();
     fishCtx.arc(fish.x, fish.y, fish.size, 0, 2 * Math.PI);
-    fishCtx.fillStyle = 'rgba(68, 68, 68, 0.3)';
-    fishCtx.shadowBlur = fish.size * 1.5;
-    fishCtx.shadowColor = 'rgba(68, 68, 68, 0.6)';
+    fishCtx.fillStyle = gradient;
+
+    fishCtx.shadowBlur = fish.size * 2; 
+    fishCtx.shadowColor = 'rgba(68, 68, 68, 0.5)';
+
     fishCtx.fill();
     fishCtx.shadowBlur = 0;
 }
 
+function drawWaterFlow() {
+    time += 0.02;
+    fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
+    fishCtx.globalAlpha = 0.1;
+
+    for (var i = 0; i < fishCanvas.width; i += 50) {
+        for (var j = 0; j < fishCanvas.height; j += 50) {
+            var waveX = Math.sin(i * 0.01 + time) * 5; // X 軸的波動
+            var waveY = Math.cos(j * 0.01 + time) * 5; // Y 軸的波動
+            var opacity = 0.1 + (Math.sin(i * 0.02 + j * 0.02 + time) * 0.05); // 透明度變化
+
+            fishCtx.fillStyle = `rgba(55, 205, 255, ${opacity})`;
+            fishCtx.fillRect(i + waveX, j + waveY, 50, 50);
+        }
+    }
+    fishCtx.globalAlpha = 1;
+}
+
 function updateFishes() {
     fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
-
+    drawWaterFlow(); 
+    drawWaterRipple(); 
     for (var i = 0; i < fishes.length; i++) {
         var fish = fishes[i];
-        fish.x += fish.speedX;
-        fish.y += fish.speedY;
+        fish.x += fish.speedX * 0.5; 
+        fish.y += fish.speedY * 0.5 + Math.sin(fish.x * 0.01) * 0.3; 
 
         if (fish.x > fishCanvas.width) fish.x = 0;
         if (fish.x < 0) fish.x = fishCanvas.width;
         if (fish.y > fishCanvas.height) fish.y = 0;
         if (fish.y < 0) fish.y = fishCanvas.height;
-
         drawFish(fish);
+        if (Math.random() < rippleSpawnRate) { 
+            ripples.push({
+                x: fish.x,
+                y: fish.y,
+                size: 15,
+                alpha: 0.1 
+            });
+        }
     }
-
+    drawWaterRipple();
     requestAnimationFrame(updateFishes);
+}
+
+function drawWaterRipple() {
+    for (var i = ripples.length - 1; i >= 0; i--) {
+        var ripple = ripples[i];
+        fishCtx.beginPath();
+        fishCtx.arc(ripple.x, ripple.y, ripple.size, 0, Math.PI * 2);
+        fishCtx.strokeStyle = `rgba(55, 155, 155, ${ripple.alpha})`;
+        fishCtx.lineWidth = 2;
+        fishCtx.stroke();
+        ripple.size += 0.2;
+        ripple.alpha -= 0.0008; 
+        if (ripple.size > maxRippleSize || ripple.alpha <= 0) {
+            ripples.splice(i, 1);
+        }
+    }
 }
 
 updateFishes();
 </script>
-</script>
 </body>
 </html>
+       
