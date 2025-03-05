@@ -259,6 +259,10 @@ function createCoins() {
 }
 createCoins();
 
+const cutSound = new Audio('m/cut1.mp3');
+const clickSound = new Audio('m/click.mp3');
+const souSound = new Audio('m/Sou.mp3');
+
 //音效控制器
 const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/47.mp3');
 bgmAudio.loop = true; // 設置 BGM 循環播放
@@ -270,12 +274,15 @@ const muteIcon = '🔇';
 const playIcon = '♫';
 const pauseIcon = '❚❚';
 
-const soundList = [coinClinkSound, coinHitHard, coinHitMedium, coinHitSoft];
+const soundList = [coinClinkSound, coinHitHard, coinHitMedium, coinHitSoft, souSound, cutSound, clickSound];
 soundList.forEach(sound => sound.volume = 0.5);
 coinClinkSound.volume = 0.6;
 coinHitHard.volume = 0.6;
 coinHitMedium.volume = 0.6;
 coinHitSoft.volume = 0.6;
+souSound.volume = 0.6;
+cutSound.volume = 0.6;
+clickSound.volume = 0.6;
 
 volumeSlider.addEventListener('input', (event) => {
     const volume = parseFloat(event.target.value);
@@ -308,6 +315,8 @@ bgmButton.addEventListener('click', () => {
 // ==============================
 let tossStartTime = 0;
 function tossCoins() {
+  clickSound.currentTime = 0; 
+  clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
   if (hexagram.length === 6) return;
   if (tossInProgress) return;
   tossInProgress = true;
@@ -334,6 +343,8 @@ function tossCoins() {
 }
 
 function resetToss() {
+  cutSound.currentTime = 0; 
+  cutSound.play().catch(error => console.warn('按鈕音效失敗:', error));
   tossInProgress = false;
   restTimer = 0;
   createCoins();
@@ -387,6 +398,12 @@ function showTopLevelMenu() {
   btnInterpretation.setAttribute("data-type", "interpretation");
   topMenuDiv.appendChild(btnInterpretation);
 
+  const btnInterpretation2 = document.createElement("button");
+  btnInterpretation2.classList.add("menu-btn");
+  btnInterpretation2.textContent = "變卦須知";
+  btnInterpretation2.setAttribute("data-type", "interpretation2");
+  topMenuDiv.appendChild(btnInterpretation2);
+
   const returnBtn = document.createElement("button");
   returnBtn.id = "closeMenu";
   returnBtn.classList.add("menu-btn");
@@ -415,11 +432,14 @@ function showTopLevelMenu() {
     <button class="menu-btn" data-type="question">卜卦問法</button>
     <button class="menu-btn" data-type="knowledge">爻象須知</button>
     <button class="menu-btn" data-type="interpretation">解卦須知</button>
+    <button class="menu-btn" data-type="interpretation2">變卦須知</button>
     <br>
     <button id="closeMenu" class="menu-btn">退出說明</button>
   </div>
   `;
   document.getElementById("closeMenu").addEventListener("click", () => {
+    cutSound.currentTime = 0; 
+    cutSound.play().catch(error => console.warn('按鈕音效失敗:', error));
     illustrateBox.style.display = "none";
     illustrateButton.style.display = "block";
   });
@@ -434,11 +454,21 @@ function showTopLevelMenu() {
 function showDetail(type) {
   let content = "";
   if (type === "question") {
+    souSound.currentTime = 0; 
+    souSound.play().catch(error => console.warn('按鈕音效失敗:', error));
     content = "◆ 誠心與靜心冥想你的問題，心唸弟子某某某，何事問卦...。(擲出六爻求出卦象解卦)<br>◆ 若問某事吉凶可如此提問：所問何事，弟子欲做何選擇 / 決定，想問吉凶....<h4>◆ 一事不二問。</h4>〔也不可以同一件事用不同問法重覆問，這是褻瀆〕<br>◆ 重要事情請先齊戒沐浴〔或可於沐浴後〕；平時問卜，如廁之後請先洗手，並稍候再卜<br>◆ 卜卦是與自己以及天地的交流對話，不是要讓人迷信、推卸責任。<br>◆ 卜問者要有理性及自我負責的心態，不要期待它可以告訴你所有未知之事，<h4>卜卦不準是常有的事。</h4>"; 
   } else if (type === "knowledge") {
-    content = "◆ 在成卦過程中，每一卦都是一爻一爻依「由下而上」（或由內而外）<br>的順序推算出來的，這也是爻的生成順序。<br>所以最下面一爻的位置稱為「初」爻，再往上為「二」，<br>然後是三、四、五，最上面不稱「六」而是「上」。<br>終始為時間的概念，以初爻為時間上的開始，上爻為結束，故第一爻取名為初。<br><br><h4>◆ 爻位稱九與六分別代表陽與陰。</h4>由於六爻的陰陽符是由數字卦演變而來，其中陽爻其實就是數字卦「筮數」的一，<br>一在長期演變過程中後來用來替代九。陰爻其實就是「筮數」六。<br><br>◆ 掛象為三或六爻組成，三畫卦是陰陽未分的三才之道，上爻為天，中爻為人，下爻為地。<br>因天道有陰陽，地道有柔剛，人道有仁義，因此三畫分別重之而成六爻。<h4>六畫卦：初與二爻象徵地道的剛與柔，三與四爻為人道之仁與義，<br>五與上為天道之陰與陽。</h4><h4>初與四為上下卦的下爻，二與五為中爻，三與上為上爻</h4><br>◆ 六爻位本身有一個吉凶架構：初難定，二多譽，三多憂，四多懼，五多功、六極端。<br>最基本的就是六爻所含的不同時空訊息。還可從時空引申出各種更為複雜與多樣的概念。<br>例如就空間上來說，初爻為近，上爻為遠。時間來說，初爻為初期，上爻為晚期"; 
+    souSound.currentTime = 0; 
+    souSound.play().catch(error => console.warn('按鈕音效失敗:', error));
+    content = "◆ 爻，音同遙。在成卦過程中，每一卦都是一爻一爻依「由下而上」（或由內而外）<br>的順序推算出來的，這也是爻的生成順序。陽爻標記「⚊」，陰爻標記「⚋」，<br>所以最下面一爻的位置稱為「初」爻，再往上為「二」，<br>然後是三、四、五，最上面不稱「六」而是「上」。<br>終始為時間的概念，以初爻為時間上的開始，上爻為結束，故第一爻取名為初。<br><br><h4>◆ 爻位稱九與六分別代表陽與陰。</h4>由於六爻的陰陽符是由數字卦演變而來，其中陽爻其實就是數字卦「筮數」的一，<br>一在長期演變過程中後來用來替代九。陰爻其實就是「筮數」六。<br><br>◆ 掛象為三或六爻組成，三畫卦是陰陽未分的三才之道，上爻為天，中爻為人，下爻為地。<br>因天道有陰陽，地道有柔剛，人道有仁義，因此三畫分別重之而成六爻。<h4>六畫卦：初與二爻象徵地道的剛與柔，三與四爻為人道之仁與義，<br>五與上為天道之陰與陽。</h4><h4>初與四為上下卦的下爻，二與五為中爻，三與上為上爻</h4><br>◆ 六爻位本身有一個吉凶架構：初難定，二多譽，三多憂，四多懼，五多功、六極端。<br>最基本的就是六爻所含的不同時空訊息。還可從時空引申出各種更為複雜與多樣的概念。<br>例如就空間上來說，初爻為近，上爻為遠。時間來說，初爻為初期，上爻為晚期"; 
   } else if (type === "interpretation") {
+    souSound.currentTime = 0; 
+    souSound.play().catch(error => console.warn('按鈕音效失敗:', error));
     content = "◆ 《易經》經文有一定架構，每一卦都有七段文字：第一段是「卦辭」，<br>後面六段就是依照爻位順序來寫的「爻辭」。<h4>卦辭統論一卦的吉凶與脈絡。<br>爻辭則分別記載六爻的吉凶，以及在卦義脈絡下的不同時機、階段，<br>或是相對位置等諸多變化。所以想全面的解掛要也需依靠爻辭詮譯。</h4><br>◆ 三爻成一卦，卦分八種「乾、坤、震、巽、坎、離、艮、兌」(也就是桌面所畫之八卦)<br>●人倫類象：乾，天也，故稱乎父。坤，地也，故稱乎母。<br>震，一索而得男，故謂之長男。巽，一索而得女，故謂之長女。<br>坎，再索而得男，故謂之中男。離，再索而得女，故謂之中女。<br>艮，三索而得男，故謂之少男。兌，三索而得女，故謂之少女。<br>●身體類象：乾為首，坤為腹，震為足，巽為股，坎為耳，離為目，艮為手，兌為口。<br>●五行類象：乾天金，坤地土，震雷木，巽風木，坎溝水，離明火，艮山土，兌澤金。<br>●方位類象：乾西北，坤西南，震東，巽東南，坎北，離南，艮東北，兌西。<br>●卦德類象：乾健也，坤順也，震動也，巽入也，坎陷也，離麗也，艮止也，兌說也。<br>●自然力類象：雷以動之，風以散之，雨以潤之，日以烜之，艮以止之，兌以說之，乾以君之，坤以藏之。<br><br>◆八卦卦象的思維方式和我們使用的象形文字很像，同時，易經做為文化載體，<br>很多文字演變的資訊也存留在卦名與卦象裡。因此文字的假借與聯想在卦象是很重要的。<br>以上基礎理解後，再藉由推理或聯想等各種方式將相關類象補充完整。<br>但由於解卦都有聯想、想像的參入，因此主觀性很強，每人想出的都不一，這是必然的。<br>如何處理這些不一樣？一是多用經文的義理來驗證。二是多落實在實際的占解來去驗證，<br>或可再多與易友溝通交流，久而久之就可建立起屬於自己一套的八卦系統。";
+  } else if (type === "interpretation2") {
+    souSound.currentTime = 0;
+    souSound.play().catch(error => console.warn('按鈕音效失敗:', error));
+    content = "◆ 要知曉變卦之前我們先了解何為變爻，每爻是由三枚錢幣擲出後視正反面得知陰陽。<br>正面為陽、反面為陰，擲出的結果又分「少陽、少陰、老陰、老陽」四種爻型態，<br>少陰、少陽就是三枚錢幣中「少者為大」原則，<br>兩反一正為少陽，亦為陽爻；兩正一反為少陰，亦是陰爻。<br>而老陰、老陽則又可稱變爻，是指當三枚錢幣都為正面或反面，<br>三枚正面為老陽，在本卦為陽爻，但陽極而陰，成了變卦的少陰爻，<br>反之，三枚反面為老陰，在本卦為陰爻，但陰極而陽，成了變卦的少陽爻。<br><br>◆ 「本卦」指為原本的卦象，而「變卦」是指由於爻變，導致本卦中的變爻陰陽轉變後，<br>形成另種卦象，這由變爻轉變後卦象稱為「變卦」。<br>「變」之所在，也被稱變爻或動爻，也就是發生變故的地方，所以就是找尋解答的地方。<h4>「卦為本，變為用」— 本卦常用代表「目前」的狀態，用變卦代表「未來」的狀態。</h4><br>◆ 所以從解讀本卦到變卦所帶來的變化趨勢，能使事情動態更加具體，<br>但有變爻，也不代表都要看著變卦來解卦判斷，<br>例如本卦只有一變爻，用本卦卦辭與本卦變爻爻辭來解讀即可。<br> <h4>● 其解卦法： (此表也會在本系統卦象卜出後在現，給予解卦提示)<br>一、 六爻都未變：以本爻卦辭為斷。 <br>二、 一個爻變，以本卦變爻為斷。 <br>三、 二個爻變，以本卦變爻的上爻為斷。變爻的下爻可做為參考。 <br>四、 三個爻變，以變卦的卦辭為斷；本卦卦辭可當參考。<br>五、 四個爻變，以變卦不變的二爻中的下爻為斷，上爻可做為參考。 <br>六、 五個爻變，以變卦不變的那一爻為斷。 <br>七、 六爻皆變，乾坤二卦時分別採用「用九」及「用六」；其餘六十二卦則以變卦為斷。 </h4>";
   }
   illustrateBox.innerHTML = `
     <div id="detailContent">
@@ -448,10 +478,14 @@ function showDetail(type) {
     </div>
   `;
   document.getElementById("returnToMenu").addEventListener("click", () => {
+    cutSound.currentTime = 0; 
+    cutSound.play().catch(error => console.warn('按鈕音效失敗:', error));
     showTopLevelMenu();
   });
 }
 illustrateButton.addEventListener("click", () => {
+  clickSound.currentTime = 0;
+  clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
   illustrateButton.style.display = "none";
   illustrateBox.style.display = "block";
   showTopLevelMenu();
@@ -641,17 +675,17 @@ function updateHexagramDisplay(_transformedArray) {
       if (changedCount < 1) {
         document.getElementById("coinResultsTransformed").style.display = "none";
       } else if (changedCount === 1) {
-        extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以本卦的變爻解卦</span>";
+        extraText = "<span style='color:rgba(241, 109, 99, 0.95); font-size: 22px;'>以本卦的變爻解卦</span>";
       } else if (changedCount === 2) {
-        extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以本卦的兩個變爻解卦，上爻為主</span>";
+        extraText = "<span style='color:rgba(241, 109, 99, 0.95); font-size: 22px;'>以本卦的兩個變爻解卦，<br>上爻為主</span>";
       } else if (changedCount === 3) {
-        extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以兩卦卦義解卦，變卦為主</span>";
+        extraText = "<span style='color:rgba(241, 109, 99, 0.95); font-size: 22px;'>以兩卦卦義解卦，變卦為主</span>";
       } else if (changedCount === 4) {
-        extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以變卦未變的兩爻解卦，下爻為主</span>";
+        extraText = "<span style='color:rgba(241, 109, 99, 0.95); font-size: 22px;'>以變卦未變的兩爻解卦，<br>下爻為主</span>";
       } else if (changedCount === 5) {
-        extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>以變卦未變的一爻解卦</span>";
+        extraText = "<span style='color:rgba(241, 109, 99, 0.95); font-size: 22px;'>以變卦未變的一爻解卦</span>";
       } else if (changedCount === 6) {
-        extraText = "<span style='color:rgba(255, 197, 158, 0.95); font-size: 18px;'>乾卦為『用九』，坤卦為『用六』<br>餘卦六二卦以變卦卦義解卦</span>";
+        extraText = "<span style='color:rgba(241, 109, 99, 0.95); font-size: 22px;'>乾卦為『用九』，坤卦為『用六』<br>餘卦六二卦以變卦卦義解卦</span>";
       }
       if (changedCount >= 1) {
         document.getElementById("coinResultsTransformed").style.display = "block";
@@ -714,6 +748,8 @@ function initYaoExplanationUI(hexagramInfo, targetId) {
       btn.style.fontSize = "18px";
       btn.style.margin = "3px";
       btn.addEventListener("click", () => {
+        souSound.currentTime = 0;
+        souSound.play().catch(error => console.warn('按鈕音效失敗:', error));
         showYaoExplanation(key, hexagramInfo.yaoInterpretation[key], targetId);
       });
       btnContainer.appendChild(btn);
@@ -740,6 +776,8 @@ function showYaoExplanation(key, text, targetId) {
     <button id="${targetId}BackBtn" class="menu-btn">返回</button>
   `;
   document.getElementById(targetId + "BackBtn").addEventListener("click", () => {
+    cutSound.currentTime = 0;
+    cutSound.play().catch(error => console.warn('按鈕音效失敗:', error));
     detailContainer.innerHTML = "";
     btnContainer.style.display = "flex";
   });
@@ -801,6 +839,8 @@ function initExplanationUI(hexagramInfo) {
     btn.innerText = aspect;
     btn.style.margin = "5px";
     btn.addEventListener("click", () => {
+      souSound.currentTime = 0;
+      souSound.play().catch(error => console.warn('按鈕音效失敗:', error));
       showExplanation(aspect, aspects[aspect]);
     });
     explanationList.appendChild(btn);
@@ -826,6 +866,8 @@ function showExplanation(aspect, text) {
   const backBtn = document.createElement("button");
   backBtn.innerText = "返回";
   backBtn.addEventListener("click", () => {
+    cutSound.currentTime = 0;
+    cutSound.play().catch(error => console.warn('按鈕音效失敗:', error));
     detailDiv.style.display = "none";
     explanationList.style.display = "block";
   });
@@ -848,6 +890,8 @@ function initTransformedExplanationUI(hexagramInfo) {
     btn.innerText = aspect;
     btn.style.margin = "5px";
     btn.addEventListener("click", () => {
+      souSound.currentTime = 0;
+      souSound.play().catch(error => console.warn('按鈕音效失敗:', error));
       showTransformedExplanation(aspect, aspects[aspect]);
     });
     listDiv.appendChild(btn);
@@ -874,6 +918,8 @@ function showTransformedExplanation(aspect, text) {
   const backBtn = document.createElement("button");
   backBtn.innerText = "返回";
   backBtn.addEventListener("click", () => {
+    cutSound.currentTime = 0;
+    cutSound.play().catch(error => console.warn('按鈕音效失敗:', error));
     detailDiv.style.display = "none";
     listDiv.style.display = "block";
   });
