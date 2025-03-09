@@ -14,7 +14,7 @@
       min-height: 100vh;
       color: #fff;
       background-image: 
-        linear-gradient(rgba(0, 25, 43, 0.74), rgba(0, 25, 43, 0.74)), /* 半透明濾鏡 */
+        linear-gradient(rgba(0, 25, 43, 0.74), rgba(0, 25, 43, 0.74)), 
         url('img/Wall.jpg');
       background-size: cover; 
       background-position: center;
@@ -27,15 +27,11 @@
     @font-face {
       font-family: 'YuPearl';
       src: url('ttf/YuPearl-Regular.woff2') format('woff2'), 
-      font-weight: normal;
-      font-style: normal;
     }
 
     @font-face {
       font-family: 'Roboto';
       src: url('ttf/Roboto-Regular.woff2') format('woff2'), 
-      font-weight: normal;
-      font-style: normal;
     }
 
     @font-face {
@@ -405,7 +401,7 @@
         <div class="template-buttons">
           <button id="coinTemplate">擲硬幣</button>
           <button id="foodTemplate">點餐</button>
-          <button id="gunTemplate">左輪手槍</button>
+          <button id="gunTemplate">俄羅斯輪盤</button>
         </div>
         <div class="template-buttons">
           <button id="diceTemplate">骰子</button>
@@ -415,13 +411,18 @@
     </div>
   </div>
 
-  <div class="lt" id="resultBox"></div>
+  <div class="result" id="resultBox"></div>
   <audio id="startSound" src="m/start-sound1.mp3"></audio>
-  <audio id="resultSound" src="m/result-Sound.mp3"></audio>
+  <audio id="resultSound" src="m/result-sound.mp3"></audio>
   <audio id="gunshotSound" src="m/gunshot.mp3"></audio>
   <audio id="clickSound" src="m/click.mp3"></audio>
   <audio id="scoreSound" src="m/Sou.mp3"></audio>
   <audio id="coinSound" src="m/coin.mp3"></audio>
+  <audio id="missSound" src="m/miss.mp3"></audio>
+  <audio id="revolverSound" src="m/revolver.mp3"></audio>
+  <audio id="revolver1Sound" src="m/revolver1.mp3"></audio>
+  <audio id="diceSound" src="m/dice.mp3"></audio>
+
   <script>
 const wheel = document.getElementById("wheel");
 const spinButton = document.getElementById("spinButton");
@@ -432,18 +433,27 @@ const gunshotSound = document.getElementById('gunshotSound');
 const coinSound = document.getElementById('coinSound');
 const clickSound = document.getElementById('clickSound');
 const scoreSound = document.getElementById('scoreSound');
+const missSound = document.getElementById('missSound');
+const revolverSound = document.getElementById('revolverSound');
+const revolver1Sound = document.getElementById('revolver1Sound');
+const diceSound = document.getElementById('diceSound');
 
+// 全域變數
 let options = ["1", "2", "3", "4", "5", "6"];
+let revolverMode = false;
+let revolverChambers = [];
 let spinning = false;
+let currentChamberIndex = 0;
+let currentRotationAngle = 0;  
 
- function isDarkColor(color) {
-      const hex = color.replace("#", "");
-      const r = parseInt(hex.substring(0, 2), 16);
-      const g = parseInt(hex.substring(2, 4), 16);
-      const b = parseInt(hex.substring(4, 6), 16);
-      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-      return brightness < 128;
-    }
+function isDarkColor(color) {
+  const hex = color.replace("#", "");
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness < 128;
+}
 
 const palettes = {
     green: ["#7cc396", "#5aa575", "#89b699", "#00a15c", "#2dce89", "#acdcc8", "#8fd9b6", "#6abf9c", "#a1e5d4", "#94d9c4"],
@@ -451,13 +461,14 @@ const palettes = {
     blue: ["#4798b3", "#7aadbe", "#72b1c7", "#afced8", "#5f9ea0", "#007b92", "#66989a", "#00808c", "#006374", "#0b5d65"],
     yellow: ["#FFD700", "#FFC125", "#FFB90F", "#FFA500", "#FF8C00", "#FFD39B", "#FFEC8B", "#FFD700", "#FFA54F", "#FFDAB9"],
     gray: ["#f5f5f5", "#757575", "#cccccc", "#383838", "#d4d4d4", "#4d4d4d", "#606060", "#8f8f8f", "#2e2e2e", "#1c1c1c"],
-    red: ["#8B0000", "#B22222", "#DC143C", "#b81414", "#FF6347", "#FF7F50", "#CD5C5C", "#E9967A", "#F08080", "#FA8072"]
+    red: ["#8B0000", "#B22222", "#DC143C", "#b81414", "#FF6347", "#FF7F50", "#CD5C5C", "#E9967A", "#F08080", "#FA8072"],
+    gun: ["#cdcdcd","#cacaca" ],
+    coin: ["#cdcdcd","#bbbbbb"]
 };
 
-
-// 初始化顏色陣列 (預設為綠色盤)
-let colors = palettes.green;
-
+// 初始化顏色陣列 
+let userPalette = palettes.green; 
+let colors = palettes.green; 
 const colorPaletteBtn = document.getElementById('color-palette-btn');
 const colorPaletteContainer = document.getElementById('color-palette-container');
 const paletteButtons = document.querySelectorAll('.palette-btn');
@@ -497,6 +508,14 @@ function drawWheel() {
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         path.setAttribute("d", describeArc(150, 150, 150, angle, angle + angleStep));
         path.setAttribute("fill", color);
+        if (colors === palettes.gun) {
+          path.setAttribute("stroke", "#A0A0A0"); 
+          path.setAttribute("stroke-width", "3");    
+        }
+        if (colors === palettes.coin) {
+          path.setAttribute("stroke", "#A0A0A0"); 
+          path.setAttribute("stroke-width", "3");    
+        }
         wheel.appendChild(path);
 
         // 添加文字
@@ -512,7 +531,6 @@ function drawWheel() {
         text.setAttribute("dominant-baseline", "middle");
         text.setAttribute("transform", `rotate(${midAngle + 90}, ${x}, ${y})`);
 
-        // 字型大小
         const optionText = options[i];
         let fontSize = "28px";
         if (options.length > 17) fontSize = "20px";
@@ -529,70 +547,219 @@ function drawWheel() {
     }
 }
 
+
+function getDesiredAngle(index) {
+  const slice = 360 / 6;
+  return 360 - (index * slice + slice / 2);
+}
+
 function spinWheel() {
-    if (spinning) return; // 防止重複執行
-    spinning = true;
-    // 取得輸入項目
-    const items = options;
-    // 檢查是否為擲硬幣項目
-    const isCoinFlip = items.length === 2 && items.includes('正面') && items.includes('反面');
-    // **播放音效判斷邏輯**
-    if (isCoinFlip) {
-        coinSound.currentTime = 0;
-        coinSound.play().catch(error => console.warn('硬幣音效播放失敗:', error));
+  if (spinning) return;
+  spinning = true;
+  console.log("spinWheel 執行時, 左輪模式 =", revolverMode);
+  
+  if (revolverMode) {
+    let textElements = wheel.querySelectorAll('text');
+    textElements.forEach(el => el.style.visibility = 'hidden');
+    let currentResult = revolverChambers[currentChamberIndex];
+    
+    spinButton.disabled = true;
+    spinButton.style.opacity = "0.5";
+    spinButton.style.cursor = "not-allowed";
+    
+    if (currentChamberIndex === 0) {
+      const desired = getDesiredAngle(0); 
+      const currentMod = currentRotationAngle % 360;
+      let additional = desired - currentMod;
+      if (additional < 0) additional += 360;
+      const targetAngle = currentRotationAngle + 360 * 4 + additional;
+      const animationName = "leftSpinAnim_" + Date.now();
+      const keyframes = `
+        @keyframes ${animationName} {
+          from { transform: rotate(${currentRotationAngle}deg); }
+          to { transform: rotate(${targetAngle}deg); }
+        }
+      `;
+      const styleElem = document.createElement("style");
+      styleElem.innerHTML = keyframes;
+      document.head.appendChild(styleElem);
+      
+      wheel.style.animation = `${animationName} 3s cubic-bezier(0.2, 1, 0.3, 1) forwards`;
+      currentRotationAngle = targetAngle;
+      revolverSound.currentTime = 0;
+      revolverSound.play().catch(err => console.warn(err));
+      
+      setTimeout(() => {
+        wheel.style.animation = "";
+        wheel.style.transform = `rotate(${currentRotationAngle}deg)`;
+        styleElem.parentNode.removeChild(styleElem);
+        
+        resultBox.style.display = "flex";
+        resultBox.textContent = "抽中: " + currentResult;
+        
+        if (currentResult === '💥') {
+          gunshotSound.currentTime = 0;
+          gunshotSound.play().catch(err => console.warn(err)); 
+          confetti({
+            particleCount: 100,
+            colors: ['#ff0000'],
+            spread: 70,
+            origin: { x: 0.5, y: 0.5 }
+          });   
+          setTimeout(() => {
+            resultBox.textContent = "遊戲結束";
+            setTimeout(() => {
+              resultBox.style.display = "none";
+              resetLeftMode();
+            }, 2000);
+          }, 2000);
+        } else if (currentResult === 'MISS') {
+          missSound.currentTime = 0;
+          missSound.play().catch(err => console.warn(err));
+          currentChamberIndex++; 
+          setTimeout(() => {
+            resultBox.style.display = "none";
+            spinning = false;
+            spinButton.disabled = false;
+            spinButton.style.opacity = "1";
+            spinButton.style.cursor = "pointer";
+          }, 2000);
+        }
+      }, 3000);
+      
     } else {
-        startSound.currentTime = 0;
-        startSound.play().catch(error => console.warn('開始音效播放失敗:', error));
+      const cellAngle = 360 / 6; // 60°
+      const targetAngle = currentRotationAngle + cellAngle;
+      
+      wheel.style.transition = "transform 2s cubic-bezier(0.2, 1, 0.3, 1)";
+      wheel.style.transform = `rotate(${targetAngle}deg)`;
+      revolver1Sound.currentTime = 0;
+      revolver1Sound.play().catch(err => console.warn(err));
+      
+      setTimeout(() => {
+        currentRotationAngle = targetAngle;  // 更新累計角度
+        resultBox.style.display = "flex";
+        resultBox.textContent = "抽中: " + currentResult;
+        
+        if (currentResult === '💥') {
+          gunshotSound.currentTime = 0;
+          gunshotSound.play().catch(err => console.warn(err));
+          confetti({
+            particleCount: 100,
+            colors: ['#ff0000'],
+            spread: 70,
+            origin: { x: 0.5, y: 0.5 }
+          });
+          setTimeout(() => {
+            resultBox.textContent = "遊戲結束";
+            setTimeout(() => {
+              resultBox.style.display = "none";
+              resetLeftMode();
+            }, 2000);
+          }, 2000);
+        } else if (currentResult === 'MISS') {
+          missSound.currentTime = 0;
+          missSound.play().catch(err => console.warn(err));
+          currentChamberIndex++; // 指向下一格
+          setTimeout(() => {
+            resultBox.style.display = "none";
+            spinning = false;
+            spinButton.disabled = false;
+            spinButton.style.opacity = "1";
+            spinButton.style.cursor = "pointer";
+          }, 2000);
+        }
+      }, 2000);
     }
-  // 禁用按鈕並添加淡化效果
+    return;
+  }
+  normalSpin();
+}
+
+function resetLeftMode() {
+  revolverMode = false;
+  revolverChambers = [];
+  options = ["1", "2", "3", "4", "5", "6"];
+  colors = userPalette;
+  drawWheel();
+  currentRotationAngle = 0;
+  currentChamberIndex = 0;
+  spinning = false;
+  spinButton.disabled = false;
+  spinButton.style.opacity = "1";
+  spinButton.style.cursor = "pointer";
+}
+
+function normalSpin() {
+  const items = options;
+  const isCoinFlip = items.length === 2 && items.includes('正面') && items.includes('反面');
+  const isDice = items.length === 6 && items[0] === "⚀";
+  
+  if (isCoinFlip) {
+    coinSound.currentTime = 0;
+    coinSound.play().catch(error => console.warn('硬幣音效播放失敗:', error));
+  } else if (isDice) {
+    diceSound.currentTime = 0;
+    diceSound.play().catch(error => console.warn('骰子音效播放失敗:', error));
+  } else {
+    startSound.currentTime = 0;
+    startSound.play().catch(error => console.warn('開始音效播放失敗:', error));
+  }
+  
   spinButton.disabled = true;
   spinButton.style.opacity = "0.5";
   spinButton.style.cursor = "not-allowed";
-
-  // 重置轉盤角度
+  
   wheel.style.transition = "none";
   wheel.style.transform = "rotate(0deg)";
-
-  // 隨機選擇一個項目
+  
   const numOptions = options.length;
   const randomIndex = Math.floor(Math.random() * numOptions);
-
-  // 計算停止的角度，確保停在 12 點鐘方向
+  
   const sliceDegree = 360 / numOptions;
   const targetDegree = 360 - (randomIndex * sliceDegree + sliceDegree / 2);
   const spinDegree = 360 * 12 + targetDegree;
-
-  // 執行旋轉
+  
   setTimeout(() => {
-    wheel.style.transition = "transform 7.5s ease-out";
+    // 根據模式決定動畫時間
+    if (isCoinFlip) {
+      wheel.style.transition = "transform 3.6s ease-out";
+    } else if (isDice) {
+      wheel.style.transition = "transform 1.7s ease-out";
+    } else {
+      wheel.style.transition = "transform 7.5s ease-out";
+    }
     wheel.style.transform = `rotate(${spinDegree}deg)`;
-
-    // 動畫結束後顯示結果
+  
     setTimeout(() => {
       resultBox.textContent = `抽中: ${options[randomIndex]}`;
       resultBox.style.display = "flex";
-
-            if (options[randomIndex] === '💥') {
-                gunshotSound.currentTime = 0;
-                gunshotSound.play();
-            } else {
-                resultSound.currentTime = 0;
-                resultSound.play();
-            }
-            showConfetti(); // 播放彩花效果
-
-            // 3 秒後隱藏結果並重置按鈕
-            setTimeout(() => {
-                resultBox.style.display = "none";
-                spinning = false;
-                spinButton.disabled = false;
-                spinButton.style.opacity = "1";
-                spinButton.style.cursor = "pointer";
-            }, 3000);
-        }, 7500);
-    }, 10);
+      
+      if (options[randomIndex] === '💥') {
+        gunshotSound.currentTime = 0;
+        gunshotSound.play().catch(error => console.warn('槍聲音效播放失敗:', error));
+        confetti({
+        particleCount: 100,
+        colors: ['#ff0000'],
+        spread: 70,
+        origin: { x: 0.5, y: 0.5 }
+      });
+      } else {
+        resultSound.currentTime = 0;
+        resultSound.play().catch(error => console.warn('結果音效播放失敗:', error));
+      }
+      showConfetti();
+      
+      setTimeout(() => {
+        resultBox.style.display = "none";
+        spinning = false;
+        spinButton.disabled = false;
+        spinButton.style.opacity = "1";
+        spinButton.style.cursor = "pointer";
+      }, isCoinFlip ? 3600 : isDice ? 1700 : 3600);
+    }, isCoinFlip ? 3600 : isDice ? 1700 : 7500);
+  }, 10);
 }
-
 function describeArc(x, y, radius, startAngle, endAngle) {
   const start = polarToCartesian(x, y, radius, endAngle);
   const end = polarToCartesian(x, y, radius, startAngle);
@@ -626,6 +793,8 @@ updateButton.addEventListener("click", () => {
     return;
   }
   options = newOptions;
+  revolverMode = false;
+  colors = userPalette;
   drawWheel();
 });
 
@@ -642,11 +811,14 @@ drawWheel();
       week: ["星期一","星期二","星期三","星期四","星期五","星期六","星期日"],
     };
 
+
 // 按鈕事件監聽器
 document.getElementById("coinTemplate").addEventListener("click", () => {
       scoreSound.currentTime = 0; // 重置播放位置
       scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
   options = templates.coin;
+  colors = palettes.coin;
+  revolverMode = false;
   drawWheel();
 });
 
@@ -654,20 +826,31 @@ document.getElementById("foodTemplate").addEventListener("click", () => {
       scoreSound.currentTime = 0; // 重置播放位置
       scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
   options = templates.food;
+  colors = userPalette;
+  revolverMode = false;
   drawWheel();
 });
 
 document.getElementById("gunTemplate").addEventListener("click", () => {
       scoreSound.currentTime = 0; // 重置播放位置
       scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
-  options = templates.gun;
+  options = templates.gun; 
+  revolverMode = true;
+  revolverChambers = templates.gun.slice();
+  revolverChambers.sort(() => Math.random() - 0.5);
+  currentChamberIndex = 0;
+  currentRotationAngle = 0;
+  colors = palettes.gun;
   drawWheel();
 });
+
 
 document.getElementById("diceTemplate").addEventListener("click", () => {
       scoreSound.currentTime = 0; // 重置播放位置
       scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
   options = templates.dice;
+  colors = userPalette;
+  revolverMode = false;
   drawWheel();
 });
 
@@ -675,6 +858,8 @@ document.getElementById("playTemplate").addEventListener("click", () => {
       scoreSound.currentTime = 0; // 重置播放位置
       scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
   options = templates.play;
+  colors = userPalette;
+  revolverMode = false;
   drawWheel();
 });
 
@@ -682,6 +867,8 @@ document.getElementById("weekTemplate").addEventListener("click", () => {
       scoreSound.currentTime = 0; // 重置播放位置
       scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
   options = templates.week;
+  colors = userPalette;
+  revolverMode = false;
   drawWheel();
 });
 
