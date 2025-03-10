@@ -653,7 +653,7 @@ function drawWaterFlow() {
             var opacity = 0.1 + (Math.sin(i * 0.02 + j * 0.02 + time) * 0.05); // 透明度變化
 
             fishCtx.fillStyle = `rgba(65, 215, 255, ${opacity})`;
-            fishCtx.fillRect(i + waveX, j + waveY, 80, 80);
+            fishCtx.fillRect(i + waveX, j + waveY, 62, 62);
         }
     }
     fishCtx.globalAlpha = 1;
