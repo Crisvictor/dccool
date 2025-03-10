@@ -650,10 +650,10 @@ function drawWaterFlow() {
         for (var j = 0; j < fishCanvas.height; j += 50) {
             var waveX = Math.sin(i * 0.01 + time) * 5; // X 軸的波動
             var waveY = Math.cos(j * 0.01 + time) * 5; // Y 軸的波動
-            var opacity = 0.1 + (Math.sin(i * 0.02 + j * 0.02 + time) * 0.05); // 透明度變化
+            var opacity = 0.1 + (Math.sin(i * 0.02 + j * 0.02 + time) * 0.08); // 透明度變化
 
-            fishCtx.fillStyle = `rgba(65, 215, 255, ${opacity})`;
-            fishCtx.fillRect(i + waveX, j + waveY, 62, 62);
+            fishCtx.fillStyle = `rgba(70, 220, 255, ${opacity})`;
+            fishCtx.fillRect(i + waveX, j + waveY, 45, 45);
         }
     }
     fishCtx.globalAlpha = 1;
