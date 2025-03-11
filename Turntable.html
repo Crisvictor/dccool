@@ -13,9 +13,7 @@
       font-family: 'Roboto', sans-serif;
       min-height: 100vh;
       color: #fff;
-      background-image: 
-        linear-gradient(rgba(0, 25, 43, 0.74), rgba(0, 25, 43, 0.74)), 
-        url('img/Wall.jpg');
+      background-color: #17191a;
       background-size: cover; 
       background-position: center;
       background-repeat: no-repeat;
@@ -162,6 +160,7 @@
       display: none;
       }
 
+      
     #resultBox {
       position: absolute !important;
       top: 425px !important; 
@@ -360,6 +359,7 @@
   </style>
 </head>
 <body>
+  <canvas id="fishCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
 <h1 id="page-title">
   <!-- 調色盤按鈕與容器 -->
   <div id="color-palette-wrapper" style="position: relative;">
@@ -952,6 +952,54 @@ bgmButton.addEventListener('click', () => {
     }
     isPlaying = !isPlaying; // 切換狀態
 });
+
+var fishCanvas = document.getElementById('fishCanvas');
+var fishCtx = fishCanvas.getContext('2d');
+var time = 0;
+
+function resizeCanvas() {
+    fishCanvas.width = window.innerWidth;
+    fishCanvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+
+function drawWaterFlow() {
+    time += 0.02;
+    fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
+    fishCtx.globalAlpha = 0.1;
+
+    for (var i = 0; i < fishCanvas.width; i += 50) {
+        for (var j = 0; j < fishCanvas.height; j += 50) {
+            var waveX = Math.sin(i * 0.01 + time) * 5;
+            var waveY = Math.cos(j * 0.01 + time) * 5;
+            var opacity = 0.1 + (Math.sin(i * 0.02 + j * 0.02 + time) * 0.08);
+
+            fishCtx.fillStyle = `rgba(70, 220, 255, ${opacity})`;
+            fishCtx.fillRect(i + waveX, j + waveY, 45, 45);
+        }
+    }
+    fishCtx.globalAlpha = 1;
+}
+
+function drawTopLight() {
+    var gradient = fishCtx.createLinearGradient(0, 0, 0, fishCanvas.height * 0.5);
+    gradient.addColorStop(0, "rgba(105, 215, 255, 0.25)");
+    gradient.addColorStop(1, "rgba(105, 215, 255, 0)");
+
+    fishCtx.globalAlpha = 0.5;
+    fishCtx.fillStyle = gradient;
+    fishCtx.fillRect(0, 0, fishCanvas.width, fishCanvas.height * 0.5);
+    fishCtx.globalAlpha = 1;  
+}
+
+function animateBackground() {
+    drawWaterFlow();
+    drawTopLight();
+    requestAnimationFrame(animateBackground);
+}
+animateBackground();
 
   </script>
 </body>
