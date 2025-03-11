@@ -40,9 +40,7 @@ h4 {
 h6 {
   color: rgba(255, 131, 122, 0.95);
   font-weight: normal;
-  top: 1px;
-  left: 1px;
-  margin: 4px 5px;
+  margin: 0px 5px;
   font-size: 24px;
 }
 
@@ -135,7 +133,7 @@ canvas {
   border-radius: 8px;
   font-family: 'ThePeakFont', Arial, sans-serif !important;
   font-size: 18px;
-  max-height: 82%;
+  max-height: 85%;
   overflow-y: auto;
   align-self: flex-start;
 }
@@ -240,7 +238,12 @@ canvas {
   position: absolute;
   bottom: 30px;
   left: 20px;
+  max-width: 1000px;
   z-index: 3000;
+}
+
+.hidden {
+  display: none !important;
 }
 
 @font-face {
@@ -581,7 +584,7 @@ canvas {
 
 @media screen and (max-width: 768px) {
   h2 {
-    font-size: 20px;
+    font-size: 15px;
   }
 
   h6 {
@@ -595,7 +598,8 @@ canvas {
     /*控制區*/
   #controls {
     bottom: 7px;
-    left: 10px;
+    left: 20px;
+    max-width: 200px;
   }
   #controls button {
     background-image: url('https://crisvictor.github.io/dccool/img/but5.png');
@@ -608,25 +612,25 @@ canvas {
 
     /*卦象區*/
   #result {
-    flex: 0 0 190px;
+    flex: 0 0 160px;
   }
   #hexagramResult, #coinResults, #transformedHexagram {
     padding: 1px;
-    font-size: 16px;
+    font-size: 14px;
     margin: 4px 0px;   
     background: rgba(0, 0, 0, 0.65);
   }
   .yao-image {
-    width: 48px !important;
-    height: 8px !important;
-    margin-left: 5px;
+    width: 53px !important;
+    height: 5px !important;
+    margin-left: 0px;
   }
 
     /*新手說明區*/
   #illustrateButton {
-    font-size: 26px;
-    margin-left: 10px;
-    padding: 6px 35px;
+    font-size: 20px;
+    margin-left: 0px;
+    padding: 6px 33px;
   } 
   #illustrateBox {
     font-size: 21px;
@@ -639,7 +643,7 @@ canvas {
 
     /*解釋區*/
   #explanationUI {
-    flex: 0 0 235px;
+    flex: 0 0 205px;
     font-size: 18px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -658,7 +662,7 @@ canvas {
   }
   #explanationDetail, #transformedExplanationDetail {
     font-size: 20px;
-    top: 5px;
+    top: 0px;
     left: 5px;
   }  
   #YaoInterpretationButtons, 
@@ -667,12 +671,12 @@ canvas {
     flex-wrap: wrap; 
   }
   #explanationUI button {
-    font-size: 22px;
-    padding: 6px 6px;
+    font-size: 20px;
+    padding: 6px 2px;
   }
     /*音控區*/
   #volume-slider {
-    width: 70px;
+    width: 85px;
     height: 7px;
   }
 }

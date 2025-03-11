@@ -349,14 +349,14 @@ function tossCoins() {
   document.getElementById("illustrateBox").style.display = "none";
   coinBodies.forEach(body => {
     body.velocity.set(
-      (Math.random() - 0.43) * 9, //X
-      9 + Math.random() * 2,     //y
-      (Math.random() - 0.6) * 3  //z
+      (Math.random() - 0.5) * 9,  // X 軸左右對稱
+      9 + Math.random() * 2,      // Y 軸向上基準
+      (Math.random() - 0.5) * 3   // Z 軸前後對稱
     );
-    body.angularVelocity.set(
-      (Math.random() - 0.5) * Math.PI * 3,
-      (Math.random() - 0.5) * Math.PI * 3,
-      (Math.random() - 0.5) * Math.PI * 3
+    body.angularVelocity.set(   //角速度
+      (Math.random() - 0.5) * Math.PI * 3.5,
+      (Math.random() - 0.5) * Math.PI * 3.5,
+      (Math.random() - 0.5) * Math.PI * 3.5
     );
   });
 }
@@ -377,6 +377,7 @@ function resetToss() {
   document.getElementById("coinResults").style.display = "block";
   document.getElementById("illustrateButtonContainer").style.display = "block";
   document.getElementById("illustrateButton").style.display = "block";
+  document.getElementById("throwButton").classList.remove("hidden");
   throwButton.disabled = false;
   throwButton.style.opacity = 1;
   throwButton.style.cursor = "pointer";
@@ -461,6 +462,8 @@ function showTopLevelMenu() {
     cutSound.play().catch(error => console.warn('按鈕音效失敗:', error));
     illustrateBox.style.display = "none";
     illustrateButton.style.display = "block";
+    document.getElementById("throwButton").classList.remove("hidden");
+    document.getElementById("resetButton").classList.remove("hidden");
   });
   const menuButtons = document.querySelectorAll("#topMenu .menu-btn");
   menuButtons.forEach(btn => {
@@ -513,6 +516,8 @@ illustrateButton.addEventListener("click", () => {
   clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
   illustrateButton.style.display = "none";
   illustrateBox.style.display = "block";
+  document.getElementById("throwButton").classList.add("hidden");
+  document.getElementById("resetButton").classList.add("hidden");
   showTopLevelMenu();
 });
 
@@ -649,13 +654,14 @@ function updateHexagramDisplay(_transformedArray) {
     } else {
       displayText = yinYangText + positions[i];
     }
-    originalLines.push(`${positions[i]}爻： ${displayText} ${line.type} ${line.symbol}<br>`);
+    originalLines.push(`${displayText} ${line.type} ${line.symbol}<br>`);
   }
   let originalText = originalLines.reverse().join("");
   document.getElementById("hexagramResult").innerHTML = originalText;
   
   if (hexagram.length === 6) {
     const throwButton = document.getElementById("throwButton");
+    document.getElementById("throwButton").classList.add("hidden");
     throwButton.disabled = true;
     throwButton.style.opacity = 0.5;
     throwButton.style.cursor = "default";
@@ -665,13 +671,13 @@ function updateHexagramDisplay(_transformedArray) {
         if (line.type.indexOf("陽") > -1) { 
           return { 
             type: "少陰", 
-            symbol: "<img src='img/sYin.png' alt='少陰' style='width:70px;height:10px; float:right; margin-left:10px;' />", 
+            symbol: "<img class='yao-image' src='img/sYin.png' alt='少陰' />", 
             isChanging: false 
           };
         } else {
           return { 
             type: "少陽", 
-            symbol: "<img src='img/sYang.png' alt='少陽' style='width:70px;height:10px; float:right; margin-left:10px;' />", 
+            symbol: "<img class='yao-image' src='img/sYang.png' alt='少陽' />", 
             isChanging: false 
           };
         }
@@ -691,7 +697,7 @@ function updateHexagramDisplay(_transformedArray) {
         } else {
           displayText = yinYangText + positions[i];
         }
-        transformedLines.push(`${positions[i]}爻： ${displayText} ${line.type} ${line.symbol}<br>`);
+        transformedLines.push(`${displayText} ${line.type} ${line.symbol}<br>`);
       }
       let transformedText = transformedLines.reverse().join("");
       // 解卦說明
@@ -702,13 +708,13 @@ function updateHexagramDisplay(_transformedArray) {
       } else if (changedCount === 1) {
         extraText = "<h6>以本卦的變爻解卦</h6>";
       } else if (changedCount === 2) {
-        extraText = "<h6>以本卦的兩個變爻解卦，<br>上爻為主</h6>";
+        extraText = "<h6>以本卦的兩個變爻<br>解卦，上爻為主</h6>";
       } else if (changedCount === 3) {
         extraText = "<h6>以兩卦卦義解卦，<br>變卦為主</h6>";
       } else if (changedCount === 4) {
-        extraText = "<h6>以變卦未變的兩爻解卦，<br>下爻為主</h6>";
+        extraText = "<h6>以變卦未變的兩爻<br>解卦，下爻為主</h6>";
       } else if (changedCount === 5) {
-        extraText = "<h6>以變卦未變的一爻解卦</h6>";
+        extraText = "<h6>以變卦未變的一爻<br>解卦</h6>";
       } else if (changedCount === 6) {
         extraText = "<h6>乾卦為『用九』，<br>坤卦為『用六』，<br>餘卦六二卦以變卦<br>卦義解卦</h6>";
       }
@@ -728,7 +734,7 @@ function updateHexagramDisplay(_transformedArray) {
       const pair2 = pairResult(4, 1);
       const pair3 = pairResult(3, 0);
       const pairSummary = `<span style='color:rgba(255,229,158,0.95); font-size: 16px;'><br>上爻：${pair1}<br>中爻：${pair2}<br>下爻：${pair3}</span>`;
-      document.getElementById("hexagramResult").innerHTML += `<br><strong>本卦爻位相應凶吉 ——</strong> ${pairSummary}`; 
+      document.getElementById("hexagramResult").innerHTML += `<br><strong>本卦爻位相應 ——</strong> ${pairSummary}`; 
       // 爻位變卦凶吉判定
       function pairResultTransformed(indexA, indexB) {
         const isYangA = transformedArray[indexA].type.indexOf("陽") > -1;
@@ -745,7 +751,7 @@ function updateHexagramDisplay(_transformedArray) {
                             getPairDescription("上爻：", tPair1) + "<br>" +
                             getPairDescription("中爻：", tPair2) + "<br>" +
                             getPairDescription("下爻：", tPair3) + "</span>";
-      document.getElementById("transformedHexagram").innerHTML += `<br><strong>變卦爻位相應凶吉 ——</strong> ${tPairSummary}`;
+      document.getElementById("transformedHexagram").innerHTML += `<br><strong>變卦爻位相應 ——</strong> ${tPairSummary}`;
     }
   }
 }
