@@ -584,11 +584,11 @@ canvas {
 
 @media screen and (max-width: 768px) {
   h2 {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   h6 {
-    font-size: 18px;
+    font-size: 15px;
   }
 
   #uiContainer {
@@ -612,7 +612,8 @@ canvas {
 
     /*卦象區*/
   #result {
-    flex: 0 0 160px;
+    flex: 0 0 145px;
+    max-height: 85%;
   }
   #hexagramResult, #coinResults, #transformedHexagram {
     padding: 1px;
@@ -630,7 +631,7 @@ canvas {
   #illustrateButton {
     font-size: 20px;
     margin-left: 0px;
-    padding: 6px 33px;
+    padding: 6px 30px;
   } 
   #illustrateBox {
     font-size: 21px;
