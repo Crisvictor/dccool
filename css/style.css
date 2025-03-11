@@ -34,7 +34,16 @@ h4 {
   font-weight: normal;
   top: 1px;
   left: 1px;
+  margin: 0px 4px;
+}
+
+h6 {
+  color: rgba(255, 131, 122, 0.95);
+  font-weight: normal;
+  top: 1px;
+  left: 1px;
   margin: 4px 5px;
+  font-size: 24px;
 }
 
 .preformatted {
@@ -59,7 +68,7 @@ canvas {
 /* UI 元素 */
 #result, #interpretation, #explanationList, #explanationDetail, #transformedInterpretation, #transformedExplanationList, #transformedExplanationDetail, #YaoInterpretation, #transformedYaoInterpretation {
   position: static; 
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.45);
   border: 2px solid rgba(0, 0, 0, 0.2);
   color: #fff;
   padding: 10px;
@@ -101,14 +110,14 @@ canvas {
 }
 
 #explanationUI::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3); 
+  background: rgba(0, 0, 0, 0.5); 
   border-radius: 12px; 
 }
 
 #explanationUI::-webkit-scrollbar-thumb {
   background: rgba(209, 186, 110, 0.651);
   border-radius: 10px; 
-  border: 2px solid rgba(30, 11, 0, 0.2);
+  border: 2px solid rgba(30, 11, 0, 0.3);
   cursor: pointer; 
 }
 
@@ -119,7 +128,7 @@ canvas {
 /* 右側結果區 */
 #result {
   flex: 0 0 300px;
-  background: rgba(253, 198, 146, 0.1);
+  background: rgba(253, 198, 146, 0.15);
   border: 2px solid rgba(255, 207, 168, 0.3);
   color: #fff;
   padding: 10px;
@@ -140,24 +149,33 @@ canvas {
 }
 
 #result::-webkit-scrollbar-track {
-background: rgba(0, 0, 0, 0.3); 
-border-radius: 12px; 
+  background: rgba(0, 0, 0, 0.5); 
+  border-radius: 12px; 
 }
 
 #result::-webkit-scrollbar-thumb {
-background: rgba(209, 186, 110, 0.651);
-border-radius: 10px; 
-border: 2px solid rgba(30, 11, 0, 0.2);
-cursor: pointer; 
+  background: rgba(209, 186, 110, 0.651);
+  border-radius: 10px; 
+  border: 2px solid rgba(30, 11, 0, 0.2); 
+  cursor: pointer; 
 }
 
 #result::-webkit-scrollbar-thumb:hover {
-background: rgba(180, 143, 75, 0.5); 
+  background: rgba(180, 143, 75, 0.5); 
+}
+
+.yao-image {
+  width: 80px;
+  height: 10px;
+  float: right;
+  margin: 4px;
+  margin-left: 20px;
+  margin-top: 5px;
 }
 
 #hexagramResult, #coinResults, #coinResults1, #transformedHexagram {
   font-family: 'ThePeakFont', Arial, sans-serif !important;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.45);
   border: 2px solid rgba(0, 0, 0, 0.2);
   border-radius: 5px;
   padding: 5px;
@@ -212,8 +230,8 @@ background: rgba(180, 143, 75, 0.5);
 #explanationDetail, #transformedExplanationDetail {
   width: 93%;
   font-size: 24px;
-  top: 20px;
-  left: 10px;
+  top: 10px;
+  left: 5px;
   display: none;
   margin: 4px 0;
 }
@@ -235,7 +253,7 @@ background: rgba(180, 143, 75, 0.5);
 #controls button {
   font-family: 'ThePeakFont', Arial, sans-serif !important;
   padding: 20px 46px;
-  font-size: 33px !important;
+  font-size: 33px;
   font-weight: bold;
   margin-right: 40px;
   cursor: pointer;
@@ -254,10 +272,10 @@ background: rgba(180, 143, 75, 0.5);
 }
 
 #controls button:hover {
-background-color: #ad9c77;
-transform: translateY(-2px);
-box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8);
-z-index: 5;
+  background-color: #ad9c77;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8);
+  z-index: 5;
 }
 
 #controls button:active {
@@ -288,6 +306,7 @@ z-index: 5;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8);
 }
 
+  /*新手說明區*/
 #illustrateButtonContainer {
   height: 60px;
   display: block;
@@ -404,7 +423,7 @@ z-index: 5;
   font-family: 'ThePeakFont', Arial, sans-serif !important;
   display: none;
   position: absolute;
-  top: 50%;
+  top: 44%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(0, 0, 0, 0.8);
@@ -416,12 +435,49 @@ z-index: 5;
   overflow-y: auto;
   max-height: 80%;
   z-index: 1000;
+  width: 225px;
+  border: 2px solid rgba(214, 153, 153, 0.596);
 }
 
+#illustrateBox.wide {
+  width: 60%;
+}
+
+#illustrateBox::-webkit-scrollbar {
+  width: 10px;
+}
+
+#illustrateBox::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.5); 
+  border-radius: 12px; 
+}
+
+#illustrateBox::-webkit-scrollbar-thumb {
+  background: rgba(209, 141, 110, 0.651);
+  border-radius: 10px; 
+  border: 2px solid rgba(30, 11, 0, 0.2);
+  cursor: pointer; 
+}
+
+#illustrateBox::-webkit-scrollbar-thumb:hover {
+  background: rgba(180, 108, 75, 0.5); 
+}
+
+  /*音控區*/
 #volume-slider {
   width: 90px;
-  height: 6px;
-  cursor: pointer;
+  height: 7px;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  border-radius: 3px;
+  --range-percent: 50%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 197, 73, 0.8) 0%,
+    rgba(255, 110, 73, 0.8) var(--range-percent),
+    rgba(255, 255, 255, 0.3) var(--range-percent),
+    rgba(255, 255, 255, 0.3) 100%
+  );
 }
 
 #bgm-button {
@@ -429,7 +485,7 @@ z-index: 5;
   height: 30px;
   border-radius: 50%;
   border: none;
-  background-color: rgba(79, 101, 121, 0.3);
+  background-color: rgba(250, 120, 68, 0.3);
   color: white;
   font-size: 18px;
   font-weight: bold;
@@ -442,58 +498,181 @@ z-index: 5;
 }
 
 #bgm-button:hover {
-  background-color: rgba(92, 126, 158, 0.3);
+  background-color: rgba(255, 109, 73, 0.603);
+  transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
+}
+
+#bgm-button:active {
+  background-color: rgba(241, 221, 37, 0.3);
+  box-shadow: 0 4px 6px rgba(190, 176, 114, 0.7);
 }
 
 #audio-control-container {
   position: absolute;
-  bottom: 20px; 
-  right: 20px; 
+  bottom: 30px; 
+  right: 10px; 
   z-index: 3000;
   display: flex;
   align-items: center;
   gap: 10px;
+  background-color: transparent;
 }
 
-.transparent-btn {
-  position: relative; 
-  font-size: 18px! important;
+/* 軌道樣式（WebKit） */
+#volume-slider::-webkit-slider-runnable-track {
   background: transparent;
+  box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
+}
+
+/* 滑塊樣式（WebKit） */
+#volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  box-shadow: 
-    inset 0px 1px 3px rgba(255, 255, 255, 0.4), 
-    inset 0px -1px 2px rgba(0, 0, 0, 0.4), 
-    0px 4px 6px rgba(0, 0, 0, 0.2); 
-  color: #fff;
-  padding: 10px;
+  background: rgba(255, 100, 28, 0.9);
+  border: 1px solid rgba(30, 11, 0, 0.8);
+  margin-top: -5px;
   cursor: pointer;
-  border: none;
-  width: 40px;
-  height: 40px;
-  font-size: 1.5em;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 10px;
 }
 
-.transparent-btn:last-child {
-  margin-right: 0;
+/* Firefox 軌道與滑塊 */
+#volume-slider::-moz-range-track {
+  background: transparent;
+  box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
 }
 
-.transparent-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 
-    inset 0px 2px 4px rgba(255, 255, 255, 0.8), 
-    inset 0px -3px 5px rgba(0, 0, 0, 0.4),
-    0px 8px 10px rgba(0, 0, 0, 0.4);
+#volume-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 110, 73, 0.8);
+  cursor: pointer;
 }
 
-.transparent-btn:active {
-  transform: scale(0.95);
-  box-shadow: 
-    0px 2px 3px rgba(0, 0, 0, 0.4), 
-    inset 0px 1px 3px rgba(0, 0, 0, 0.6); 
+/* Edge 及 IE */
+#volume-slider::-ms-track {
+  background: transparent;
+  box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
+}
+
+#volume-slider::-ms-fill-lower {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+#volume-slider::-ms-fill-upper {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+#volume-slider::-ms-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 110, 73, 0.8);
+  cursor: pointer;
+}
+
+#volume-slider:focus {
+  outline: none;
+}
+
+@media screen and (max-width: 768px) {
+  h2 {
+    font-size: 20px;
+  }
+
+  h6 {
+    font-size: 18px;
+  }
+
+  #uiContainer {
+    padding: 10px;
+  }
+
+    /*控制區*/
+  #controls {
+    bottom: 7px;
+    left: 10px;
+  }
+  #controls button {
+    background-image: url('https://crisvictor.github.io/dccool/img/but5.png');
+    padding: 25px 21px;
+    font-size: 28px;
+    margin-right: 6px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+  }
+
+    /*卦象區*/
+  #result {
+    flex: 0 0 190px;
+  }
+  #hexagramResult, #coinResults, #transformedHexagram {
+    padding: 1px;
+    font-size: 16px;
+    margin: 4px 0px;   
+    background: rgba(0, 0, 0, 0.65);
+  }
+  .yao-image {
+    width: 48px !important;
+    height: 8px !important;
+    margin-left: 5px;
+  }
+
+    /*新手說明區*/
+  #illustrateButton {
+    font-size: 24px;
+    margin-left: 25px;
+    padding: 8px 40px;
+  } 
+  #illustrateBox {
+    font-size: 21px;
+    overflow-y: auto;
+    max-height: 75%;
+  }
+  #illustrateBox.wide {
+    width: 85%;
+  }
+
+    /*解釋區*/
+  #explanationUI {
+    flex: 0 0 235px;
+    font-size: 18px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 82%;
+    gap: 1px;
+    padding: 1px;
+  }
+  #explanationUI::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.7); 
+  }
+  #interpretation, #transformedInterpretation {
+    font-size: 20px;
+  }
+  #explanationList, #transformedExplanationList, #YaoInterpretation, #transformedYaoInterpretation {
+    font-size: 20px;
+  }
+  #explanationDetail, #transformedExplanationDetail {
+    font-size: 20px;
+    top: 5px;
+    left: 5px;
+  }  
+  #YaoInterpretationButtons, 
+  #transformedYaoInterpretationButtons {
+    display: flex;
+    flex-wrap: wrap; 
+  }
+  #explanationUI button {
+    font-size: 22px;
+    padding: 6px 6px;
+  }
+    /*音控區*/
+  #volume-slider {
+    width: 70px;
+    height: 7px;
+  }
 }

@@ -53,7 +53,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById("container").appendChild(renderer.domElement);
 
 // 燈光 - 使用聚光燈
-const spotLight = new THREE.SpotLight(0xffffff, 1);
+const spotLight = new THREE.SpotLight(0xffffff, 1.65);
 spotLight.position.set(0, 20, -9);
 spotLight.angle = Math.PI / 8;       // 聚光燈光束角度
 spotLight.penumbra = 0.8;            // 邊緣柔和程度
@@ -167,8 +167,8 @@ const coinGroundContactMaterial = new CANNON.ContactMaterial(
   coinMaterial,
   groundPhysMaterial,
   {
-    friction: 0.1,     // 摩擦
-    restitution: 0.15,  // 反彈
+    friction: 0.05,     // 摩擦
+    restitution: 0.17,  // 反彈
   }
 );
 world.addContactMaterial(coinGroundContactMaterial);
@@ -215,11 +215,14 @@ function createCoins() {
     coinMesh.userData.physicsBody = coinBody;
     
     // 其他物理屬性
-    coinBody.material.restitution = 0.3; // 反彈
-    coinBody.material.friction = 0.2;    // 摩擦
-    coinBody.linearDamping = 0.05;       // 線性阻尼
-    coinBody.angularDamping = 0.1;       // 旋力阻尼
+    coinBody.material.restitution = 0.25; // 反彈
+    coinBody.material.friction = 0.08;    // 摩擦
+    coinBody.linearDamping = 0.02;       // 線性阻尼
+    coinBody.angularDamping = 0.05;       // 旋力阻尼
+
     coinBody.allowSleep = true;
+    coinBody.sleepSpeedLimit = 0.1; 
+    coinBody.sleepTimeLimit = 0.3; 
     
     // 加入碰撞事件監聽器 (包含防抖與撞擊閾值)
     coinBody.addEventListener("collide", function(event) {
@@ -309,6 +312,22 @@ bgmButton.addEventListener('click', () => {
     }
     isPlaying = !isPlaying;
 });
+volumeSlider.addEventListener('input', (event) => {
+  const volume = parseFloat(event.target.value);
+  const min = parseFloat(event.target.min) || 0;
+  const max = parseFloat(event.target.max) || 1;
+  const percent = ((volume - min) / (max - min)) * 100;
+  event.target.style.setProperty('--range-percent', percent + '%');
+
+  // 調整其他音效音量邏輯…
+  bgmAudio.volume = volume;
+  soundList.forEach(sound => sound.volume = volume);
+  if (volume === 0) {
+    bgmButton.textContent = muteIcon;
+  } else {
+    bgmButton.textContent = isPlaying ? pauseIcon : playIcon;
+  }
+});
 
 // ==============================
 // 5. 擲幣操作與結果判斷
@@ -330,9 +349,9 @@ function tossCoins() {
   document.getElementById("illustrateBox").style.display = "none";
   coinBodies.forEach(body => {
     body.velocity.set(
-      (Math.random() - 0.5) * 10, //X
-      10 + Math.random() * 2,     //y
-      (Math.random() - 0.5) * 3  //z
+      (Math.random() - 0.43) * 9, //X
+      9 + Math.random() * 2,     //y
+      (Math.random() - 0.6) * 3  //z
     );
     body.angularVelocity.set(
       (Math.random() - 0.5) * Math.PI * 3,
@@ -468,7 +487,7 @@ function showDetail(type) {
   } else if (type === "interpretation2") {
     souSound.currentTime = 0;
     souSound.play().catch(error => console.warn('按鈕音效失敗:', error));
-    content = "◆ 要知曉變卦之前我們先了解何為變爻，每爻是由三枚錢幣擲出後視正反面得知陰陽。<br>正面為陽、反面為陰，擲出的結果又分「少陽、少陰、老陰、老陽」四種爻型態，<br>少陰、少陽就是三枚錢幣中「少者為大」原則，<br>兩反一正為少陽，亦為陽爻；兩正一反為少陰，亦是陰爻。<br>而老陰、老陽則又可稱變爻，是指當三枚錢幣都為正面或反面，<br>三枚正面為老陽，在本卦為陽爻，但陽極而陰，成了變卦的少陰爻，<br>反之，三枚反面為老陰，在本卦為陰爻，但陰極而陽，成了變卦的少陽爻。<br><br>◆ 「本卦」指為原本的卦象，而「變卦」是指由於爻變，導致本卦中的變爻陰陽轉變後，<br>形成另種卦象，這由變爻轉變後卦象稱為「變卦」。<br>「變」之所在，也被稱變爻或動爻，也就是發生變故的地方，所以就是找尋解答的地方。<h4>「卦為本，變為用」— 本卦常用代表「目前」的狀態，用變卦代表「未來」的狀態。</h4><br>◆ 所以從解讀本卦到變卦所帶來的變化趨勢，能使事情動態更加具體，<br>但有變爻，也不代表都要看著變卦來解卦判斷，<br>例如本卦只有一變爻，用本卦卦辭與本卦變爻爻辭來解讀即可。<br> <h4>● 其解卦法： (此表也會在本系統卦象卜出後在現，給予解卦提示)<br>一、 六爻都未變：以本爻卦辭為斷。 <br>二、 一個爻變，以本卦變爻為斷。 <br>三、 二個爻變，以本卦變爻的上爻為斷。變爻的下爻可做為參考。 <br>四、 三個爻變，以變卦的卦辭為斷；本卦卦辭可當參考。<br>五、 四個爻變，以變卦不變的二爻中的下爻為斷，上爻可做為參考。 <br>六、 五個爻變，以變卦不變的那一爻為斷。 <br>七、 六爻皆變，乾坤二卦時分別採用「用九」及「用六」；其餘六十二卦則以變卦為斷。 </h4>";
+    content = "◆ 要知曉變卦之前我們先了解何為變爻，每爻是由三枚錢幣擲出後視正反面得知陰陽。<br>正面為陽、反面為陰，擲出的結果又分「少陽、少陰、老陰、老陽」四種爻型態，<br>少陰、少陽就是三枚錢幣中「少者為大」原則，<br>兩反一正為少陽，亦為陽爻；兩正一反為少陰，亦是陰爻。<br>而老陰、老陽則又可稱變爻，是指當三枚錢幣都為正面或反面，<br>三枚正面為老陽，在本卦為陽爻，但陽極而陰，成了變卦的少陰爻，<br>反之，三枚反面為老陰，在本卦為陰爻，但陰極而陽，成了變卦的少陽爻。<br><br>◆ 「本卦」指為原本的卦象，而「變卦」是指由於爻變，導致本卦中的變爻陰陽轉變後，<br>形成另種卦象，這由變爻轉變後卦象稱為「變卦」。<br>「變」之所在，也被稱變爻或動爻，也就是發生變故的地方，所以就是找尋解答的地方。<h4>「卦為本，變為用」— 本卦常用代表「目前」的狀態，用變卦代表「未來」的狀態。</h4><br>◆ 所以從解讀本卦到變卦所帶來的變化趨勢，能使事情動態更加具體，<br>但有變爻，也不代表都要看著變卦來解卦判斷，<br>例如本卦只有一變爻，用本卦卦辭與本卦變爻爻辭來解讀即可。<br> <h4>● 其解卦法： (此表本系統卦象卜出後也會顯示，給予解卦提示)<br>一、 六爻都未變：以本爻卦辭為斷。 <br>二、 一個爻變，以本卦變爻為斷。 <br>三、 二個爻變，以本卦變爻的上爻為斷。變爻的下爻可做為參考。 <br>四、 三個爻變，以變卦的卦辭為斷；本卦卦辭可當參考。<br>五、 四個爻變，以變卦不變的二爻中的下爻為斷，上爻可做為參考。 <br>六、 五個爻變，以變卦不變的那一爻為斷。 <br>七、 六爻皆變，乾坤二卦時分別採用「用九」及「用六」；其餘六十二卦則以變卦為斷。 </h4>";
   }
   illustrateBox.innerHTML = `
     <div id="detailContent">
@@ -477,9 +496,15 @@ function showDetail(type) {
       <button id="returnToMenu">返回</button>
     </div>
   `;
+  if (content && content.trim().length > 0) {
+    illustrateBox.classList.add("wide");
+  } else {
+    illustrateBox.classList.remove("wide");
+  }
   document.getElementById("returnToMenu").addEventListener("click", () => {
     cutSound.currentTime = 0; 
     cutSound.play().catch(error => console.warn('按鈕音效失敗:', error));
+    illustrateBox.classList.remove("wide");
     showTopLevelMenu();
   });
 }
@@ -523,25 +548,25 @@ function triggerResult() {
   if (headsCount === 3) {
     lineResult = { 
       type: "老陽", 
-      symbol: "<img src='img/oYang.png' alt='老陽' style='width:70px;height:10px; float:right; margin-left:10px;' />", 
+      symbol: "<img class='yao-image' src='img/oYang.png' alt='老陽' />",  
       isChanging: true 
     };
   } else if (headsCount === 1) {
     lineResult = { 
       type: "少陽", 
-      symbol: "<img src='img/sYang.png' alt='少陽' style='width:70px;height:10px; float:right; margin-left:10px;' />", 
+      symbol: "<img class='yao-image' src='img/sYang.png' alt='少陽' />", 
       isChanging: false 
     };
   } else if (headsCount === 2) {
     lineResult = { 
       type: "少陰", 
-      symbol: "<img src='img/sYin.png' alt='少陰' style='width:70px;height:10px; float:right; margin-left:10px;' />", 
+      symbol: "<img class='yao-image' src='img/sYin.png' alt='少陰' />", 
       isChanging: false 
     };
   } else if (headsCount === 0) {
     lineResult = { 
       type: "老陰", 
-      symbol: "<img src='img/oYin.png' alt='老陰' style='width:70px;height:10px; float:right; margin-left:10px;' />", 
+      symbol: "<img class='yao-image' src='img/oYin.png' alt='老陰' />", 
       isChanging: true 
     };
   }
@@ -561,13 +586,13 @@ function triggerResult() {
         if (line.type.indexOf("陽") > -1) {
           return { 
             type: "少陰", 
-            symbol: "<img src='img/sYin.png' alt='少陰' style='width:70px;height:10px; float:right; margin-left:10px;' />", 
+            symbol: "<img class='yao-image' src='img/sYin.png' alt='少陰' />", 
             isChanging: false 
           };
         } else {
           return { 
             type: "少陽", 
-            symbol: "<img src='img/sYang.png' alt='少陽' style='width:70px;height:10px; float:right; margin-left:10px;' />", 
+            symbol: "<img class='yao-image' src='img/sYang.png' alt='少陽' />", 
             isChanging: false 
           };
         }
@@ -675,17 +700,17 @@ function updateHexagramDisplay(_transformedArray) {
       if (changedCount < 1) {
         document.getElementById("coinResultsTransformed").style.display = "none";
       } else if (changedCount === 1) {
-        extraText = "<span style='color:rgba(241, 109, 99, 0.95); font-size: 22px;'>以本卦的變爻解卦</span>";
+        extraText = "<h6>以本卦的變爻解卦</h6>";
       } else if (changedCount === 2) {
-        extraText = "<span style='color:rgba(241, 109, 99, 0.95); font-size: 22px;'>以本卦的兩個變爻解卦，<br>上爻為主</span>";
+        extraText = "<h6>以本卦的兩個變爻解卦，<br>上爻為主</h6>";
       } else if (changedCount === 3) {
-        extraText = "<span style='color:rgba(241, 109, 99, 0.95); font-size: 22px;'>以兩卦卦義解卦，變卦為主</span>";
+        extraText = "<h6>以兩卦卦義解卦，<br>變卦為主</h6>";
       } else if (changedCount === 4) {
-        extraText = "<span style='color:rgba(241, 109, 99, 0.95); font-size: 22px;'>以變卦未變的兩爻解卦，<br>下爻為主</span>";
+        extraText = "<h6>以變卦未變的兩爻解卦，<br>下爻為主</h6>";
       } else if (changedCount === 5) {
-        extraText = "<span style='color:rgba(241, 109, 99, 0.95); font-size: 22px;'>以變卦未變的一爻解卦</span>";
+        extraText = "<h6>以變卦未變的一爻解卦</h6>";
       } else if (changedCount === 6) {
-        extraText = "<span style='color:rgba(241, 109, 99, 0.95); font-size: 22px;'>乾卦為『用九』，坤卦為『用六』<br>餘卦六二卦以變卦卦義解卦</span>";
+        extraText = "<h6>乾卦為『用九』，<br>坤卦為『用六』，<br>餘卦六二卦以變卦<br>卦義解卦</h6>";
       }
       if (changedCount >= 1) {
         document.getElementById("coinResultsTransformed").style.display = "block";
