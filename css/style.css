@@ -624,9 +624,9 @@ canvas {
 
     /*新手說明區*/
   #illustrateButton {
-    font-size: 24px;
-    margin-left: 25px;
-    padding: 8px 40px;
+    font-size: 26px;
+    margin-left: 10px;
+    padding: 6px 35px;
   } 
   #illustrateBox {
     font-size: 21px;
