@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="img/truble.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="img/truble.ico" type="image/x-icon">
+  <link rel="icon" href="img/truble.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="img/truble.ico" type="image/x-icon">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
   <title>命運抽籤轉盤</title>
   <style>
@@ -21,24 +20,20 @@
       margin: 0;
       padding: 20px;
     }
-
     @font-face {
       font-family: 'YuPearl';
-      src: url('ttf/YuPearl-Regular.woff2') format('woff2'), 
+      src: url('ttf/YuPearl-Regular.woff2') format('woff2');
     }
-
     @font-face {
       font-family: 'Roboto';
-      src: url('ttf/Roboto-Regular.woff2') format('woff2'), 
+      src: url('ttf/Roboto-Regular.woff2') format('woff2');
     }
-
     @font-face {
       font-family: 'NaniFont-Regular';
       src: url('ttf/NaniFont-Regular.woff') format('woff');
       font-weight: normal;
       font-style: normal;
     }
-
     .container {
       display: flex;
       justify-content: center;
@@ -47,11 +42,9 @@
       gap: 50px;
       margin-top: 40px; 
     }
-
     .wheel-container {
       position: relative;
     }
-
     #wheel {
       font-family: 'Roboto', sans-serif;
       width: 300px;
@@ -61,7 +54,6 @@
       z-index: 1;
       box-shadow: 0 1px 15px rgba(0, 0, 0, 0.6);
     }
-
     .arrow {
       position: absolute;
       top: -20px;
@@ -75,7 +67,6 @@
       filter: drop-shadow(0 -8px 3px rgba(0, 0, 0, 0.9));
       z-index: 2;
     }
-
     textarea {
       background-color: rgba(227, 227, 227, 0.75);
       border: 1px solid #000;
@@ -85,13 +76,11 @@
       resize: none;
       box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.6), inset -2px -6px 5px rgba(255, 255, 255, 0.4);
     }
-
     .buttons {
       display: flex;
       flex-direction: column;
       gap: 15px;
     }
-
     button {
       font-family: 'Roboto', 'YuPearl', sans-serif;
       padding: 10px 20px;
@@ -102,36 +91,28 @@
       cursor: pointer;
       box-shadow: inset 2px 2px 5px rgba(255, 255, 255, 0.4), inset -2px -6px 5px rgba(0, 0, 0, 0.6);
     }
-
     button:active {
       transform: scale(0.95);
-      box-shadow: 
-        0px 2px 3px rgba(0, 0, 0, 0.4), 
-        inset 0px 1px 3px rgba(0, 0, 0, 0.6); 
+      box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.4), inset 0px 1px 3px rgba(0, 0, 0, 0.6);
     }
-
     #spinButton {
       margin-top: 20px;
       background-color: #238547;
     }
-
     #updateButton {
       background-color: #2196f3;
     }
-
     #clock {
       font-size: 18px;
       margin-top: 20px;
       line-height: 1.5; 
     }
-
     @font-face {
       font-family: 'Sangyo';
       src: url('ttf/sangyo.woff2') format('woff2');
       font-weight: normal;
       font-style: normal;
     }
-
     #timeDisplay {
       font-family: 'Sangyo', Arial, sans-serif;
       margin-top: 20px;              
@@ -146,7 +127,6 @@
       margin-left: auto;          
       margin-right: auto;
     }
-
     .result {
       background-color: #008000;
       color: #fff;
@@ -158,9 +138,7 @@
       left: 50%;
       transform: translateX(-50%);
       display: none;
-      }
-
-      
+    }
     #resultBox {
       position: absolute !important;
       top: 425px !important; 
@@ -179,13 +157,11 @@
       display: none; 
       z-index: 10;
     }
-    
     .template-buttons {
       margin-top: 10px;
       display: flex;
       gap: 10px;
     }
-
     .template-buttons button {
       padding: 10px 15px;
       background-color: #24367d;
@@ -196,11 +172,9 @@
       font-size: 16px;
       transition: background-color 0.2s;
     }
-
     .template-buttons button:hover {
       background-color: #384a91;
     }
-
     #page-title {
       display: flex;
       justify-content: center;
@@ -212,20 +186,17 @@
       margin: 0 auto; 
       position: relative;
     }
-    
     #audio-control-container {
       display: flex;
       align-items: center;
       gap: 10px;
       margin-left: 20px; 
     }
-
     #volume-slider {
       width: 90px;
       height: 6px;
       cursor: pointer;
     }
-
     #bgm-button {
       width: 30px;
       height: 30px;
@@ -242,21 +213,16 @@
       box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
       transition: all 0.2s ease;
     }
-
     #bgm-button:hover {
       background-color: rgba(92, 126, 158, 0.3);
       box-shadow: 0 4px 6px rgba(0, 6, 8, 0.7);
     }
-
     .transparent-btn {
       position: relative; 
-      font-size: 18px! important;
+      font-size: 18px!important;
       background: transparent;
       border-radius: 50%;
-      box-shadow: 
-        inset 0px 1px 3px rgba(255, 255, 255, 0.4), 
-        inset 0px -1px 2px rgba(0, 0, 0, 0.4), 
-        0px 4px 6px rgba(0, 0, 0, 0.2); 
+      box-shadow: inset 0px 1px 3px rgba(255, 255, 255, 0.4), inset 0px -1px 2px rgba(0, 0, 0, 0.4), 0px 4px 6px rgba(0, 0, 0, 0.2);
       color: #fff;
       padding: 10px;
       cursor: pointer;
@@ -270,25 +236,17 @@
       justify-content: center;
       margin-right: 10px;
     }
-
     .transparent-btn:last-child {
       margin-right: 0;
     }
-
     .transparent-btn:hover {
       transform: scale(1.1);
-      box-shadow: 
-        inset 0px 2px 4px rgba(255, 255, 255, 0.8), 
-        inset 0px -3px 5px rgba(0, 0, 0, 0.4),
-        0px 8px 10px rgba(0, 0, 0, 0.4);
+      box-shadow: inset 0px 2px 4px rgba(255, 255, 255, 0.8), inset 0px -3px 5px rgba(0, 0, 0, 0.4), 0px 8px 10px rgba(0, 0, 0, 0.4);
     }
     .transparent-btn:active {
       transform: scale(0.95);
-      box-shadow: 
-        0px 2px 3px rgba(0, 0, 0, 0.4), 
-        inset 0px 1px 3px rgba(0, 0, 0, 0.6); 
+      box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.4), inset 0px 1px 3px rgba(0, 0, 0, 0.6);
     }
-
     .palette-container {
       position: absolute;
       top: 100%; 
@@ -300,7 +258,6 @@
       border-radius: 10px;
       z-index: 1000;
     }
-
     .palette-btn {
       width: 30px;
       height: 30px;
@@ -311,75 +268,60 @@
       border: none;
       padding: 0; 
       margin: 0; 
-      box-shadow:
-        inset 0px 1px 3px rgba(255, 255, 255, 0.6), 
-        inset 0px -1px 2px rgba(0, 0, 0, 0.3), 
-        0px 4px 6px rgba(0, 0, 0, 0.2); 
+      box-shadow: inset 0px 1px 3px rgba(255, 255, 255, 0.6), inset 0px -1px 2px rgba(0, 0, 0, 0.3), 0px 4px 6px rgba(0, 0, 0, 0.2);
       background: transparent;
       transition: transform 0.2s, box-shadow 0.2s;
     }
-
     .palette-btn:hover {
       transform: scale(1.1);
     }
-
     .palette-btn:active {
-      transform: scale(0.9); /* 按鈕縮小效果 */
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5); /* 按鈕壓入效果 */
+      transform: scale(0.9);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
     }
-
     .palette-btn[data-palette="green"] {
-      background: linear-gradient(135deg, #7cc396, #5aa575); /* 綠色漸層 */
+      background: linear-gradient(135deg, #7cc396, #5aa575);
     }
-
     .palette-btn[data-palette="pink"] {
-      background: linear-gradient(135deg, #FF60AF, #FFD0FF); /* 粉色漸層 */
+      background: linear-gradient(135deg, #FF8FC1, #f9d0e2);
     }
-
     .palette-btn[data-palette="blue"] {
-      background: linear-gradient(135deg, #81C0C0, #4F9D9D); /* 藍色漸層 */
+      background: linear-gradient(135deg, #54A8C3, #7aadbe);
     }
-
     .palette-btn[data-palette="yellow"] {
-      background: linear-gradient(135deg, #FFD700, #FFA500); /* 黃色漸層 */
+      background: linear-gradient(135deg, #FFD700, #FFA500);
     }
-
     .palette-btn[data-palette="gray"] {
-      background: linear-gradient(135deg, #FFFFFF, #E0E0E0); /* 灰白漸層 */
+      background: linear-gradient(135deg, #FFFFFF, #E0E0E0);
     }
-
     .palette-btn[data-palette="red"] {
-      background: linear-gradient(135deg, #8B0000, #FF0000); /* 血色漸層 */
+      background: linear-gradient(135deg, #8B0000, #FF0000);
     }
-
     .hidden {
-      display: none; /* 初始隱藏 */
+      display: none;
     }
-
   </style>
 </head>
 <body>
   <canvas id="fishCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
-<h1 id="page-title">
-  <!-- 調色盤按鈕與容器 -->
-  <div id="color-palette-wrapper" style="position: relative;">
-    <button id="color-palette-btn" class="transparent-btn">🎨</button>
-    <div id="color-palette-container" class="palette-container hidden">
-      <button class="palette-btn" data-palette="green"></button>
-      <button class="palette-btn" data-palette="pink"></button>
-      <button class="palette-btn" data-palette="blue"></button>
-      <button class="palette-btn" data-palette="yellow"></button>
-      <button class="palette-btn" data-palette="gray"></button>
-      <button class="palette-btn" data-palette="red"></button>
+  <h1 id="page-title">
+    <div id="color-palette-wrapper" style="position: relative;">
+      <button id="color-palette-btn" class="transparent-btn">🎨</button>
+      <div id="color-palette-container" class="palette-container hidden">
+        <button class="palette-btn" data-palette="green"></button>
+        <button class="palette-btn" data-palette="pink"></button>
+        <button class="palette-btn" data-palette="blue"></button>
+        <button class="palette-btn" data-palette="yellow"></button>
+        <button class="palette-btn" data-palette="gray"></button>
+        <button class="palette-btn" data-palette="red"></button>
+      </div>
     </div>
-  </div>
-  抽籤轉盤
-  <div id="audio-control-container">
-    <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5">
-    <button id="bgm-button">♫</button>
-  </div>
-</h1>
-
+    抽籤轉盤
+    <div id="audio-control-container">
+      <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5">
+      <button id="bgm-button">♫</button>
+    </div>
+  </h1>
   <div class="container">
     <div class="wheel-container">
       <div class="arrow"></div>
@@ -387,13 +329,11 @@
       <div class="buttons">
         <button id="spinButton">啟動轉盤</button>
       </div>
-
       <div id="timeDisplay">
         <div id="date"></div>
         <div id="time"></div>
       </div>
     </div>
-    
     <div class="options-container">
       <textarea id="optionsInput" placeholder="請輸入抽籤選項，每行一個"></textarea>
       <div class="buttons">
@@ -407,10 +347,10 @@
           <button id="diceTemplate">骰子</button>
           <button id="playTemplate">聚會</button>
           <button id="weekTemplate">排假</button>
+        </div>
       </div>
     </div>
   </div>
-
   <div class="result" id="resultBox"></div>
   <audio id="startSound" src="m/start-sound1.mp3"></audio>
   <audio id="resultSound" src="m/result-Sound.mp3"></audio>
@@ -422,651 +362,561 @@
   <audio id="revolverSound" src="m/revolver.mp3"></audio>
   <audio id="revolver1Sound" src="m/revolver1.mp3"></audio>
   <audio id="diceSound" src="m/dice.mp3"></audio>
-
   <script>
-const wheel = document.getElementById("wheel");
-const spinButton = document.getElementById("spinButton");
-const updateButton = document.getElementById("updateButton");
-const optionsInput = document.getElementById("optionsInput");
-const resultBox = document.getElementById("resultBox");
-const gunshotSound = document.getElementById('gunshotSound');
-const coinSound = document.getElementById('coinSound');
-const clickSound = document.getElementById('clickSound');
-const scoreSound = document.getElementById('scoreSound');
-const missSound = document.getElementById('missSound');
-const revolverSound = document.getElementById('revolverSound');
-const revolver1Sound = document.getElementById('revolver1Sound');
-const diceSound = document.getElementById('diceSound');
+    // 全域變數
+    const wheel = document.getElementById("wheel");
+    const spinButton = document.getElementById("spinButton");
+    const updateButton = document.getElementById("updateButton");
+    const optionsInput = document.getElementById("optionsInput");
+    const resultBox = document.getElementById("resultBox");
+    const gunshotSound = document.getElementById('gunshotSound');
+    const coinSound = document.getElementById('coinSound');
+    const clickSound = document.getElementById('clickSound');
+    const scoreSound = document.getElementById('scoreSound');
+    const missSound = document.getElementById('missSound');
+    const revolverSound = document.getElementById('revolverSound');
+    const revolver1Sound = document.getElementById('revolver1Sound');
+    const diceSound = document.getElementById('diceSound');
 
-// 全域變數
-let options = ["1", "2", "3", "4", "5", "6"];
-let revolverMode = false;
-let revolverChambers = [];
-let spinning = false;
-let currentChamberIndex = 0;
-let currentRotationAngle = 0;  
+    let useRevolverOverlay = true;
+    let revolverOverlayImageUrl = "img/rmz.png";
 
-function isDarkColor(color) {
-  const hex = color.replace("#", "");
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-  return brightness < 128;
-}
+    let options = ["1", "2", "3", "4", "5", "6"];
+    let revolverMode = false;
+    let revolverChambers = [];
+    let spinning = false;
+    let currentChamberIndex = 0;
+    let currentRotationAngle = 0;
+    let time = 0;
 
-const palettes = {
-    green: ["#7cc396", "#5aa575", "#89b699", "#00a15c", "#2dce89", "#acdcc8", "#8fd9b6", "#6abf9c", "#a1e5d4", "#94d9c4"],
-    pink: ["#FF60AF", "#f8bfdb", "#e37daf", "#f288ac", "#ffd9e6", "#d2abd2", "#dda0dd", "#bf72bf", "#AE57A4", "#f070af"],
-    blue: ["#4798b3", "#7aadbe", "#72b1c7", "#afced8", "#5f9ea0", "#007b92", "#66989a", "#00808c", "#006374", "#0b5d65"],
-    yellow: ["#FFD700", "#FFC125", "#FFB90F", "#FFA500", "#FF8C00", "#FFD39B", "#FFEC8B", "#FFD700", "#FFA54F", "#FFDAB9"],
-    gray: ["#f5f5f5", "#757575", "#cccccc", "#383838", "#d4d4d4", "#4d4d4d", "#606060", "#8f8f8f", "#2e2e2e", "#1c1c1c"],
-    red: ["#8B0000", "#B22222", "#DC143C", "#b81414", "#FF6347", "#FF7F50", "#CD5C5C", "#E9967A", "#F08080", "#FA8072"],
-    gun: ["#cdcdcd","#cacaca" ],
-    coin: ["#cdcdcd","#bbbbbb"]
-};
+    function isDarkColor(color) {
+      const hex = color.replace("#", "");
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness < 128;
+    }
 
-// 初始化顏色陣列 
-let userPalette = palettes.green; 
-let colors = palettes.green; 
-const colorPaletteBtn = document.getElementById('color-palette-btn');
-const colorPaletteContainer = document.getElementById('color-palette-container');
-const paletteButtons = document.querySelectorAll('.palette-btn');
+    const palettes = {
+      green: ["#7cc396", "#5aa575", "#89b699", "#00a15c", "#2dce89", "#acdcc8", "#8fd9b6", "#6abf9c", "#a1e5d4", "#94d9c4"],
+      pink: ["#FF8FC1", "#f9d0e2", "#eaa7c1", "#f5a4c0", "#ffe6ef", "#e3c3e3", "#e6b5e6", "#d49bd4", "#c985c0", "#f59abc"],
+      blue: ["#54A8C3", "#7aadbe", "#72b1c7", "#afced8", "#66a3b0", "#47B0B3", "#7DB2B2", "#5BAAAE", "#5197A2", "#54929A"],
+      yellow: ["#FFD700", "#FFC125", "#FFB90F", "#FFA500", "#FF8C00", "#FFD39B", "#FFEC8B", "#FFD700", "#FFA54F", "#FFDAB9"],
+      gray: ["#f5f5f5", "#757575", "#cccccc", "#383838", "#d4d4d4", "#4d4d4d", "#606060", "#8f8f8f", "#2e2e2e", "#1c1c1c"],
+      red: ["#8B0000", "#B22222", "#DC143C", "#b81414", "#FF6347", "#FF7F50", "#CD5C5C", "#E9967A", "#F08080", "#FA8072"],
+      gun: ["#151615","#151617"],
+      coin: ["#cdcdcd","#bbbbbb"]
+    };
 
-colorPaletteBtn.addEventListener('click', () => {
-    clickSound.currentTime = 0; // 重置播放位置
-    clickSound.play().catch(error => console.warn('碼錶按鈕音效失敗:', error));
-    colorPaletteContainer.classList.toggle('hidden');
-});
+    let userPalette = palettes.green;
+    let colors = palettes.green;
+    const colorPaletteBtn = document.getElementById('color-palette-btn');
+    const colorPaletteContainer = document.getElementById('color-palette-container');
+    const paletteButtons = document.querySelectorAll('.palette-btn');
 
-paletteButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        clickSound.currentTime = 0; // 重置播放位置
-        clickSound.play().catch(error => console.warn('碼錶按鈕音效失敗:', error));
-        const selectedPalette = button.getAttribute('data-palette');
-        colors = palettes[selectedPalette]; 
-        drawWheel();
-        colorPaletteContainer.classList.add('hidden'); 
+    colorPaletteBtn.addEventListener('click', () => {
+      clickSound.currentTime = 0;
+      clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
+      colorPaletteContainer.classList.toggle('hidden');
     });
-});
 
+    paletteButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        clickSound.currentTime = 0;
+        clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
+        const selectedPalette = button.getAttribute('data-palette');
+        colors = palettes[selectedPalette];
+        drawWheel();
+        colorPaletteContainer.classList.add('hidden');
+      });
+    });
 
-function drawWheel() {
-    wheel.innerHTML = "";
-    const numOptions = options.length;
-    if (numOptions === 0) {
+    function drawWheel() {
+
+      wheel.innerHTML = "";
+      const numOptions = options.length;
+      if (numOptions === 0) {
         alert('請輸入至少一個選項');
         return;
-    }
-    const angleStep = 360 / numOptions;
-
-    for (let i = 0; i < numOptions; i++) {
+      }
+      const angleStep = 360 / numOptions;
+      for (let i = 0; i < numOptions; i++) {
         const angle = i * angleStep;
         const color = colors[i % colors.length];
 
-        // 繪製扇形
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         path.setAttribute("d", describeArc(150, 150, 150, angle, angle + angleStep));
         path.setAttribute("fill", color);
-        if (colors === palettes.gun) {
-          path.setAttribute("stroke", "#A0A0A0"); 
-          path.setAttribute("stroke-width", "3");    
-        }
         if (colors === palettes.coin) {
-          path.setAttribute("stroke", "#A0A0A0"); 
-          path.setAttribute("stroke-width", "3");    
+          path.setAttribute("stroke", "#A0A0A0");
+          path.setAttribute("stroke-width", "3");
         }
         wheel.appendChild(path);
 
-        // 添加文字
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        const textRadius = 110; 
+        const textRadius = 110;
         const midAngle = angle + angleStep / 2;
         const x = 150 + textRadius * Math.cos((midAngle - 90) * Math.PI / 180);
         const y = 150 + textRadius * Math.sin((midAngle - 90) * Math.PI / 180);
-
         text.setAttribute("x", x);
         text.setAttribute("y", y);
         text.setAttribute("text-anchor", "middle");
         text.setAttribute("dominant-baseline", "middle");
         text.setAttribute("transform", `rotate(${midAngle + 90}, ${x}, ${y})`);
-
         const optionText = options[i];
         let fontSize = "28px";
         if (options.length > 17) fontSize = "20px";
         else if (optionText.length > 3) fontSize = "24px";
-
         text.style.fontSize = fontSize;
         text.style.fontFamily = '"Roboto", "NaniFont-Regular", sans-serif';
         text.textContent = optionText;
-
         const textColor = isDarkColor(color) ? "#fff" : "#000";
         text.setAttribute("fill", textColor);
-
         wheel.appendChild(text);
-    }
-}
-
-
-function getDesiredAngle(index) {
-  const slice = 360 / 6;
-  return 360 - (index * slice + slice / 2);
-}
-
-function spinWheel() {
-  if (spinning) return;
-  spinning = true;
-  console.log("spinWheel 執行時, 左輪模式 =", revolverMode);
-  
-  if (revolverMode) {
-    let textElements = wheel.querySelectorAll('text');
-    textElements.forEach(el => el.style.visibility = 'hidden');
-    let currentResult = revolverChambers[currentChamberIndex];
-    
-    spinButton.disabled = true;
-    spinButton.style.opacity = "0.5";
-    spinButton.style.cursor = "not-allowed";
-    
-    if (currentChamberIndex === 0) {
-      const desired = getDesiredAngle(0); 
-      const currentMod = currentRotationAngle % 360;
-      let additional = desired - currentMod;
-      if (additional < 0) additional += 360;
-      const targetAngle = currentRotationAngle + 360 * 4 + additional;
-      const animationName = "leftSpinAnim_" + Date.now();
-      const keyframes = `
-        @keyframes ${animationName} {
-          from { transform: rotate(${currentRotationAngle}deg); }
-          to { transform: rotate(${targetAngle}deg); }
-        }
-      `;
-      const styleElem = document.createElement("style");
-      styleElem.innerHTML = keyframes;
-      document.head.appendChild(styleElem);
-      
-      wheel.style.animation = `${animationName} 3s cubic-bezier(0.2, 1, 0.3, 1) forwards`;
-      currentRotationAngle = targetAngle;
-      revolverSound.currentTime = 0;
-      revolverSound.play().catch(err => console.warn(err));
-      
-      setTimeout(() => {
-        wheel.style.animation = "";
-        wheel.style.transform = `rotate(${currentRotationAngle}deg)`;
-        styleElem.parentNode.removeChild(styleElem);
-        
-        resultBox.style.display = "flex";
-        resultBox.textContent = "抽中: " + currentResult;
-        
-        if (currentResult === '💥') {
-          gunshotSound.currentTime = 0;
-          gunshotSound.play().catch(err => console.warn(err)); 
-          confetti({
-            particleCount: 100,
-            colors: ['#ff0000'],
-            spread: 70,
-            origin: { x: 0.5, y: 0.5 }
-          });   
-          setTimeout(() => {
-            resultBox.textContent = "遊戲結束";
-            setTimeout(() => {
-              resultBox.style.display = "none";
-              resetLeftMode();
-            }, 2000);
-          }, 2000);
-        } else if (currentResult === 'MISS') {
-          missSound.currentTime = 0;
-          missSound.play().catch(err => console.warn(err));
-          currentChamberIndex++; 
-          setTimeout(() => {
-            resultBox.style.display = "none";
-            spinning = false;
-            spinButton.disabled = false;
-            spinButton.style.opacity = "1";
-            spinButton.style.cursor = "pointer";
-          }, 2000);
-        }
-      }, 3000);
-      
-    } else {
-      const cellAngle = 360 / 6; // 60°
-      const targetAngle = currentRotationAngle + cellAngle;
-      
-      wheel.style.transition = "transform 2s cubic-bezier(0.2, 1, 0.3, 1)";
-      wheel.style.transform = `rotate(${targetAngle}deg)`;
-      revolver1Sound.currentTime = 0;
-      revolver1Sound.play().catch(err => console.warn(err));
-      
-      setTimeout(() => {
-        currentRotationAngle = targetAngle;  // 更新累計角度
-        resultBox.style.display = "flex";
-        resultBox.textContent = "抽中: " + currentResult;
-        
-        if (currentResult === '💥') {
-          gunshotSound.currentTime = 0;
-          gunshotSound.play().catch(err => console.warn(err));
-          confetti({
-            particleCount: 100,
-            colors: ['#ff0000'],
-            spread: 70,
-            origin: { x: 0.5, y: 0.5 }
-          });
-          setTimeout(() => {
-            resultBox.textContent = "遊戲結束";
-            setTimeout(() => {
-              resultBox.style.display = "none";
-              resetLeftMode();
-            }, 2000);
-          }, 2000);
-        } else if (currentResult === 'MISS') {
-          missSound.currentTime = 0;
-          missSound.play().catch(err => console.warn(err));
-          currentChamberIndex++; // 指向下一格
-          setTimeout(() => {
-            resultBox.style.display = "none";
-            spinning = false;
-            spinButton.disabled = false;
-            spinButton.style.opacity = "1";
-            spinButton.style.cursor = "pointer";
-          }, 2000);
-        }
-      }, 2000);
-    }
-    return;
-  }
-  normalSpin();
-}
-
-function resetLeftMode() {
-  revolverMode = false;
-  revolverChambers = [];
-  options = ["1", "2", "3", "4", "5", "6"];
-  colors = userPalette;
-  drawWheel();
-  currentRotationAngle = 0;
-  currentChamberIndex = 0;
-  spinning = false;
-  spinButton.disabled = false;
-  spinButton.style.opacity = "1";
-  spinButton.style.cursor = "pointer";
-}
-
-function normalSpin() {
-  const items = options;
-  const isCoinFlip = items.length === 2 && items.includes('正面') && items.includes('反面');
-  const isDice = items.length === 6 && items[0] === "⚀";
-  
-  if (isCoinFlip) {
-    coinSound.currentTime = 0;
-    coinSound.play().catch(error => console.warn('硬幣音效播放失敗:', error));
-  } else if (isDice) {
-    diceSound.currentTime = 0;
-    diceSound.play().catch(error => console.warn('骰子音效播放失敗:', error));
-  } else {
-    startSound.currentTime = 0;
-    startSound.play().catch(error => console.warn('開始音效播放失敗:', error));
-  }
-  
-  spinButton.disabled = true;
-  spinButton.style.opacity = "0.5";
-  spinButton.style.cursor = "not-allowed";
-  
-  wheel.style.transition = "none";
-  wheel.style.transform = "rotate(0deg)";
-  
-  const numOptions = options.length;
-  const randomIndex = Math.floor(Math.random() * numOptions);
-  
-  const sliceDegree = 360 / numOptions;
-  const targetDegree = 360 - (randomIndex * sliceDegree + sliceDegree / 2);
-  const spinDegree = 360 * 12 + targetDegree;
-  
-  setTimeout(() => {
-    // 根據模式決定動畫時間
-    if (isCoinFlip) {
-      wheel.style.transition = "transform 3.6s ease-out";
-    } else if (isDice) {
-      wheel.style.transition = "transform 1.7s ease-out";
-    } else {
-      wheel.style.transition = "transform 7.5s ease-out";
-    }
-    wheel.style.transform = `rotate(${spinDegree}deg)`;
-  
-    setTimeout(() => {
-      resultBox.textContent = `抽中: ${options[randomIndex]}`;
-      resultBox.style.display = "flex";
-      
-      if (options[randomIndex] === '💥') {
-        gunshotSound.currentTime = 0;
-        gunshotSound.play().catch(error => console.warn('槍聲音效播放失敗:', error));
-        confetti({
-        particleCount: 100,
-        colors: ['#ff0000'],
-        spread: 70,
-        origin: { x: 0.5, y: 0.5 }
-      });
-      } else {
-        resultSound.currentTime = 0;
-        resultSound.play().catch(error => console.warn('結果音效播放失敗:', error));
       }
-      showConfetti();
-      
+      if (revolverMode && useRevolverOverlay) {
+        const overlay = document.createElementNS("http://www.w3.org/2000/svg", "image");
+        overlay.setAttributeNS(null, "href", revolverOverlayImageUrl);
+        overlay.setAttribute("x", "-46");
+        overlay.setAttribute("y", "-38");
+        overlay.setAttribute("width", "390");
+        overlay.setAttribute("height", "390");
+        overlay.setAttribute("preserveAspectRatio", "xMidYMid meet");
+        wheel.appendChild(overlay);
+      }
+    }
+
+    function describeArc(x, y, radius, startAngle, endAngle) {
+      const start = polarToCartesian(x, y, radius, endAngle);
+      const end = polarToCartesian(x, y, radius, startAngle);
+      const largeArcFlag = (endAngle - startAngle + 360) % 360 > 180 ? "1" : "0";
+      return [
+        "M", x, y,
+        "L", start.x, start.y,
+        "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+        "Z"
+      ].join(" ");
+    }
+
+    function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+      const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+      return {
+        x: centerX + (radius * Math.cos(angleInRadians)),
+        y: centerY + (radius * Math.sin(angleInRadians))
+      };
+    }
+
+    function getDesiredAngle(index) {
+      const slice = 360 / 6;
+      return 360 - (index * slice + slice / 2);
+    }
+
+    function spinWheel() {
+      if (spinning) return;
+      spinning = true;
+      console.log("spinWheel 執行時, 左輪模式 =", revolverMode);
+      if (revolverMode) {
+        let textElements = wheel.querySelectorAll('text');
+        textElements.forEach(el => el.style.visibility = 'hidden');
+        let currentResult = revolverChambers[currentChamberIndex];
+        spinButton.disabled = true;
+        spinButton.style.opacity = "0.5";
+        spinButton.style.cursor = "not-allowed";
+        if (currentChamberIndex === 0) {
+          const desired = getDesiredAngle(0);
+          const currentMod = currentRotationAngle % 360;
+          let additional = desired - currentMod;
+          if (additional < 0) additional += 360;
+          const targetAngle = currentRotationAngle + 360 * 4 + additional;
+          const animationName = "leftSpinAnim_" + Date.now();
+          const keyframes = `
+            @keyframes ${animationName} {
+              from { transform: rotate(${currentRotationAngle}deg); }
+              to { transform: rotate(${targetAngle}deg); }
+            }
+          `;
+          const styleElem = document.createElement("style");
+          styleElem.innerHTML = keyframes;
+          document.head.appendChild(styleElem);
+          wheel.style.animation = `${animationName} 3s cubic-bezier(0.2, 1, 0.3, 1) forwards`;
+          currentRotationAngle = targetAngle;
+          revolverSound.currentTime = 0;
+          revolverSound.play().catch(err => console.warn(err));
+          setTimeout(() => {
+            wheel.style.animation = "";
+            wheel.style.transform = `rotate(${currentRotationAngle}deg)`;
+            styleElem.parentNode.removeChild(styleElem);
+            resultBox.style.display = "flex";
+            resultBox.textContent = "抽中: " + currentResult;
+            if (currentResult === '💥') {
+              gunshotSound.currentTime = 0;
+              gunshotSound.play().catch(err => console.warn(err));
+              confetti({
+                particleCount: 100,
+                colors: ['#ff0000'],
+                spread: 70,
+                origin: { x: 0.5, y: 0.5 }
+              });
+              setTimeout(() => {
+                resultBox.textContent = "遊戲結束";
+                setTimeout(() => {
+                  resultBox.style.display = "none";
+                  resetLeftMode();
+                }, 2000);
+              }, 2000);
+            } else if (currentResult === 'MISS') {
+              missSound.currentTime = 0;
+              missSound.play().catch(err => console.warn(err));
+              currentChamberIndex++;
+              setTimeout(() => {
+                resultBox.style.display = "none";
+                spinning = false;
+                spinButton.disabled = false;
+                spinButton.style.opacity = "1";
+                spinButton.style.cursor = "pointer";
+              }, 2000);
+            }
+          }, 3000);
+        } else {
+          const cellAngle = 360 / 6;
+          const targetAngle = currentRotationAngle + cellAngle;
+          wheel.style.transition = "transform 2s cubic-bezier(0.2, 1, 0.3, 1)";
+          wheel.style.transform = `rotate(${targetAngle}deg)`;
+          revolver1Sound.currentTime = 0;
+          revolver1Sound.play().catch(err => console.warn(err));
+          setTimeout(() => {
+            currentRotationAngle = targetAngle;
+            resultBox.style.display = "flex";
+            resultBox.textContent = "抽中: " + currentResult;
+            if (currentResult === '💥') {
+              gunshotSound.currentTime = 0;
+              gunshotSound.play().catch(err => console.warn(err));
+              confetti({
+                particleCount: 100,
+                colors: ['#ff0000'],
+                spread: 70,
+                origin: { x: 0.5, y: 0.5 }
+              });
+              setTimeout(() => {
+                resultBox.textContent = "遊戲結束";
+                setTimeout(() => {
+                  resultBox.style.display = "none";
+                  resetLeftMode();
+                }, 2000);
+              }, 2000);
+            } else if (currentResult === 'MISS') {
+              missSound.currentTime = 0;
+              missSound.play().catch(err => console.warn(err));
+              currentChamberIndex++;
+              setTimeout(() => {
+                resultBox.style.display = "none";
+                spinning = false;
+                spinButton.disabled = false;
+                spinButton.style.opacity = "1";
+                spinButton.style.cursor = "pointer";
+              }, 2000);
+            }
+          }, 2000);
+        }
+        return;
+      }
+      normalSpin();
+    }
+
+    function resetLeftMode() {
+      revolverMode = false;
+      revolverChambers = [];
+      options = ["1", "2", "3", "4", "5", "6"];
+      colors = userPalette;
+      drawWheel();
+      currentRotationAngle = 0;
+      currentChamberIndex = 0;
+      spinning = false;
+      spinButton.disabled = false;
+      spinButton.style.opacity = "1";
+      spinButton.style.cursor = "pointer";
+    }
+
+    function normalSpin() {
+      const items = options;
+      const isCoinFlip = items.length === 2 && items.includes('正面') && items.includes('反面');
+      const isDice = items.length === 6 && items[0] === "⚀";
+      if (isCoinFlip) {
+        coinSound.currentTime = 0;
+        coinSound.play().catch(error => console.warn('硬幣音效失敗:', error));
+      } else if (isDice) {
+        diceSound.currentTime = 0;
+        diceSound.play().catch(error => console.warn('骰子音效失敗:', error));
+      } else {
+        startSound.currentTime = 0;
+        startSound.play().catch(error => console.warn('開始音效失敗:', error));
+      }
+      spinButton.disabled = true;
+      spinButton.style.opacity = "0.5";
+      spinButton.style.cursor = "not-allowed";
+      wheel.style.transition = "none";
+      wheel.style.transform = "rotate(0deg)";
+      const numOptions = options.length;
+      const randomIndex = Math.floor(Math.random() * numOptions);
+      const sliceDegree = 360 / numOptions;
+      const targetDegree = 360 - (randomIndex * sliceDegree + sliceDegree / 2);
+      const spinDegree = 360 * 12 + targetDegree;
       setTimeout(() => {
-        resultBox.style.display = "none";
-        spinning = false;
-        spinButton.disabled = false;
-        spinButton.style.opacity = "1";
-        spinButton.style.cursor = "pointer";
-      }, isCoinFlip ? 3600 : isDice ? 1700 : 3600);
-    }, isCoinFlip ? 3600 : isDice ? 1700 : 7500);
-  }, 10);
-}
-function describeArc(x, y, radius, startAngle, endAngle) {
-  const start = polarToCartesian(x, y, radius, endAngle);
-  const end = polarToCartesian(x, y, radius, startAngle);
-  const largeArcFlag = (endAngle - startAngle + 360) % 360 > 180 ? "1" : "0";
+        if (isCoinFlip) {
+          wheel.style.transition = "transform 3.6s ease-out";
+        } else if (isDice) {
+          wheel.style.transition = "transform 1.7s ease-out";
+        } else {
+          wheel.style.transition = "transform 7.5s ease-out";
+        }
+        wheel.style.transform = `rotate(${spinDegree}deg)`;
+        setTimeout(() => {
+          resultBox.textContent = `抽中: ${options[randomIndex]}`;
+          resultBox.style.display = "flex";
+          if (options[randomIndex] === '💥') {
+            gunshotSound.currentTime = 0;
+            gunshotSound.play().catch(error => console.warn('槍聲失敗:', error));
+            confetti({
+              particleCount: 100,
+              colors: ['#ff0000'],
+              spread: 70,
+              origin: { x: 0.5, y: 0.5 }
+            });
+          } else {
+            resultSound.currentTime = 0;
+            resultSound.play().catch(error => console.warn('結果音效失敗:', error));
+          }
+          showConfetti();
+          setTimeout(() => {
+            resultBox.style.display = "none";
+            spinning = false;
+            spinButton.disabled = false;
+            spinButton.style.opacity = "1";
+            spinButton.style.cursor = "pointer";
+          }, isCoinFlip ? 3600 : isDice ? 1700 : 3600);
+        }, isCoinFlip ? 3600 : isDice ? 1700 : 7500);
+      }, 10);
+    }
 
-  return [
-    "M", x, y,
-    "L", start.x, start.y,
-    "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
-    "Z"
-  ].join(" ");
-}
+    function describeArc(x, y, radius, startAngle, endAngle) {
+      const start = polarToCartesian(x, y, radius, endAngle);
+      const end = polarToCartesian(x, y, radius, startAngle);
+      const largeArcFlag = (endAngle - startAngle + 360) % 360 > 180 ? "1" : "0";
+      return [
+        "M", x, y,
+        "L", start.x, start.y,
+        "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+        "Z"
+      ].join(" ");
+    }
 
-function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-  const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
-  return {
-    x: centerX + (radius * Math.cos(angleInRadians)),
-    y: centerY + (radius * Math.sin(angleInRadians))
-  };
-}
+    function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+      const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+      return {
+        x: centerX + (radius * Math.cos(angleInRadians)),
+        y: centerY + (radius * Math.sin(angleInRadians))
+      };
+    }
 
-spinButton.addEventListener("click", spinWheel);
-      clickSound.currentTime = 0; // 重置播放位置
-      clickSound.play().catch(error => console.warn('碼錶按鈕音效失敗:', error));
-updateButton.addEventListener("click", () => {
-      clickSound.currentTime = 0; // 重置播放位置
-      clickSound.play().catch(error => console.warn('碼錶按鈕音效失敗:', error));
-  const newOptions = optionsInput.value.trim().split("\n").map(opt => opt.trim()).filter(opt => opt);
-  if (newOptions.length === 0) {
-    alert("請輸入至少一個選項");
-    return;
-  }
-  options = newOptions;
-  revolverMode = false;
-  colors = userPalette;
-  drawWheel();
-});
+    spinButton.addEventListener("click", spinWheel);
+    clickSound.currentTime = 0;
+    clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
+    updateButton.addEventListener("click", () => {
+      clickSound.currentTime = 0;
+      clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
+      const newOptions = optionsInput.value.trim().split("\n").map(opt => opt.trim()).filter(opt => opt);
+      if (newOptions.length === 0) {
+        alert("請輸入至少一個選項");
+        return;
+      }
+      options = newOptions;
+      revolverMode = false;
+      colors = userPalette;
+      drawWheel();
+    });
 
-// 初始繪製轉盤
-drawWheel();
+    // 初始繪製轉盤
+    drawWheel();
 
-    // 範例設定
+    // 範例模板設定
     const templates = {
       coin: ["正面", "反面"],
       food: ["披薩", "速食", "便利商店", "水餃", "燒烤", "海鮮", "咖啡廳", "麵包", "麵類", "炸物", "港式", "泰式", "飯類", "早餐店", "泡麵", "鍋貼", "西餐", "火鍋"],
       gun: ["MISS", "MISS", "MISS", "💥", "MISS", "MISS"],
       dice: ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"],
-      play: ["電影院","桌遊之夜","爬山遠足","博物館","露營","溫泉/泳池","餐廳","遊樂園","音樂廳","美術館","DIY勞作體驗","海邊/水族館","咖啡館","運動","烤肉","購物中心","觀光農場","公路旅行","森林公園","歡唱KTV"],
-      week: ["星期一","星期二","星期三","星期四","星期五","星期六","星期日"],
+      play: ["電影院", "桌遊之夜", "爬山遠足", "博物館", "露營", "溫泉/泳池", "餐廳", "遊樂園", "音樂廳", "美術館", "DIY勞作體驗", "海邊/水族館", "咖啡館", "運動", "烤肉", "購物中心", "觀光農場", "公路旅行", "森林公園", "歡唱KTV"],
+      week: ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
     };
 
+    document.getElementById("coinTemplate").addEventListener("click", () => {
+      scoreSound.currentTime = 0;
+      scoreSound.play().catch(error => console.warn('模板音效失敗:', error));
+      options = templates.coin;
+      colors = palettes.coin;
+      revolverMode = false;
+      drawWheel();
+    });
+    document.getElementById("foodTemplate").addEventListener("click", () => {
+      scoreSound.currentTime = 0;
+      scoreSound.play().catch(error => console.warn('模板音效失敗:', error));
+      options = templates.food;
+      colors = userPalette;
+      revolverMode = false;
+      drawWheel();
+    });
+    document.getElementById("gunTemplate").addEventListener("click", () => {
+      scoreSound.currentTime = 0;
+      scoreSound.play().catch(error => console.warn('模板音效失敗:', error));
+      options = templates.gun;
+      revolverMode = true;
+      revolverChambers = templates.gun.slice();
+      revolverChambers.sort(() => Math.random() - 0.5);
+      currentChamberIndex = 0;
+      currentRotationAngle = 0;
+      colors = palettes.gun;
+      drawWheel();
+    });
+    document.getElementById("diceTemplate").addEventListener("click", () => {
+      scoreSound.currentTime = 0;
+      scoreSound.play().catch(error => console.warn('模板音效失敗:', error));
+      options = templates.dice;
+      colors = userPalette;
+      revolverMode = false;
+      drawWheel();
+    });
+    document.getElementById("playTemplate").addEventListener("click", () => {
+      scoreSound.currentTime = 0;
+      scoreSound.play().catch(error => console.warn('模板音效失敗:', error));
+      options = templates.play;
+      colors = userPalette;
+      revolverMode = false;
+      drawWheel();
+    });
+    document.getElementById("weekTemplate").addEventListener("click", () => {
+      scoreSound.currentTime = 0;
+      scoreSound.play().catch(error => console.warn('模板音效失敗:', error));
+      options = templates.week;
+      colors = userPalette;
+      revolverMode = false;
+      drawWheel();
+    });
 
-// 按鈕事件監聽器
-document.getElementById("coinTemplate").addEventListener("click", () => {
-      scoreSound.currentTime = 0; // 重置播放位置
-      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
-  options = templates.coin;
-  colors = palettes.coin;
-  revolverMode = false;
-  drawWheel();
-});
-
-document.getElementById("foodTemplate").addEventListener("click", () => {
-      scoreSound.currentTime = 0; // 重置播放位置
-      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
-  options = templates.food;
-  colors = userPalette;
-  revolverMode = false;
-  drawWheel();
-});
-
-document.getElementById("gunTemplate").addEventListener("click", () => {
-      scoreSound.currentTime = 0; // 重置播放位置
-      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
-  options = templates.gun; 
-  revolverMode = true;
-  revolverChambers = templates.gun.slice();
-  revolverChambers.sort(() => Math.random() - 0.5);
-  currentChamberIndex = 0;
-  currentRotationAngle = 0;
-  colors = palettes.gun;
-  drawWheel();
-});
-
-
-document.getElementById("diceTemplate").addEventListener("click", () => {
-      scoreSound.currentTime = 0; // 重置播放位置
-      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
-  options = templates.dice;
-  colors = userPalette;
-  revolverMode = false;
-  drawWheel();
-});
-
-document.getElementById("playTemplate").addEventListener("click", () => {
-      scoreSound.currentTime = 0; // 重置播放位置
-      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
-  options = templates.play;
-  colors = userPalette;
-  revolverMode = false;
-  drawWheel();
-});
-
-document.getElementById("weekTemplate").addEventListener("click", () => {
-      scoreSound.currentTime = 0; // 重置播放位置
-      scoreSound.play().catch(error => console.warn('分數按鈕音效失敗:', error));
-  options = templates.week;
-  colors = userPalette;
-  revolverMode = false;
-  drawWheel();
-});
-
-    // 彩花
     function showConfetti() {
       confetti({ particleCount: 100, spread: 70, origin: { x: 0 } });
       confetti({ particleCount: 100, spread: 70, origin: { x: 1 } });
     }
 
-    // 時鐘
     function updateClock() {
       const now = new Date();
-      
-      // 取得年月日
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
       const day = String(now.getDate()).padStart(2, '0');
-      
-      // 取得時分秒
       const hours = String(now.getHours()).padStart(2, '0');
       const minutes = String(now.getMinutes()).padStart(2, '0');
       const seconds = String(now.getSeconds()).padStart(2, '0');
-      
-      // 更新日期與時間
       document.getElementById('date').textContent = `${year} 年 ${month} 月 ${day} 日`;
       document.getElementById('time').textContent = `${hours} ： ${minutes} ： ${seconds} `;
     }
-
-    // 每秒更新一次時鐘
     setInterval(updateClock, 1000);
-
-    // 初始化時鐘
     updateClock();
 
-const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/groovy-funk.mp3');
-bgmAudio.loop = true; // 設置 BGM 循環播放
-bgmAudio.volume = 0.5; // 預設音量
-
-const volumeSlider = document.getElementById('volume-slider');
-const bgmButton = document.getElementById('bgm-button');
-
-const muteIcon = '🔇';
-const playIcon = '♫';
-const pauseIcon = '❚❚';
-    
-const soundList = [resultSound, startSound, gunshotSound, coinSound, scoreSound, clickSound];
-soundList.forEach(sound => sound.volume = 0.5);
-coinSound.volume = 0.6;
-
-// 控制音量大小與靜音狀態
-volumeSlider.addEventListener('input', (event) => {
-    const volume = parseFloat(event.target.value);
-
-    // 更新所有音效的音量
-    bgmAudio.volume = volume; // 調整 BGM 音量
-    soundList.forEach(sound => sound.volume = volume);
-
-    // 靜音圖示邏輯
-    if (volume === 0) {
-        bgmButton.textContent = muteIcon; // 顯示靜音符號
-    } else {
-        bgmButton.textContent = isPlaying ? pauseIcon : playIcon; // 顯示播放/暫停符號
-    }
-});
-
-// 播放/暫停 BGM 按鈕
-let isPlaying = false; 
-bgmButton.addEventListener('click', () => {
-    if (volumeSlider.value === '0') {
+    const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/groovy-funk.mp3');
+    bgmAudio.loop = true;
+    bgmAudio.volume = 0.5;
+    const volumeSlider = document.getElementById('volume-slider');
+    const bgmButton = document.getElementById('bgm-button');
+    const muteIcon = '🔇';
+    const playIcon = '♫';
+    const pauseIcon = '❚❚';
+    const soundList = [resultSound, startSound, gunshotSound, coinSound, scoreSound, clickSound];
+    soundList.forEach(sound => sound.volume = 0.5);
+    coinSound.volume = 0.6;
+    volumeSlider.addEventListener('input', (event) => {
+      const volume = parseFloat(event.target.value);
+      bgmAudio.volume = volume;
+      soundList.forEach(sound => sound.volume = volume);
+      if (volume === 0) {
+        bgmButton.textContent = muteIcon;
+      } else {
+        bgmButton.textContent = isPlaying ? pauseIcon : playIcon;
+      }
+    });
+    let isPlaying = false;
+    bgmButton.addEventListener('click', () => {
+      if (volumeSlider.value === '0') {
         alert('音量為零，請先調高音量再播放！');
         return;
-    }
-
-    if (isPlaying) {
+      }
+      if (isPlaying) {
         bgmAudio.pause();
-        bgmButton.textContent = playIcon; 
-    } else {
+        bgmButton.textContent = playIcon;
+      } else {
         bgmAudio.play();
         bgmButton.textContent = pauseIcon;
+      }
+      isPlaying = !isPlaying;
+    });
+
+    var fishCanvas = document.getElementById('fishCanvas');
+    var fishCtx = fishCanvas.getContext('2d');
+    function resizeCanvas() {
+      fishCanvas.width = window.innerWidth;
+      fishCanvas.height = window.innerHeight;
     }
-    isPlaying = !isPlaying;
-});
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-var fishCanvas = document.getElementById('fishCanvas');
-var fishCtx = fishCanvas.getContext('2d');
-var time = 0;
-var selectedHexagons = [];
-
-function resizeCanvas() {
-    fishCanvas.width = window.innerWidth;
-    fishCanvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-function drawHexagon(ctx, centerX, centerY, radius, fillStyle) {
-    ctx.beginPath();
-    for (let i = 0; i < 6; i++) {
+    // 以下為背景六角形蜂巢效果（可依需求自行調整）
+    function drawHexagon(ctx, centerX, centerY, radius, fillStyle) {
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
         const angle = Math.PI / 3 * i - Math.PI / 6;
         const x = centerX + radius * Math.cos(angle);
         const y = centerY + radius * Math.sin(angle);
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = fillStyle;
+      ctx.fill();
     }
-    ctx.closePath();
-    ctx.fillStyle = fillStyle;
-    ctx.fill();
-}
-
-function drawHexagonGrid(ctx, canvasWidth, canvasHeight, radius, time) {
-    const hexWidth = 1.72 * radius;
-    const hexHeight = Math.sqrt(3.1) * radius;
-    for (let row = 0; row < canvasHeight / (hexHeight * 0.8) + 1; row++) {
+    function drawHexagonGrid(ctx, canvasWidth, canvasHeight, radius, time) {
+      const hexWidth = 1.72 * radius;
+      const hexHeight = Math.sqrt(3.1) * radius;
+      for (let row = 0; row < canvasHeight / (hexHeight * 0.8) + 1; row++) {
         const offsetX = (row % 2) * (hexWidth / 2);
         for (let col = 0; col < canvasWidth / hexWidth + 1; col++) {
-            const centerX = col * hexWidth + offsetX;
-            const centerY = row * (hexHeight * 0.85);
-            const waveX = Math.sin(centerX * 0.01 + time) * 3;
-            const waveY = Math.cos(centerY * 0.01 + time) * 3;
-            let opacity = 0.08 + (Math.sin(centerX * 0.01 + centerY * 0.01 + time) * 0.021);
-            let fillStyle = `rgba(70, 220, 255, ${opacity})`;
-            let glowOpacity = 0;
-
-            for (let hex of selectedHexagons) {
-                if (hex.col === col && hex.row === row) {
-                    const elapsed = (performance.now() - hex.startTime) / 1000; 
-                    if (elapsed < 1) {
-                        let blendFactor = elapsed;
-                        fillStyle = `rgba(${70 + blendFactor * (190 - 70)}, ${220 + blendFactor * (250 - 220)}, ${255 + blendFactor * (255 - 255)}, ${opacity + blendFactor * (0.2 - opacity)})`;
-                        glowOpacity = blendFactor * 0.2;
-                    } else if (elapsed < 2) {
-                        fillStyle = `rgba(190, 250, 255, 0.2)`;
-                        glowOpacity = 0.2;
-                    } else if (elapsed < 3) {
-                        let blendFactor = 1 - (elapsed - 2);
-                        fillStyle = `rgba(${70 + blendFactor * (255 - 70)}, ${220 + blendFactor * (255 - 220)}, ${255 + blendFactor * (255 - 255)}, ${opacity + blendFactor * (0.2 - opacity)})`;
-                        glowOpacity = blendFactor * 0.2; 
-                    }
-                }
-            }
-            if (glowOpacity > 0) {
-                drawGlow(ctx, centerX + waveX, centerY + waveY, radius * 1.5, glowOpacity);
-            }
-            drawHexagon(ctx, centerX + waveX, centerY + waveY, radius, fillStyle);
+          const centerX = col * hexWidth + offsetX;
+          const centerY = row * (hexHeight * 0.85);
+          const waveX = Math.sin(centerX * 0.01 + time) * 3;
+          const waveY = Math.cos(centerY * 0.01 + time) * 3;
+          let opacity = 0.08 + (Math.sin(centerX * 0.01 + centerY * 0.01 + time) * 0.021);
+          let fillStyle = `rgba(70, 220, 255, ${opacity})`;
+          drawHexagon(ctx, centerX + waveX, centerY + waveY, radius, fillStyle);
         }
+      }
     }
-    selectedHexagons = selectedHexagons.filter(hex => (performance.now() - hex.startTime) / 1000 < 3);
-}
-
-function drawGlow(ctx, centerX, centerY, radius, opacity) {
-    let gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.5, centerX, centerY, radius);
-    gradient.addColorStop(0, `rgba(190, 250, 255, ${opacity * 0.8})`);
-    gradient.addColorStop(1, `rgba(190, 250, 255, 0)`); 
-
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.fillStyle = gradient;
-    ctx.fill();
-}
-
-function updateSelectedHexagons() {
-    const hexWidth = 1.70 * 45;
-    const hexHeight = Math.sqrt(3) * 45;
-    
-    let randomCol = Math.floor(Math.random() * (fishCanvas.width / hexWidth));
-    let randomRow = Math.floor(Math.random() * (fishCanvas.height / hexHeight));
-
-    selectedHexagons.push({ col: randomCol, row: randomRow, startTime: performance.now() });
-
-    setTimeout(updateSelectedHexagons, 1000);//六角光頻
-}
-
-function drawWaterFlow() {
-    time += 0.02;
-    fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
-    drawHexagonGrid(fishCtx, fishCanvas.width, fishCanvas.height, 45, time);
-    drawTopLight();
-}
-
-function drawTopLight() {
-    var gradient = fishCtx.createLinearGradient(0, 0, 0, fishCanvas.height * 0.25);
-    gradient.addColorStop(0, "rgba(135, 235, 255, 0.25)");
-    gradient.addColorStop(1, "rgba(105, 215, 255, 0)");
-
-    fishCtx.globalAlpha = 0.5;
-    fishCtx.fillStyle = gradient;
-    fishCtx.fillRect(0, 0, fishCanvas.width, fishCanvas.height * 0.5);
-    fishCtx.globalAlpha = 1;
-}
-
-function animateBackground() {
-    drawWaterFlow();
-    requestAnimationFrame(animateBackground);
-}
-
-animateBackground();
-updateSelectedHexagons();
-
+    function drawWaterFlow() {
+      time += 0.02;
+      fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
+      drawHexagonGrid(fishCtx, fishCanvas.width, fishCanvas.height, 45, time);
+      drawTopLight();
+    }
+    function drawTopLight() {
+      var gradient = fishCtx.createLinearGradient(0, 0, 0, fishCanvas.height * 0.25);
+      gradient.addColorStop(0, "rgba(135, 235, 255, 0.25)");
+      gradient.addColorStop(1, "rgba(105, 215, 255, 0)");
+      fishCtx.globalAlpha = 0.5;
+      fishCtx.fillStyle = gradient;
+      fishCtx.fillRect(0, 0, fishCanvas.width, fishCanvas.height * 0.5);
+      fishCtx.globalAlpha = 1;
+    }
+    function animateBackground() {
+      drawWaterFlow();
+      requestAnimationFrame(animateBackground);
+    }
+    animateBackground();
   </script>
 </body>
 </html>
