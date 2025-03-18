@@ -20,6 +20,13 @@
       margin: 0;
       padding: 20px;
     }
+    #fishCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0; 
+    pointer-events: auto;
+    }
     @font-face {
       font-family: 'YuPearl';
       src: url('ttf/YuPearl-Regular.woff2') format('woff2');
@@ -76,6 +83,9 @@
       resize: none;
       box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.6), inset -2px -6px 5px rgba(255, 255, 255, 0.4);
     }
+    textarea::placeholder {
+      color: #444241; 
+    }
     .buttons {
       display: flex;
       flex-direction: column;
@@ -98,9 +108,33 @@
     #spinButton {
       margin-top: 20px;
       background-color: #238547;
+      z-index: 20;
+    }
+    #spinButton:hover {
+      background-color: #2a9e60;
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+    }
+    #spinButton:active {
+      background-color: #1f6e3e;
+      transform: scale(0.98);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
     }
     #updateButton {
       background-color: #2196f3;
+      z-index: 10;
+    }
+    #updateButton:hover {
+      background-color: #42a5f5;
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+    }
+    #updateButton:active {
+      background-color: #1e88e5; 
+      transform: scale(0.98);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
     }
     #clock {
       font-size: 18px;
@@ -161,6 +195,7 @@
       margin-top: 10px;
       display: flex;
       gap: 10px;
+      z-index: 10;
     }
     .template-buttons button {
       padding: 10px 15px;
@@ -303,7 +338,7 @@
   </style>
 </head>
 <body>
-  <canvas id="fishCanvas" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
+  <canvas id="fishCanvas"></canvas>
   <h1 id="page-title">
     <div id="color-palette-wrapper" style="position: relative;">
       <button id="color-palette-btn" class="transparent-btn">🎨</button>
@@ -433,7 +468,7 @@
     });
 
     function drawWheel() {
-
+      // 清空 SVG
       wheel.innerHTML = "";
       const numOptions = options.length;
       if (numOptions === 0) {
@@ -445,6 +480,7 @@
         const angle = i * angleStep;
         const color = colors[i % colors.length];
 
+        // 畫扇形
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         path.setAttribute("d", describeArc(150, 150, 150, angle, angle + angleStep));
         path.setAttribute("fill", color);
@@ -454,6 +490,7 @@
         }
         wheel.appendChild(path);
 
+        // 添加文字
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
         const textRadius = 110;
         const midAngle = angle + angleStep / 2;
@@ -475,13 +512,14 @@
         text.setAttribute("fill", textColor);
         wheel.appendChild(text);
       }
+
       if (revolverMode && useRevolverOverlay) {
         const overlay = document.createElementNS("http://www.w3.org/2000/svg", "image");
         overlay.setAttributeNS(null, "href", revolverOverlayImageUrl);
-        overlay.setAttribute("x", "-46");
-        overlay.setAttribute("y", "-38");
-        overlay.setAttribute("width", "390");
-        overlay.setAttribute("height", "390");
+        overlay.setAttribute("x", "-51");
+        overlay.setAttribute("y", "-43");
+        overlay.setAttribute("width", "400");
+        overlay.setAttribute("height", "400");
         overlay.setAttribute("preserveAspectRatio", "xMidYMid meet");
         wheel.appendChild(overlay);
       }
@@ -858,65 +896,153 @@
       isPlaying = !isPlaying;
     });
 
+//背景
     var fishCanvas = document.getElementById('fishCanvas');
     var fishCtx = fishCanvas.getContext('2d');
-    function resizeCanvas() {
-      fishCanvas.width = window.innerWidth;
-      fishCanvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    var selectedHexagons = [];
+    let hoveredHexagonsMap = {};
+    var mouseX = -1;
+    var mouseY = -1;
 
-    // 以下為背景六角形蜂巢效果（可依需求自行調整）
-    function drawHexagon(ctx, centerX, centerY, radius, fillStyle) {
-      ctx.beginPath();
-      for (let i = 0; i < 6; i++) {
-        const angle = Math.PI / 3 * i - Math.PI / 6;
-        const x = centerX + radius * Math.cos(angle);
-        const y = centerY + radius * Math.sin(angle);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.fillStyle = fillStyle;
-      ctx.fill();
-    }
-    function drawHexagonGrid(ctx, canvasWidth, canvasHeight, radius, time) {
-      const hexWidth = 1.72 * radius;
-      const hexHeight = Math.sqrt(3.1) * radius;
-      for (let row = 0; row < canvasHeight / (hexHeight * 0.8) + 1; row++) {
+function resizeCanvas() {
+        fishCanvas.width = window.innerWidth;
+        fishCanvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function drawHexagon(ctx, centerX, centerY, radius, fillStyle) {
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const angle = Math.PI / 3 * i - Math.PI / 6;
+    const x = centerX + radius * Math.cos(angle);
+    const y = centerY + radius * Math.sin(angle);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = fillStyle;
+  ctx.fill();
+}
+
+function drawHexagonGrid(ctx, canvasWidth, canvasHeight, radius, time) {
+    const hexWidth = 1.7 * radius;
+    const hexHeight = Math.sqrt(3.1) * radius;
+    let currentHovered = {};
+
+    for (let row = 0; row < canvasHeight / (hexHeight * 0.8) + 1; row++) {
         const offsetX = (row % 2) * (hexWidth / 2);
         for (let col = 0; col < canvasWidth / hexWidth + 1; col++) {
-          const centerX = col * hexWidth + offsetX;
-          const centerY = row * (hexHeight * 0.85);
-          const waveX = Math.sin(centerX * 0.01 + time) * 3;
-          const waveY = Math.cos(centerY * 0.01 + time) * 3;
-          let opacity = 0.08 + (Math.sin(centerX * 0.01 + centerY * 0.01 + time) * 0.021);
-          let fillStyle = `rgba(70, 220, 255, ${opacity})`;
-          drawHexagon(ctx, centerX + waveX, centerY + waveY, radius, fillStyle);
+            const centerX = col * hexWidth + offsetX;
+            const centerY = row * (hexHeight * 0.85);
+            const waveX = Math.sin(centerX * 0.01 + time) * 3;
+            const waveY = Math.cos(centerY * 0.01 + time) * 3;
+            let opacity = 0.08 + (Math.sin(centerX * 0.01 + centerY * 0.01 + time) * 0.021);
+            let fillStyle = `rgba(70, 220, 255, ${opacity})`;
+            let glowOpacity = 0;
+
+            const actualCenterX = centerX + waveX;
+            const actualCenterY = centerY + waveY;
+            const dx = mouseX - actualCenterX;
+            const dy = mouseY - actualCenterY;
+            const key = `${row}-${col}`;
+            if (Math.sqrt(dx * dx + dy * dy) < radius * 1.2) {
+                if (!hoveredHexagonsMap[key]) {
+                    hoveredHexagonsMap[key] = { col, row, startTime: performance.now() };
+                }
+                currentHovered[key] = hoveredHexagonsMap[key];
+            }
+
+            let hexEffects = [];
+            for (let hex of selectedHexagons) {
+                if (hex.col === col && hex.row === row) {
+                    hexEffects.push(hex);
+                }
+            }
+            if (hoveredHexagonsMap[key]) {
+                hexEffects.push(hoveredHexagonsMap[key]);
+            }
+
+            for (let hex of hexEffects) {
+                const elapsed = (performance.now() - hex.startTime) / 1000;
+                if (elapsed < 1) {
+                    let blendFactor = elapsed;
+                    fillStyle = `rgba(${70 + blendFactor * (190 - 70)}, ${220 + blendFactor * (250 - 220)}, ${255}, ${opacity + blendFactor * (0.2 - opacity)})`;
+                    glowOpacity = blendFactor * 0.2;
+                } else if (elapsed < 2) {
+                    fillStyle = `rgba(190, 250, 255, 0.2)`;
+                    glowOpacity = 0.2;
+                } else if (elapsed < 3) {
+                    let blendFactor = 1 - (elapsed - 2);
+                    fillStyle = `rgba(${70 + blendFactor * (255 - 70)}, ${220 + blendFactor * (255 - 220)}, ${255}, ${opacity + blendFactor * (0.2 - opacity)})`;
+                    glowOpacity = blendFactor * 0.2;
+                }
+            }
+
+            if (glowOpacity > 0) {
+                drawGlow(ctx, centerX + waveX, centerY + waveY, radius * 1.5, glowOpacity);
+            }
+
+            drawHexagon(ctx, centerX + waveX, centerY + waveY, radius, fillStyle);
         }
-      }
     }
-    function drawWaterFlow() {
-      time += 0.02;
-      fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
-      drawHexagonGrid(fishCtx, fishCanvas.width, fishCanvas.height, 45, time);
-      drawTopLight();
+
+    for (let key in hoveredHexagonsMap) {
+        if (!currentHovered[key]) {
+            if ((performance.now() - hoveredHexagonsMap[key].startTime) / 1000 > 3) {
+                delete hoveredHexagonsMap[key];
+            }
+        }
     }
-    function drawTopLight() {
-      var gradient = fishCtx.createLinearGradient(0, 0, 0, fishCanvas.height * 0.25);
-      gradient.addColorStop(0, "rgba(135, 235, 255, 0.25)");
-      gradient.addColorStop(1, "rgba(105, 215, 255, 0)");
-      fishCtx.globalAlpha = 0.5;
-      fishCtx.fillStyle = gradient;
-      fishCtx.fillRect(0, 0, fishCanvas.width, fishCanvas.height * 0.5);
-      fishCtx.globalAlpha = 1;
-    }
-    function animateBackground() {
-      drawWaterFlow();
-      requestAnimationFrame(animateBackground);
-    }
-    animateBackground();
+    selectedHexagons = selectedHexagons.filter(hex => (performance.now() - hex.startTime) / 1000 < 3);
+}
+
+function drawGlow(ctx, centerX, centerY, radius, opacity) {
+  let gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.5, centerX, centerY, radius);
+  gradient.addColorStop(0, `rgba(190, 250, 255, ${opacity * 0.8})`);
+  gradient.addColorStop(1, `rgba(190, 250, 255, 0)`); 
+
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.fillStyle = gradient;
+  ctx.fill();
+}
+
+function updateSelectedHexagons() {
+  const hexWidth = 1.70 * 45;
+  const hexHeight = Math.sqrt(3) * 45;
+        
+  let randomCol = Math.floor(Math.random() * (fishCanvas.width / hexWidth));
+  let randomRow = Math.floor(Math.random() * (fishCanvas.height / hexHeight));
+
+  selectedHexagons.push({ col: randomCol, row: randomRow, startTime: performance.now() });
+
+  setTimeout(updateSelectedHexagons, 1000);
+}
+
+function animateBackground() {
+  time += 0.02;
+  fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
+  drawHexagonGrid(fishCtx, fishCanvas.width, fishCanvas.height, 45, time);
+  requestAnimationFrame(animateBackground);
+}
+
+function handleMouseMove(event) {
+  const rect = fishCanvas.getBoundingClientRect();
+  mouseX = event.clientX - rect.left;
+  mouseY = event.clientY - rect.top;
+}
+
+function handleMouseLeave() {
+  mouseX = -1;
+  mouseY = -1;
+}
+
+fishCanvas.addEventListener("mousemove", handleMouseMove);
+fishCanvas.addEventListener("mouseleave", handleMouseLeave);
+
+  animateBackground();
+  updateSelectedHexagons();
   </script>
 </body>
 </html>
