@@ -938,8 +938,10 @@ function drawHexagonGrid(ctx, canvasWidth, canvasHeight, radius, time) {
             const waveX = Math.sin(centerX * 0.01 + time) * 3;
             const waveY = Math.cos(centerY * 0.01 + time) * 3;
             let opacity = 0.08 + (Math.sin(centerX * 0.01 + centerY * 0.01 + time) * 0.021);
-            let fillStyle = `rgba(70, 220, 255, ${opacity})`;
+            let baseR = 70, baseG = 220, baseB = 255;
+            let fillStyle = `rgba(${baseR}, ${baseG}, ${baseB}, ${opacity})`;
             let glowOpacity = 0;
+            let effectiveRadius = radius;
 
             const actualCenterX = centerX + waveX;
             const actualCenterY = centerY + waveY;
@@ -953,40 +955,52 @@ function drawHexagonGrid(ctx, canvasWidth, canvasHeight, radius, time) {
                 currentHovered[key] = hoveredHexagonsMap[key];
             }
 
-            let hexEffects = [];
+            let isSelected = false;
             for (let hex of selectedHexagons) {
                 if (hex.col === col && hex.row === row) {
-                    hexEffects.push(hex);
+                    isSelected = true;
+                    const elapsed = (performance.now() - hex.startTime) / 1000;
+                    if (elapsed < 1) {
+                        let blendFactor = elapsed;
+                        fillStyle = `rgba(${70 + blendFactor * (190 - 70)}, ${220 + blendFactor * (250 - 220)}, ${255}, ${opacity + blendFactor * (0.2 - opacity)})`;
+                        glowOpacity = blendFactor * 0.2;
+                    } else if (elapsed < 2) {
+                        fillStyle = `rgba(190, 250, 255, 0.2)`;
+                        glowOpacity = 0.2;
+                    } else if (elapsed < 3) {
+                        let blendFactor = 1 - (elapsed - 2);
+                        fillStyle = `rgba(${70 + blendFactor * (255 - 70)}, ${220 + blendFactor * (255 - 220)}, ${255}, ${opacity + blendFactor * (0.2 - opacity)})`;
+                        glowOpacity = blendFactor * 0.2;
+                    }
+                    break;
                 }
             }
-            if (hoveredHexagonsMap[key]) {
-                hexEffects.push(hoveredHexagonsMap[key]);
-            }
-
-            for (let hex of hexEffects) {
-                const elapsed = (performance.now() - hex.startTime) / 1000;
-                if (elapsed < 1) {
-                    let blendFactor = elapsed;
-                    fillStyle = `rgba(${70 + blendFactor * (190 - 70)}, ${220 + blendFactor * (250 - 220)}, ${255}, ${opacity + blendFactor * (0.2 - opacity)})`;
-                    glowOpacity = blendFactor * 0.2;
-                } else if (elapsed < 2) {
-                    fillStyle = `rgba(190, 250, 255, 0.2)`;
-                    glowOpacity = 0.2;
-                } else if (elapsed < 3) {
-                    let blendFactor = 1 - (elapsed - 2);
-                    fillStyle = `rgba(${70 + blendFactor * (255 - 70)}, ${220 + blendFactor * (255 - 220)}, ${255}, ${opacity + blendFactor * (0.2 - opacity)})`;
-                    glowOpacity = blendFactor * 0.2;
+            if (!isSelected && hoveredHexagonsMap[key]) {
+                let intensity = 0;
+                if (currentHovered[key]) {
+                    intensity = 1;
+                } else {
+                    const elapsed = (performance.now() - hoveredHexagonsMap[key].startTime) / 1000;
+                    if (elapsed < 3) {
+                        intensity = 1 - (elapsed / 3);
+                    }
                 }
+                let targetR = baseR + 0.1 * (255 - baseR);
+                let targetG = baseG + 0.1 * (255 - baseG);
+                let targetB = baseB; 
+                let newR = Math.round(baseR + intensity * (targetR - baseR));
+                let newG = Math.round(baseG + intensity * (targetG - baseG));
+                let newB = Math.round(baseB + intensity * (targetB - baseB));
+                fillStyle = `rgba(${newR}, ${newG}, ${newB}, ${opacity})`;
+                effectiveRadius = radius * (1 + 0.05 * intensity);
+                glowOpacity = 0.1 * intensity;
             }
-
             if (glowOpacity > 0) {
-                drawGlow(ctx, centerX + waveX, centerY + waveY, radius * 1.5, glowOpacity);
+                drawGlow(ctx, actualCenterX, actualCenterY, radius * 1.5, glowOpacity);
             }
-
-            drawHexagon(ctx, centerX + waveX, centerY + waveY, radius, fillStyle);
+            drawHexagon(ctx, actualCenterX, actualCenterY, effectiveRadius, fillStyle);
         }
     }
-
     for (let key in hoveredHexagonsMap) {
         if (!currentHovered[key]) {
             if ((performance.now() - hoveredHexagonsMap[key].startTime) / 1000 > 3) {
