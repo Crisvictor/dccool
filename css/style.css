@@ -325,6 +325,7 @@ canvas {
   display: flex;
   font-size: 28px;
   margin: 4px;
+  white-space: nowrap;
   border-radius: 6px;
   padding: 8px 52px;
   background-image: url('https://crisvictor.github.io/dccool/img/but3.png');
