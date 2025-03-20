@@ -18,9 +18,13 @@
             padding: 0;
         }
         header {
-            background-color: #1f1f1f;
+            background: rgba(21, 21, 21, 0.05);
             padding: 20px;
             text-align: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); 
+            border-radius: 10px; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
         h1 {
             margin: 0;
@@ -599,6 +603,7 @@ function filterArticles() {
 }
 
 // 背景畫布
+// 背景畫布
 var fishCanvas = document.getElementById('fishCanvas');
 var fishCtx = fishCanvas.getContext('2d');
 var fishes = [];
@@ -609,6 +614,19 @@ var maxRippleSize = 80;
 var rippleSpawnRate = 0.0035; 
 fishCanvas.width = window.innerWidth;
 fishCanvas.height = window.innerHeight;
+var highlights = [];
+
+setInterval(function() {
+    var cols = Math.floor(fishCanvas.width / 50);
+    var rows = Math.floor(fishCanvas.height / 50);
+    var randomCol = Math.floor(Math.random() * cols);
+    var randomRow = Math.floor(Math.random() * rows);
+    highlights.push({
+         i: randomCol * 50,  // 基底 X 座標
+         j: randomRow * 50,  // 基底 Y 座標
+         start: Date.now()   // 開始時間（毫秒）
+    });
+}, 850);//隨機亮起頻率
 
 window.addEventListener('resize', function() {
     fishCanvas.width = window.innerWidth;
@@ -645,21 +663,51 @@ function drawWaterFlow() {
     time += 0.02;
     fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
     fishCtx.globalAlpha = 0.1;
-
     for (var i = 0; i < fishCanvas.width; i += 50) {
         for (var j = 0; j < fishCanvas.height; j += 50) {
-            var waveX = Math.sin(i * 0.01 + time) * 5; // X 軸的波動
-            var waveY = Math.cos(j * 0.01 + time) * 5; // Y 軸的波動
+            var waveX = Math.sin(i * 0.01 + time) * 5; // X 軸波動
+            var waveY = Math.cos(j * 0.01 + time) * 5; // Y 軸波動
             var opacity = 0.1 + (Math.sin(i * 0.02 + j * 0.02 + time) * 0.08); // 透明度變化
 
-            fishCtx.fillStyle = `rgba(70, 220, 255, ${opacity})`;
-            fishCtx.fillRect(i + waveX, j + waveY, 45, 45);
+            fishCtx.fillStyle = `rgba(90, 240, 255, ${opacity})`;
+            fishCtx.fillRect(i + waveX, j + waveY, 50, 50);
         }
     }
     fishCtx.globalAlpha = 1;
+    var now = Date.now();
+    for (var h = highlights.length - 1; h >= 0; h--) {
+        var hl = highlights[h];
+        var elapsed = (now - hl.start) / 1000; 
+        if (elapsed >= 3) {
+            highlights.splice(h, 1);
+            continue;
+        }
+        var overlayOpacity = 0;
+        if (elapsed < 1) {//隨機亮起規則
+            overlayOpacity = 0.04 * (elapsed / 1);
+        } else if (elapsed < 2) {
+            overlayOpacity = 0.04;
+        } else if (elapsed < 3) {
+            overlayOpacity = 0.04 * (1 - (elapsed - 2) / 1);
+        }
+        var glowOpacity = overlayOpacity;
+
+        var waveX = Math.sin(hl.i * 0.01 + time) * 5;
+        var waveY = Math.cos(hl.j * 0.01 + time) * 5;
+        var maxGlowBlur = 60; //光芒值
+        var glowBlur = maxGlowBlur * (glowOpacity / 0.1); 
+
+        fishCtx.save();
+        fishCtx.shadowBlur = glowBlur;
+        fishCtx.shadowColor = `rgba(255, 255, 255, ${glowOpacity})`;
+        fishCtx.fillStyle = `rgba(85, 205, 255, ${overlayOpacity})`;
+        fishCtx.fillRect(hl.i + waveX, hl.j + waveY, 50, 50);
+        fishCtx.restore();
+    }
 }
 
 function updateFishes() {
+    // 清除畫布 (背景與流動效果在 drawWaterFlow() 裡重繪)
     fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
     drawWaterFlow(); 
     drawWaterRipple(); 
@@ -703,6 +751,7 @@ function drawWaterRipple() {
 }
 
 updateFishes();
+
 </script>
 </body>
 </html>
