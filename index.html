@@ -607,7 +607,7 @@ function filterArticles() {
 var fishCanvas = document.getElementById('fishCanvas');
 var fishCtx = fishCanvas.getContext('2d');
 var fishes = [];
-var fishCount = 10;
+var fishCount = 7;
 var time = 0;
 var ripples = [];
 var maxRippleSize = 80; 
@@ -626,7 +626,7 @@ setInterval(function() {
          j: randomRow * 50,  // 基底 Y 座標
          start: Date.now()   // 開始時間（毫秒）
     });
-}, 850);//隨機亮起頻率
+}, 1550);//隨機亮起頻率
 
 window.addEventListener('resize', function() {
     fishCanvas.width = window.innerWidth;
