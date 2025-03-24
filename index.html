@@ -626,7 +626,7 @@ setInterval(function() {
          j: randomRow * 50,  // 基底 Y 座標
          start: Date.now()   // 開始時間（毫秒）
     });
-}, 1550);//隨機亮起頻率
+}, 850);//隨機亮起頻率
 
 window.addEventListener('resize', function() {
     fishCanvas.width = window.innerWidth;
@@ -667,7 +667,7 @@ function drawWaterFlow() {
         for (var j = 0; j < fishCanvas.height; j += 50) {
             var waveX = Math.sin(i * 0.01 + time) * 5; // X 軸波動
             var waveY = Math.cos(j * 0.01 + time) * 5; // Y 軸波動
-            var opacity = 0.1 + (Math.sin(i * 0.02 + j * 0.02 + time) * 0.08); // 透明度變化
+            var opacity = 0.1 + (Math.sin(i * 0.005 + j * 0.005 + time) * 0.35); // 透明度變化
 
             fishCtx.fillStyle = `rgba(90, 240, 255, ${opacity})`;
             fishCtx.fillRect(i + waveX, j + waveY, 50, 50);
