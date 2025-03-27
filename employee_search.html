@@ -199,16 +199,13 @@
       border-radius: 4px;
     }
 
-    .id, .name, 
-      background-color: #5A5A5A;
-      margin-top: 3px !important;
-      margin-bottom: 3px !important; 
+    .id {
+      position: relative;
       z-index: 1;
     }
 
-    .id {
-      position: relative;
-      margin-left: 59px !important;
+    .name, .id {
+      cursor: pointer;
     }
 
     .Tra { /* 技術訓標示🖊️ */
@@ -694,14 +691,15 @@
     { branch: "福科", id: '746', name: "陳舒維", dateOfEntry: "2025-3-03" },
     { branch: "八德", id: '747', name: "吳怡萱", dateOfEntry: "2025-3-03" , opto:"👓" },
     { branch: "環東", id: '748', name: "葉珮庭", dateOfEntry: "2025-3-03" },
-    { branch: "大竹", id: '749', name: "許芯瑜", dateOfEntry: "2025-3-03" },
     { branch: "南崁", id: '750', name: "盧懷瑾", dateOfEntry: "2025-3-03" , opto:"👓" },
     { branch: "大竹", id: '751', name: "趙玟婷", dateOfEntry: "2025-3-03" },
     { branch: "經國", id: '752', name: "王又弘", dateOfEntry: "2025-3-04" },
     { branch: "公益", id: '753', name: "吳正傑", dateOfEntry: "2025-3-10" },
     { branch: "環東", id: '754', name: "潘均濡", dateOfEntry: "2025-3-10" , trainee:"🎓" },
     { branch: "八德", id: '755', name: "黃靖涵", dateOfEntry: "2025-3-10" , trainee:"🎓" },
-    { branch: "中壢", id: '756', name: "王淑貞", dateOfEntry: "2025-3-12" }
+    { branch: "中壢", id: '756', name: "王淑貞", dateOfEntry: "2025-3-12" },
+    { branch: "崇德", id: '757', name: "賴以純", dateOfEntry: "2025-3-17" },
+    { branch: "經國", id: '758', name: "楊絜詒", dateOfEntry: "2025-3-25" }
   ];
 
   const correctPassword = [2, 4, 5, 7];
@@ -913,6 +911,36 @@ document.querySelectorAll('.tooltip').forEach(item => {
     });
 });
 
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("name") || e.target.classList.contains("id")) {
+    const text = e.target.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const tooltip = document.createElement("div");
+      tooltip.textContent = "已複製";
+      tooltip.style.position = "absolute";
+      tooltip.style.background = "#444";
+      tooltip.style.color = "#fff";
+      tooltip.style.padding = "5px 10px";
+      tooltip.style.borderRadius = "5px";
+      tooltip.style.fontSize = "14px";
+      tooltip.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+      tooltip.style.zIndex = "1000";
+      tooltip.style.transition = "opacity 0.5s ease";
+      tooltip.style.opacity = "1";
+
+      const rect = e.target.getBoundingClientRect();
+      tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - 25}px`;
+      tooltip.style.top = `${rect.top + window.scrollY - 30}px`;
+
+      document.body.appendChild(tooltip);
+
+      setTimeout(() => {
+        tooltip.style.opacity = "0";
+        setTimeout(() => tooltip.remove(), 500);
+      }, 1000);
+    });
+  }
+});
 </script>
 
 </body>
