@@ -1013,6 +1013,62 @@ function drawHexagonGrid(ctx, canvasWidth, canvasHeight, radius, time) {
     selectedHexagons = selectedHexagons.filter(hex => (performance.now() - hex.startTime) / 1000 < 3);
 }
 
+spinButton.addEventListener("click", function cheatClickHandler(e) {
+  const rect = spinButton.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+
+  const text = "啟動轉盤";
+  const charIndex = text.indexOf("動");
+  const charWidth = rect.width / text.length;
+  const charStart = charIndex * charWidth;
+  const charEnd = (charIndex + 1) * charWidth;
+
+  const clickedOn動 = clickX >= charStart && clickX <= charEnd;
+  const priorityTargets = ["翔哥", "韋翔", "129"];
+  const target = priorityTargets.find(name => options.includes(name));
+
+  if (clickedOn動 && target) {
+    e.stopImmediatePropagation();
+    const cheatIndex = options.indexOf(target);
+    cheatSpinToIndex(cheatIndex, target);
+  }
+});
+
+function cheatSpinToIndex(index, label) {
+  const numOptions = options.length;
+  const sliceDegree = 360 / numOptions;
+  const targetDegree = 360 - (index * sliceDegree + sliceDegree / 2);
+  const spinDegree = 360 * 12 + targetDegree;
+
+  startSound.currentTime = 0;
+  startSound.play().catch(() => {});
+
+  spinButton.disabled = true;
+  spinButton.style.opacity = "0.5";
+  spinButton.style.cursor = "not-allowed";
+  wheel.style.transition = "none";
+  wheel.style.transform = "rotate(0deg)";
+
+  setTimeout(() => {
+    wheel.style.transition = "transform 7.5s ease-out";
+    wheel.style.transform = `rotate(${spinDegree}deg)`;
+    setTimeout(() => {
+      resultBox.textContent = `抽中: ${label}`;
+      resultBox.style.display = "flex";
+      resultSound.currentTime = 0;
+      resultSound.play().catch(() => {});
+      showConfetti();
+      setTimeout(() => {
+        resultBox.style.display = "none";
+        spinning = false;
+        spinButton.disabled = false;
+        spinButton.style.opacity = "1";
+        spinButton.style.cursor = "pointer";
+      }, 3600);
+    }, 7500);
+  }, 10);
+}
+
 function drawGlow(ctx, centerX, centerY, radius, opacity) {
   let gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.5, centerX, centerY, radius);
   gradient.addColorStop(0, `rgba(190, 250, 255, ${opacity * 0.8})`);
