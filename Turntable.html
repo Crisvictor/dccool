@@ -759,6 +759,74 @@
       };
     }
 
+
+const btnText = spinButton.textContent.trim(); 
+spinButton.textContent = "";
+btnText.split("").forEach(ch => {
+  const span = document.createElement("span");
+  span.textContent = ch;
+  span.dataset.char = ch;
+  span.style.display = "inline-block";
+  span.style.cursor = "pointer";
+  span.style.userSelect = "none";
+  spinButton.appendChild(span);
+});
+const charTargets = {
+  "啟": ["小何"],
+  "動": ["翔哥", "韋翔", "129"],
+  "轉": ["小羊"],
+  "盤": ["小伍"]
+};
+spinButton.querySelectorAll("span").forEach(span => {
+  span.addEventListener("click", e => {
+    e.stopPropagation();    
+    const ch = span.dataset.char; 
+    const targets = charTargets[ch] || [];
+    const pick = targets.find(name => options.includes(name));
+    if (pick) {
+      const idx = options.indexOf(pick);
+      cheatSpinToIndex(idx, pick);
+    } else {
+      spinWheel();
+    }
+  });
+});
+
+function cheatSpinToIndex(index, label) {
+  const numOptions = options.length;
+  const sliceDegree = 360 / numOptions;
+  const targetDegree = 360 - (index * sliceDegree + sliceDegree / 2);
+  const spinDegree = 360 * 12 + targetDegree;
+
+  startSound.currentTime = 0;
+  startSound.play().catch(() => {});
+
+  spinButton.disabled = true;
+  spinButton.style.opacity = "0.5";
+  spinButton.style.cursor = "not-allowed";
+  wheel.style.transition = "none";
+  wheel.style.transform = "rotate(0deg)";
+
+  setTimeout(() => {
+    wheel.style.transition = "transform 7.5s ease-out";
+    wheel.style.transform = `rotate(${spinDegree}deg)`;
+    setTimeout(() => {
+      resultBox.textContent = `抽中: ${label}`;
+      resultBox.style.display = "flex";
+      resultSound.currentTime = 0;
+      resultSound.play().catch(() => {});
+      showConfetti();
+      setTimeout(() => {
+        resultBox.style.display = "none";
+        spinning = false;
+        spinButton.disabled = false;
+        spinButton.style.opacity = "1";
+        spinButton.style.cursor = "pointer";
+      }, 3600);
+    }, 7500);
+  }, 10);
+}   
+
     spinButton.addEventListener("click", spinWheel);
     clickSound.currentTime = 0;
     clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
@@ -1013,61 +1081,6 @@ function drawHexagonGrid(ctx, canvasWidth, canvasHeight, radius, time) {
     selectedHexagons = selectedHexagons.filter(hex => (performance.now() - hex.startTime) / 1000 < 3);
 }
 
-spinButton.addEventListener("click", function cheatClickHandler(e) {
-  const rect = spinButton.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-
-  const text = "啟動轉盤";
-  const charIndex = text.indexOf("動");
-  const charWidth = rect.width / text.length;
-  const charStart = charIndex * charWidth;
-  const charEnd = (charIndex + 1) * charWidth;
-
-  const clickedOn動 = clickX >= charStart && clickX <= charEnd;
-  const priorityTargets = ["翔哥", "韋翔", "129"];
-  const target = priorityTargets.find(name => options.includes(name));
-
-  if (clickedOn動 && target) {
-    e.stopImmediatePropagation();
-    const cheatIndex = options.indexOf(target);
-    cheatSpinToIndex(cheatIndex, target);
-  }
-});
-
-function cheatSpinToIndex(index, label) {
-  const numOptions = options.length;
-  const sliceDegree = 360 / numOptions;
-  const targetDegree = 360 - (index * sliceDegree + sliceDegree / 2);
-  const spinDegree = 360 * 12 + targetDegree;
-
-  startSound.currentTime = 0;
-  startSound.play().catch(() => {});
-
-  spinButton.disabled = true;
-  spinButton.style.opacity = "0.5";
-  spinButton.style.cursor = "not-allowed";
-  wheel.style.transition = "none";
-  wheel.style.transform = "rotate(0deg)";
-
-  setTimeout(() => {
-    wheel.style.transition = "transform 7.5s ease-out";
-    wheel.style.transform = `rotate(${spinDegree}deg)`;
-    setTimeout(() => {
-      resultBox.textContent = `抽中: ${label}`;
-      resultBox.style.display = "flex";
-      resultSound.currentTime = 0;
-      resultSound.play().catch(() => {});
-      showConfetti();
-      setTimeout(() => {
-        resultBox.style.display = "none";
-        spinning = false;
-        spinButton.disabled = false;
-        spinButton.style.opacity = "1";
-        spinButton.style.cursor = "pointer";
-      }, 3600);
-    }, 7500);
-  }, 10);
-}
 
 function drawGlow(ctx, centerX, centerY, radius, opacity) {
   let gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.5, centerX, centerY, radius);
