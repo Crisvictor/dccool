@@ -728,6 +728,11 @@
           } else {
             resultSound.currentTime = 0;
             resultSound.play().catch(error => console.warn('結果音效失敗:', error));
+            const cheerSound = document.getElementById("cheerSound");
+            setTimeout(() => {
+              cheerSound.currentTime = 0;
+              cheerSound.play().catch(() => {});
+            }, 500);
           }
           showConfetti();
           setTimeout(() => {
