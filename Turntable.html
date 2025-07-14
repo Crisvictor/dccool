@@ -399,6 +399,7 @@
   <audio id="revolverSound" src="m/revolver.mp3"></audio>
   <audio id="revolver1Sound" src="m/revolver1.mp3"></audio>
   <audio id="diceSound" src="m/dice.mp3"></audio>
+  <audio id="cheerSound" src="cheer.mp3" preload="auto"></audio>
   <script>
     // 全域變數
     const wheel = document.getElementById("wheel");
@@ -414,6 +415,7 @@
     const revolverSound = document.getElementById('revolverSound');
     const revolver1Sound = document.getElementById('revolver1Sound');
     const diceSound = document.getElementById('diceSound');
+    const cheerSound = document.getElementById("cheerSound");
 
     let useRevolverOverlay = true;
     let revolverOverlayImageUrl = "img/rmz.png";
@@ -815,6 +817,10 @@ function cheatSpinToIndex(index, label) {
       resultBox.style.display = "flex";
       resultSound.currentTime = 0;
       resultSound.play().catch(() => {});
+      setTimeout(() => {
+        cheerSound.currentTime = 0;
+        cheerSound.play().catch(() => {});
+      }, 500);
       showConfetti();
       setTimeout(() => {
         resultBox.style.display = "none";
