@@ -8,14 +8,14 @@
     body { margin:0; padding:0; overflow:hidden; background:#000; }
     #fishCanvas{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;}
     #toolSelector{position:relative;z-index:10;padding:20px;text-align:center;}
-    #toolSelector button{margin:0 10px;padding:10px 20px;font-size:16px;cursor:pointer;border:none;border-radius:5px;background:#2b3432;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);} 
+    #toolSelector button{margin:0 10px;padding:10px 20px;font-size:12px;cursor:pointer;border:none;border-radius:5px;background:#2b3432;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);} 
     #toolSelector button.active{background:#537e74;}
     .tool-container{display:none;position:relative;z-index:10;padding:20px;}
     .tool-container.active{display:block;}
 
     /* ====== 時間管理工具樣式 ====== */
-    #timeTool{width:35%;max-height:70vh;background:rgba(0,0,0,.7);transform:translateY(-20px);margin:0px auto;padding:20px 24px 24px 24px;color:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.6);font-family:sans-serif;overflow-y:auto;position:relative;}
-    #timeTool h2{margin:0 0 12px 0;font-size:18px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.7);}
+    #timeTool{width:45%;max-height:70vh;background:rgba(0,0,0,.7);transform:translateY(-20px);margin:0px auto;padding:20px 24px 24px 24px;color:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.6);font-family:sans-serif;overflow-y:auto;position:relative;}
+    #timeTool h2{margin:0 0 12px 0;font-size:12px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.7);}
 
     /*卷軸樣式*/
     #timeTool::-webkit-scrollbar,
@@ -50,12 +50,12 @@
 
     /* 模式選擇按鈕 */
     #modeSelector{display:flex;gap:10px;margin-bottom:15px;}
-    .mode-btn{flex:1;padding:8px 0;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:6px;cursor:pointer;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.6);box-shadow:0 2px 4px rgba(0,0,0,.4);} 
-    .mode-btn.active{background:#29cfa8;color:#fff;font-weight:bold;font-size:16px;}
+    .mode-btn{flex:1;padding:8px 0;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:6px;cursor:pointer;font-size:10px;text-shadow:0 1px 2px rgba(0,0,0,.6);box-shadow:0 2px 4px rgba(0,0,0,.4);} 
+    .mode-btn.active{background:#29cfa8;color:#fff;font-weight:bold;font-size:12px;}
 
     /* 時間輸入列 */
     .time-row{margin-bottom:10px;display:none;}
-    .time-row label{display:block;font-size:14px;margin-bottom:4px;text-shadow:0 1px 2px rgba(0,0,0,.5);} 
+    .time-row label{display:block;font-size:12px;margin-bottom:4px;text-shadow:0 1px 2px rgba(0,0,0,.5);} 
     .time-row input[type="time"]{width:45%;padding:4px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.4);border-radius:4px;color:#fff;}
     .time-row input[type="time"]::-webkit-calendar-picker-indicator{filter:invert(1); opacity:1;}
 
@@ -70,43 +70,44 @@
     .event-name::placeholder{color:rgba(255,255,255,.5);} 
     .duration-group{display:flex;align-items:center;gap:4px;flex:0 0 auto;}
     .duration-group input{width:55px;padding:4px;background:transparent;border:1px solid rgba(255,255,255,.6);border-radius:3px;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.5);text-align:right;}
-    .duration-group span{font-size:12px;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.5);} 
+    .duration-group span{font-size:10px;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.5);} 
     .remove-btn{background:transparent;border:1px solid rgba(255,255,255,.6);color:#fff;padding:4px 8px;border-radius:3px;cursor:pointer;text-shadow:0 1px 1px rgba(0,0,0,.5);}  
 
     #result{margin-top:15px;font-weight:bold;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.7);} 
 
     /* ===== 摩斯密碼工具樣式 ===== */
     #morseTool{
-      width:35%;max-height:70vh;background:rgba(0,0,0,.7);transform:translateY(-20px);
+      width:45%;max-height:70vh;background:rgba(0,0,0,.7);transform:translateY(-20px);
       margin:0px auto;padding:20px 24px;color:#fff;border-radius:8px;
       box-shadow:0 4px 12px rgba(0,0,0,.6);font-family:sans-serif;
       overflow-y:auto;position:relative;
     }
-    #morseTool h2{margin:0 0 16px;font-size:18px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.7);}
+    #morseTool h2{margin:0 0 16px;font-size:12px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.7);}
     #morsePanels{display:flex;flex-direction:column;gap:14px;}
     #swapBtn{align-self:center;padding:8px 14px;background:#216858;color:#fff;border:none;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
     .panel{background:rgba(41,207,168,.3);padding:12px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.5);}
-    .panel label{display:block;font-size:14px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.6);}
+    .panel label{display:block;font-size:10px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.6);}
     .panel textarea{
       width:95%;height:50px;resize:vertical;padding:8px;
       background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.3);
-      border-radius:4px;color:#fff;font-family:monospace;font-size:14px;line-height:1.4;
+      border-radius:4px;color:#fff;font-family:monospace;font-size:12px;line-height:1.4;
     }
     .panel textarea::placeholder{color:rgba(255,255,255,.45);}
     .counter{margin-top:4px;font-size:12px;color:rgba(255,255,255,.8);text-align:right;}
     #morseActions{display:flex;gap:10px;justify-content:space-between;margin-top:12px;}
     #morseActions button{
-      flex:1;padding:8px 0;background:#0b8a5c;border:none;color:#000;font-weight:bold;
+      flex:1;padding:8px 0;background:#0b8a5c;border:none;color:#fff;font-weight:bold;
       border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);
     }
 
     /* 追加覆寫 */
     .time-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
     .time-row label{margin:0;width:auto;}
-    .time-output{margin-left:auto;font-size:14px;color:#29cfa8;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,.7);} 
+    .time-output{margin-left:auto;font-size:12px;color:#29cfa8;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,.7);} 
     
     /* === 立體感與互動效果覆寫 === */
     #toolSelector button,
+    #morseActions button,
     .mode-btn,
     #addEventBtn,
     #calculateBtn,
@@ -117,6 +118,7 @@
       box-shadow: 0 3px 0 rgba(0,0,0,.35), 0 6px 12px rgba(0,0,0,.45);
     }
     #toolSelector button:hover,
+    #morseActions button:hover,
     .mode-btn:hover,
     #addEventBtn:hover,
     #calculateBtn:hover,
@@ -127,6 +129,7 @@
       filter: brightness(1.08);
     }
     #toolSelector button:active,
+    #morseActions button:active,
     .mode-btn:active,
     #addEventBtn:active,
     #calculateBtn:active,
@@ -135,6 +138,37 @@
       transform: translateY(1px);
       box-shadow: inset 0 2px 4px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.4);
       filter: brightness(.95);
+    }
+
+    /* ==== 手機版調整（<= 768px）==== */
+    @media (max-width:768px){
+      body{overflow:auto;}
+      #toolSelector{padding:12px 0;}
+      #toolSelector button{margin:0 6px;padding:8px 12px;font-size:14px;}
+
+      #timeTool,#morseTool{width:90vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto;}
+      /* 捲軸高度調整 */
+      #eventsList{max-height:40vh;}
+
+      .time-row{gap:6px;}
+      .time-row input[type="time"]{width:60%;}
+      .time-output{font-size:12px;}
+      .mode-btn{font-size:13px;}
+      .mode-btn.active{font-size:15px;}
+      .panel textarea{width:100%;box-sizing:border-box;}
+
+      /* 摩斯工具 textarea 放大 */
+      #morsePanels .panel textarea{width:100%;height:120px;}
+      #swapBtn{padding:6px 10px;}
+    }
+
+    /* 極小螢幕（<=480px）再縮排/字級 */
+    @media (max-width:480px){
+      #toolSelector button{font-size:13px;padding:7px 10px;}
+      #timeTool,#morseTool{padding:14px 16px;}
+      .mode-btn{font-size:12px;}
+      .mode-btn.active{font-size:14px;}
+      .duration-group input{width:50px;}
     }
   </style>
 </head>
