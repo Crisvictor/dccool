@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小工具聚合站</title>
+  <style>
+    body { margin:0; padding:0; overflow:hidden; background:#000; }
+    #fishCanvas{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;}
+    #toolSelector{position:relative;z-index:10;padding:20px;text-align:center;}
+    #toolSelector button{margin:0 10px;padding:10px 20px;font-size:16px;cursor:pointer;border:none;border-radius:5px;background:#2b3432;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);} 
+    #toolSelector button.active{background:#537e74;}
+    .tool-container{display:none;position:relative;z-index:10;padding:20px;}
+    .tool-container.active{display:block;}
+
+    /* ====== 時間管理工具樣式 ====== */
+    #timeTool{width:35%;max-height:70vh;background:rgba(0,0,0,.7);transform:translateY(-20px);margin:0px auto;padding:20px 24px 24px 24px;color:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.6);font-family:sans-serif;overflow-y:auto;position:relative;}
+    #timeTool h2{margin:0 0 12px 0;font-size:18px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.7);}
+
+    /*卷軸樣式*/
+    #timeTool::-webkit-scrollbar,
+    #eventsList::-webkit-scrollbar {
+      width: 8px;
+    }
+    #timeTool::-webkit-scrollbar-track,
+    #eventsList::-webkit-scrollbar-track {
+      background: rgba(255,255,255,.08);
+      border-radius: 4px;
+    }
+    #timeTool::-webkit-scrollbar-thumb,
+    #eventsList::-webkit-scrollbar-thumb {
+      background: #1b6c5a;
+      border-radius: 4px;
+    }
+    #timeTool::-webkit-scrollbar-thumb:hover,
+    #eventsList::-webkit-scrollbar-thumb:hover {
+      background: #0e4236;
+    }
+    #timeTool, #eventsList {
+      scrollbar-width: thin;
+      scrollbar-color: #29cfa8 rgba(255,255,255,.08);
+    }
+    #morseTool::-webkit-scrollbar,#morseTool textarea::-webkit-scrollbar{width:8px;}
+    #morseTool::-webkit-scrollbar-track,#morseTool textarea::-webkit-scrollbar-track{background:rgba(255,255,255,.08);border-radius:4px;}
+    #morseTool::-webkit-scrollbar-thumb,#morseTool textarea::-webkit-scrollbar-thumb{background:#29cfa8;border-radius:4px;}
+    #morseTool,#morseTool textarea{scrollbar-width:thin;scrollbar-color:#29cfa8 rgba(255,255,255,.08);}
+
+    /* 重整鍵 */
+    #resetBtn{position:absolute;top:12px;right:12px;background:#00683c;border:none;color:#000;font-weight:bold;border-radius:8px;padding:6px 10px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);} 
+
+    /* 模式選擇按鈕 */
+    #modeSelector{display:flex;gap:10px;margin-bottom:15px;}
+    .mode-btn{flex:1;padding:8px 0;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:6px;cursor:pointer;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.6);box-shadow:0 2px 4px rgba(0,0,0,.4);} 
+    .mode-btn.active{background:#29cfa8;color:#fff;font-weight:bold;font-size:16px;}
+
+    /* 時間輸入列 */
+    .time-row{margin-bottom:10px;display:none;}
+    .time-row label{display:block;font-size:14px;margin-bottom:4px;text-shadow:0 1px 2px rgba(0,0,0,.5);} 
+    .time-row input[type="time"]{width:45%;padding:4px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.4);border-radius:4px;color:#fff;}
+    .time-row input[type="time"]::-webkit-calendar-picker-indicator{filter:invert(1); opacity:1;}
+
+    /* 控制按鈕容器 */
+    #actionBtns{display:flex;gap:10px;justify-content:space-between;margin:10px 0;}
+    #addEventBtn,#calculateBtn{flex:1;padding:8px 0;background:#03453b;border:none;color:#fff;font-weight:bold;border-radius:12px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);} 
+    #calculateBtn{background:#00683c;}
+
+    #eventsList{max-height:300px;overflow-y:auto;margin-bottom:10px;}
+    .event-item{display:flex;align-items:center;gap:6px;background:rgba(41,207,168,.3);padding:8px;margin:8px 0;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.5);flex-wrap:wrap;}
+    .event-name{flex:0 0 35%;min-width:35%;padding:4px;background:transparent;border:1px solid rgba(255,255,255,.6);border-radius:3px;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.5);} 
+    .event-name::placeholder{color:rgba(255,255,255,.5);} 
+    .duration-group{display:flex;align-items:center;gap:4px;flex:0 0 auto;}
+    .duration-group input{width:55px;padding:4px;background:transparent;border:1px solid rgba(255,255,255,.6);border-radius:3px;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.5);text-align:right;}
+    .duration-group span{font-size:12px;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.5);} 
+    .remove-btn{background:transparent;border:1px solid rgba(255,255,255,.6);color:#fff;padding:4px 8px;border-radius:3px;cursor:pointer;text-shadow:0 1px 1px rgba(0,0,0,.5);}  
+
+    #result{margin-top:15px;font-weight:bold;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.7);} 
+
+    /* ===== 摩斯密碼工具樣式 ===== */
+    #morseTool{
+      width:35%;max-height:70vh;background:rgba(0,0,0,.7);transform:translateY(-20px);
+      margin:0px auto;padding:20px 24px;color:#fff;border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,.6);font-family:sans-serif;
+      overflow-y:auto;position:relative;
+    }
+    #morseTool h2{margin:0 0 16px;font-size:18px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.7);}
+    #morsePanels{display:flex;flex-direction:column;gap:14px;}
+    #swapBtn{align-self:center;padding:8px 14px;background:#216858;color:#fff;border:none;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
+    .panel{background:rgba(41,207,168,.3);padding:12px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.5);}
+    .panel label{display:block;font-size:14px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.6);}
+    .panel textarea{
+      width:95%;height:50px;resize:vertical;padding:8px;
+      background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.3);
+      border-radius:4px;color:#fff;font-family:monospace;font-size:14px;line-height:1.4;
+    }
+    .panel textarea::placeholder{color:rgba(255,255,255,.45);}
+    .counter{margin-top:4px;font-size:12px;color:rgba(255,255,255,.8);text-align:right;}
+    #morseActions{display:flex;gap:10px;justify-content:space-between;margin-top:12px;}
+    #morseActions button{
+      flex:1;padding:8px 0;background:#0b8a5c;border:none;color:#000;font-weight:bold;
+      border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);
+    }
+
+    /* 追加覆寫 */
+    .time-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+    .time-row label{margin:0;width:auto;}
+    .time-output{margin-left:auto;font-size:14px;color:#29cfa8;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,.7);} 
+    
+    /* === 立體感與互動效果覆寫 === */
+    #toolSelector button,
+    .mode-btn,
+    #addEventBtn,
+    #calculateBtn,
+    #resetBtn,
+    #swapBtn {
+      position: relative;
+      transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
+      box-shadow: 0 3px 0 rgba(0,0,0,.35), 0 6px 12px rgba(0,0,0,.45);
+    }
+    #toolSelector button:hover,
+    .mode-btn:hover,
+    #addEventBtn:hover,
+    #calculateBtn:hover,
+    #resetBtn:hover,
+    #swapBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 0 rgba(0,0,0,.4), 0 10px 18px rgba(0,0,0,.55);
+      filter: brightness(1.08);
+    }
+    #toolSelector button:active,
+    .mode-btn:active,
+    #addEventBtn:active,
+    #calculateBtn:active,
+    #resetBtn:active,
+    #swapBtn:active {
+      transform: translateY(1px);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.4);
+      filter: brightness(.95);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fishCanvas"></canvas>
+  <div id="toolSelector">
+    <button id="tool1Btn" class="active">時間管理工具</button>
+    <button id="tool2Btn">摩斯密碼翻譯器</button>
+  </div>
+
+  <div id="tool1Container" class="tool-container active">
+    <div id="timeTool">
+      <button id="resetBtn" title="重整">↻</button>
+      <h2>時間管理工具</h2>
+      <div id="modeSelector">
+        <button class="mode-btn active" data-mode="arrive">何時出發</button>
+        <button class="mode-btn" data-mode="depart">何時抵達</button>
+      </div>
+
+      <div class="time-row" id="rowStart">
+        <label>起始時間</label>
+        <input type="time" id="startTime" />
+        <span class="time-output" id="calcEndOut"></span>
+      </div>
+      <div class="time-row" id="rowTarget">
+        <label>目標時間</label>
+        <input type="time" id="targetTime" />
+        <span class="time-output" id="calcDepartOut"></span>
+      </div>
+
+      <div id="eventsList"></div>
+      <div id="actionBtns">
+        <button id="addEventBtn">新增行程</button>
+        <button id="calculateBtn">計算時間</button>
+      </div>
+      <div id="result"></div>
+    </div>
+  </div>
+  <div id="tool2Container" class="tool-container">
+    <div id="morseTool">
+    <h2>摩斯密碼翻譯器</h2>
+    <div id="morsePanels">
+      <div class="panel">
+        <label for="textInput">英文 / 文字輸入</label>
+        <textarea id="textInput" placeholder="輸入英文、數字或符號..."></textarea>
+        <div class="counter" id="textCount">0 字元</div>
+      </div>
+
+      <button id="swapBtn" title="交換上下內容">⇅ 交換</button>
+
+      <div class="panel">
+        <label for="morseInput">摩斯碼輸入（用 . - 和 / 或空白分隔）</label>
+        <textarea id="morseInput" placeholder="例如：.... . .-.. .-.. --- / .-- --- .-. .-.. -.."></textarea>
+        <div class="counter" id="morseCount">0 符號</div>
+      </div>
+    </div>
+
+    <div id="morseActions">
+      <button id="copyTextBtn">複製文字</button>
+      <button id="copyMorseBtn">複製摩斯</button>
+      <button id="clearAllBtn">清除</button>
+    </div>
+  </div>
+  <script>
+    const fishCanvas = document.getElementById('fishCanvas');
+    const fishCtx = fishCanvas.getContext('2d');
+    let selectedHexagons = [];
+    let hoveredHexagonsMap = {};
+    let mouseX = -1, mouseY = -1;
+    let time = 0;
+
+    function resizeCanvas() {
+      fishCanvas.width = window.innerWidth;
+      fishCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function drawHexagon(ctx, cx, cy, r, style) {
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const ang = Math.PI / 3 * i - Math.PI / 6;
+        const x = cx + r * Math.cos(ang);
+        const y = cy + r * Math.sin(ang);
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.closePath(); ctx.fillStyle = style; ctx.fill();
+    }
+
+    function drawGlow(ctx, x, y, r, op) {
+      const g = ctx.createRadialGradient(x, y, r * 0.5, x, y, r);
+      g.addColorStop(0, `rgba(190,250,255,${op * 0.8})`);
+      g.addColorStop(1, `rgba(190,250,255,0)`);
+      ctx.beginPath(); ctx.arc(x, y, r, 0, 2*Math.PI);
+      ctx.fillStyle = g; ctx.fill();
+    }
+
+    function drawHexagonGrid(ctx, w, h, radius, t) {
+      const hexW = 1.7 * radius;
+      const hexH = Math.sqrt(3.1) * radius;
+      
+      for (let row = 0; row < h / (hexH * 0.8) + 1; row++) {
+        const offsetX = (row % 2) * (hexW / 2);
+        for (let col = 0; col < w / hexW + 1; col++) {
+          const baseX = col * hexW + offsetX;
+          const baseY = row * (hexH * 0.85);
+          const waveX = Math.sin(baseX * 0.01 + t) * 3;
+          const waveY = Math.cos(baseY * 0.01 + t) * 3;
+          const x = baseX + waveX, y = baseY + waveY;
+
+          // 基本顏色與透明度
+          let op = 0.08 + Math.sin(baseX * 0.01 + baseY * 0.01 + t) * 0.021;
+          const bR = 70, bG = 220, bB = 255;
+          let style = `rgba(${bR},${bG},${bB},${op})`;
+          let glowOp = 0;
+          let effR = radius;
+
+          const dx = mouseX - x, dy = mouseY - y;
+          const key = `${row}-${col}`;
+          let isSelected = false;
+
+          // 隨機選中動畫
+          for (const hex of selectedHexagons) {
+            if (hex.col === col && hex.row === row) {
+              const e = (performance.now() - hex.startTime) / 1000;
+              if (e < 1) {
+                const m = e;
+                style = `rgba(${70 + m * 120},${220 + m * 30},255,${op + m * (0.2 - op)})`;
+                glowOp = m * 0.2;
+              } else if (e < 2) {
+                style = `rgba(190,250,255,0.2)`; glowOp = 0.2;
+              } else if (e < 3) {
+                const m = 1 - (e - 2);
+                style = `rgba(${70 + m * 185},${220 + m * 35},255,${op + m * (0.2 - op)})`;
+                glowOp = m * 0.2;
+              }
+              isSelected = true;
+              break;
+            }
+          }
+
+          // 偵測滑鼠掠過起始
+          if (Math.hypot(dx, dy) < radius * 1.2) {
+            if (!hoveredHexagonsMap[key]) hoveredHexagonsMap[key] = { startTime: performance.now() };
+          }
+
+          // 滑鼠掠過與漸退效果
+          if (!isSelected && hoveredHexagonsMap[key]) {
+            const elapsed = performance.now() - hoveredHexagonsMap[key].startTime;
+            // 只要有 hover 過，持續到 3 秒
+            const intensity = elapsed < 3000 ? 1 - (elapsed / 3000) : 0;
+            const tR = bR + 0.1 * (255 - bR);
+            const tG = bG + 0.1 * (255 - bG);
+            const nR = Math.round(bR + intensity * (tR - bR));
+            const nG = Math.round(bG + intensity * (tG - bG));
+            style = `rgba(${nR},${nG},${bB},${op})`;
+            effR = radius * (1 + 0.05 * intensity);
+            glowOp = 0.1 * intensity;
+          }
+
+          if (glowOp > 0) drawGlow(ctx, x, y, radius * 1.5, glowOp);
+          drawHexagon(ctx, x, y, effR, style);
+        }
+      }
+
+      // 清理過期 hover，逾 3 秒後移除 key
+      for (const k in hoveredHexagonsMap) {
+        if ((performance.now() - hoveredHexagonsMap[k].startTime) / 1000 > 3) {
+          delete hoveredHexagonsMap[k];
+        }
+      }
+
+      // 清理過期選中
+      selectedHexagons = selectedHexagons.filter(h => (performance.now() - h.startTime) / 1000 < 3);
+    }
+
+    function animateBackground() {
+      time += 0.02;
+      fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
+      drawHexagonGrid(fishCtx, fishCanvas.width, fishCanvas.height, 45, time);
+      requestAnimationFrame(animateBackground);
+    }
+
+    function randomSelectHexagon() {
+      const cols = Math.ceil(fishCanvas.width / (1.7 * 45));
+      const rows = Math.ceil(fishCanvas.height / (Math.sqrt(3.1) * 45));
+      selectedHexagons.push({ col: Math.floor(Math.random() * cols), row: Math.floor(Math.random() * rows), startTime: performance.now() });
+      setTimeout(randomSelectHexagon, 1000);
+    }
+
+    function handleMouseMove(e){
+      const rect = fishCanvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+    }
+    function handleMouseLeave(){
+      mouseX = -1;
+      mouseY = -1;
+    }
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('touchmove', e => {
+      if (e.touches && e.touches[0]) handleMouseMove(e.touches[0]);
+    }, { passive: true });
+
+    /* ===== 時間管理工具邏輯 ===== */
+    const events = [];
+    const eventsList = document.getElementById('eventsList');
+    const startInput = document.getElementById('startTime');
+    const targetInput = document.getElementById('targetTime');
+    const resultDiv = document.getElementById('result');
+    const modeButtons = document.querySelectorAll('.mode-btn');
+    const rowStart = document.getElementById('rowStart');
+    const rowTarget = document.getElementById('rowTarget');
+    const labelStart = rowStart.querySelector('label');
+    const labelTarget = rowTarget.querySelector('label');
+    const calcEndOut = document.getElementById('calcEndOut');
+    const calcDepartOut = document.getElementById('calcDepartOut');
+    let mode = 'arrive';
+
+    function setMode(m){
+      mode = m;
+      modeButtons.forEach(btn=>btn.classList.toggle('active', btn.dataset.mode===m));
+      if(m==='arrive'){
+        rowTarget.style.display='block';
+        rowStart.style.display='none';
+        labelTarget.textContent='輸入行程目標時間';
+        startInput.value='';
+      }else{
+        rowStart.style.display='block';
+        rowTarget.style.display='none';
+        labelStart.textContent='輸入行程起始時間';
+        targetInput.value='';
+      }
+      calcEndOut.textContent='';
+      calcDepartOut.textContent='';
+      resultDiv.textContent='';
+    }
+    setMode(mode);
+    modeButtons.forEach(btn=>btn.addEventListener('click',()=>setMode(btn.dataset.mode)));
+
+    document.getElementById('addEventBtn').addEventListener('click',()=>{
+      events.push({name:'',hours:0,mins:0});
+      renderEvents();
+    });
+    function attachAutoPicker(el) {
+      ['focus', 'click'].forEach(ev => {
+        el.addEventListener(ev, () => {
+          if (typeof el.showPicker === 'function') el.showPicker();
+        });
+      });
+    }
+    document.querySelectorAll('.time-row input[type="time"]').forEach(attachAutoPicker);
+
+    function renderEvents(){
+      eventsList.innerHTML='';
+      events.forEach((e,i)=>{
+        const div=document.createElement('div');
+        div.className='event-item';
+        div.innerHTML=`<input class="event-name" type="text" placeholder="行程名稱" value="${e.name}" data-i="${i}" data-f="name">
+          <div class=\"duration-group\">
+            <input type=\"number\" min=\"0\" value=\"${e.hours}\" data-i=\"${i}\" data-f=\"hours\"><span>小時</span>
+            <input type=\"number\" min=\"0\" max=\"59\" value=\"${e.mins}\" data-i=\"${i}\" data-f=\"mins\"><span>分鐘</span>
+          </div>
+          <button class=\"remove-btn\" data-rm=\"${i}\">刪除</button>`;
+        eventsList.appendChild(div);
+      });
+    }
+
+    eventsList.addEventListener('input',e=>{
+      const i=e.target.getAttribute('data-i');
+      const f=e.target.getAttribute('data-f');
+      if(i!==null && f){
+        events[i][f]=f==='name'?e.target.value:parseInt(e.target.value)||0;
+      }
+    });
+
+    eventsList.addEventListener('click',e=>{
+      if(e.target.dataset.rm!==undefined){
+        const idx=parseInt(e.target.dataset.rm);
+        events.splice(idx,1);renderEvents();
+      }
+    });
+
+    document.getElementById('calculateBtn').addEventListener('click',()=>{
+
+      calcEndOut.textContent='';
+      calcDepartOut.textContent='';
+      resultDiv.textContent='';
+      const totalMins = events.reduce((s,e)=>s+e.hours*60+e.mins,0);
+      if(mode==='depart'){
+        if(!startInput.value){resultDiv.textContent='請輸入起始(出發)時間';return;}
+        const start=parseTime(startInput.value);
+        const endRaw=addMinutes(start,totalMins);
+        calcEndOut.textContent = '→ ' + formatWithDays(endRaw,'forward');
+      }else{
+        if(!targetInput.value){resultDiv.textContent='請輸入抵達(目標)時間';return;}
+        const target=parseTime(targetInput.value);
+        const departRaw=addMinutes(target,-totalMins);
+        calcDepartOut.textContent = '→ ' + formatWithDays(departRaw,'backward');
+      }
+    });
+
+    document.getElementById('resetBtn').addEventListener('click',()=>{
+      if(confirm('確定要清空所有資料並回到模式選擇？')){
+        events.length=0;
+        startInput.value='';
+        targetInput.value='';
+        renderEvents();
+        setMode('arrive');
+        resultDiv.textContent='';
+      }
+    });
+
+    function parseTime(str){const [h,m]=str.split(':').map(n=>parseInt(n,10));return h*60+m;}
+    function formatTime(mins){mins=(mins+24*60)%(24*60);const h=Math.floor(mins/60).toString().padStart(2,'0');const m=(mins%60).toString().padStart(2,'0');return `${h}:${m}`;}
+    function addMinutes(base,delta){return base+delta;}
+    const DAY_MIN=1440;
+    function formatWithDays(rawMins, type){
+      // type: 'forward' => 結束/抵達 ; 'backward' => 出發
+      if(type==='forward'){
+        const days=Math.floor(rawMins/DAY_MIN);
+        if(days>0){return `抵達時間：${days}天 ${formatTime(rawMins)}`;}
+        return `最終結束時間：${formatTime(rawMins)}`;
+      }else{ // backward
+        if(rawMins<0){
+          const daysBefore=Math.ceil(Math.abs(rawMins)/DAY_MIN);
+          const norm=((rawMins % DAY_MIN)+DAY_MIN)%DAY_MIN;
+          return `出發時間：前${daysBefore}天 ${formatTime(norm)}`;
+        }
+        return `出發時間：${formatTime(rawMins)}`;
+      }
+    }
+  
+    // ===== 摩斯密碼翻譯器 =====
+    const textInput     = document.getElementById('textInput');
+    const morseInput    = document.getElementById('morseInput');
+    const textCount     = document.getElementById('textCount');
+    const morseCount    = document.getElementById('morseCount');
+    const copyTextBtn   = document.getElementById('copyTextBtn');
+    const copyMorseBtn  = document.getElementById('copyMorseBtn');
+    const clearAllBtn   = document.getElementById('clearAllBtn');
+    const swapBtn       = document.getElementById('swapBtn');
+
+    const TEXT_TO_MORSE = {
+      "A":".-","B":"-...","C":"-.-.","D":"-..","E":".","F":"..-.","G":"--.","H":"....","I":"..","J":".---",
+      "K":"-.-","L":".-..","M":"--","N":"-.","O":"---","P":".--.","Q":"--.-","R":".-.","S":"...","T":"-",
+      "U":"..-","V":"...-","W":".--","X":"-..-","Y":"-.--","Z":"--..",
+      "0":"-----","1":".----","2":"..---","3":"...--","4":"....-","5":".....","6":"-....","7":"--...","8":"---..","9":"----.",
+      ".":".-.-.-",",":"--..--","?":"..--..","!":"-.-.--",":":"---...",";":"-.-.-.","/":"-..-.","-":"-....-","(":"-.--.",")":"-.--.-",
+      "\"":".-..-.","'":".----.","=":"-...-","+":".-.-.","@":".--.-.","&":".-...","¿":"..-.-","¡":"--...-"
+    };
+    const MORSE_TO_TEXT = Object.fromEntries(Object.entries(TEXT_TO_MORSE).map(([k,v])=>[v,k]));
+
+    let lock = false;
+    function getMorseTokens(str){
+      return str.trim()
+                .replace(/\n+/g,' ')
+                .split(/(?:\s+|\/|\|)+/g) 
+                .filter(Boolean);
+    }
+    function updateCounts(){
+      if(textCount)  textCount.textContent  = [...(textInput?.value||'')].length + ' 字元';
+      if(morseCount) morseCount.textContent = getMorseTokens(morseInput?.value||'').length + ' 符號';
+    }
+    function textToMorse(str){
+      return str.toUpperCase().split('').map(ch=>{
+        if(ch===' ') return '/';
+        return TEXT_TO_MORSE[ch] || '';
+      }).filter(Boolean).join(' ');
+    }
+    function morseToText(str){
+      const tokens = getMorseTokens(str);
+      return tokens.map(code=>{
+        if(code==='/'||code==='|') return ' ';
+        return MORSE_TO_TEXT[code] || '';
+      }).join('').replace(/\s+/g,' ');
+    }
+    if(textInput){
+      textInput.addEventListener('input', ()=>{
+        if(lock) return; lock = true;
+        morseInput.value = textToMorse(textInput.value);
+        updateCounts(); lock = false;
+      });
+    }
+    if(morseInput){
+      morseInput.addEventListener('input', ()=>{
+        if(lock) return; lock = true;
+        textInput.value = morseToText(morseInput.value);
+        updateCounts(); lock = false;
+      });
+    }
+
+    copyTextBtn?.addEventListener('click', ()=> navigator.clipboard?.writeText(textInput.value));
+    copyMorseBtn?.addEventListener('click',()=> navigator.clipboard?.writeText(morseInput.value));
+    clearAllBtn?.addEventListener('click', ()=>{
+      textInput.value=''; morseInput.value=''; updateCounts();
+    });
+    swapBtn?.addEventListener('click', ()=>{
+      const t = textInput.value;
+      textInput.value  = morseToText(morseInput.value);
+      morseInput.value = textToMorse(t);
+      updateCounts();
+    });
+    updateCounts();
+
+    /* === 工具切換邏輯 === */
+    const tool1Btn = document.getElementById('tool1Btn');
+    const tool2Btn = document.getElementById('tool2Btn');
+    const tool1Container = document.getElementById('tool1Container');
+    const tool2Container = document.getElementById('tool2Container');
+    function switchTool(which){
+      if(which===1){
+        tool1Btn.classList.add('active'); tool2Btn.classList.remove('active');
+        tool1Container.classList.add('active'); tool2Container.classList.remove('active');
+      }else{
+        tool2Btn.classList.add('active'); tool1Btn.classList.remove('active');
+        tool2Container.classList.add('active'); tool1Container.classList.remove('active');
+      }
+    }
+    tool1Btn.addEventListener('click',()=>switchTool(1));
+    tool2Btn.addEventListener('click',()=>switchTool(2));
+
+    randomSelectHexagon();
+    animateBackground();
+  </script>
+</body>
+</html>
