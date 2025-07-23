@@ -10,12 +10,40 @@
     #toolSelector{position:relative;z-index:10;padding:20px;text-align:center;}
     #toolSelector button{margin:0 10px;padding:10px 20px;font-size:12px;cursor:pointer;border:none;border-radius:5px;background:#2b3432;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);} 
     #toolSelector button.active{background:#537e74;}
-    .tool-container{display:none;position:relative;z-index:10;padding:20px;}
+    .tool-container{display:none;position:relative;z-index:10;padding:10px;}
     .tool-container.active{display:block;}
 
     /* ====== 時間管理工具樣式 ====== */
-    #timeTool{width:45%;max-height:70vh;background:rgba(0,0,0,.7);transform:translateY(-20px);margin:0px auto;padding:20px 24px 24px 24px;color:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.6);font-family:sans-serif;overflow-y:auto;position:relative;}
-    #timeTool h2{margin:0 0 12px 0;font-size:13px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.7);}
+    #timeTool{
+      width:45%;
+      max-height:70vh;
+      background:rgba(0,0,0,.7);
+      margin:0 auto;
+      padding:10px 20px 10px 20px;
+      color:#fff;
+      border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,.6);
+      font-family:sans-serif;
+      overflow-y:auto;
+      position:relative !important;
+      display:flex;
+      flex-direction:column;
+      transform:none !important;
+      margin-top:0 !important;
+    }
+    #timeTool::before{
+      content:"";
+      display:block;
+      height:0;
+    }
+    #timeTool > h2{
+      margin:0 0 12px 0 !important;
+      font-size:13px;
+      text-align:center;
+      text-shadow:0 1px 3px rgba(0,0,0,.7);
+      line-height:1.2;
+    }
+    #tool2Container {padding-top: 10px; } 
 
     /*卷軸樣式*/
     #timeTool::-webkit-scrollbar,
@@ -46,7 +74,20 @@
     #morseTool,#morseTool textarea{scrollbar-width:thin;scrollbar-color:#29cfa8 rgba(255,255,255,.08);}
 
     /* 重整鍵 */
-    #resetBtn{position:absolute;top:12px;right:12px;background:#00683c;border:none;color:#000;font-weight:bold;border-radius:8px;padding:6px 10px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);} 
+    #resetBtn{
+      position:absolute !important;
+      top:6px !important;
+      right:6px !important;
+      background:#00683c;
+      border:none;
+      color:#000;
+      font-weight:bold;
+      border-radius:8px;
+      padding:6px 10px;
+      cursor:pointer;
+      box-shadow:0 2px 6px rgba(0,0,0,.5);
+      margin:0 !important;
+    }
 
     /* 模式選擇按鈕 */
     #modeSelector{display:flex;gap:10px;margin-bottom:15px;}
@@ -69,24 +110,47 @@
     .event-name{flex:0 0 35%;min-width:35%;padding:4px;background:transparent;border:1px solid rgba(255,255,255,.6);border-radius:3px;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.5);} 
     .event-name::placeholder{color:rgba(255,255,255,.5);} 
     .duration-group{display:flex;align-items:center;gap:4px;flex:0 0 auto;}
-    .duration-group input{width:55px;padding:4px;background:transparent;border:1px solid rgba(255,255,255,.6);border-radius:3px;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.5);text-align:right;}
+    .duration-group input{width:30px;padding:4px;background:transparent;border:1px solid rgba(255,255,255,.6);border-radius:3px;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.5);text-align:right;}
     .duration-group span{font-size:13px;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.5);} 
-    .remove-btn{background:transparent;border:1px solid rgba(255,255,255,.6);color:#fff;padding:4px 8px;border-radius:3px;cursor:pointer;text-shadow:0 1px 1px rgba(0,0,0,.5);}  
+    .remove-btn{background:transparent;border:1px solid rgba(255,255,255,.6);color:#fff;padding:4px 8px;border-radius:3px;cursor:pointer;text-shadow:0 1px 1px rgba(0,0,0,.5);margin-left: auto;}  
 
     #result{margin-top:15px;font-weight:bold;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.7);} 
 
     /* ===== 摩斯密碼工具樣式 ===== */
+    #tool2Container {padding-top: 10px; } 
     #morseTool{
-      width:45%;max-height:70vh;background:rgba(0,0,0,.7);transform:translateY(-20px);
-      margin:0px auto;padding:20px 24px;color:#fff;border-radius:8px;
-      box-shadow:0 4px 12px rgba(0,0,0,.6);font-family:sans-serif;
-      overflow-y:auto;position:relative;
+      width:45%;
+      max-height:70vh;
+      background:rgba(0,0,0,.7);
+      margin:0 auto;
+      padding:10px 20px 10px 20px;
+      color:#fff;
+      border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,.6);
+      font-family:sans-serif;
+      overflow-y:auto;
+      position:relative !important;
+      display:flex;
+      flex-direction:column;
+      transform:none !important;
+      margin-top:0 !important;
     }
-    #morseTool h2{margin:0 0 16px;font-size:13px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.7);}
+    #morseTool::before{
+      content:"";
+      display:block;
+      height:0;
+    }
+    #morseTool > h2{
+      margin:0 0 12px 0 !important;
+      font-size:13px;
+      text-align:center;
+      text-shadow:0 1px 3px rgba(0,0,0,.7);
+      line-height:1.2;
+    }
     #morsePanels{display:flex;flex-direction:column;gap:14px;}
-    #swapBtn{align-self:center;padding:8px 14px;background:#216858;color:#fff;border:none;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
+    #swapBtn{align-self:center;padding:4px 26px;background:#216858;color:#fff;border:none;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
     .panel{background:rgba(41,207,168,.3);padding:12px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.5);}
-    .panel label{display:block;font-size:13px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.6);}
+    .panel label{display:block;font-size:12px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.6);}
     .panel textarea{
       width:95%;height:50px;resize:vertical;padding:8px;
       background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.3);
@@ -146,7 +210,7 @@
       #toolSelector{padding:12px 0;}
       #toolSelector button{margin:0 6px;padding:8px 12px;font-size:14px;}
 
-      #timeTool,#morseTool{width:90vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto;}
+      #timeTool,#morseTool{width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto;}
       /* 捲軸高度調整 */
       #eventsList{max-height:40vh;}
 
@@ -156,13 +220,14 @@
       .mode-btn{font-size:13px;}
       .mode-btn.active{font-size:13px;}
       .panel textarea{width:100%;box-sizing:border-box;}
+      .event-name{flex:0 0 22%;min-width:22%;}
 
       /* 摩斯工具 textarea 放大 */
       #morsePanels .panel textarea{width:100%;height:120px;}
-      #swapBtn{padding:6px 10px;}
+      #swapBtn{padding:2px 22px;}
     }
 
-    /* 極小螢幕（<=480px）再縮排/字級 */
+    /* 極小螢幕（<=480px）*/
     @media (max-width:480px){
       #toolSelector button{font-size:13px;padding:7px 10px;}
       #timeTool,#morseTool{padding:14px 16px;}
