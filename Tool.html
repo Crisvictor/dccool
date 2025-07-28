@@ -815,77 +815,56 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearExchangeBtn = document.getElementById('clearExchangeBtn');
   const exchangeResult   = document.getElementById('exchangeResult');
 
+  // 只要這十種常用幣別
   const CODES = ['TWD','USD','EUR','JPY','CNY','HKD','SGD','AUD','GBP','CAD'];
-  const nameMap = {
-    TWD:'新台幣',
-    USD:'美金',
-    EUR:'歐元',
-    JPY:'日幣',
-    CNY:'人民幣',
-    HKD:'港幣',
-    SGD:'新加坡幣',
-    AUD:'澳幣',
-    GBP:'英鎊',
-    CAD:'加拿大幣'
+  const NAMES = {
+    TWD:'新台幣', USD:'美金', EUR:'歐元', JPY:'日幣', CNY:'人民幣',
+    HKD:'港幣', SGD:'新加坡幣', AUD:'澳幣', GBP:'英鎊', CAD:'加拿大幣'
   };
-  const ratesCache = {};
 
-  // 填充下拉選單
-  function initSelects() {
-    CODES.forEach(code => {
-      const label = `${code} – ${nameMap[code]}`;
-      baseCurrency  .add(new Option(label, code));
-      targetCurrency.add(new Option(label, code));
-    });
-    baseCurrency.value   = 'TWD';
-    targetCurrency.value = 'USD';
-  }
+  // 初始化下拉
+  baseCurrency.innerHTML = '';
+  targetCurrency.innerHTML = '';
+  CODES.forEach(code => {
+    const label = `${code} – ${NAMES[code]}`;
+    baseCurrency .add(new Option(label, code));
+    targetCurrency.add(new Option(label, code));
+  });
+  baseCurrency.value   = 'TWD';
+  targetCurrency.value = 'USD';
 
-  // 從 RTER API 取得匯率，以 TWD 為基準
-  async function fetchRates() {
-    try {
-      const res  = await fetch('https://tw.rter.info/capi.php');
-      const data = await res.json();
-      ratesCache['TWD'] = 1;
-      // USD↔TWD
-      if (data['USDTWD']?.Exrate) {
-        ratesCache['USD'] = data['USDTWD'].Exrate;
-      } else if (data['TWDUSD']?.Exrate) {
-        ratesCache['USD'] = 1 / data['TWDUSD'].Exrate;
-      }
-      // 其他常用幣別透過 USD 轉換
-      CODES.filter(c => c!=='TWD'&&c!=='USD').forEach(code => {
-        const pair1 = `USD${code}`, pair2 = `${code}USD`;
-        if (data[pair1]?.Exrate) {
-          ratesCache[code] = ratesCache['USD'] / data[pair1].Exrate;
-        } else if (data[pair2]?.Exrate) {
-          ratesCache[code] = data[pair2].Exrate * ratesCache['USD'];
-        }
-      });
-    } catch (err) {
-      console.error('無法取得 RTER 匯率', err);
-      // fallback
-      CODES.forEach(code => ratesCache[code] = code==='TWD'?1:(code==='USD'?1:null));
-    }
-  }
-
-  // 執行轉換
-  function convertExchange() {
-    const amt    = parseFloat(amountInput.value);
-    const b      = baseCurrency.value;
-    const t      = targetCurrency.value;
-    if (isNaN(amt) || !ratesCache[b] || !ratesCache[t]) {
-      exchangeResult.textContent = '請輸入金額並等候匯率載入';
+  // 按下「轉換」才呼叫 API
+  async function convertExchange() {
+    const amt  = parseFloat(amountInput.value);
+    const from = baseCurrency.value;
+    const to   = targetCurrency.value;
+    if (isNaN(amt)) {
+      exchangeResult.textContent = '請輸入有效金額';
       return;
     }
-    const result = amt * (ratesCache[t] / ratesCache[b]);
-    exchangeResult.textContent = `${amt} ${b} = ${result.toFixed(4)} ${t}`;
+    try {
+      const res  = await fetch(
+        `https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amt}`
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      // 優先使用 data.result，若不存在再用 info.rate * amt
+      let result = (typeof data.result === 'number')
+        ? data.result
+        : (data.info?.rate ? data.info.rate * amt : NaN);
+      if (isNaN(result)) throw new Error('無效的轉換結果');
+      exchangeResult.textContent = `${amt} ${from} = ${result.toFixed(4)} ${to}`;
+    } catch (err) {
+      console.error('匯率轉換失敗', err);
+      exchangeResult.textContent = '取得匯率失敗，請稍後再試';
+    }
   }
 
-  initSelects();
-  fetchRates();
-  convertBtn     .addEventListener('click', convertExchange);
-  copyExchangeBtn.addEventListener('click', () => navigator.clipboard.writeText(exchangeResult.textContent));
+  convertBtn    .addEventListener('click', convertExchange);
+  copyExchangeBtn.addEventListener('click', () => {
+    if (exchangeResult.textContent) 
+      navigator.clipboard.writeText(exchangeResult.textContent);
+  });
   clearExchangeBtn.addEventListener('click', () => {
     amountInput.value = '';
     exchangeResult.textContent = '';
