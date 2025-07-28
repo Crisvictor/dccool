@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="img/Tool.png" type="image/x-icon">
+  <link rel="shortcut icon" href="img/Tool.png" type="image/x-icon">
   <title>小工具聚合站</title>
   <style>
     body { margin:0; padding:0; overflow:hidden; background:#000; }
     #fishCanvas{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;}
     #toolSelector{position:relative;z-index:10;padding:20px;text-align:center;}
-    #toolSelector button{margin:0 10px;padding:10px 20px;font-size:12px;cursor:pointer;border:none;border-radius:5px;background:#2b3432;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);} 
+    #toolSelector button{margin:0 5px;padding:8px 10px;font-size:12px;cursor:pointer;border:none;border-radius:5px;background:#2b3432;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);} 
     #toolSelector button.active{background:#537e74;}
     .tool-container{display:none;position:relative;z-index:10;padding:10px;}
     .tool-container.active{display:block;}
@@ -161,38 +163,42 @@
 
     #result{margin-top:15px;font-weight:bold;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.7);} 
 
-    /* ===== 摩斯密碼工具樣式 ===== */
+    /* 摩斯密碼工具樣式 */
     #morsePanels{display:flex;flex-direction:column;gap:14px;}
     #swapBtn,#swapBinBtn{align-self:center;padding:4px 26px;background:#216858;color:#fff;border:none;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
     .panel{background:rgba(41,207,168,.3);padding:12px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.5);}
     .panel label{display:block;font-size:12px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.6);}
     .panel textarea{
       width:95%;height:50px;resize:vertical;padding:8px;
-      background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.3);
+      background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.3);
       border-radius:4px;color:#fff;font-family:monospace;font-size:12px;line-height:1.4;
     }
     .panel textarea::placeholder{color:rgba(255,255,255,.45);}
     .counter{margin-top:4px;font-size:12px;color:rgba(255,255,255,.8);text-align:right;}
     #morseActions{display:flex;gap:10px;justify-content:space-between;margin-top:12px;}
     #morseActions button{
-      flex:1;padding:8px 0;background:#0b8a5c;border:none;color:#fff;font-weight:bold;
+      flex:1;padding:8px 0;background:#013836;border:none;color:#fff;font-weight:bold;
       border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);
     }
     /* 二進制轉換工具樣式 */
-    #binaryTool textarea{width:95%;height:50px;resize:vertical;padding:8px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.4);border-radius:4px;color:#fff;font-family:monospace;font-size:14px;line-height:1.4;}
+    #binaryTool textarea{width:95%;height:50px;resize:vertical;padding:8px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.4);border-radius:4px;color:#fff;font-family:monospace;font-size:14px;line-height:1.4;}
     #binaryTool textarea::placeholder{color:rgba(255,255,255,.45);}
     #binaryPanels{display:flex;flex-direction:column;gap:14px;}
     #binaryActions{display:flex;gap:10px;justify-content:space-between;margin-top:12px;}
-    #binaryActions button{flex:1;padding:8px 0;background:#29cfa8;border:none;color:#000;font-weight:bold;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
+    #binaryActions button{flex:1;padding:8px 0;background:#013836;border:none;color:#fff;font-weight:bold;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
 
     /* 匯率轉換工具樣式 */
-    #exchangeTool{
-      width:45%; max-height:70vh; background:rgba(0,0,0,.7);
-      margin:0 auto; padding:15px 20px; color:#fff;
-      border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.6);
-      font-family:sans-serif; overflow-y:auto;
-      position:relative; display:flex; flex-direction:column;
-      transform:none !important; margin-top:0 !important;
+    #exchangeTool {
+      width: 45%;
+      margin: 0 auto;
+      padding: 15px 20px;
+      background: rgba(0,0,0,0.7);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      font-family: sans-serif;
     }
     #exchangeTool::before{ content:""; display:block; height:0; }
     #exchangeTool > h2{
@@ -209,65 +215,239 @@
     }
     #exchangeActions{ display:flex; gap:10px; justify-content:space-between; margin:12px 0; }
     #exchangeActions button{
-      flex:1; padding:8px 0; background:#29cfa8; border:none;
-      color:#000; font-weight:bold; border-radius:8px;
+      flex:1; padding:8px 0; background:#013836; border:none;
+      color:#fff; font-weight:bold; border-radius:8px;
       cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.5);
     }
     #exchangeResult{ margin-top:10px; font-size:16px; text-align:center; color:#29cfa8; }
+    #exchangeTool .exchange-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    #exchangeTool .exchange-item {
+      flex: 1;
+    }
+    #exchangeTool .exchange-item label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 4px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+    #exchangeTool .exchange-item select {
+      width: 100%;
+      padding: 6px;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 4px;
+      color: #fff;
+      font-size: 14px;
+      appearance: none;
+    }
+    #exchangeResultWrapper {
+      margin: 8px 0;
+      padding: 10px;
+      background: rgba(34,69,115,0.2);
+      border-radius: 4px;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #exchangeResult {
+      font-size: 15px;
+      color: #a2d3df;
+      font-weight: bold;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+    }
+    /* QR/條碼產生器 */
+    #codeTool{
+      width:45%; max-height:70vh; background:rgba(0,0,0,.7);
+      margin:0 auto; padding:10px 20px; color:#fff;
+      border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.6);
+      font-family:sans-serif; overflow-y:auto;
+      position:relative; display:flex; flex-direction:column;
+      transform:none !important; margin-top:0 !important;
+    }
+    #codeTool::before{
+      content:""; display:block; height:0;
+    }
+    #codeTool > h2{
+      margin:0 0 12px 0; font-size:13px; text-align:center;
+      text-shadow:0 1px 3px rgba(0,0,0,.7); line-height:1.2;
+    }
+    #codeSettings label{
+      display:flex; flex-direction:column; font-size:12px; color:#fff;
+    }
+    #codeSettings input[type="text"],
+    #codeSettings input[type="number"],
+    #codeSettings input[type="color"],
+    #codeSettings select{
+      margin-top:4px; padding:6px; background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.4); border-radius:4px;
+      color:#fff; font-size:13px;
+    }
+    #codeSettings{
+      display:flex; flex-wrap:wrap; gap:12px;
+    }
+    #codeSettings label{ width:100%; }
+    #codeSettings select{
+      background:rgba(0,0,0,0.7) !important;
+      color:#fff !important;
+    }
+    #codeSettings input[type="file"] { display: none; }
+    #codeSettings label.file-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 8px;
+      background: rgba(12, 45, 51, 0.7);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 3px 0 rgba(0,0,0,.35), 0 6px 12px rgba(0,0,0,.45);
+      cursor: pointer;
+      transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
+      position: relative;
+      font-size: 13px;
+    }
+    #generateCodeBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 8px;
+      background: rgba(3, 92, 114, 0.7);
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 3px 0 rgba(0,0,0,.35), 0 6px 12px rgba(0,0,0,.45);
+      cursor: pointer;
+      transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
+      position: relative;
+      font-size: 14px;
+    }
+    #codeSettings label.file-btn::before {
+      content: "\1F4E4";
+      margin-right: 6px;
+      font-size: 13px;
+    }
+    #codeSettings label.file-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 0 rgba(0,0,0,.4), 0 10px 18px rgba(0,0,0,.55);
+      filter: brightness(1.08);
+    }
+    #codeSettings label.file-btn:active {
+      transform: translateY(1px);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.4);
+      filter: brightness(.95);
+    }
+
+    /* 單位換算器樣式 */
+    #unitTool {
+      width:45%; max-height:70vh; background:rgba(0,0,0,.7);
+      margin:0 auto; padding:10px 20px; color:#fff;
+      border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.6);
+      font-family:sans-serif; display:flex; flex-direction:column;
+      overflow-y:auto; position:relative;
+    }
+    #unitTool::before{content:"";display:block;height:0;}
+    #unitTool>h2{
+      margin:0 0 12px 0;font-size:13px;text-align:center;
+      text-shadow:0 1px 3px rgba(0,0,0,.7);line-height:1.2;
+    }
+    .unit-row{
+      display:flex; gap:12px; margin-bottom:12px;
+    }
+    .unit-row label{
+      flex:1; display:flex; flex-direction:column;
+      font-size:12px; color:#fff;
+    }
+    .unit-row select,
+    .unit-row input[type="number"]{
+      margin-top:4px; padding:6px;
+      background:rgba(0,0,0,0.7);
+      border:1px solid rgba(255,255,255,.4);
+      border-radius:4px; color:#fff; font-size:13px;
+      appearance:none;
+    }
+    #unitResultWrapper{
+      margin:8px 0; padding:10px;
+      background:rgba(34,69,115,0.35);
+      border-radius:4px; min-height:36px;
+      display:flex; align-items:center; justify-content:center;
+    }
+    #unitResult{
+      font-size:14px; color:#29cfa8;
+      text-shadow:0 1px 2px rgba(0,0,0,.7);
+    }
+    #unitActions{
+      display:flex; gap:10px; margin-top:10px;
+    }
+    #unitActions button{
+      flex:1; padding:8px 0; background:#013836;
+      border:none; color:#fff; font-weight:bold;
+      border-radius:8px; cursor:pointer;
+      box-shadow:0 2px 6px rgba(0,0,0,.5);
+      transition:transform .08s ease,
+                 box-shadow .12s ease,
+                 filter .12s ease;
+    }
 
     /* 追加覆寫 */
     .time-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
     .time-row label{margin:0;width:auto;}
     .time-output{margin-left:auto;font-size:12px;color:#29cfa8;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,.7);} 
     
-    /* === 立體感與互動效果覆寫 === */
+    /* 按鈕 */
+    #generateCodeBtn,
+    #downloadPngBtn,
+    #downloadJpgBtn,
     #toolSelector button,
-    #binaryActions button,
-    #morseActions button,
     .mode-btn,
     #addEventBtn,
     #calculateBtn,
     #resetBtn,
-    #swapBinBtn,
-    #swapBtn {
+    #swapBtn{
       position: relative;
       transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
       box-shadow: 0 3px 0 rgba(0,0,0,.35), 0 6px 12px rgba(0,0,0,.45);
     }
+    #generateCodeBtn:hover,
+    #downloadPngBtn:hover,
+    #downloadJpgBtn:hover,
     #toolSelector button:hover,
-    #binaryActions button:hover,
-    #morseActions button:hover,
     .mode-btn:hover,
     #addEventBtn:hover,
     #calculateBtn:hover,
     #resetBtn:hover,
-    #swapBinBtn:hover,
-    #swapBtn:hover {
+    #unitActions button:hover,
+    #swapBtn:hover{
       transform: translateY(-2px);
       box-shadow: 0 5px 0 rgba(0,0,0,.4), 0 10px 18px rgba(0,0,0,.55);
       filter: brightness(1.08);
     }
+    #generateCodeBtn:active,
+    #downloadPngBtn:active,
+    #downloadJpgBtn:active,
     #toolSelector button:active,
-    #binaryActions button:active,
-    #morseActions button:active,
     .mode-btn:active,
     #addEventBtn:active,
     #calculateBtn:active,
+    #unitActions button:active,
     #resetBtn:active,
-    #swapBinBtn:active,
-    #swapBtn:active {
+    #swapBtn:active{
       transform: translateY(1px);
       box-shadow: inset 0 2px 4px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.4);
       filter: brightness(.95);
     }
-
     /* ==== 手機版調整（<= 768px）==== */
     @media (max-width:768px){
       body{overflow:auto;}
-      #toolSelector{padding:12px 0;}
-      #toolSelector button{margin:0 6px;padding:8px 12px;font-size:14px;}
+      #toolSelector{padding:15px 0;}
+      #toolSelector button{margin:0 3px;padding:8px 12px;font-size:10px;}
 
-      #timeTool,#morseTool,#binaryTool{width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto;}
+      #timeTool,#morseTool,#binaryTool,#codeTool,#exchangeTool,#unitTool{width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto;}
       /* 捲軸高度調整 */
       #eventsList{max-height:40vh;}
 
@@ -286,7 +466,7 @@
 
     /* 極小螢幕（<=480px）*/
     @media (max-width:480px){
-      #toolSelector button{font-size:13px;padding:7px 10px;}
+      #toolSelector button{font-size:10px;padding:7px 10px;}
       #timeTool,#morseTool{padding:14px 16px;}
       .mode-btn{font-size:12px;}
       .mode-btn.active{font-size:14px;}
@@ -303,6 +483,8 @@
     <button id="tool2Btn">摩斯密碼</button>
     <button id="tool3Btn">轉二進制</button>
     <button id="tool4Btn">匯率轉換</button>
+    <button id="tool5Btn">QR／條碼</button>
+    <button id="tool6Btn">單位換算</button>
   </div>
 
   <!-- 時間管理工具 -->
@@ -336,7 +518,6 @@
   <!-- 摩斯密碼翻譯器 -->
   <div id="tool2Container" class="tool-container">
     <div id="morseTool">
-      <button id="resetBtn" title="重整">↻</button>
       <h2>摩斯密碼翻譯器</h2>
       <div id="morsePanels">
         <div class="panel">
@@ -390,22 +571,107 @@
         <label for="amountInput">金額</label>
         <input type="number" id="amountInput" placeholder="輸入金額" min="0" step="any" />
       </div>
-      <div class="panel">
-        <label for="baseCurrency">原幣別</label>
-        <select id="baseCurrency"></select>
+      <div class="exchange-row">
+        <div class="exchange-item">
+          <label for="baseCurrency">原幣別</label>
+          <select id="baseCurrency"></select>
+        </div>
+        <div class="exchange-item">
+          <label for="targetCurrency">目標幣別</label>
+          <select id="targetCurrency"></select>
+        </div>
       </div>
-      <div class="panel">
-        <label for="targetCurrency">目標幣別</label>
-        <select id="targetCurrency"></select>
+      <div id="exchangeResultWrapper">
+        <span id="exchangeResult"></span>
       </div>
       <div id="exchangeActions">
         <button id="convertBtn">轉換</button>
         <button id="copyExchangeBtn">複製結果</button>
         <button id="clearExchangeBtn">清除</button>
       </div>
-      <div id="exchangeResult"></div>
     </div>
   </div>
+  <div id="tool5Container" class="tool-container">
+    <div id="codeTool">
+      <h2>QR／條碼產生器</h2>
+      <div id="codeSettings">
+        <label>模式
+          <select id="codeType">
+            <option value="qrcode">QR Code</option>
+            <option value="barcode">條碼 (CODE128)</option>
+          </select>
+        </label>
+        <label>文字／網址
+          <input type="text" id="codeText" placeholder="輸入文字或網址" />
+        </label>
+        <label style="flex:0 0 20%;">
+          尺寸 (px)
+          <input type="number" id="codeSize" value="200" min="50" />
+        </label>
+        <label style="flex:0 0 8%;">
+          前景色
+          <input type="color" id="codeColor" value="#000000" />
+        </label>
+        <label style="flex:0 0 8%;">
+          背景色
+          <input type="color" id="codeBgColor" value="#ffffff" />
+          </label>
+        <label for="codeLogo" class="file-btn" style="flex:0 0 20%;"> 上傳 Logo</label>
+        <input type="file" id="codeLogo" accept="image/*" style="display:none;" />
+        <button id="generateCodeBtn" style="flex:0 0 20%;">生成</button>
+      </div>
+      <canvas id="codeCanvas" style="display:block;margin:0 auto 16px;"></canvas>
+      <div id="downloadButtons" style="display:flex;gap:10px;justify-content:center;">
+        <button id="downloadPngBtn" style="flex:1;padding:8px;border:none;border-radius:4px;background:#2F5C3B;color:#fff;cursor:pointer;">
+          下載 PNG
+        </button>
+        <button id="downloadJpgBtn" style="flex:1;padding:8px;border:none;border-radius:4px;background:#2F5C3B;color:#fff;cursor:pointer;">
+          下載 JPG
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="tool6Container" class="tool-container">
+    <div id="unitTool">
+      <h2>單位換算</h2>
+      <div class="unit-row">
+        <label>
+          類型
+          <select id="unitCategory">
+            <option value="distance">距離</option>
+            <option value="weight">重量</option>
+            <option value="volume">容積</option>
+            <option value="area">面積</option>
+            <option value="temperature">溫度</option>
+            <option value="angle">角度</option>
+          </select>
+        </label>
+        <label>
+          從
+          <select id="unitFrom"></select>
+        </label>
+        <label>
+          到
+          <select id="unitTo"></select>
+        </label>
+      </div>
+      <div class="unit-row">
+        <label>
+          數值
+          <input type="number" id="unitValue" placeholder="輸入數值" />
+        </label>
+      </div>
+      <div id="unitResultWrapper">
+        <span id="unitResult"></span>
+      </div>
+      <div id="unitActions">
+        <button id="convertUnitBtn">轉換</button>
+        <button id="clearUnitBtn">清除</button>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode/dist/JsBarcode.all.min.js"></script>
   <script>
     const fishCanvas = document.getElementById('fishCanvas');
     const fishCtx = fishCanvas.getContext('2d');
@@ -870,29 +1136,210 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+  //======QR/條碼邏輯=========
+  const codeType      = document.getElementById('codeType');
+  const codeText      = document.getElementById('codeText');
+  const codeSize      = document.getElementById('codeSize');
+  const codeColor     = document.getElementById('codeColor');
+  const codeBgColor   = document.getElementById('codeBgColor');
+  const codeLogoInput = document.getElementById('codeLogo');
+  const generateBtn   = document.getElementById('generateCodeBtn');
+  const canvas        = document.getElementById('codeCanvas');
+  const downloadPng   = document.getElementById('downloadPngBtn');
+  const downloadJpg   = document.getElementById('downloadJpgBtn');
+  const ctx           = canvas.getContext('2d');
+  let logoImg         = new Image();
+
+  codeLogoInput.addEventListener('change', () => {
+    const file = codeLogoInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => logoImg.src = e.target.result;
+    reader.readAsDataURL(file);
+  });
+
+  async function drawCode() {
+    const text = codeText.value.trim();
+    if (!text) return;
+    const size = Math.max(50, parseInt(codeSize.value, 10) || 200);
+    if (codeType.value === 'qrcode') {
+      canvas.width = canvas.height = size;
+      ctx.fillStyle = codeBgColor.value;
+      ctx.fillRect(0, 0, size, size);
+      await QRCode.toCanvas(canvas, text, {
+        width: size,
+        margin: 1,
+        color: { dark: codeColor.value, light: codeBgColor.value }
+      });
+      if (logoImg.src) {
+        const lw     = size * 0.2;   
+        const margin = 5;        
+        const lx     = (size - lw) / 2;   
+        const ly     = (size - lw) / 2;  
+        ctx.fillStyle = codeBgColor.value;
+        ctx.fillRect(
+          lx - margin,
+          ly - margin,
+          lw + margin * 2,
+          lw + margin * 2
+        );
+        ctx.drawImage(logoImg, lx, ly, lw, lw);
+      }
+      } else {
+        const w = size;
+        const h = size * 0.5;
+        canvas.width = w;
+        canvas.height = h;
+        ctx.fillStyle = codeBgColor.value;
+        ctx.fillRect(0, 0, w, h);
+        const modules = text.length * 11;
+        const barWidth = Math.max(1, Math.floor(w / modules));
+        JsBarcode(canvas, text, {
+          format: 'CODE128',
+          width: barWidth,
+          height: h * 0.8,
+          displayValue: false,
+          lineColor: codeColor.value,
+          background: codeBgColor.value
+      });
+    }
+  }
+  generateBtn.addEventListener('click', drawCode);
+  downloadPng.addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'code.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+  downloadJpg.addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'code.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.8);
+    link.click();
+  });
+
+  // 單位轉換參數表
+  const maps = {
+    distance:   { m: 1, cm: 0.01, mm: 0.001, um: 1e-6, km: 1000, mi: 1609.34, ft: 0.3048 },
+    weight:     { g:1,    kg:1000,   lb:453.592, oz:28.3495, jin:600 },
+    volume:     { L:1,    mL:0.001,  gal:3.78541, qt:0.946353 },
+    temperature:{ C:1,    F:1,       K:1 }, 
+    area:       { m2:1,   km2:1e6,   ha:10000,   ac:4046.86, ft2:0.092903, in2:0.00064516 },
+    angle:      { deg: 1, rad: Math.PI / 180, grad: 0.9, amin: 1 / 60, asec: 1 / 3600 }
+  };
+  const labels = {
+    distance:   { m: '公尺', cm:'公分', mm:'毫米', um:'微米', km:'公里', mi:'英里', ft:'英尺' },
+    weight:     { g:'克',       kg:'公斤',      lb:'磅',       oz:'盎司', jin:'台斤' },
+    volume:     { L:'公升',     mL:'毫升',      gal:'加侖',     qt:'夸脫' },
+    temperature:{ C:'攝氏度',   F:'華氏度',    K:'開氏度' },
+    area:       { m2:'平方公尺', km2:'平方公里', ha:'公頃',     ac:'英畝',     ft2:'平方英尺', in2:'平方英吋' },
+    angle:      { deg:  '度', rad:  '弧度',  grad: '梯度',  amin: '分角',  asec: '秒角' }
+  };
+
+  const catSel   = document.getElementById('unitCategory');
+  const fromSel  = document.getElementById('unitFrom');
+  const toSel    = document.getElementById('unitTo');
+  const valInput = document.getElementById('unitValue');
+  const resultEl = document.getElementById('unitResult');
+
+  function populateUnits() {
+    const cat = catSel.value;
+    fromSel.innerHTML = '';
+    toSel.innerHTML   = '';
+    Object.entries(labels[cat]).forEach(([code,name]) => {
+      const label = `${code} – ${name}`;
+      fromSel.add(new Option(label, code));
+      toSel  .add(new Option(label, code));
+    });
+  }
+
+  catSel.addEventListener('change', populateUnits);
+  populateUnits();
+
+  const suffixMap = {
+    distance: {
+      m:  'm',
+      cm: 'cm',
+      mm: 'mm',
+      um: 'µm',
+      km: 'km',
+      mi: 'mi',
+      ft: 'ft'
+    },
+    weight: {
+      g:   'g',
+      kg:  'kg',
+      lb:  'lb',
+      oz:  'oz',
+      jin: '台斤'
+    },
+    volume: {
+      L:   'L',
+      mL:  'mL',
+      gal: 'gal',
+      qt:  'qt'
+    },
+    temperature: {
+      C: '°C',
+      F: '°F',
+      K: 'K'
+    },
+    area: {
+      m2:  'm²',
+      km2: 'km²',
+      ha:  'ha',
+      ac:  'ac',
+      ft2: 'ft²',
+      in2: 'in²'
+    },
+    angle: {
+      deg:  '°',
+      rad:  'rad',
+      grad: 'grad',
+      amin: '′',
+      asec: '″'
+    }
+  };
+
+  document.getElementById('convertUnitBtn').addEventListener('click', () => {
+    const cat  = catSel.value;
+    const from = fromSel.value;
+    const to   = toSel.value;
+    const v    = parseFloat(valInput.value);
+    if (isNaN(v)) {
+      resultEl.textContent = '請輸入數值';
+      return;
+    }
+    let r;
+    if (cat === 'temperature') {
+      let c = from === 'C' ? v
+            : from === 'F' ? (v - 32) * 5/9
+            : (v - 273.15);
+      r = to === 'C' ? c
+        : to === 'F' ? c * 9/5 + 32
+        : c + 273.15;
+    } else {
+      r = v * maps[cat][from] / maps[cat][to];
+    }
+    const suffix = (suffixMap[cat] && suffixMap[cat][to])
+      ? suffixMap[cat][to]
+      : to;
+    resultEl.textContent = `${r.toFixed(4)}${suffix}`;
+  });
+
+  document.getElementById('clearUnitBtn').addEventListener('click', () => {
+    valInput.value = '';
+    resultEl.textContent = '';
+  });
+
+  
     /* === 工具切換邏輯 === */
-    const tool1Btn=document.getElementById('tool1Btn'),
-    tool2Btn=document.getElementById('tool2Btn'),
-    tool3Btn=document.getElementById('tool3Btn'),
-    tool4Btn=document.getElementById('tool4Btn');
-    const c1=document.getElementById('tool1Container'),
-    c2=document.getElementById('tool2Container'),
-    c3=document.getElementById('tool3Container'),
-    c4=document.getElementById('tool4Container');
-    function switchTool(n){
-      c1.classList.toggle('active',n===1);
-      c2.classList.toggle('active',n===2);
-      c3.classList.toggle('active',n===3);
-      c4.classList.toggle('active',n===4);
-      tool1Btn.classList.toggle('active',n===1);
-      tool2Btn.classList.toggle('active',n===2);
-      tool3Btn.classList.toggle('active',n===3);
-      tool4Btn.classList.toggle('active',n===4);
-    }    
-  tool1Btn.addEventListener('click', () => switchTool(1));
-  tool2Btn.addEventListener('click', () => switchTool(2));
-  tool3Btn.addEventListener('click', () => switchTool(3));
-  tool4Btn.addEventListener('click', () => switchTool(4));
+  const btns = Array.from(document.querySelectorAll('#toolSelector button'));
+  const containers = btns.map(b => document.getElementById(b.id.replace('Btn','Container')));
+  btns.forEach((btn,i) => btn.addEventListener('click', () => {
+    btns.forEach((b,j) => b.classList.toggle('active', i===j));
+    containers.forEach((c,j) => c.classList.toggle('active', i===j));
+  }));
 
     randomSelectHexagon();
     animateBackground();
