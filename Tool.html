@@ -295,23 +295,25 @@
   </style>
 </head>
 <body>
+<body>
   <canvas id="fishCanvas"></canvas>
+
   <div id="toolSelector">
-    <button id="tool1Btn" class="active">時間管理</button>
-    <button id="tool2Btn">摩斯密碼</button>
-    <button id="tool3Btn">二進制</button>
+    <button id="tool1Btn" class="active">時間管理工具</button>
+    <button id="tool2Btn">摩斯密碼翻譯器</button>
+    <button id="tool3Btn">二進制轉換</button>
     <button id="tool4Btn">匯率轉換</button>
   </div>
 
+  <!-- 時間管理工具 -->
   <div id="tool1Container" class="tool-container active">
     <div id="timeTool">
       <button id="resetBtn" title="重整">↻</button>
       <h2>時間管理工具</h2>
       <div id="modeSelector">
-        <button class="mode-btn active" data-mode="arrive">何時出發</button>
-        <button class="mode-btn" data-mode="depart">何時抵達</button>
+        <button class="mode-btn active" data-mode="arrive">何時到達</button>
+        <button class="mode-btn" data-mode="depart">何時出發</button>
       </div>
-
       <div class="time-row" id="rowStart">
         <label>開始時間</label>
         <input type="time" id="startTime" />
@@ -322,7 +324,6 @@
         <input type="time" id="targetTime" />
         <span class="time-output" id="calcDepartOut"></span>
       </div>
-
       <div id="eventsList"></div>
       <div id="actionBtns">
         <button id="addEventBtn">新增行程</button>
@@ -331,8 +332,11 @@
       <div id="result"></div>
     </div>
   </div>
+
+  <!-- 摩斯密碼翻譯器 -->
   <div id="tool2Container" class="tool-container">
     <div id="morseTool">
+      <button id="resetBtn" title="重整">↻</button>
       <h2>摩斯密碼翻譯器</h2>
       <div id="morsePanels">
         <div class="panel">
@@ -354,6 +358,8 @@
       </div>
     </div>
   </div>
+
+  <!-- 二進制轉換 -->
   <div id="tool3Container" class="tool-container">
     <div id="binaryTool">
       <h2>二進制轉換器</h2>
@@ -375,7 +381,8 @@
       </div>
     </div>
   </div>
-  $1
+
+  <!-- 匯率轉換 -->
   <div id="tool4Container" class="tool-container">
     <div id="exchangeTool">
       <h2>匯率轉換器</h2>
@@ -399,7 +406,6 @@
       <div id="exchangeResult"></div>
     </div>
   </div>
-
   <script>
     const fishCanvas = document.getElementById('fishCanvas');
     const fishCtx = fishCanvas.getContext('2d');
