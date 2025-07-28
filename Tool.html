@@ -14,7 +14,7 @@
     #toolSelector button.active{background:#537e74;}
     .tool-container{display:none;position:relative;z-index:10;padding:10px;}
     .tool-container.active{display:block;}
-    /*系統工具容器框架*/
+    /*系統工具容器框架 時間管理工具樣式 */
     #timeTool,#morseTool,#binaryTool{
       width:45%; max-height:70vh; background:rgba(0,0,0,.7);
       margin:0 auto; padding:15px 20px; color:#fff;
@@ -29,31 +29,7 @@
       text-shadow:0 1px 3px rgba(0,0,0,.7); line-height:1.2;
     }
     #tool1Container, #tool2Container,#tool3Container{padding-top: 10px;} 
-    /* ====== 時間管理工具樣式 ====== */
 
-    /*卷軸樣式*/
-    #timeTool::-webkit-scrollbar,
-    #eventsList::-webkit-scrollbar {
-      width: 8px;
-    }
-    #timeTool::-webkit-scrollbar-track,
-    #eventsList::-webkit-scrollbar-track {
-      background: rgba(255,255,255,.08);
-      border-radius: 4px;
-    }
-    #timeTool::-webkit-scrollbar-thumb,
-    #eventsList::-webkit-scrollbar-thumb {
-      background: #1b6c5a;
-      border-radius: 4px;
-    }
-    #timeTool::-webkit-scrollbar-thumb:hover,
-    #eventsList::-webkit-scrollbar-thumb:hover {
-      background: #0e4236;
-    }
-    #timeTool, #eventsList {
-      scrollbar-width: thin;
-      scrollbar-color: #29cfa8 rgba(255,255,255,.08);
-    }
     /*卷軸樣式*/
     #timeTool::-webkit-scrollbar,
     #eventsList::-webkit-scrollbar {
@@ -139,7 +115,7 @@
     /* 模式選擇按鈕 */
     #modeSelector{display:flex;gap:10px;margin-bottom:15px;}
     .mode-btn{flex:1;padding:8px 0;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:6px;cursor:pointer;font-size:12px;text-shadow:0 1px 2px rgba(0,0,0,.6);box-shadow:0 2px 4px rgba(0,0,0,.4);} 
-    .mode-btn.active{background:#29cfa8;color:#fff;font-weight:bold;font-size:13px;}
+    .mode-btn.active{background:#578d80;color:#fff;font-weight:bold;font-size:13px;}
 
     /* 時間輸入列 */
     .time-row{margin-bottom:10px;display:none;}
@@ -1331,7 +1307,6 @@ document.addEventListener('DOMContentLoaded', () => {
     valInput.value = '';
     resultEl.textContent = '';
   });
-
   
     /* === 工具切換邏輯 === */
   const btns = Array.from(document.querySelectorAll('#toolSelector button'));
