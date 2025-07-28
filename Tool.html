@@ -299,9 +299,9 @@
   <canvas id="fishCanvas"></canvas>
 
   <div id="toolSelector">
-    <button id="tool1Btn" class="active">時間管理工具</button>
-    <button id="tool2Btn">摩斯密碼翻譯器</button>
-    <button id="tool3Btn">二進制轉換</button>
+    <button id="tool1Btn" class="active">時間管理</button>
+    <button id="tool2Btn">摩斯密碼</button>
+    <button id="tool3Btn">轉二進制</button>
     <button id="tool4Btn">匯率轉換</button>
   </div>
 
@@ -815,16 +815,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearExchangeBtn = document.getElementById('clearExchangeBtn');
   const exchangeResult   = document.getElementById('exchangeResult');
 
-  // 只要這十種常用幣別
-  const CODES = ['TWD','USD','EUR','JPY','CNY','HKD','SGD','AUD','GBP','CAD'];
+  const CODES = ['TWD','USD','EUR','JPY','CNY','HKD','SGD','AUD','GBP','CAD','KRW','THB','RUB'];
   const NAMES = {
-    TWD:'新台幣', USD:'美金', EUR:'歐元', JPY:'日幣', CNY:'人民幣',
-    HKD:'港幣', SGD:'新加坡幣', AUD:'澳幣', GBP:'英鎊', CAD:'加拿大幣'
+    TWD:'新台幣',USD:'美金',EUR:'歐元',JPY:'日幣',CNY:'人民幣',HKD:'港幣',
+    SGD:'新加坡幣',AUD:'澳幣',GBP:'英鎊',CAD:'加拿大幣',KRW:'韓元',THB:'泰銖',RUB:'盧布'
   };
-
-  // 初始化下拉
-  baseCurrency.innerHTML = '';
-  targetCurrency.innerHTML = '';
+  const ratesCache = {};
   CODES.forEach(code => {
     const label = `${code} – ${NAMES[code]}`;
     baseCurrency .add(new Option(label, code));
@@ -832,37 +828,40 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   baseCurrency.value   = 'TWD';
   targetCurrency.value = 'USD';
-
-  // 按下「轉換」才呼叫 API
-  async function convertExchange() {
-    const amt  = parseFloat(amountInput.value);
-    const from = baseCurrency.value;
-    const to   = targetCurrency.value;
-    if (isNaN(amt)) {
-      exchangeResult.textContent = '請輸入有效金額';
-      return;
-    }
+  async function fetchRates() {
     try {
-      const res  = await fetch(
-        `https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amt}`
-      );
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const res = await fetch('https://open.er-api.com/v6/latest/TWD');
       const data = await res.json();
-      // 優先使用 data.result，若不存在再用 info.rate * amt
-      let result = (typeof data.result === 'number')
-        ? data.result
-        : (data.info?.rate ? data.info.rate * amt : NaN);
-      if (isNaN(result)) throw new Error('無效的轉換結果');
-      exchangeResult.textContent = `${amt} ${from} = ${result.toFixed(4)} ${to}`;
+      if (data.result !== 'success' || typeof data.rates !== 'object') {
+        throw new Error('Invalid API response');
+      }
+      CODES.forEach(code => {
+        ratesCache[code] = data.rates[code] ?? null;
+      });
     } catch (err) {
-      console.error('匯率轉換失敗', err);
-      exchangeResult.textContent = '取得匯率失敗，請稍後再試';
+      console.error('取得匯率失敗，使用 fallback', err);
+      CODES.forEach(code => {
+        ratesCache[code] = (code === 'TWD' || code === 'USD') ? 1 : null;
+      });
     }
   }
 
+  function convertExchange() {
+    const amt  = parseFloat(amountInput.value);
+    const from = baseCurrency.value;
+    const to   = targetCurrency.value;
+    if (isNaN(amt) || ratesCache[from] == null || ratesCache[to] == null) {
+      exchangeResult.textContent = '請輸入金額並等待匯率載入';
+      return;
+    }
+    const result = amt * (ratesCache[to] / ratesCache[from]);
+    exchangeResult.textContent = `${amt} ${from} = ${result.toFixed(4)} ${to}`;
+  }
+
+  fetchRates();
   convertBtn    .addEventListener('click', convertExchange);
   copyExchangeBtn.addEventListener('click', () => {
-    if (exchangeResult.textContent) 
+    if (exchangeResult.textContent)
       navigator.clipboard.writeText(exchangeResult.textContent);
   });
   clearExchangeBtn.addEventListener('click', () => {
@@ -872,8 +871,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
     /* === 工具切換邏輯 === */
-    const tool1Btn=document.getElementById('tool1Btn'),tool2Btn=document.getElementById('tool2Btn'),tool3Btn=document.getElementById('tool3Btn'),tool4Btn=document.getElementById('tool4Btn');
-    const c1=document.getElementById('tool1Container'),c2=document.getElementById('tool2Container'),c3=document.getElementById('tool3Container'),c4=document.getElementById('tool4Container');
+    const tool1Btn=document.getElementById('tool1Btn'),
+    tool2Btn=document.getElementById('tool2Btn'),
+    tool3Btn=document.getElementById('tool3Btn'),
+    tool4Btn=document.getElementById('tool4Btn');
+    const c1=document.getElementById('tool1Container'),
+    c2=document.getElementById('tool2Container'),
+    c3=document.getElementById('tool3Container'),
+    c4=document.getElementById('tool4Container');
     function switchTool(n){
       c1.classList.toggle('active',n===1);
       c2.classList.toggle('active',n===2);
@@ -884,7 +889,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tool3Btn.classList.toggle('active',n===3);
       tool4Btn.classList.toggle('active',n===4);
     }    
-    tool1Btn.addEventListener('click', () => switchTool(1));
+  tool1Btn.addEventListener('click', () => switchTool(1));
   tool2Btn.addEventListener('click', () => switchTool(2));
   tool3Btn.addEventListener('click', () => switchTool(3));
   tool4Btn.addEventListener('click', () => switchTool(4));
