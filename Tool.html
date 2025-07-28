@@ -806,61 +806,63 @@
     });
 
 // ===== 匯率轉換邏輯 =====
-const amountInput = document.getElementById('amountInput');
-const baseCurrency = document.getElementById('baseCurrency');
-const targetCurrency = document.getElementById('targetCurrency');
-const convertBtn = document.getElementById('convertBtn');
-const copyExchangeBtn = document.getElementById('copyExchangeBtn');
-const clearExchangeBtn = document.getElementById('clearExchangeBtn');
-const exchangeResult = document.getElementById('exchangeResult');
-
-let ratesCache = {};
-
-async function fetchRates() {
-  try {
-    const res = await fetch('https://api.exchangerate.host/latest');
-    if (!res.ok) throw new Error(`Network response was not ok: ${res.status}`);
-    const data = await res.json();
-    if (!data || typeof data.rates !== 'object' || data.rates === null) {
-      throw new Error('Invalid rates data');
-    }
-    ratesCache = data.rates;
-  } catch (err) {
-    console.error('取得匯率失敗，使用 fallback 列表', err);
-    // fallback 常用幣別
-    ['USD','EUR','JPY','GBP','CNY'].forEach(cur => ratesCache[cur] = 1);
-  }
-
-  // 只填充一次下拉選單
-  if (baseCurrency.options.length === 0) {
-    Object.keys(ratesCache).sort().forEach(cur => {
-      baseCurrency.add(new Option(cur, cur));
-      targetCurrency.add(new Option(cur, cur));
-    });
-    baseCurrency.value = 'USD';
-    targetCurrency.value = 'EUR';
-  }
-}
-
-function convertExchange() {
-  const amt = parseFloat(amountInput.value);
-  const base = baseCurrency.value;
-  const target = targetCurrency.value;
-  if (isNaN(amt) || !ratesCache[base] || !ratesCache[target]) {
-    exchangeResult.textContent = '請輸入有效金額與幣別';
-    return;
-  }
-  const rate = ratesCache[target] / ratesCache[base];
-  exchangeResult.textContent = `${amt} ${base} = ${(amt * rate).toFixed(4)} ${target}`;
-}
-
-// 初始化：等 DOMready 再呼叫
 document.addEventListener('DOMContentLoaded', () => {
+  const amountInput      = document.getElementById('amountInput');
+  const baseCurrency     = document.getElementById('baseCurrency');
+  const targetCurrency   = document.getElementById('targetCurrency');
+  const convertBtn       = document.getElementById('convertBtn');
+  const copyExchangeBtn  = document.getElementById('copyExchangeBtn');
+  const clearExchangeBtn = document.getElementById('clearExchangeBtn');
+  const exchangeResult   = document.getElementById('exchangeResult');
+
+  let ratesCache = {};
+  const FALLBACK = ['USD','EUR','JPY','GBP','CNY'];
+
+  async function fetchRates() {
+    try {
+      const res  = await fetch('https://api.exchangerate.host/latest');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data || typeof data.rates !== 'object' || data.rates === null) {
+        throw new Error('Invalid rates data');
+      }
+      ratesCache = data.rates;
+      // 确保基准货币（如 EUR）也在 ratesCache 里
+      if (data.base) ratesCache[data.base] = 1;
+    } catch (err) {
+      console.warn('取得匯率失敗，使用 fallback 列表', err);
+      FALLBACK.forEach(cur => ratesCache[cur] = 1);
+    }
+
+    // 只填充一次下拉
+    if (baseCurrency.options.length === 0) {
+      Object.keys(ratesCache).sort().forEach(cur => {
+        baseCurrency.add(new Option(cur, cur));
+        targetCurrency.add(new Option(cur, cur));
+      });
+      baseCurrency.value   = 'USD';
+      targetCurrency.value = 'EUR';
+    }
+  }
+
+  function convertExchange() {
+    const amt    = parseFloat(amountInput.value);
+    const base   = baseCurrency.value;
+    const target = targetCurrency.value;
+    if (isNaN(amt) || !ratesCache[base] || !ratesCache[target]) {
+      exchangeResult.textContent = '請輸入有效金額與幣別';
+      return;
+    }
+    const rate = ratesCache[target] / ratesCache[base];
+    exchangeResult.textContent = `${amt} ${base} = ${(amt * rate).toFixed(4)} ${target}`;
+  }
+
+  // 初始化
   fetchRates();
   convertBtn.addEventListener('click', convertExchange);
   copyExchangeBtn.addEventListener('click', () => navigator.clipboard.writeText(exchangeResult.textContent));
   clearExchangeBtn.addEventListener('click', () => {
-    amountInput.value = '';
+    amountInput.value      = '';
     exchangeResult.textContent = '';
   });
 });
