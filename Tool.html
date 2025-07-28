@@ -12,38 +12,22 @@
     #toolSelector button.active{background:#537e74;}
     .tool-container{display:none;position:relative;z-index:10;padding:10px;}
     .tool-container.active{display:block;}
-
+    /*系統工具容器框架*/
+    #timeTool,#morseTool,#binaryTool{
+      width:45%; max-height:70vh; background:rgba(0,0,0,.7);
+      margin:0 auto; padding:15px 20px; color:#fff;
+      border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.6);
+      font-family:sans-serif; overflow-y:auto;
+      position:relative; display:flex; flex-direction:column;
+      transform:none; margin-top:0;
+    }
+    #timeTool::before,#morseTool::before,#binaryTool::before{content:"";display:block;height:0;}
+    #timeTool>h2,#morseTool>h2,#binaryTool>h2{
+      margin:0 0 6px 0; font-size:13px; text-align:center;
+      text-shadow:0 1px 3px rgba(0,0,0,.7); line-height:1.2;
+    }
+    #tool1Container, #tool2Container,#tool3Container{padding-top: 10px;} 
     /* ====== 時間管理工具樣式 ====== */
-    #timeTool{
-      width:45%;
-      max-height:70vh;
-      background:rgba(0,0,0,.7);
-      margin:0 auto;
-      padding:10px 20px 10px 20px;
-      color:#fff;
-      border-radius:8px;
-      box-shadow:0 4px 12px rgba(0,0,0,.6);
-      font-family:sans-serif;
-      overflow-y:auto;
-      position:relative !important;
-      display:flex;
-      flex-direction:column;
-      transform:none !important;
-      margin-top:0 !important;
-    }
-    #timeTool::before{
-      content:"";
-      display:block;
-      height:0;
-    }
-    #timeTool > h2{
-      margin:0 0 12px 0 !important;
-      font-size:13px;
-      text-align:center;
-      text-shadow:0 1px 3px rgba(0,0,0,.7);
-      line-height:1.2;
-    }
-    #tool2Container {padding-top: 10px; } 
 
     /*卷軸樣式*/
     #timeTool::-webkit-scrollbar,
@@ -68,10 +52,71 @@
       scrollbar-width: thin;
       scrollbar-color: #29cfa8 rgba(255,255,255,.08);
     }
-    #morseTool::-webkit-scrollbar,#morseTool textarea::-webkit-scrollbar{width:8px;}
-    #morseTool::-webkit-scrollbar-track,#morseTool textarea::-webkit-scrollbar-track{background:rgba(255,255,255,.08);border-radius:4px;}
-    #morseTool::-webkit-scrollbar-thumb,#morseTool textarea::-webkit-scrollbar-thumb{background:#29cfa8;border-radius:4px;}
-    #morseTool,#morseTool textarea{scrollbar-width:thin;scrollbar-color:#29cfa8 rgba(255,255,255,.08);}
+    /*卷軸樣式*/
+    #timeTool::-webkit-scrollbar,
+    #eventsList::-webkit-scrollbar {
+      width: 8px;
+    }
+    #timeTool::-webkit-scrollbar-track,
+    #eventsList::-webkit-scrollbar-track {
+      background: rgba(255,255,255,.08);
+      border-radius: 4px;
+    }
+    #timeTool::-webkit-scrollbar-thumb,
+    #eventsList::-webkit-scrollbar-thumb {
+      background: #1b6c5a;
+      border-radius: 4px;
+    }
+    #timeTool::-webkit-scrollbar-thumb:hover,
+    #eventsList::-webkit-scrollbar-thumb:hover {
+      background: #0e4236;
+    }
+    #timeTool, #eventsList {
+      scrollbar-width: thin;
+      scrollbar-color: #29cfa8 rgba(255,255,255,.08);
+    }
+    #binaryTool::-webkit-scrollbar,
+    #binaryTool textarea::-webkit-scrollbar,
+    #morseTool::-webkit-scrollbar,
+    #morseTool textarea::-webkit-scrollbar {
+      width:8px;
+    }
+    #binaryTool::-webkit-scrollbar-track,
+    #binaryTool textarea::-webkit-scrollbar-track,
+    #morseTool::-webkit-scrollbar-track,
+    #morseTool textarea::-webkit-scrollbar-track {
+      background:rgba(255,255,255,.08);
+      border-radius:4px;
+    }
+    #binaryTool::-webkit-scrollbar-thumb,
+    #binaryTool textarea::-webkit-scrollbar-thumb,
+    #morseTool::-webkit-scrollbar-thumb,
+    #morseTool textarea::-webkit-scrollbar-thumb {
+      background:#29cfa8;
+      border-radius:4px;
+    }
+    #binaryTool::-webkit-scrollbar-thumb:hover,
+    #binaryTool textarea::-webkit-scrollbar-thumb:hover,
+    #morseTool::-webkit-scrollbar-thumb:hover,
+    #morseTool textarea::-webkit-scrollbar-thumb:hover {
+      background:#1b6c5a;
+    }
+    #exchangeTool::-webkit-scrollbar,
+    #exchangeTool input::-webkit-scrollbar,
+    #exchangeTool select::-webkit-scrollbar{
+      width:8px;
+    }
+    #exchangeTool::-webkit-scrollbar-track,
+    #exchangeTool input::-webkit-scrollbar-track,
+    #exchangeTool select::-webkit-scrollbar-track{
+      background:rgba(255,255,255,.08); border-radius:4px;
+    }
+    #exchangeTool::-webkit-scrollbar-thumb,
+    #exchangeTool input::-webkit-scrollbar-thumb,
+    #exchangeTool select::-webkit-scrollbar-thumb{
+      background:#29cfa8; border-radius:4px;
+    }
+    #exchangeTool,#exchangeTool input,#exchangeTool select{ scrollbar-width:thin; scrollbar-color:#29cfa8 rgba(255,255,255,.08); }
 
     /* 重整鍵 */
     #resetBtn{
@@ -117,38 +162,8 @@
     #result{margin-top:15px;font-weight:bold;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.7);} 
 
     /* ===== 摩斯密碼工具樣式 ===== */
-    #tool2Container {padding-top: 10px; } 
-    #morseTool{
-      width:45%;
-      max-height:70vh;
-      background:rgba(0,0,0,.7);
-      margin:0 auto;
-      padding:10px 20px 10px 20px;
-      color:#fff;
-      border-radius:8px;
-      box-shadow:0 4px 12px rgba(0,0,0,.6);
-      font-family:sans-serif;
-      overflow-y:auto;
-      position:relative !important;
-      display:flex;
-      flex-direction:column;
-      transform:none !important;
-      margin-top:0 !important;
-    }
-    #morseTool::before{
-      content:"";
-      display:block;
-      height:0;
-    }
-    #morseTool > h2{
-      margin:0 0 12px 0 !important;
-      font-size:13px;
-      text-align:center;
-      text-shadow:0 1px 3px rgba(0,0,0,.7);
-      line-height:1.2;
-    }
     #morsePanels{display:flex;flex-direction:column;gap:14px;}
-    #swapBtn{align-self:center;padding:4px 26px;background:#216858;color:#fff;border:none;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
+    #swapBtn,#swapBinBtn{align-self:center;padding:4px 26px;background:#216858;color:#fff;border:none;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
     .panel{background:rgba(41,207,168,.3);padding:12px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.5);}
     .panel label{display:block;font-size:12px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.6);}
     .panel textarea{
@@ -163,6 +178,42 @@
       flex:1;padding:8px 0;background:#0b8a5c;border:none;color:#fff;font-weight:bold;
       border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);
     }
+    /* 二進制轉換工具樣式 */
+    #binaryTool textarea{width:95%;height:50px;resize:vertical;padding:8px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.4);border-radius:4px;color:#fff;font-family:monospace;font-size:14px;line-height:1.4;}
+    #binaryTool textarea::placeholder{color:rgba(255,255,255,.45);}
+    #binaryPanels{display:flex;flex-direction:column;gap:14px;}
+    #binaryActions{display:flex;gap:10px;justify-content:space-between;margin-top:12px;}
+    #binaryActions button{flex:1;padding:8px 0;background:#29cfa8;border:none;color:#000;font-weight:bold;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
+
+    /* 匯率轉換工具樣式 */
+    #exchangeTool{
+      width:45%; max-height:70vh; background:rgba(0,0,0,.7);
+      margin:0 auto; padding:15px 20px; color:#fff;
+      border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.6);
+      font-family:sans-serif; overflow-y:auto;
+      position:relative; display:flex; flex-direction:column;
+      transform:none !important; margin-top:0 !important;
+    }
+    #exchangeTool::before{ content:""; display:block; height:0; }
+    #exchangeTool > h2{
+      margin:0 0 6px 0 !important; font-size:13px; text-align:center;
+      text-shadow:0 1px 3px rgba(0,0,0,.7); line-height:1.2;
+    }
+    #exchangeTool .panel{ margin-bottom:12px; }
+    #exchangeTool label{display:block; font-size:14px; margin-bottom:6px; color:#fff;}
+    #exchangeTool input,
+    #exchangeTool select{
+      width:80%; padding:8px; background:rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.4); border-radius:4px;
+      color:#fff; font-size:14px;
+    }
+    #exchangeActions{ display:flex; gap:10px; justify-content:space-between; margin:12px 0; }
+    #exchangeActions button{
+      flex:1; padding:8px 0; background:#29cfa8; border:none;
+      color:#000; font-weight:bold; border-radius:8px;
+      cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.5);
+    }
+    #exchangeResult{ margin-top:10px; font-size:16px; text-align:center; color:#29cfa8; }
 
     /* 追加覆寫 */
     .time-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
@@ -171,33 +222,39 @@
     
     /* === 立體感與互動效果覆寫 === */
     #toolSelector button,
+    #binaryActions button,
     #morseActions button,
     .mode-btn,
     #addEventBtn,
     #calculateBtn,
     #resetBtn,
+    #swapBinBtn,
     #swapBtn {
       position: relative;
       transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
       box-shadow: 0 3px 0 rgba(0,0,0,.35), 0 6px 12px rgba(0,0,0,.45);
     }
     #toolSelector button:hover,
+    #binaryActions button:hover,
     #morseActions button:hover,
     .mode-btn:hover,
     #addEventBtn:hover,
     #calculateBtn:hover,
     #resetBtn:hover,
+    #swapBinBtn:hover,
     #swapBtn:hover {
       transform: translateY(-2px);
       box-shadow: 0 5px 0 rgba(0,0,0,.4), 0 10px 18px rgba(0,0,0,.55);
       filter: brightness(1.08);
     }
     #toolSelector button:active,
+    #binaryActions button:active,
     #morseActions button:active,
     .mode-btn:active,
     #addEventBtn:active,
     #calculateBtn:active,
     #resetBtn:active,
+    #swapBinBtn:active,
     #swapBtn:active {
       transform: translateY(1px);
       box-shadow: inset 0 2px 4px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.4);
@@ -210,12 +267,12 @@
       #toolSelector{padding:12px 0;}
       #toolSelector button{margin:0 6px;padding:8px 12px;font-size:14px;}
 
-      #timeTool,#morseTool{width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto;}
+      #timeTool,#morseTool,#binaryTool{width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto;}
       /* 捲軸高度調整 */
       #eventsList{max-height:40vh;}
 
       .time-row{gap:6px;}
-      .time-row input[type="time"]{width:60%;}
+      .time-row input[type="time"]{width:45%;}
       .time-output{font-size:12px;}
       .mode-btn{font-size:13px;}
       .mode-btn.active{font-size:13px;}
@@ -223,7 +280,7 @@
       .event-name{flex:0 0 22%;min-width:22%;}
 
       /* 摩斯工具 textarea 放大 */
-      #morsePanels .panel textarea{width:100%;height:120px;}
+      #morsePanels.panel textarea{width:100%;height:120px;}
       #swapBtn{padding:2px 22px;}
     }
 
@@ -240,8 +297,10 @@
 <body>
   <canvas id="fishCanvas"></canvas>
   <div id="toolSelector">
-    <button id="tool1Btn" class="active">時間管理工具</button>
-    <button id="tool2Btn">摩斯密碼翻譯器</button>
+    <button id="tool1Btn" class="active">時間管理</button>
+    <button id="tool2Btn">摩斯密碼</button>
+    <button id="tool3Btn">二進制</button>
+    <button id="tool4Btn">匯率轉換</button>
   </div>
 
   <div id="tool1Container" class="tool-container active">
@@ -254,7 +313,7 @@
       </div>
 
       <div class="time-row" id="rowStart">
-        <label>起始時間</label>
+        <label>開始時間</label>
         <input type="time" id="startTime" />
         <span class="time-output" id="calcEndOut"></span>
       </div>
@@ -274,29 +333,73 @@
   </div>
   <div id="tool2Container" class="tool-container">
     <div id="morseTool">
-    <h2>摩斯密碼翻譯器</h2>
-    <div id="morsePanels">
-      <div class="panel">
-        <label for="textInput">英文 / 文字輸入</label>
-        <textarea id="textInput" placeholder="輸入英文、數字或符號..."></textarea>
-        <div class="counter" id="textCount">0 字元</div>
+      <h2>摩斯密碼翻譯器</h2>
+      <div id="morsePanels">
+        <div class="panel">
+          <label for="textInput">英文 / 文字輸入</label>
+          <textarea id="textInput" placeholder="輸入英文、數字或符號..."></textarea>
+          <div class="counter" id="textCount">0 字元</div>
+        </div>
+        <button id="swapBtn" title="交換上下內容">⇅ 交換</button>
+        <div class="panel">
+          <label for="morseInput">摩斯碼輸入（用 . - 和 / 或空白分隔）</label>
+          <textarea id="morseInput" placeholder="例如：.... . .-.. .-.. --- / .-- --- .-. .-.. -.."></textarea>
+          <div class="counter" id="morseCount">0 符號</div>
+        </div>
       </div>
-
-      <button id="swapBtn" title="交換上下內容">⇅ 交換</button>
-
-      <div class="panel">
-        <label for="morseInput">摩斯碼輸入（用 . - 和 / 或空白分隔）</label>
-        <textarea id="morseInput" placeholder="例如：.... . .-.. .-.. --- / .-- --- .-. .-.. -.."></textarea>
-        <div class="counter" id="morseCount">0 符號</div>
+      <div id="morseActions">
+        <button id="copyTextBtn">複製文字</button>
+        <button id="copyMorseBtn">複製摩斯</button>
+        <button id="clearAllBtn">清除</button>
       </div>
-    </div>
-
-    <div id="morseActions">
-      <button id="copyTextBtn">複製文字</button>
-      <button id="copyMorseBtn">複製摩斯</button>
-      <button id="clearAllBtn">清除</button>
     </div>
   </div>
+  <div id="tool3Container" class="tool-container">
+    <div id="binaryTool">
+      <h2>二進制轉換器</h2>
+      <div id="binaryPanels">
+        <div class="panel">
+          <label for="decimalInput">十進制輸入</label>
+          <textarea id="decimalInput" placeholder="輸入數字..."></textarea>
+        </div>
+        <button id="swapBinBtn">⇅ 交換</button>
+        <div class="panel">
+          <label for="binaryInput">二進制輸入</label>
+          <textarea id="binaryInput" placeholder="輸入 0/1..."></textarea>
+        </div>
+      </div>
+      <div id="binaryActions">
+        <button id="copyDecBtn">複製十進制</button>
+        <button id="copyBinBtn">複製二進制</button>
+        <button id="clearBinBtn">清除</button>
+      </div>
+    </div>
+  </div>
+  $1
+  <div id="tool4Container" class="tool-container">
+    <div id="exchangeTool">
+      <h2>匯率轉換器</h2>
+      <div class="panel">
+        <label for="amountInput">金額</label>
+        <input type="number" id="amountInput" placeholder="輸入金額" min="0" step="any" />
+      </div>
+      <div class="panel">
+        <label for="baseCurrency">原幣別</label>
+        <select id="baseCurrency"></select>
+      </div>
+      <div class="panel">
+        <label for="targetCurrency">目標幣別</label>
+        <select id="targetCurrency"></select>
+      </div>
+      <div id="exchangeActions">
+        <button id="convertBtn">轉換</button>
+        <button id="copyExchangeBtn">複製結果</button>
+        <button id="clearExchangeBtn">清除</button>
+      </div>
+      <div id="exchangeResult"></div>
+    </div>
+  </div>
+
   <script>
     const fishCanvas = document.getElementById('fishCanvas');
     const fishCtx = fishCanvas.getContext('2d');
@@ -343,8 +446,6 @@
           const waveX = Math.sin(baseX * 0.01 + t) * 3;
           const waveY = Math.cos(baseY * 0.01 + t) * 3;
           const x = baseX + waveX, y = baseY + waveY;
-
-          // 基本顏色與透明度
           let op = 0.08 + Math.sin(baseX * 0.01 + baseY * 0.01 + t) * 0.021;
           const bR = 70, bG = 220, bB = 255;
           let style = `rgba(${bR},${bG},${bB},${op})`;
@@ -354,8 +455,6 @@
           const dx = mouseX - x, dy = mouseY - y;
           const key = `${row}-${col}`;
           let isSelected = false;
-
-          // 隨機選中動畫
           for (const hex of selectedHexagons) {
             if (hex.col === col && hex.row === row) {
               const e = (performance.now() - hex.startTime) / 1000;
@@ -374,16 +473,11 @@
               break;
             }
           }
-
-          // 偵測滑鼠掠過起始
           if (Math.hypot(dx, dy) < radius * 1.2) {
             if (!hoveredHexagonsMap[key]) hoveredHexagonsMap[key] = { startTime: performance.now() };
           }
-
-          // 滑鼠掠過與漸退效果
           if (!isSelected && hoveredHexagonsMap[key]) {
             const elapsed = performance.now() - hoveredHexagonsMap[key].startTime;
-            // 只要有 hover 過，持續到 3 秒
             const intensity = elapsed < 3000 ? 1 - (elapsed / 3000) : 0;
             const tR = bR + 0.1 * (255 - bR);
             const tG = bG + 0.1 * (255 - bG);
@@ -398,32 +492,25 @@
           drawHexagon(ctx, x, y, effR, style);
         }
       }
-
-      // 清理過期 hover，逾 3 秒後移除 key
       for (const k in hoveredHexagonsMap) {
         if ((performance.now() - hoveredHexagonsMap[k].startTime) / 1000 > 3) {
           delete hoveredHexagonsMap[k];
         }
       }
-
-      // 清理過期選中
       selectedHexagons = selectedHexagons.filter(h => (performance.now() - h.startTime) / 1000 < 3);
     }
-
     function animateBackground() {
       time += 0.02;
       fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
       drawHexagonGrid(fishCtx, fishCanvas.width, fishCanvas.height, 45, time);
       requestAnimationFrame(animateBackground);
     }
-
     function randomSelectHexagon() {
       const cols = Math.ceil(fishCanvas.width / (1.7 * 45));
       const rows = Math.ceil(fishCanvas.height / (Math.sqrt(3.1) * 45));
       selectedHexagons.push({ col: Math.floor(Math.random() * cols), row: Math.floor(Math.random() * rows), startTime: performance.now() });
       setTimeout(randomSelectHexagon, 1000);
     }
-
     function handleMouseMove(e){
       const rect = fishCanvas.getBoundingClientRect();
       mouseX = e.clientX - rect.left;
@@ -556,15 +643,15 @@
       // type: 'forward' => 結束/抵達 ; 'backward' => 出發
       if(type==='forward'){
         const days=Math.floor(rawMins/DAY_MIN);
-        if(days>0){return `抵達時間：${days}天 ${formatTime(rawMins)}`;}
-        return `最終結束時間：${formatTime(rawMins)}`;
+        if(days>0){return `抵達時間：隔${days}天的 ${formatTime(rawMins)}`;}
+        return `最終抵達時間：${formatTime(rawMins)}`;
       }else{ // backward
         if(rawMins<0){
           const daysBefore=Math.ceil(Math.abs(rawMins)/DAY_MIN);
           const norm=((rawMins % DAY_MIN)+DAY_MIN)%DAY_MIN;
-          return `出發時間：前${daysBefore}天 ${formatTime(norm)}`;
+          return `出發時間：前${daysBefore}天的 ${formatTime(norm)}`;
         }
-        return `出發時間：${formatTime(rawMins)}`;
+        return `行程出發時間：${formatTime(rawMins)}`;
       }
     }
   
@@ -626,7 +713,6 @@
         updateCounts(); lock = false;
       });
     }
-
     copyTextBtn?.addEventListener('click', ()=> navigator.clipboard?.writeText(textInput.value));
     copyMorseBtn?.addEventListener('click',()=> navigator.clipboard?.writeText(morseInput.value));
     clearAllBtn?.addEventListener('click', ()=>{
@@ -640,22 +726,146 @@
     });
     updateCounts();
 
-    /* === 工具切換邏輯 === */
-    const tool1Btn = document.getElementById('tool1Btn');
-    const tool2Btn = document.getElementById('tool2Btn');
-    const tool1Container = document.getElementById('tool1Container');
-    const tool2Container = document.getElementById('tool2Container');
-    function switchTool(which){
-      if(which===1){
-        tool1Btn.classList.add('active'); tool2Btn.classList.remove('active');
-        tool1Container.classList.add('active'); tool2Container.classList.remove('active');
-      }else{
-        tool2Btn.classList.add('active'); tool1Btn.classList.remove('active');
-        tool2Container.classList.add('active'); tool1Container.classList.remove('active');
+    // 二進制轉換邏輯
+    const decIn = document.getElementById('decimalInput');
+    const binIn = document.getElementById('binaryInput');
+    const copyDecBtn = document.getElementById('copyDecBtn');
+    const copyBinBtn = document.getElementById('copyBinBtn');
+    const clearBinBtn = document.getElementById('clearBinBtn');
+    const swapBinBtn = document.getElementById('swapBinBtn');
+    let lockBin = false;
+    function updateBinary() {
+      if (lockBin) return;
+      lockBin = true;
+      let d = decIn.value.trim().replace(/,/g, ''); // 允許逗號
+      if (d === '') {
+        binIn.value = '';
+        lockBin = false;
+        return;
       }
+      // 處理小數點
+      const parts = d.split('.');
+      const intNum = parseInt(parts[0], 10);//最多處理小數點後兩位
+      const intBin = isNaN(intNum) ? '' : intNum.toString(2);
+      let fracBin = '';
+      if (parts[1] !== undefined) {
+        let frac = parseFloat('0.' + parts[1]);
+        let count = 0;
+        while (frac > 0 && count < 10) { 
+          frac *= 2;
+          if (frac >= 1) {
+            fracBin += '1';
+            frac -= 1;
+          } else {
+            fracBin += '0';
+          }
+          count++;
+        }
+      }
+      binIn.value = fracBin ? `${intBin}.${fracBin}` : intBin;
+      lockBin = false;
     }
-    tool1Btn.addEventListener('click',()=>switchTool(1));
-    tool2Btn.addEventListener('click',()=>switchTool(2));
+
+    function updateDecimal() {
+      if (lockBin) return;
+      lockBin = true;
+      const raw = binIn.value.trim();
+      if (raw === '') {
+        decIn.value = '';
+      } else {
+        const parts = raw.split(/([,\.\/])/);
+        const result = parts.map(part => {
+          if (/^[,\.\/]$/.test(part)) {
+            return part; // 保留分隔符
+          }
+        const b = part.replace(/[^01]/g, '');
+          if (b === '') return '';
+          const n = parseInt(b, 2);
+          return isNaN(n) ? '' : n.toString(10);
+        }).join('');
+        decIn.value = result;
+      }
+      lockBin = false;
+    }
+    decIn.addEventListener('input', updateBinary);
+    binIn.addEventListener('input', updateDecimal);
+    copyDecBtn.addEventListener('click', () => navigator.clipboard?.writeText(decIn.value));
+    copyBinBtn.addEventListener('click', () => navigator.clipboard?.writeText(binIn.value));
+    clearBinBtn.addEventListener('click', () => { decIn.value = ''; binIn.value = ''; });
+    swapBinBtn.addEventListener('click', () => {
+      const t = decIn.value;
+      decIn.value = binIn.value;
+      binIn.value = t;
+      updateBinary();
+    });
+
+// ===== 匯率轉換邏輯 =====
+const amountInput = document.getElementById('amountInput');
+const baseCurrency = document.getElementById('baseCurrency');
+const targetCurrency = document.getElementById('targetCurrency');
+const convertBtn = document.getElementById('convertBtn');
+const copyExchangeBtn = document.getElementById('copyExchangeBtn');
+const clearExchangeBtn = document.getElementById('clearExchangeBtn');
+const exchangeResult = document.getElementById('exchangeResult');
+
+let ratesCache = {};
+
+async function fetchRates() {
+  if (Object.keys(ratesCache).length === 0) {
+    const res = await fetch('https://api.exchangerate.host/latest');
+    const data = await res.json();
+    ratesCache = data.rates;
+    // populate selects
+    const currencies = Object.keys(ratesCache).sort();
+    currencies.forEach(cur => {
+      baseCurrency.append(new Option(cur, cur));
+      targetCurrency.append(new Option(cur, cur));
+    });
+    baseCurrency.value = 'USD';
+    targetCurrency.value = 'EUR';
+  }
+}
+
+function convertExchange() {
+  const amt = parseFloat(amountInput.value);
+  const base = baseCurrency.value;
+  const target = targetCurrency.value;
+  if (isNaN(amt) || !ratesCache[base] || !ratesCache[target]) {
+    exchangeResult.textContent = '請輸入有效金額與幣別';
+    return;
+  }
+  const rate = ratesCache[target] / ratesCache[base];
+  const result = (amt * rate).toFixed(4);
+  exchangeResult.textContent = `${amt} ${base} = ${result} ${target}`;
+}
+
+convertBtn.addEventListener('click', convertExchange);
+copyExchangeBtn.addEventListener('click', ()=>navigator.clipboard?.writeText(exchangeResult.textContent));
+clearExchangeBtn.addEventListener('click', ()=>{
+  amountInput.value = '';
+  exchangeResult.textContent = '';
+});
+
+// init
+fetchRates().then(()=>{});
+
+    /* === 工具切換邏輯 === */
+    const tool1Btn=document.getElementById('tool1Btn'),tool2Btn=document.getElementById('tool2Btn'),tool3Btn=document.getElementById('tool3Btn'),tool4Btn=document.getElementById('tool4Btn');
+    const c1=document.getElementById('tool1Container'),c2=document.getElementById('tool2Container'),c3=document.getElementById('tool3Container'),c4=document.getElementById('tool4Container');
+    function switchTool(n){
+      c1.classList.toggle('active',n===1);
+      c2.classList.toggle('active',n===2);
+      c3.classList.toggle('active',n===3);
+      c4.classList.toggle('active',n===4);
+      tool1Btn.classList.toggle('active',n===1);
+      tool2Btn.classList.toggle('active',n===2);
+      tool3Btn.classList.toggle('active',n===3);
+      tool4Btn.classList.toggle('active',n===4);
+    }    
+    tool1Btn.addEventListener('click', () => switchTool(1));
+  tool2Btn.addEventListener('click', () => switchTool(2));
+  tool3Btn.addEventListener('click', () => switchTool(3));
+  tool4Btn.addEventListener('click', () => switchTool(4));
 
     randomSelectHexagon();
     animateBackground();
