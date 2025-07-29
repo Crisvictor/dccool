@@ -9,11 +9,66 @@
   <style>
     body { margin:0; padding:0; overflow:hidden; background:#000; }
     #fishCanvas{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;}
-    #toolSelector{position:relative;z-index:10;padding:20px;text-align:center;}
-    #toolSelector button{margin:0 5px;padding:8px 10px;font-size:12px;cursor:pointer;border:none;border-radius:5px;background:#2b3432;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);} 
+    #toolSelector {
+      flex: 1;
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    #toolSelector::-webkit-scrollbar { display: none; }
+    #toolSelector button{margin:0 5px;padding:8px 10px;font-size:12px;cursor:pointer;border:none;border-radius:5px;background:#2b3432;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5); flex: 0 0 18.5%; scroll-snap-align: start;transition: transform .3s ease, filter .3s ease; transform: scale(0.9); filter: brightness(0.7);} 
+    #toolSelector button.focused {transform: scale(1.1); filter: brightness(1);}
     #toolSelector button.active{background:#537e74;}
     .tool-container{display:none;position:relative;z-index:10;padding:10px;}
     .tool-container.active{display:block;}
+    #toolNav {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-10%);
+      width: 32px; height: 32px;
+      border:none; background:rgba(0,0,0,0.6); color:#fff;
+      cursor: pointer; border-radius:50%;
+      z-index: 10;
+    }
+    #prevBtn { left: 4px; }
+    #nextBtn { right: 4px; }
+    .nav-arrow {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      margin: 0 4px;
+      background: rgba(0,0,0,0.5);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+    }    
+    .nav-arrow svg {
+      width: 20px;
+      height: 20px;
+    }
+    .nav-arrow:hover {
+      background: rgba(41,207,168,0.8);
+      transform: scale(1.1);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+    }    
+    .nav-arrow:active {
+      transform: scale(0.95);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    }
+
     /*系統工具容器框架 時間管理工具樣式 */
     #timeTool,#morseTool,#binaryTool{
       width:45%; max-height:70vh; background:rgba(0,0,0,.7);
@@ -420,9 +475,9 @@
     /* ==== 手機版調整（<= 768px）==== */
     @media (max-width:768px){
       body{overflow:auto;}
-      #toolSelector{padding:15px 0;}
-      #toolSelector button{margin:0 3px;padding:8px 12px;font-size:10px;}
-
+      #toolSelector{padding:15px 0}
+      #toolSelector button{margin:0 3px;padding:11px 12px;font-size:13px;; flex: 0 0 22.5%;}
+     
       #timeTool,#morseTool,#binaryTool,#codeTool,#exchangeTool,#unitTool{width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto;}
       /* 捲軸高度調整 */
       #eventsList{max-height:40vh;}
@@ -453,16 +508,22 @@
 <body>
 <body>
   <canvas id="fishCanvas"></canvas>
-
-  <div id="toolSelector">
-    <button id="tool1Btn" class="active">時間管理</button>
-    <button id="tool2Btn">摩斯密碼</button>
-    <button id="tool3Btn">轉二進制</button>
-    <button id="tool4Btn">匯率轉換</button>
-    <button id="tool5Btn">QR／條碼</button>
-    <button id="tool6Btn">單位換算</button>
+  <div id="toolNav">
+    <button id="prevBtn" class="nav-arrow">
+      <svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div id="toolSelector">
+      <button id="tool1Btn" class="active">時間管理</button>
+      <button id="tool2Btn">摩斯密碼</button>
+      <button id="tool3Btn">轉二進制</button>
+      <button id="tool4Btn">匯率轉換</button>
+      <button id="tool5Btn">QR／條碼</button>
+      <button id="tool6Btn">單位換算</button>
+    </div>
+    <button id="nextBtn" class="nav-arrow">
+      <svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
   </div>
-
   <!-- 時間管理工具 -->
   <div id="tool1Container" class="tool-container active">
     <div id="timeTool">
@@ -1308,13 +1369,52 @@ document.addEventListener('DOMContentLoaded', () => {
     resultEl.textContent = '';
   });
   
-    /* === 工具切換邏輯 === */
-  const btns = Array.from(document.querySelectorAll('#toolSelector button'));
-  const containers = btns.map(b => document.getElementById(b.id.replace('Btn','Container')));
-  btns.forEach((btn,i) => btn.addEventListener('click', () => {
-    btns.forEach((b,j) => b.classList.toggle('active', i===j));
-    containers.forEach((c,j) => c.classList.toggle('active', i===j));
-  }));
+  /* === 小工具列邏輯 === */
+  const tabBtns = Array.from(document.querySelectorAll('#toolSelector button'));
+  const containers = tabBtns.map(b =>
+    document.getElementById(b.id.replace('Btn','Container'))
+  );
+  tabBtns.forEach((btn,i) => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach((b,j) => b.classList.toggle('active', i===j));
+      containers.forEach((c,j) => c.classList.toggle('active', i===j));
+    });
+  });
+
+  const scroller   = document.getElementById('toolSelector');
+  const scrollBtns = Array.from(scroller.querySelectorAll('button'));
+  let itemWidth = scrollBtns[0]?.offsetWidth || 0;
+  window.addEventListener('resize', () => {
+    itemWidth = scrollBtns[0].offsetWidth;
+  });
+
+  let currentIndex = 0;
+  const total = scrollBtns.length;
+
+  function updateFocus() {
+    scrollBtns.forEach((btn, i) =>
+      btn.classList.toggle('focused', i === currentIndex)
+    );
+  }
+
+  function scrollToIndex(idx) {
+    currentIndex = Math.max(0, Math.min(total - 1, idx));
+    scrollBtns[currentIndex].scrollIntoView({
+      behavior: 'smooth',
+      inline: 'center',
+      block: 'nearest'
+    });
+    updateFocus();
+  }
+
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    scrollToIndex(currentIndex - 1);
+  });
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    scrollToIndex(currentIndex + 1);
+  });
+
+  updateFocus();
 
     randomSelectHexagon();
     animateBackground();
