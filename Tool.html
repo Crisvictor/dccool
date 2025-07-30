@@ -86,70 +86,70 @@
     #tool1Container, #tool2Container,#tool3Container{padding-top: 10px;} 
 
     /*卷軸樣式*/
-    #timeTool::-webkit-scrollbar,
-    #eventsList::-webkit-scrollbar {
-      width: 8px;
-    }
-    #timeTool::-webkit-scrollbar-track,
-    #eventsList::-webkit-scrollbar-track {
-      background: rgba(255,255,255,.08);
-      border-radius: 4px;
-    }
-    #timeTool::-webkit-scrollbar-thumb,
-    #eventsList::-webkit-scrollbar-thumb {
-      background: #1b6c5a;
-      border-radius: 4px;
-    }
-    #timeTool::-webkit-scrollbar-thumb:hover,
-    #eventsList::-webkit-scrollbar-thumb:hover {
-      background: #0e4236;
-    }
-    #timeTool, #eventsList {
+    #timeTool,
+    #eventsList,
+    #binaryTool,
+    #binaryTool textarea,
+    #morseTool,
+    #morseTool textarea,
+    #codeTool,
+    #exchangeTool,
+    #exchangeTool input,
+    #exchangeTool select {
       scrollbar-width: thin;
-      scrollbar-color: #29cfa8 rgba(255,255,255,.08);
+      scrollbar-color: #29cfa8 rgba(255,255,255,0.08);
     }
+    #timeTool::-webkit-scrollbar,
+    #eventsList::-webkit-scrollbar,
     #binaryTool::-webkit-scrollbar,
     #binaryTool textarea::-webkit-scrollbar,
     #morseTool::-webkit-scrollbar,
-    #morseTool textarea::-webkit-scrollbar {
-      width:8px;
+    #morseTool textarea::-webkit-scrollbar,
+    #codeTool::-webkit-scrollbar,
+    #exchangeTool::-webkit-scrollbar,
+    #exchangeTool input::-webkit-scrollbar,
+    #exchangeTool select::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
     }
+    #timeTool::-webkit-scrollbar-track,
+    #eventsList::-webkit-scrollbar-track,
     #binaryTool::-webkit-scrollbar-track,
     #binaryTool textarea::-webkit-scrollbar-track,
     #morseTool::-webkit-scrollbar-track,
-    #morseTool textarea::-webkit-scrollbar-track {
-      background:rgba(255,255,255,.08);
-      border-radius:4px;
+    #morseTool textarea::-webkit-scrollbar-track,
+    #codeTool::-webkit-scrollbar-track,
+    #exchangeTool::-webkit-scrollbar-track,
+    #exchangeTool input::-webkit-scrollbar-track,
+    #exchangeTool select::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.08);
+      border-radius: 4px;
     }
+    #timeTool::-webkit-scrollbar-thumb,
+    #eventsList::-webkit-scrollbar-thumb,
     #binaryTool::-webkit-scrollbar-thumb,
     #binaryTool textarea::-webkit-scrollbar-thumb,
     #morseTool::-webkit-scrollbar-thumb,
-    #morseTool textarea::-webkit-scrollbar-thumb {
-      background:#29cfa8;
-      border-radius:4px;
+    #morseTool textarea::-webkit-scrollbar-thumb,
+    #codeTool::-webkit-scrollbar-thumb,
+    #exchangeTool::-webkit-scrollbar-thumb,
+    #exchangeTool input::-webkit-scrollbar-thumb,
+    #exchangeTool select::-webkit-scrollbar-thumb {
+      background: #29cfa8;
+      border-radius: 4px;
     }
+    #timeTool::-webkit-scrollbar-thumb:hover,
+    #eventsList::-webkit-scrollbar-thumb:hover,
     #binaryTool::-webkit-scrollbar-thumb:hover,
     #binaryTool textarea::-webkit-scrollbar-thumb:hover,
     #morseTool::-webkit-scrollbar-thumb:hover,
-    #morseTool textarea::-webkit-scrollbar-thumb:hover {
-      background:#1b6c5a;
+    #morseTool textarea::-webkit-scrollbar-thumb:hover,
+    #codeTool::-webkit-scrollbar-thumb:hover,
+    #exchangeTool::-webkit-scrollbar-thumb:hover,
+    #exchangeTool input::-webkit-scrollbar-thumb:hover,
+    #exchangeTool select::-webkit-scrollbar-thumb:hover {
+      background: #1b6c5a;
     }
-    #exchangeTool::-webkit-scrollbar,
-    #exchangeTool input::-webkit-scrollbar,
-    #exchangeTool select::-webkit-scrollbar{
-      width:8px;
-    }
-    #exchangeTool::-webkit-scrollbar-track,
-    #exchangeTool input::-webkit-scrollbar-track,
-    #exchangeTool select::-webkit-scrollbar-track{
-      background:rgba(255,255,255,.08); border-radius:4px;
-    }
-    #exchangeTool::-webkit-scrollbar-thumb,
-    #exchangeTool input::-webkit-scrollbar-thumb,
-    #exchangeTool select::-webkit-scrollbar-thumb{
-      background:#29cfa8; border-radius:4px;
-    }
-    #exchangeTool,#exchangeTool input,#exchangeTool select{ scrollbar-width:thin; scrollbar-color:#29cfa8 rgba(255,255,255,.08); }
 
     /* 重整鍵 */
     #resetBtn{
