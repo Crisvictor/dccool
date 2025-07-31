@@ -19,7 +19,7 @@
     }
     #toolSelector::-webkit-scrollbar { display: none; }
     #toolSelector button{margin:0 5px;padding:8px 10px;font-size:12px;cursor:pointer;border:none;border-radius:5px;background:#2b3432;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5); flex: 0 0 18.5%; scroll-snap-align: start;transition: transform .3s ease, filter .3s ease; transform: scale(0.9); filter: brightness(0.7);} 
-    #toolSelector button.focused {transform: scale(1.1); filter: brightness(1);}
+    #toolSelector button.focused {transform: scale(1.05); filter: brightness(0.8);}
     #toolSelector button.active{background:#537e74;}
     .tool-container{display:none;position:relative;z-index:10;padding:10px;}
     .tool-container.active{display:block;}
@@ -681,6 +681,8 @@
             <option value="area">面積</option>
             <option value="temperature">溫度</option>
             <option value="angle">角度</option>
+            <option value="time">時間</option>
+            <option value="shoe">鞋碼</option>
           </select>
         </label>
         <label>
@@ -1255,22 +1257,53 @@ document.addEventListener('DOMContentLoaded', () => {
     link.click();
   });
 
-  // 單位轉換參數表
+// 單位換算工具
   const maps = {
-    distance:   { m: 1, cm: 0.01, mm: 0.001, um: 1e-6, km: 1000, mi: 1609.34, ft: 0.3048 },
-    weight:     { g:1,    kg:1000,   lb:453.592, oz:28.3495, jin:600 },
-    volume:     { L:1,    mL:0.001,  gal:3.78541, qt:0.946353 },
-    temperature:{ C:1,    F:1,       K:1 }, 
-    area:       { m2:1,   km2:1e6,   ha:10000,   ac:4046.86, ft2:0.092903, in2:0.00064516 },
-    angle:      { deg: 1, rad: Math.PI / 180, grad: 0.9, amin: 1 / 60, asec: 1 / 3600 }
+    distance: { m:1, cm:0.01, mm:0.001, um:1e-6, km:1000, mi:1609.34, ft:0.3048, chi:0.33333, taiChi:0.30303, in:0.0254 },
+    weight:   { g:1, kg:1000, lb:453.592, oz:28.3495, jin:600 },
+    volume:   { L:1, mL:0.001, gal:3.78541, qt:0.946353 },
+    temperature:{ C:1, F:1, K:1 }, 
+    area:     { m2:1, km2:1e6, ha:10000, ac:4046.86, ft2:0.092903, in2:0.00064516, ping:3.305785 },
+    angle:    { deg:1, rad:Math.PI/180, grad:0.9, amin:1/60, asec:1/3600 },
+    time:     { s:1, min:60, h:3600, d:86400, week:604800, month:2629800, year:31557600 }
   };
+  const shoeCharts = [
+    { footMin: 23.0, footMax: 23.5, TW: 65,   US: 4.5,  US_sport: '5-5.5',   EU: 35, JP: '22-22.5', UK: 2.5 },
+    { footMin: 23.5, footMax: 24.0, TW: 66,   US: 5.0,  US_sport: '5.5-6',   EU: 35, JP: '22.5-23', UK: 3.0 },
+    { footMin: 24.0, footMax: 24.5, TW: 67,   US: 5.5,  US_sport: '6-6.5',   EU: 36, JP: '23-23.5', UK: 3.5 },
+    { footMin: 24.5, footMax: 25.0, TW: 68,   US: 6.0,  US_sport: '6.5-7',   EU: 37, JP: '23.5-24', UK: 4.0 },
+    { footMin: 25.0, footMax: 25.5, TW: 69,   US: 6.5,  US_sport: '7-7.5',   EU: 37, JP: '24-24.5', UK: 4.5 },
+    { footMin: 25.5, footMax: 26.0, TW: 70,   US: 7.0,  US_sport: '7.5-8',   EU: 38, JP: '24.5-25', UK: 5.0 },
+    { footMin: 26.0, footMax: 26.5, TW: 71,   US: 7.5,  US_sport: '8-8.5',   EU: 38, JP: '25-25.5', UK: 5.5 },
+    { footMin: 26.5, footMax: 27.0, TW: 72,   US: 8.0,  US_sport: '8.5-9',   EU: 39, JP: '25.5-26', UK: 6.0 },
+    { footMin: 27.0, footMax: 27.5, TW: 73,   US: 8.5,  US_sport: '9-9.5',   EU: 40, JP: '26-26.5', UK: 6.5 },
+    { footMin: 27.5, footMax: 28.0, TW: 74,   US: 9.0,  US_sport: '9.5-10',  EU: 40, JP: '26.5-27', UK: 7.0 },
+    { footMin: 28.0, footMax: 28.5, TW: 75,   US: 9.5,  US_sport: '10-10.5', EU: 41, JP: '27-27.5', UK: 7.5 },
+    { footMin: 28.5, footMax: 29.0, TW: 76,   US: 10.0, US_sport: '10.5-11', EU: 42, JP: '27.5-28', UK: 8.0 },
+    { footMin: 29.0, footMax: 29.5, TW: 77,   US: 10.5, US_sport: '11-11.5', EU: 42, JP: '28-28.5', UK: 8.5 },
+    { footMin: 29.5, footMax: 30.0, TW: 78,   US: 11.0, US_sport: '11.5-12', EU: 43, JP: '28.5-29', UK: 9.0 },
+    { footMin: 30.0, footMax: 30.5, TW: 79,   US: 11.5, US_sport: '12-12.5', EU: 43, JP: '29-29.5', UK: 9.5 },
+    { footMin: 30.5, footMax: 31.0, TW: 80,   US: 12.0, US_sport: '12.5-13', EU: 44, JP: '29.5-30', UK: 10.0 }
+  ];
   const labels = {
-    distance:   { m: '公尺', cm:'公分', mm:'毫米', um:'微米', km:'公里', mi:'英里', ft:'英尺' },
-    weight:     { g:'克',       kg:'公斤',      lb:'磅',       oz:'盎司', jin:'台斤' },
-    volume:     { L:'公升',     mL:'毫升',      gal:'加侖',     qt:'夸脫' },
-    temperature:{ C:'攝氏度',   F:'華氏度',    K:'開氏度' },
-    area:       { m2:'平方公尺', km2:'平方公里', ha:'公頃',     ac:'英畝',     ft2:'平方英尺', in2:'平方英吋' },
-    angle:      { deg:  '度', rad:  '弧度',  grad: '梯度',  amin: '分角',  asec: '秒角' }
+    distance:{ m:'公尺',cm:'公分',mm:'毫米',um:'微米',chi:'市尺',taiChi:'台尺',km:'公里',mi:'英里',ft:'英尺',in:'英吋' },
+    weight:{ g:'克',kg:'公斤',lb:'磅',oz:'盎司',jin:'台斤' },
+    volume:{ L:'公升',mL:'毫升',gal:'加侖',qt:'夸脫' },
+    temperature:{ C:'攝氏度',F:'華氏度',K:'開氏度' },
+    area:{ m2:'平方公尺',km2:'平方公里',ha:'公頃',ac:'英畝',ft2:'平方英尺',in2:'平方英吋',ping:'坪' },
+    angle:{ deg:'度',rad:'弧度',grad:'梯度',amin:'分角',asec:'秒角' },
+    time:{ s:'秒',min:'分',h:'時',d:'天',week:'週',month:'月',year:'年' },
+    shoe:{ foot:'腳尺寸(cm)',TW:'台灣尺碼',US:'美國尺碼',US_sport:'美國運動鞋尺碼',UK:'英國尺碼',EU:'歐洲尺碼',JP:'日本/中國尺碼' }
+  };
+  const suffixMap = {
+    distance:{ m:'m',cm:'cm',mm:'mm',um:'µm',km:'km',mi:'mi',ft:'ft',chi:'chi',taiChi:'taiChi',in:'in' },
+    weight:{ g:'g',kg:'kg',lb:'lb',oz:'oz',jin:'台斤' },
+    volume:{ L:'L',mL:'mL',gal:'gal',qt:'qt' },
+    temperature:{ C:'°C',F:'°F',K:'K' },
+    area:{ m2:'m²',km2:'km²',ha:'ha',ac:'ac',ft2:'ft²',in2:'in²',ping:'坪' },
+    angle:{ deg:'°',rad:'rad',grad:'grad',amin:'′',asec:'″' },
+    time:{ s:'秒',min:'分',h:'時',d:'天',week:'週',month:'月',year:'年' },
+    shoe:{ foot:'cm',TW:'TW',us:'US',US_sport:'USsport',uk:'UK',eu:'EU',jp:'JP' }
   };
 
   const catSel   = document.getElementById('unitCategory');
@@ -1278,91 +1311,81 @@ document.addEventListener('DOMContentLoaded', () => {
   const toSel    = document.getElementById('unitTo');
   const valInput = document.getElementById('unitValue');
   const resultEl = document.getElementById('unitResult');
+  const btnConvert = document.getElementById('convertUnitBtn');
+  const btnClear   = document.getElementById('clearUnitBtn');
 
   function populateUnits() {
     const cat = catSel.value;
-    fromSel.innerHTML = '';
-    toSel.innerHTML   = '';
-    Object.entries(labels[cat]).forEach(([code,name]) => {
-      const label = `${code} – ${name}`;
-      fromSel.add(new Option(label, code));
-      toSel  .add(new Option(label, code));
+    fromSel.innerHTML = toSel.innerHTML = '';
+    if (cat === 'shoe') {
+      Object.entries(labels.shoe).forEach(([code, name]) => {
+        fromSel.add(new Option(`${code} – ${name}`, code));
+        toSel  .add(new Option(`${code} – ${name}`, code));
+      });
+    } else {
+      Object.entries(labels[cat]).forEach(([code, name]) => {
+        fromSel.add(new Option(`${code} – ${name}`, code));
+        toSel  .add(new Option(`${code} – ${name}`, code));
+      });
+    }
+  }
+  function findShoeRow(value, unit) {
+    const v = parseFloat(value);
+    return shoeCharts.find(row => {
+      if (unit === 'foot') {
+        return v >= row.footMin && v <= row.footMax;
+      }
+      const cell = row[unit];
+      if (typeof cell === 'number') return v === cell;
+      const parts = cell.split('-').map(parseFloat);
+      return parts.length === 1
+        ? v === parts[0]
+        : (v >= parts[0] && v <= parts[1]);
     });
   }
-
-  catSel.addEventListener('change', populateUnits);
-  populateUnits();
-
-  const suffixMap = {
-    distance: {
-      m:  'm',
-      cm: 'cm',
-      mm: 'mm',
-      um: 'µm',
-      km: 'km',
-      mi: 'mi',
-      ft: 'ft'
-    },
-    weight: {
-      g:   'g',
-      kg:  'kg',
-      lb:  'lb',
-      oz:  'oz',
-      jin: '台斤'
-    },
-    volume: {
-      L:   'L',
-      mL:  'mL',
-      gal: 'gal',
-      qt:  'qt'
-    },
-    temperature: {
-      C: '°C',
-      F: '°F',
-      K: 'K'
-    },
-    area: {
-      m2:  'm²',
-      km2: 'km²',
-      ha:  'ha',
-      ac:  'ac',
-      ft2: 'ft²',
-      in2: 'in²'
-    },
-    angle: {
-      deg:  '°',
-      rad:  'rad',
-      grad: 'grad',
-      amin: '′',
-      asec: '″'
-    }
-  };
-
-  document.getElementById('convertUnitBtn').addEventListener('click', () => {
+  function convertUnit() {
     const cat  = catSel.value;
     const from = fromSel.value;
     const to   = toSel.value;
-    const v    = parseFloat(valInput.value);
-    if (isNaN(v)) {
+    const raw  = valInput.value.trim();
+    const v    = parseFloat(raw);
+    if (cat !== 'shoe' && isNaN(v)) {
       resultEl.textContent = '請輸入數值';
+      return;
+    }
+    if (cat === 'shoe' && raw === '') {
+      resultEl.textContent = '請輸入鞋碼或腳長';
       return;
     }
     let r;
     if (cat === 'temperature') {
-      let c = from === 'C' ? v
-            : from === 'F' ? (v - 32) * 5/9
-            : (v - 273.15);
-      r = to === 'C' ? c
-        : to === 'F' ? c * 9/5 + 32
-        : c + 273.15;
-    } else {
+      r = convertTemperature(v, from, to);
+    }
+    else if (cat === 'shoe') {
+      const row = findShoeRow(raw, from);
+      if (!row) {
+        resultEl.textContent = '找不到對應尺碼';
+       return;
+      }
+      r = (to === 'foot')
+        ? `${row.footMin}-${row.footMax}`
+        : row[to];
+    }
+    else {
       r = v * maps[cat][from] / maps[cat][to];
     }
-    const suffix = (suffixMap[cat] && suffixMap[cat][to])
-      ? suffixMap[cat][to]
-      : to;
-    resultEl.textContent = `${r.toFixed(4)}${suffix}`;
+    const suffix  = suffixMap[cat]?.[to] ?? to;
+    const display = (cat === 'shoe') ? r.toString() : parseFloat(r).toFixed(4);
+    resultEl.textContent = `${display} ${suffix}`;
+  }
+
+  catSel.addEventListener('change', populateUnits);
+  btnConvert.addEventListener('click', convertUnit);
+  btnClear  .addEventListener('click', () => {
+    valInput.value = '';
+    resultEl.textContent = '';
   });
+  populateUnits();
 
   document.getElementById('clearUnitBtn').addEventListener('click', () => {
     valInput.value = '';
