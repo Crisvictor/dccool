@@ -84,7 +84,20 @@
       text-shadow:0 1px 3px rgba(0,0,0,.7); line-height:1.2;
     }
     #tool1Container, #tool2Container,#tool3Container{padding-top: 10px;} 
-
+    .copy-tooltip {
+      position: absolute;
+      transform: translateX(-50%);
+      background: #444;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 10000;
+    }
     /*卷軸樣式*/
     #timeTool,
     #eventsList,
@@ -441,11 +454,15 @@
     #addEventBtn,
     #calculateBtn,
     #resetBtn,
-    #swapBtn{
+    #swapBtn,
+    #swapBinBtn{
       position: relative;
       transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
       box-shadow: 0 3px 0 rgba(0,0,0,.35), 0 6px 12px rgba(0,0,0,.45);
     }
+    #morseActions button:hover,
+    #exchangeActions button:hover,
+    #binaryActions button:hover,
     #generateCodeBtn:hover,
     #downloadPngBtn:hover,
     #downloadJpgBtn:hover,
@@ -455,11 +472,16 @@
     #calculateBtn:hover,
     #resetBtn:hover,
     #unitActions button:hover,
-    #swapBtn:hover{
+    #swapBtn:hover,
+    #swapBinBtn:hover{
       transform: translateY(-2px);
       box-shadow: 0 5px 0 rgba(0,0,0,.4), 0 10px 18px rgba(0,0,0,.55);
       filter: brightness(1.08);
     }
+    
+    #morseActions button:active,
+    #exchangeActions button:active,
+    #binaryActions button:active,
     #generateCodeBtn:active,
     #downloadPngBtn:active,
     #downloadJpgBtn:active,
@@ -469,7 +491,8 @@
     #calculateBtn:active,
     #unitActions button:active,
     #resetBtn:active,
-    #swapBtn:active{
+    #swapBtn:active,
+    #swapBinBtn:active{
       transform: translateY(1px);
       box-shadow: inset 0 2px 4px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.4);
       filter: brightness(.95);
@@ -507,7 +530,6 @@
     }
   </style>
 </head>
-<body>
 <body>
   <canvas id="fishCanvas"></canvas>
   <div id="toolNav">
@@ -572,8 +594,8 @@
         </div>
       </div>
       <div id="morseActions">
-        <button id="copyTextBtn">複製文字</button>
-        <button id="copyMorseBtn">複製摩斯</button>
+        <button id="copyTextBtn" data-copy-target="textInput">複製文字</button>
+        <button id="copyMorseBtn" data-copy-target="morseInput">複製摩斯</button>
         <button id="clearAllBtn">清除</button>
       </div>
     </div>
@@ -595,8 +617,8 @@
         </div>
       </div>
       <div id="binaryActions">
-        <button id="copyDecBtn">複製十進制</button>
-        <button id="copyBinBtn">複製二進制</button>
+        <button id="copyDecBtn"   data-copy-target="decimalInput">複製十進制</button>
+        <button id="copyBinBtn"   data-copy-target="binaryInput">複製二進制</button>
         <button id="clearBinBtn">清除</button>
       </div>
     </div>
@@ -625,7 +647,7 @@
       </div>
       <div id="exchangeActions">
         <button id="convertBtn">轉換</button>
-        <button id="copyExchangeBtn">複製結果</button>
+        <button id="copyExchangeBtn" data-copy-target="exchangeResult">複製結果</button>
         <button id="clearExchangeBtn">清除</button>
       </div>
       <div id="exchangeTimestamp" style="
@@ -721,14 +743,36 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode/dist/JsBarcode.all.min.js"></script>
+  <audio id="clickSound" src="m/click.mp3"></audio>
+  <audio id="scoreSound" src="m/Sou.mp3"></audio>
+  <audio id="cutSound" src="m/cut1.mp3"></audio>
+  <audio id="click1Sound" src="m/click1.mp3" preload="auto"></audio>
+  </body>
   <script>
+    const clickSound = document.getElementById('clickSound');
+    const scoreSound = document.getElementById('scoreSound');
+    const cutSound = document.getElementById('cutSound');
+    const click1Sound = document.getElementById('click1Sound');
     const fishCanvas = document.getElementById('fishCanvas');
     const fishCtx = fishCanvas.getContext('2d');
     let selectedHexagons = [];
     let hoveredHexagonsMap = {};
     let mouseX = -1, mouseY = -1;
     let time = 0;
-
+    function playScoreSound() {
+      scoreSound.currentTime = 0;
+      scoreSound.play().catch(error => console.warn('範例按鈕音效失敗:', error));
+    }
+    document.querySelectorAll('.example-option').forEach(button => {
+        button.addEventListener('click', playScoreSound);
+    });
+    function playclickSound() {
+      clickSound.currentTime = 0;
+      clickSound.play().catch(error => console.warn('範例按鈕音效失敗:', error));
+    }
+    document.querySelectorAll('.example-option').forEach(button => {
+        button.addEventListener('click', playScoreSound);
+    });
     function resizeCanvas() {
       fishCanvas.width = window.innerWidth;
       fishCanvas.height = window.innerHeight;
@@ -866,11 +910,13 @@
       mode = m;
       modeButtons.forEach(btn=>btn.classList.toggle('active', btn.dataset.mode===m));
       if(m==='arrive'){
+        playScoreSound();
         rowTarget.style.display='block';
         rowStart.style.display='none';
         labelTarget.textContent='輸入行程目標時間';
         startInput.value='';
       }else{
+        playScoreSound();
         rowStart.style.display='block';
         rowTarget.style.display='none';
         labelStart.textContent='輸入行程起始時間';
@@ -886,6 +932,7 @@
     document.getElementById('addEventBtn').addEventListener('click',()=>{
       events.push({name:'',hours:0,mins:0});
       renderEvents();
+      playScoreSound();
     });
     function attachAutoPicker(el) {
       ['focus', 'click'].forEach(ev => {
@@ -910,7 +957,15 @@
         eventsList.appendChild(div);
       });
     }
-
+    eventsList.addEventListener('click', e => {
+      if (e.target.dataset.rm !== undefined) {
+        cutSound.currentTime = 0;
+        cutSound.play();
+        const idx = parseInt(e.target.dataset.rm);
+        events.splice(idx,1);
+        renderEvents();
+      }
+    });
     eventsList.addEventListener('input',e=>{
       const i=e.target.getAttribute('data-i');
       const f=e.target.getAttribute('data-f');
@@ -927,7 +982,7 @@
     });
 
     document.getElementById('calculateBtn').addEventListener('click',()=>{
-
+      playScoreSound();
       calcEndOut.textContent='';
       calcDepartOut.textContent='';
       resultDiv.textContent='';
@@ -946,6 +1001,7 @@
     });
 
     document.getElementById('resetBtn').addEventListener('click',()=>{
+      playScoreSound();
       if(confirm('確定要清空所有資料並回到模式選擇？')){
         events.length=0;
         startInput.value='';
@@ -1034,18 +1090,41 @@
         updateCounts(); lock = false;
       });
     }
-    copyTextBtn?.addEventListener('click', ()=> navigator.clipboard?.writeText(textInput.value));
-    copyMorseBtn?.addEventListener('click',()=> navigator.clipboard?.writeText(morseInput.value));
     clearAllBtn?.addEventListener('click', ()=>{
       textInput.value=''; morseInput.value=''; updateCounts();
+      playScoreSound();
     });
     swapBtn?.addEventListener('click', ()=>{
       const t = textInput.value;
+      playScoreSound();
       textInput.value  = morseToText(morseInput.value);
       morseInput.value = textToMorse(t);
       updateCounts();
     });
     updateCounts();
+
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-copy-target]');
+    if (!btn) return;
+    const targetId = btn.getAttribute('data-copy-target');
+    const srcEl = document.getElementById(targetId);
+    if (!srcEl) return;
+    const text = srcEl.value != null ? srcEl.value : srcEl.textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+      const tip = document.createElement('div');
+      tip.className = 'copy-tooltip';
+      tip.textContent = '已複製';
+      document.body.appendChild(tip);
+      const r = btn.getBoundingClientRect();
+      tip.style.left = `${r.left + r.width / 2}px`;
+      tip.style.top = `${r.top + window.scrollY - 8}px`;
+      setTimeout(() => {
+        tip.style.opacity = '0';
+        setTimeout(() => tip.remove(), 300);
+      }, 1000);
+      if (typeof playScoreSound === 'function') playScoreSound();
+    });
+  });
 
     // 二進制轉換邏輯
     const decIn = document.getElementById('decimalInput');
@@ -1110,14 +1189,13 @@
     }
     decIn.addEventListener('input', updateBinary);
     binIn.addEventListener('input', updateDecimal);
-    copyDecBtn.addEventListener('click', () => navigator.clipboard?.writeText(decIn.value));
-    copyBinBtn.addEventListener('click', () => navigator.clipboard?.writeText(binIn.value));
-    clearBinBtn.addEventListener('click', () => { decIn.value = ''; binIn.value = ''; });
+    clearBinBtn.addEventListener('click', () => { decIn.value = ''; binIn.value = '';playScoreSound(); });
     swapBinBtn.addEventListener('click', () => {
       const t = decIn.value;
       decIn.value = binIn.value;
       binIn.value = t;
       updateBinary();
+      playScoreSound();
     });
 
 // ===== 匯率轉換邏輯 =====
@@ -1181,14 +1259,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   fetchRates();
-  convertBtn    .addEventListener('click', convertExchange);
-  copyExchangeBtn.addEventListener('click', () => {
-    if (exchangeResult.textContent)
-      navigator.clipboard.writeText(exchangeResult.textContent);
+  convertBtn.addEventListener('click', () => {
+    playScoreSound();
+    convertExchange();
   });
   clearExchangeBtn.addEventListener('click', () => {
     amountInput.value = '';
     exchangeResult.textContent = '';
+    playScoreSound();
   });
 });
 
@@ -1260,18 +1338,20 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
-  generateBtn.addEventListener('click', drawCode);
+  generateBtn.addEventListener('click', () => {drawCode();playScoreSound();});
   downloadPng.addEventListener('click', () => {
     const link = document.createElement('a');
     link.download = 'code.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
+    playScoreSound();
   });
   downloadJpg.addEventListener('click', () => {
     const link = document.createElement('a');
     link.download = 'code.jpg';
     link.href = canvas.toDataURL('image/jpeg', 0.8);
     link.click();
+    playScoreSound();
   });
 
 // 單位換算工具
@@ -1397,10 +1477,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   catSel.addEventListener('change', populateUnits);
-  btnConvert.addEventListener('click', convertUnit);
+  btnConvert.addEventListener('click', () => {convertUnit();playScoreSound();});
   btnClear  .addEventListener('click', () => {
     valInput.value = '';
     resultEl.textContent = '';
+    playScoreSound();
   });
   populateUnits();
 
@@ -1416,6 +1497,7 @@ document.addEventListener('DOMContentLoaded', () => {
   );
   tabBtns.forEach((btn,i) => {
     btn.addEventListener('click', () => {
+      playclickSound()
       tabBtns.forEach((b,j) => b.classList.toggle('active', i===j));
       containers.forEach((c,j) => c.classList.toggle('active', i===j));
     });
@@ -1449,9 +1531,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('prevBtn').addEventListener('click', () => {
     scrollToIndex(currentIndex - 1);
+    click1Sound.currentTime = 0;
+    click1Sound.play();
   });
   document.getElementById('nextBtn').addEventListener('click', () => {
     scrollToIndex(currentIndex + 1);
+    click1Sound.currentTime = 0;
+    click1Sound.play();
   });
 
   updateFocus();
