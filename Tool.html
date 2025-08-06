@@ -404,12 +404,14 @@
     }
     #unitResultWrapper{
       margin:8px 0; padding:10px;
-      background:rgba(34,69,115,0.35);
+      background:rgba(34,69,115,0.2);
       border-radius:4px; min-height:36px;
       display:flex; align-items:center; justify-content:center;
     }
     #unitResult{
-      font-size:14px; color:#29cfa8;
+      font-size:14px;       
+      color: #a2d3df;
+      font-weight: bold;
       text-shadow:0 1px 2px rgba(0,0,0,.7);
     }
     #unitActions{
@@ -625,6 +627,14 @@
         <button id="convertBtn">轉換</button>
         <button id="copyExchangeBtn">複製結果</button>
         <button id="clearExchangeBtn">清除</button>
+      </div>
+      <div id="exchangeTimestamp" style="
+          text-align: right;
+          color: #ccc;
+          font-size: 12px;
+          margin-top: 6px;
+      ">
+        資料時間：--/--/-- --:--
       </div>
     </div>
   </div>
@@ -1120,10 +1130,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearExchangeBtn = document.getElementById('clearExchangeBtn');
   const exchangeResult   = document.getElementById('exchangeResult');
 
-  const CODES = ['TWD','USD','EUR','JPY','CNY','HKD','SGD','AUD','GBP','CAD','KRW','THB','RUB'];
+  const CODES = ['TWD','USD','EUR','JPY','CNY','HKD','SGD','AUD','GBP','CAD','KRW','THB','CHF'];
   const NAMES = {
     TWD:'新台幣',USD:'美金',EUR:'歐元',JPY:'日幣',CNY:'人民幣',HKD:'港幣',
-    SGD:'新加坡幣',AUD:'澳幣',GBP:'英鎊',CAD:'加拿大幣',KRW:'韓元',THB:'泰銖',RUB:'盧布'
+    SGD:'新加坡幣',AUD:'澳幣',GBP:'英鎊',CAD:'加拿大幣',KRW:'韓元',THB:'泰銖',CHF:'瑞士法郎'
   };
   const ratesCache = {};
   CODES.forEach(code => {
@@ -1131,8 +1141,8 @@ document.addEventListener('DOMContentLoaded', () => {
     baseCurrency .add(new Option(label, code));
     targetCurrency.add(new Option(label, code));
   });
-  baseCurrency.value   = 'TWD';
-  targetCurrency.value = 'USD';
+  baseCurrency.value   = 'USD';
+  targetCurrency.value = 'TWD';
   async function fetchRates() {
     try {
       const res = await fetch('https://open.er-api.com/v6/latest/TWD');
@@ -1143,11 +1153,18 @@ document.addEventListener('DOMContentLoaded', () => {
       CODES.forEach(code => {
         ratesCache[code] = data.rates[code] ?? null;
       });
+      const ts = new Date(data.time_last_update_unix * 1000);
+      const Y  = ts.getFullYear();
+      const M  = String(ts.getMonth()+1).padStart(2,'0');
+      const D  = String(ts.getDate()).padStart(2,'0');
+      const h  = String(ts.getHours()).padStart(2,'0');
+      const m  = String(ts.getMinutes()).padStart(2,'0');
+      document.getElementById('exchangeTimestamp').textContent =
+        `匯率掛牌時間：${Y}/${M}/${D} ${h}:${m}`;
     } catch (err) {
-      console.error('取得匯率失敗，使用 fallback', err);
-      CODES.forEach(code => {
-        ratesCache[code] = (code === 'TWD' || code === 'USD') ? 1 : null;
-      });
+      console.error('取得匯率失敗，使用 fallback 列表', err);
+      document.getElementById('exchangeTimestamp').textContent =
+        '匯率掛牌時間：無法取得';
     }
   }
 
