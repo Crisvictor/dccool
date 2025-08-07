@@ -1001,7 +1001,8 @@
     });
 
     document.getElementById('resetBtn').addEventListener('click',()=>{
-      playScoreSound();
+      cutSound.currentTime = 0;
+      cutSound.play();
       if(confirm('確定要清空所有資料並回到模式選擇？')){
         events.length=0;
         startInput.value='';
@@ -1092,7 +1093,8 @@
     }
     clearAllBtn?.addEventListener('click', ()=>{
       textInput.value=''; morseInput.value=''; updateCounts();
-      playScoreSound();
+      cutSound.currentTime = 0;
+      cutSound.play();
     });
     swapBtn?.addEventListener('click', ()=>{
       const t = textInput.value;
@@ -1189,7 +1191,12 @@
     }
     decIn.addEventListener('input', updateBinary);
     binIn.addEventListener('input', updateDecimal);
-    clearBinBtn.addEventListener('click', () => { decIn.value = ''; binIn.value = '';playScoreSound(); });
+    clearBinBtn.addEventListener('click', () => { 
+      decIn.value = ''; 
+      binIn.value = ''; 
+      cutSound.currentTime = 0;
+      cutSound.play(); 
+    });
     swapBinBtn.addEventListener('click', () => {
       const t = decIn.value;
       decIn.value = binIn.value;
@@ -1266,7 +1273,8 @@ document.addEventListener('DOMContentLoaded', () => {
   clearExchangeBtn.addEventListener('click', () => {
     amountInput.value = '';
     exchangeResult.textContent = '';
-    playScoreSound();
+    cutSound.currentTime = 0;
+    cutSound.play();
   });
 });
 
@@ -1477,17 +1485,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   catSel.addEventListener('change', populateUnits);
-  btnConvert.addEventListener('click', () => {convertUnit();playScoreSound();});
+  btnConvert.addEventListener('click', () => {
+    convertUnit();
+    playScoreSound();
+  });
   btnClear  .addEventListener('click', () => {
     valInput.value = '';
     resultEl.textContent = '';
-    playScoreSound();
+    cutSound.currentTime = 0;
+    cutSound.play();
   });
   populateUnits();
-
   document.getElementById('clearUnitBtn').addEventListener('click', () => {
     valInput.value = '';
     resultEl.textContent = '';
+    cutSound.currentTime = 0;
+    cutSound.play();
   });
   
   /* === 小工具列邏輯 === */
