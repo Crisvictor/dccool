@@ -1,775 +1,951 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
-    <title>大倉酷扣項細則</title>
-    <video autoplay muted loop playsinline id="background-video">
-    <source src="v/HexUp.webm" type="video/webm">
-    </video>
-    <style>
-        body {
-            font-family: "Noto Sans CJK TC", Arial, sans-serif; /* 設定主要字體 */
-            background-color: #121212;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background: rgba(21, 21, 21, 0.05);
-            padding: 20px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); 
-            border-radius: 10px; 
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-        h1 {
-            margin: 0;
-        }
-        h2 {
-            font-size: 24px;
-            color: #fff;
-        }
-        main {
-            padding: 20px;
-        }
-        .article {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1.5px solid #3e645b;
-            border-radius: 5px;
-        }
-        footer {
-            background-color: rgba(30, 30, 30, 0.4);
-            padding: 8px;
-            text-align: center;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            background-color: #333;
-            border: 1px solid #444;
-            color: #fff;
-            border-radius: 5px;
-        }
-        .search-result {
-            margin-top: 20px;
-        }
-        html, body {
-            height: 100%;
-            padding: 0;
-            overflow: auto; 
-            margin: 0; 
-		    }
-        #fishCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: -1; 
-        }
-        #searchInput {
-            margin: 20px;
-            padding: 10px;
-            width: 250px;
-            background-color: Black;
-            color: white; 
-            border: 1px solid white;
-        }
-        #noResultsMessage {
-            display: none;
-            color: LightCoral;
-            font-weight: bold;
-        }
-        .article {
-            margin: 20px;
-        }
-        .article p {
-            font-size: 14px;
-            line-height: 1.6;
-            position: relative; 
-            padding: 10px; 
-            background-color: rgba(10, 92, 92, 0.2);
-            border: 1px solid #87cda9;
-            border-radius: 6px; 
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); 
-            display: inline-block; 
-        }
-        .article p:hover {
-            background-color: rgba(0, 128, 128, 0.3);
-            transform: scale(1.05);
-            transition: all 0.3s ease;
-        }
-        #background-video {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          z-index: -1;
-	  filter: brightness(0.3);
-        }
-	.game-button {
-  	  position: relative; 
-   	  padding: 5px 10px;
-   	  background-color: #3a865b; 
-	  border: 1px solid #ddd;
-  	  color: #fff; 
-  	  border-radius: 5px;
- 	  text-decoration: none;
- 	  font-size: 14px;
-    	  margin-right: 10px; 
-    	  margin-top: 10px; 
- 	  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
- 	  transition: background-color 0.3s;
-  	  display: inline-block; 
-   	  z-index: 10;
-	}
-        .game-button:hover {
-          background-color: #6bbf91; 
-        }
-        .tags-container {
-          display: flex;
-          gap: 10px;
-          flex-wrap: wrap; 
-          margin: 20px; 
-          margin-bottom: 20px;
-        }
-        .tag {
-          background-color: #0e3835; /* 背景 */
-          color: white; /* 白色文字 */
-          font-size: 20px;
-          border: none;
-          padding: 8px 8px;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: background-color 0.3s;
-          border: 1px solid #0a0c0c;
-          z-index: 11;
-        }
-        .tag:hover {
-          background-color: #07615b; 
-          transform: translateY(-2px); 
-          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
-        }
-        .tag.active {
-          background-color: #24a4a4;
-          color: #fff;
-          font-weight: bold;
-          border: 1px solid #d3d3d3; 
-        }
-        .clear-tag {
-          background-color: #417587;
-          color: white;
-        }
-        .clear-tag:hover {
-          background-color: #4798b3;
-          color: white;
-          transform: translateY(-2px);
-          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4); 
-        }
-
-	@media (max-width: 768px) {
-        body {
-          font-size: 14px;
-        }
-       .article p {
-          font-size: 12px; 
-          padding: 8px; 
-        }
-       .article h2 {
-          font-size: 21.3px; 
-        }
-        .tag {
-          font-size: 18.7px;
-        }
-        .game-button {
-          font-size: 12px; 
-          padding: 5px 8px;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="img/865.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="img/865.ico" type="image/x-icon">
+  <title>員工查詢</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #222, #111);
+      color: white;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      flex-direction: column;
+      padding: 20px;
     }
-    </style>
+
+    .container {
+      max-width: 600px;
+      margin: 20px;
+      padding: 20px;
+      background-color: #333;
+      border-radius: 8px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+      width: 100%; 
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      grid-gap: 20px;
+      margin-bottom: 20px;
+      position: relative;
+      justify-content: center; /* 居中 */
+    }
+
+    .dot {
+      width: 80px;
+      height: 80px;
+      background-color: #555;
+      border-radius: 50%;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2); 
+    }
+
+    .dot:hover {
+      transform: translateY(-7px); 
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.3); 
+    }
+
+    .dot.active {
+      background-color: orange;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .line {
+      position: absolute;
+      height: 4px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0) 100%); /* 漸變效果 */
+      box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+      border-radius: 2px;
+      transform-origin: left;
+      z-index: 1;
+      transition: all 0.2s ease; 
+    }
+
+    .line::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: white;
+      border-radius: 50%;
+      top: -3px;
+      right: -3px;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .unlock-message {
+      background-color: green;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 搜索區域 */
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #444;
+      color: white;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    
+    .search-container {
+      display: flex;    
+      gap: 10px;
+    }
+
+    #branchSelect, #categorySelect, #employeeIdInput, #employeeNameInput {
+      flex: 1;            
+      padding: 8px;       
+      font-size: 14px;     
+      border: 1px solid #a3a3a3; 
+      border-radius: 4px;  
+    }
+
+    #searchResults {
+      margin-bottom: 20px; 
+    }
+    
+    button {
+      padding: 10px 20px;
+      background-color: #ff6600;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-size: 16px;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #ff4400;
+    }
+
+    .results {
+      max-height: 350px;
+      overflow-y: auto;
+      background-color: #222;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .result-item {
+      position: relative;
+      align-items: center;
+      background-color: #444;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .result-item span {
+      background-color: #666;
+      border-radius: 5px;
+      padding: 5px 10px;
+      margin-right: 10px;
+      color: white;
+    }
+
+    .branch {
+      position: absolute; top: 0; left: 0;
+      width: 40px !important; 
+      height: 40px !important; 
+      background-color: #778899 !important;
+      font-size: 12px !important;
+      padding: 1px 1px !important;
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+      border-top-left-radius: 8px; 
+      border-bottom-right-radius: 8px;
+      z-index: 2;
+    }
+
+    .date {
+      position: absolute ; bottom: 0; right: 0;
+      font-size: 12px !important; 
+      padding: 2px 5px !important;
+      background-color: rgba(255, 255, 255, 0.1) !important; /* 半透明背景 */
+      color: #ddd !important; 
+      border-radius: 4px;
+    }
+
+    .id {
+      position: relative;
+      z-index: 1;
+    }
+
+    .name, .id {
+      cursor: pointer;
+    }
+
+    .Tra { /* 技術訓標示🖊️ */
+      display: inline-flex !important;
+      background-color: #7cc396 !important; /* 草綠色 */
+      font-size: 14px !important; /* 設定字體大小 */
+      justify-content: center !important;   /* 水平置中 */
+      width: 10px !important;
+      height: 20px !important;
+      border-radius: 8px !important; /* 調整邊框圓角 */
+      margin-top: 3px !important; /* 上間距 */
+    }
+
+    .opto { /* 驗光人員標示👓 */
+      display: inline-flex !important;
+      background-color: #f5f5f5 !important; /* 白煙色 */
+      font-size: 14px !important; /* 設定字體大小 */
+      justify-content: center !important;   /* 水平置中 */
+      width: 10px !important;
+      height: 20px !important;
+      border-radius: 8px !important; /* 調整邊框圓角 */
+      margin-top: 3px !important; /* 上間距 */
+    }
+
+    .suspended { /* 停職標示❄ */
+      display: inline-flex !important;
+      background-color: #539dec !important; /* 冰藍  */
+      font-size: 18px !important; /* 設定字體大小 */
+      justify-content: center !important;   /* 水平置中 */
+      width: 10px !important;
+      height: 20px !important;
+      border-radius: 8px !important; /* 調整邊框圓角 */
+      margin-top: 3px !important; /* 上間距 */
+    }
+
+    .manager { /* 主管標示♠️ */
+      display: inline-flex !important;
+      background-color: #e6c35c !important; /* 金幣黃 */
+      font-size: 14px !important; /* 設定字體大小 */
+      justify-content: center !important;   /* 水平置中 */
+      width: 10px !important;
+      height: 20px !important;
+      border-radius: 8px !important; /* 調整邊框圓角 */
+      margin-top: 3px !important; /* 上間距 */
+    }
+
+    .trainee { /* 建教生標示🎓 */
+      display: inline-flex !important;
+      background-color: #eee8aa !important; /* 灰金菊色 */
+      font-size: 14px !important; /* 設定字體大小 */
+      justify-content: center !important;   /* 水平置中 */
+      width: 10px !important;
+      height: 20px !important;
+      border-radius: 8px !important; /* 調整邊框圓角 */
+      margin-top: 3px !important; /* 上間距 */
+    }
+
+    .depot { /* 倉儲標示📦 */
+      display: inline-flex !important;
+      background-color: #d8bfd8 !important; /* 薊紫 */
+      font-size: 14px !important; /* 設定字體大小 */
+      justify-content: center !important;   /* 水平置中 */
+      width: 10px !important;
+      height: 20px !important;
+      border-radius: 8px !important; /* 調整邊框圓角 */
+      margin-top: 3px !important; /* 上間距 */
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .tooltip::after {
+      content: attr(data-tooltip);
+      visibility: hidden;
+      opacity: 0;
+      width: 70px;
+      background-color: black;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: opacity 0.3s;
+    }
+
+    .tooltip:hover::after {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    footer {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 14px;
+      background-color: #1a1a1a;
+      color: #ccc;
+      font-size: 13px;
+      border-radius: 4px;
+    }
+
+    .footer-center {
+      flex: 1; 
+      display: flex;
+      justify-content: center; 
+    }
+
+    footer a {
+      color: #ccc;
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      color: #fff; 
+    }
+
+    footer img {
+      width: 60px; 
+      height: 60px; 
+      animation: moveFlip 4s infinite; 
+    }
+
+    @keyframes moveFlip {
+      0% {
+        transform: translateX(0) scaleX(1);
+      }
+      25% {
+        transform: translateX(-20px) scaleX(1); 
+      }
+      50% {
+        transform: translateX(-40px) scaleX(-1);
+      }
+      75% {
+        transform: translateX(-20px) scaleX(-1); 
+      }
+      100% {
+        transform: translateX(0) scaleX(1);
+      }
+    }
+
+    .search-count {
+      background-color: #2f4f4f; 
+      color: white;
+      text-align: center;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+
+    .game-button {
+      position: absolute ; bottom: 15px; right: 20px;
+      padding: 10px 12px;
+      background-color: #3a4a7d;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 13px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s;
+      z-index: 1;
+    }
+
+    .game-button:hover {
+      background-color: #4a5c9a;
+    }
+    
+    #errorMessage {
+      color: #e25c7d; 
+      text-align: center;
+      font-size: 18px; 
+      margin-top: 20px; 
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+
+      button {
+        font-size: 14px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>扣項實行細則</h1>
-    </header>
-    <main>
-	        <!-- 搜索欄 -->
-        <input type="text" id="searchInput" onkeyup="searchArticles()" placeholder="搜索關鍵字...">
-         <!-- 標籤系統 -->
-        <div class="tags-container">
-          <button class="tag" data-tag="環境">環境</button>
-          <button class="tag" data-tag="填單">填單</button>
-          <button class="tag" data-tag="資料">資料</button>
-          <button class="tag" data-tag="驗光">驗光</button>
-          <button class="tag" data-tag="品檢">品檢</button>
-          <button class="tag" data-tag="管理">管理</button>
-          <button class="tag" data-tag="鏡片">鏡片</button>
-	  <button class="tag" data-tag="鏡框">鏡框</button>
-          <button class="tag" data-tag="交件">交件</button>
-          <button class="tag" data-tag="銷售">銷售</button>
-          <button class="tag" data-tag="磨片">磨片</button>
-          <button class="tag" data-tag="出勤">出勤</button>		
-        </div>
-	        <!-- 搜索結果區域 -->
-        <div id="articles">		
-            <div class="article" data-tags="管理" data-title="迎賓及送客口號呼喊不完整、配鏡流程及買一送一活動未主動說明。 站哨期間無故擅離崗位，無法提供合理正當理由說明。">
-                <h2>迎賓及送客口號呼喊不完整、配鏡流程及買一送一活動未主動說明。<br>站哨期間無故擅離崗位，無法提供合理正當理由說明。</h2>
-                <p>(扣個人/主管 20 點)</p>
-            </div>
-            <div class="article" data-tags="管理 驗光" data-title="看到客人挑選好眼鏡，未主動上前引導及詢問是否安排驗光，及未主動提供眼鏡托盤給客人使用。">
-                <h2>看到客人挑選好眼鏡，未主動上前引導及詢問是否安排驗光，<br>及未主動提供眼鏡托盤給客人使用。</h2>
-                <p>(扣公積金點數 100 點/主管 50 點)</p>
-            </div>
-          <div class="article" data-tags="鏡框" data-title="展示檯面鏡框空缺、未完成補框動作並將多餘庫存放在底下，抽屜鏡框未裝袋檢查動作不確實。">
-                <h2>展示檯面鏡框空缺、未完成補框動作並將多餘庫存放在底下，<br>抽屜鏡框未裝袋檢查動作不確實。</h2>
-                <p>(扣公積金點數/主管 20 點)</p>
-            </div>
-          <div class="article" data-tags="品檢 管理" data-title="於工作櫃檯區域品檢及處理備品時，背對客人且未注意到客人正在等候安排服務。">
-                <h2>於工作櫃檯區域品檢及處理備品時，<br>背對客人且未注意到客人正在等候安排服務。</h2>
-                <p>(扣個人50點/主管50點)</p>
-            </div>
-          <div class="article" data-tags="管理" data-title="於門市工作範圍群聚聊天及大聲喧嘩，非打單人員無正當原因逗留櫃檯聊天。">
-                <h2>於門市工作範圍群聚聊天及大聲喧嘩，<br>非打單人員無正當原因逗留櫃檯聊天。</h2>
-                <p>(扣個人/主管 50 點)</p>
-            </div>
-          <div class="article" data-tags="銷售 管理" data-title="服務完客人，銷售本及示範鏡片未擦拭整理，客人離開座椅未完成歸位。 ">
-                <h2>服務完客人，銷售本及示範鏡片未擦拭整理，<br>客人離開座椅未完成歸位。 </h2>
-                <p>(扣公積金點數/主管 20 點) ※假日若閒置10分鐘以上未處理將直接扣點 </p>
-            </div>
-          <div class="article" data-tags="品檢 管理" data-title="承件者未主動關心客人眼鏡是否已完成加工及掌握品檢狀況，有提供號碼牌但未即時通知取件，讓客人閒置在休息區等候。 ">
-                <h2>承件者未主動關心客人眼鏡是否已完成加工及掌握品檢狀況，<br>有提供號碼牌但未即時通知取件，讓客人閒置在休息區等候。 </h2>
-                <p>(扣承件、品檢/主管 20 點) </p>
-            </div>
-          <div class="article" data-tags="管理" data-title="於工作現場群聚聊天，工作時間滑手機及使用公司電腦上網處理私事。 ">
-                <h2>於工作現場群聚聊天，工作時間滑手機及使用公司電腦上網處理私事。</h2>
-                <p>(扣使用者200點/公積金400點/主管200點加一支警告)<br>※當月以上行為超過二次，降低個人積效點數20%，主管將延後升遷二個月時間</p>
-            </div>
-          <div class="article" data-tags="管理" data-title="使用廁所時間過長及過於頻繁，影響到主管調配現場人力狀況。  ">
-                <h2>使用廁所時間過長及過於頻繁，影響到主管調配現場人力狀況。</h2>
-                <p>※如有身體不適及特殊情形，請主動回報主管及在場專員。(扣個人 100 點)</p>
-            </div>
-          <div class="article" data-tags="鏡框" data-title="架上眼鏡開合鬆緊度未調整，全門市範圍在5副以內，以勸導單登記。 ">
-                <h2>架上眼鏡開合鬆緊度未調整，全門市範圍在5副以內，以勸導單登記。 </h2>
-                <p>(扣公積金點數) 超過5副以上，從第6副檢核開始，一副扣 60 點向上扣罰。</p>
-            </div>
-          <div class="article" data-tags="填單" data-title="三聯單資料填寫不確實，客人配鏡資訊、承件、磨片、品檢未簽名。 ※舊度數未填寫/配鏡用途未勾選(近用、遠用、多焦)/客人如何得知門市訊息及客人居住地/客人年齡 ">
-                <h2>三聯單資料填寫不確實，客人配鏡資訊、承件、磨片、品檢未簽名。<br>※舊度數未填寫/配鏡用途未勾選(近用、遠用、多焦)/<br>客人如何得知門市訊息及客人居住地/客人年齡 </h2>
-                <p>(扣公積金點數/主管 20 點) ※按單數累加計算</p>
-            </div>
-          <div class="article" data-tags="銷售 交件" data-title="銷售時未使用展示道具，及未主動推升級及滿額活動，該提供的票券及贈品漏發或溢給。 交件人員未仔細說明保固內容，未確認客人配戴狀況，草率完成交件流程。 ">
-                <h2>銷售時未使用展示道具，及未主動推升級及滿額活動，<br>該提供的票券及贈品漏發或溢給。<br>交件人員未仔細說明保固內容，<br>未確認客人配戴狀況，草率完成交件流程。 </h2>
-                <p>(扣承件 100 /交件人員 50 /主管 20 點)</p>
-            </div>
-          <div class="article" data-tags="品檢 交件 鏡框 鏡片" data-title="鏡框製作完成，承件人員未多留意客人鏡框處理狀況，品檢人員未照品檢SOP 完成，未檢查鏡片內容及製作偏大、偏小問題。">
-                <h2>鏡框製作完成，承件人員未多留意客人鏡框處理狀況，<br>品檢人員未照品檢SOP完成，<br>未檢查鏡片內容及製作偏大、偏小問題。 </h2>
-                <p>(扣承件/品檢/公積金點數)</p>
-            </div>
-          <div class="article" data-tags="交件" data-title="交件時無雙手遞交眼鏡給客人試戴，保固時間未完整說明，未主動察覺客人佩戴狀況，執意讓客人回去適應觀察。">
-                <h2>交件時無雙手遞交眼鏡給客人試戴，<br>保固時間未完整說明，未主動察覺客人佩戴狀況，<br>執意讓客人回去適應觀察。</h2>
-                <p>(扣交件人員/主管 20 點) </p>
-            </div>
-          <div class="article" data-tags="驗光 管理" data-title="客人現場等候驗光時間過久，驗光及主管未即時發現問題，造成客人等候時間已超過30分鐘離開，當下未即時處理並安排客人優先驗光者">
-                <h2>客人現場等候驗光時間過久，<br>驗光及主管未即時發現問題，<br>造成客人等候時間已超過30分鐘離開，<br>當下未即時處理並安排客人優先驗光者</h2>
-                <p>(扣當日值班驗光人員 300 點/主管 100 點) </p>
-            </div>
-          <div class="article" data-tags="鏡片 磨片" data-title="抓片人員抓錯鏡片度數及片種，磨片人員加工時未再仔細確認，造成損片及失錯率發生。">
-                <h2>抓片人員抓錯鏡片度數及片種，磨片人員加工時未再仔細確認，<br>造成損片及失錯率發生。</h2>
-                <p>(扣抓片者/磨片人員)※若磨片人員即時發現更換，則不列入扣點中。  </p>
-            </div>
-          <div class="article" data-tags="鏡片" data-title="海訂鏡片下錯片種及度數，造成二次加工作業及延宕客人取件時間，刻意隱瞞及規避罰責。">
-                <h2>海訂鏡片下錯片種及度數，造成二次加工作業及延宕客人取件時間，<br>刻意隱瞞及規避罰責。</h2>
-                <p>(扣該片種升級價之半價)</p>
-            </div>
-          <div class="article" data-tags="鏡片" data-title="海訂件未在承件的第二天完成訂單作業，並且導致交期逾期和客訴事件。 ">
-                <h2>海訂件未在承件的第二天完成訂單作業 </h2>
-                <p>(扣公積金 100 點/主管 100 點) ※按件計算<br>若造成延遲交件：（扣公積金200點/主管200點*按件計算)<br>*如主管因個人未注意，所造成作業逾期及發現，未主動告知處理將加倍扣罰*<br>*訂片與主管未確認簽名，再各扣100點（扣未簽名者）</p>
-            </div>
-          <div class="article" data-tags="鏡片 磨片 管理" data-title="到片製作完成無簡訊或電話通知客人，郵寄件未依照正常作業完成。承件/遺漏/未通知/聯繫">
-                <h2>到片製作完成無簡訊或電話通知客人，郵寄件未依照正常作業完成。 </h2>
-                <p>(扣承件 100 點/店長 100 點/主任.副主任 50 點) ※按件計算 <br>※<u>引起客訴或退費者，視情況加重處份。</u></p>
-            </div>
-          <div class="article" data-tags="磨片" data-title="驗度儀器及公司營運用品未參照正確使用方式，造成公司資產損壞。設備/打點/力道/焦度計/磨片">
-                <h2>驗度儀器及公司營運用品未參照正確使用方式，造成公司資產損壞。 </h2>
-                <p>(操作不當及用力使用扣個人500點/主管200點)<br>※若因人為操作而導致毀損之情形將依照公司修繕費用做為賠償 </p>
-            </div>
-          <div class="article" data-tags="驗光 填單" data-title="安排驗光服務，未完成白單填寫號碼牌、隱眼等候時間及<u>填寫帶驗光時間</u>，客人舊度數與隱眼配戴度數, 未按照實際內容填寫。">
-                <h2>安排驗光服務，未完成白單填寫號碼牌、<br>隱眼等候時間及<u>填寫帶驗光時間</u>，<br>客人舊度數與隱眼配戴度數, 未按照實際內容填寫。 </h2>
-                <p>(扣公積金點數/主管 20 點)</p>
-            </div>
-          <div class="article" data-tags="管理" data-title="學習護照未在達成時間內完成，依三個月/半年/一年為一個評核項目，未依員工入職日期填上項目完成時間，主管未簽核確認。 包含員工教育訓練、儲備幹部課程訓練、在職員工培訓日期。 員工未主動告知完成進度給專員考核簽名。 ">
-                <h2>學習護照未在達成時間內完成，依三個月/半年/一年為一個評核項目，<br>未依員工入職日期填上項目完成時間，主管未簽核確認。<br>包含員工教育訓練、儲備幹部課程訓練、在職員工培訓日期。 <br>員工未主動告知完成進度給專員考核簽名。  </h2>
-                <p>(該欄位項目缺失個人扣 300 點/主管一格空位扣 20 點以此類推)<br>※學習護照扣款會再給予10天完成期<br>※若未依時間期限內完成再繼續扣罰300點，主管將扣罰300點</p>
-            </div>
-          <div class="article" data-tags="驗光" data-title="驗光人員未主動引導客人進行驗光室，坐在驗光室內擦拭鏡片及整理桌面，怠慢服務驗光客人。※驗光室客用座椅及驗光桌面物品散落未收拾歸位完成。試鏡/清潔/不理/疏漏 ">
-                <h2>驗光人員未主動引導客人進行驗光室，<br>坐在驗光室內擦拭鏡片及整理桌面，怠慢服務驗光客人。<br>※驗光室客用座椅及驗光桌面物品散落未收拾歸位完成。 </h2>
-                <p>(扣驗光人員及主管 50 點) </p>
-            </div>
-          <div class="article" data-tags="驗光 填單" data-title="鏡框、驗光、瑕疵原因售服未開立售服三聯單作業，驗光人員未完成售服資料填寫。※入職未滿半年的驗光人員需遵守驗光售服資料開立">
-                <h2>鏡框、驗光、瑕疵原因售服未開立售服三聯單作業，<br>驗光人員未完成售服資料填寫。<br>※入職未滿半年的驗光人員需遵守驗光售服資料開立</h2>
-                <p>(扣個人/主管 100 點) ※按單數累加計算 </p>
-            </div>
-          <div class="article" data-tags="鏡片 磨片" data-title="海訂加工/調整，因人為因素而造成鏡片車損及其他作業上的疏失，導致需重新下訂增加公司過多成本開銷。">
-                <h2>海訂加工/調整，因人為因素而造成鏡片車損及其他作業上的疏失，<br>導致需重新下訂增加公司過多成本開銷。</h2>
-                <p>依各級別門店，給予機會<u>(A級店:6片/B級店:4片/C級店:2片) </u><br>※若主管有任何包庇疏失行為的舉動，除扣罰款外另將記一支警告<br>(超過以上機會次數.每一片扣公積金 550 點) </p>
-            </div>
-          <div class="article" data-tags="鏡框" data-title="1280HH 及 1580 HH 上架前未先行檢查調整好鼻墊狀況。">
-                <h2>1280HH 及 1580 HH 上架前未先行檢查調整好鼻墊狀況。</h2>
-                <p>(一副扣10點) ※若超過6副以上，當店主管將給予積效懲處。 </p>
-            </div>
-          <div class="article" data-tags="鏡片 磨片" data-title="庫存片車損、瑕疵紀錄表，未如實填寫並刻意有規避情形。">
-                <h2>庫存片車損、瑕疵紀錄表，未如實填寫並刻意有規避情形。</h2>
-                <p>(扣磨片人員 50 點/主管 50 點) </p>
-            </div>
-          <div class="article" data-tags="驗光" data-title="驗光人員白單上未簽名，未勾選最終驗光度數。 客人舊度未檢測視力值，並備註於白單上。 ">
-                <h2>驗光人員白單上未簽名，未勾選最終驗光度數。<br>客人舊度未檢測視力值，並備註於白單上。 </h2>
-                <p>(扣驗光人員 3 0點/主管 30 點) </p>
-            </div>
-          <div class="article" data-tags="鏡片 鏡框" data-title="瑕疵框/庫存片/海訂片，退貨作業未按照公司標準方式完成。 ※瑕疵框:需貼上標籤，並入盒填寫退貨明細 ※瑕疵片:填寫日期/人員/瑕疵原因，並在鏡片上用奈米筆標記 ※車損片:填寫日期/人員/車損原因，並附上售服單">
-                <h2>瑕疵框/庫存片/海訂片，退貨作業未按照公司標準方式完成。<br>※瑕疵框:需貼上標籤，並入盒填寫退貨明細<br>※瑕疵片:填寫日期/人員/瑕疵原因，並在鏡片上用奈米筆標記 <br>※車損片:填寫日期/人員/車損原因，並附上售服單</h2>
-                <p>(扣公積金50點/主管50點) </p>
-            </div>
-          <div class="article" data-tags="出勤" data-title="每月出勤補申請作業，未於規定時限之內完成，及通報申請錯誤及漏完成者。">
-                <h2>每月出勤補申請作業，未於規定時限之內完成，<br>及通報申請錯誤及漏完成者。</h2>
-                <p>(扣個人100點) </p>
-            </div>
-          <div class="article" data-tags="鏡片 鏡框 填單" data-title="非本公司鏡框加工前，未主動說明及提供免責聲明簽名。※漏勾選將視同未完成說明 ">
-                <h2>非本公司鏡框加工前，未主動說明及提供免責聲明簽名。<br>※<u>漏勾選將視同未完成說明</u> </h2>
-                <p>(扣個人200點/主管100點)</p>
-            </div>
-          <div class="article" data-tags="資料 銷售" data-title="系統建立(key)顧客消費資料，總金額、收現、刷卡、銷售員以上四格欄位，輸入時與三聯單上資訊有出入，按一格欄位扣點計算。錯誤/現金/單號/結帳/營收/溢收/漏收/打單 ">
-                <h2>系統建立顧客消費資料，<br>總金額、收現、刷卡、銷售員以上四格欄位，<br>輸入時與三聯單上資訊有出入，<br>按一格欄位扣點計算。 </h2>
-                <p>(一個欄位錯誤扣打單300點，累積計算)<br>※發生少收及多收客人金額作業疏失，多收不扣少收將由公積金墊付<br>※<u>主管自行發現並主動回報可不扣主管點數，若知情未主動回報將雙倍扣點</u><br>※經專員查帳發現少收、多收的狀況，KEY單人員也未發現<br>(扣主管100點 / 扣承件人員300點 / KEY單人員100點)<br>※當月若發生三次以上(扣公積金1500點) </p>
-            </div>
-          <div class="article" data-tags="填單 銷售" data-title="三聯單有剩餘尾款未用紅筆圈選做記號，銷售人員扣300點經專員查帳發現尾款未收，交件人員扣500點/主管扣500/交件/漏收/ ">
-                <h2>三聯單有剩餘尾款未用紅筆圈選做記號</h2>
-                <p>銷售人員扣 300 點<br>※經專員查帳發現尾款未收，交件人員扣500點/主管扣500點<br>※<u>主管若先行發現尾款未收主動告知，則交件人員被扣1000點</u> </p>
-            </div>
-          <div class="article" data-tags="銷售" data-title="銷售結帳未與客人收取一半以上訂金且製作完成，包含放置在取件抽屜中超過一個月時間。">
-                <h2>銷售結帳未與客人收取一半以上訂金且製作完成，<br>包含放置在取件抽屜中超過一個月時間。</h2>
-                <p>扣承件人員 300 點/主管扣 300 點/公積金扣點<br>依據實際銷售金額(如客人取件付清尾款時將回補)</p>
-            </div>
-          <div class="article" data-tags="管理" data-title="上班未確實佩戴對講機，領帶及工牌未攜帶、女生頭髮檔住工牌，上班未畫淡妝(明顯氣色不佳)，男生制服後擺未紮好。">
-                <h2>上班未確實佩戴對講機，領帶及工牌未攜帶、<br>女生頭髮檔住工牌，上班未畫淡妝(明顯氣色不佳)，<br>男生制服後擺未紮好。</h2>
-                <p>(扣個人/公積金/主管 20 點)<br>※專員會依每日口號影片進行扣點<br>※<u>主管每日需入內帶領員工拍攝</u></p>
-            </div>
-          <div class="article" data-tags="管理" data-title="員工著黑色外套非依公司規定的長度及樣式穿著，工牌未放置在外套上。">
-                <h2>員工著黑色外套非依公司規定的長度及樣式穿著，<br>工牌未放置在外套上。</h2>
-                <p>(扣個人 100 點/主管 50 點)</p>
-            </div>
-          <div class="article" data-tags="管理" data-title="個人用餐時間/休息時間未登記，用餐超過規定時間，外出買飯未通知在場主管及專員。">
-                <h2>個人用餐/休息時間未登記，用餐/休息超過規定時間</h2>
-                <p>(扣個人 100 點/主管 50 點) </p>
-            </div>
-          <div class="article" data-tags="出勤" data-title="當日遲到與請假人員未按照公司流程申請，未提供佐證內容，於群組上未主動回報說明。※請假人員須於早上10:00前請示當區專員是否准予，並主動告知店內人力狀況。報備/提早/微信/出缺勤/事假/病假/喪假/婚假/特休 ">
-                <h2>當日遲到與請假人員未按照公司流程申請，<br>未提供佐證內容，於群組上未主動回報說明。<br>※請假人員須於早上10:00前請示當區專員是否准予，<br>並主動告知店內人力狀況。</h2>
-                <p>(扣個人 100 點/主管 50 點)<br>※<u>主管不得代替員工請假，新人入職當天請主動加當區專員/主管微信</u> </p>
-            </div>
-          <div class="article" data-tags="鏡框" data-title="鏡框保留件到期日超過三日未電話與客人確認及整理，保留時間押超過一週以上，未標示延長保留原因。※保留鏡框2副以上未分開裝入 ">
-                <h2>鏡框保留件到期日超過三日未電話與客人確認及整理，<br>保留時間押超過一週以上，未標示延長保留原因。<br>※保留鏡框2副以上未分開裝入</h2>
-                <p>(扣公積金點數/主管20點) ※按件數累加計算</p>
-            </div>
-          <div class="article" data-tags="環境" data-title="廁所相關注意事項未完成:洗手乳、擦手紙、衛生紙未補充、鏡面有水痕、洗手台與地面積水未擦拭乾淨、小便斗芳香球未照規定置擺放。">
-                <h2>廁所相關注意事項未完成:洗手乳、擦手紙、衛生紙未補充、<br>鏡面有水痕、洗手台與地面積水未擦拭乾淨、<br>小便斗芳香球未照規定置擺放。</h2>
-                <p>※單項未達扣 25 點/單次檢查最高扣除 100 點<br>※當日扣除最高次數兩次，最高金額扣除200點</p>
-            </div>
-          <div class="article" data-tags="環境" data-title="公司外部水龍頭未檢查是否上鎖，門口木牌展示架及下雨天傘架未擺放完成。">
-                <h2>公司外部水龍頭未檢查是否上鎖，<br>門口木牌展示架及下雨天傘架未擺放完成。</h2>
-                <p>(扣公積金 150 點/次)</p>
-            </div>
-          <div class="article" data-tags="鏡框 鏡片" data-title="暫放區眼鏡於空閒時間，未即時上架並有堆疊情形。 鏡片間鏡片未放置在歸片盒內，直接擺放在層架上。 ">
-                <h2>暫放區眼鏡於空閒時間，未即時上架並有堆疊情形。<br>鏡片間鏡片未放置在歸片盒內，直接擺放在層架上。 </h2>
-                <p>(公積金一支(片)罰 20 點/主管 20 點) ※按數量累加計算</p>
-            </div>
-          <div class="article" data-tags="鏡框 鏡片 銷售 管理" data-title="海訂件押製時間超過14天以上1.74藍光押製時間超過10天，調框(片)押製時間超過5天以上，未自行追蹤處理。※海訂件未於5日追蹤確認 / 調框、調片未於2日追蹤確認">
-                <h2>海訂件押製時間超過14天以上，<br>1.74藍光押製時間超過10天，<br>調框(片)押製時間超過5天以上，<br>未自行追蹤處理。<br>※海訂件未於5日追蹤確認 / 調框、調片未於2日追蹤確認</h2>
-                <p>(扣公積金點數/主管20點) ※按數量累加計算</p>
-            </div>
-          <div class="article" data-tags="磨片 品檢" data-title="眼鏡製作完成磨片人員未通知，外場服務人員未立即品檢，有堆件情形發生。">
-                <h2>眼鏡製作完成磨片人員未通知，<br>外場服務人員未立即品檢，有堆件情形發生。</h2>
-                <p>(公積金一支扣 10 點/主管 20 點) ※按數量累加計算</p>
-            </div>
-          <div class="article" data-tags="鏡框" data-title="鏡框改價，未於公告3天內完成作業，發現尚有未調整內容。抽屜鏡框未改價及未完成貼標。">
-                <h2>鏡框改價，未於公告3天內完成作業，發現尚有未調整內容。<br>抽屜鏡框未改價及未完成貼標。</h2>
-                <p>(公積金一支扣 20 點) </p>
-            </div>
-          <div class="article" data-tags="鏡框 管理" data-title="$1280/$1580 HH 及 ZC 薄鋼編碼鏡框，未依照模板上序號排放，庫存上架不齊全。">
-                <h2>$1280/$1580 HH 及 ZC 薄鋼編碼鏡框，<br>未依照模板上序號排放，庫存上架不齊全。</h2>
-                <p>(公積金一支扣 10 點/主管扣 10 點)※第一次先口頭告知提醒不扣點，第二次發現則進行扣點<br>※如鏡框該序號售空，則先依照下一序號排放</p>
-            </div>
-          <div class="article" data-tags="鏡框 管理" data-title="檯面眼鏡明顯髒汙(含殘膠)，鼻墊缺少、鼻墊明顯油汙，平面擺放區眼鏡未向上靠齊排放。">
-                <h2>檯面眼鏡明顯髒汙(含殘膠)，鼻墊缺少、鼻墊明顯油汙，<br>平面擺放區眼鏡未向上靠齊排放。</h2>
-                <p>(扣公積金 50 點/主管 50 點)  ※一次性扣點，當日最高可扣點兩次共200點</p>
-            </div>
-          <div class="article" data-tags="品檢 環境" data-title="品檢區域更換完的鼻墊、螺絲未清理乾淨，手工具使用完沒有正確收拾歸位，工作區洗手台明顯積水及品檢完眼鏡未放置在待取件區域。">
-                <h2>品檢區域更換完的鼻墊、螺絲未清理乾淨，<br>手工具使用完沒有正確收拾歸位，<br>工作區洗手台明顯積水及品檢完眼鏡未放置在待取件區域。</h2>
-                <p>(扣個人/公積金點數) </p>
-            </div>
-          <div class="article" data-tags="管理 環境" data-title="於11:20 上班時間未將鐵門打開，停車處三角錐未收拾起來。">
-                <h2>於11:20 上班時間未將鐵門打開，停車處三角錐未收拾起來。</h2>
-                <p>(扣公積金 100 點/主管 100 點) </p>
-            </div>
-          <div class="article" data-tags="環境 管理" data-title="每週的週二及週五環境打掃/整潔/清潔/整理，未在當日完成及上傳打掃檢查表。專員到店巡視發現眼鏡展示區明顯灰塵，客用飲料區檯面殘留水漬及髒汙。現場環境髒亂，倉庫內場堆放雜物 ">
-                <h2>每週的週二及週五環境打掃，<br>未在當日完成及上傳打掃檢查表。<br>專員到店巡視發現眼鏡展示區明顯灰塵，<br>客用飲料區檯面殘留水漬及髒汙。<br>現場環境髒亂，倉庫內場堆放雜物</h2>
-                <p>※以上缺失可累計扣點 (扣公積金100點/主管100點)  </p>
-            </div>
-          <div class="article" data-tags="環境 管理" data-title="飲料未置放於規定專屬區域，隨意擺放在工作台，員休室未隨時保持整潔。">
-                <h2>飲料未置放於規定專屬區域，隨意擺放在工作台，<br>員休室未隨時保持整潔。</h2>
-                <p>(扣個人 20 點/主管 20 點)</p>
-            </div>
-          <div class="article" data-tags="環境 管理" data-title="店內冷氣系統未依照規定，任意更改溫度設定，及未經公司許可自行調整。">
-                <h2>店內冷氣系統未依照規定，任意更改溫度設定，<br>及未經公司許可自行調整。</h2>
-                <p>(扣公積金 100 點/主管 100 點)</p>
-            </div>
-          <div class="article" data-tags="鏡片" data-title="收到鏡片庫存時，未在指定時間內完成歸片。 ※平日於收到的四小時內完成 / 假日於收到的六小時內完成/閒置/貨運/簽收/進貨/到貨">
-                <h2>收到鏡片庫存時，未在指定時間內完成歸片。<br>※平日於收到的四小時內完成 / 假日於收到的六小時內完成</h2>
-                <p>(扣公積金 200 點/主管 100 點)</p>
-            </div>
-          <div class="article" data-tags="磨片" data-title="磨片加工人員，在製作雙色鏡框時，未將螺絲完全卸下再組裝鏡片，造成鏡框瑕疵風險的疑慮。 ">
-                <h2>磨片加工人員，在製作雙色鏡框時，<br>未將螺絲完全卸下再組裝鏡片，造成鏡框瑕疵風險的疑慮。 </h2>
-                <p>(扣磨片人員 50 點/主管 20 點) </p>
-            </div>
-          <div class="article" data-tags="鏡框 交件" data-title="鏡框產品標示卡，未確實擺放在鏡框挑選區域，或未勾選鏡框材質。 客人取件未主動檢附產品標示卡。 ">
-                <h2>鏡框產品標示卡，未確實擺放在鏡框挑選區域，<br>或未勾選鏡框材質。 客人取件未主動檢附產品標示卡。 </h2>
-                <p>(扣公積金 300 點/主管 200 點) </p>
-            </div>
-          <div class="article" data-tags="填單 驗光" data-title="白單或三聯單度數抄寫不實，或字跡潦草導致同仁看錯及抄錯。 ※包含ADD未寫/PD用途寫錯/用途勾選錯誤，驗光人員處方勾選不符合實際客人配鏡內容。(處方/寫單導致退費)/若在銷售接待時客人更改度數需求，銷售人員必須在黃單清楚標示告知/">
-                <h2>白單或三聯單度數抄寫不實，或字跡潦草導致同仁看錯及抄錯。<br>驗光人員處方勾選不符合實際客人配鏡內容。<br>※若在銷售接待時客人更改度數需求，<br>銷售人員必需在黃單上清楚標示告知<br>※包含ADD未寫/PD用途寫錯/用途勾選錯誤，<br>驗光人員處方勾選不符合實際客人配鏡內容。，<br>※<u>若在銷售接待時客人更改度數需求，銷售人員必須在黃單清楚標示告知</u><br><u>A單與B單皆須依此規範填寫確實</u> </h2>
-                <p>※若為驗光人員白單填寫不確實扣800點(初犯者第一次僅扣400點)<br>※若為門市人員抄單填寫不確實扣500點(初犯者第一次僅扣250點)<br>A 單及 B 單皆須依照此規範填寫確實<br>▲以三聯單上日期為主每半年重新計算機會次數<br>1/1~6/30 為一區間<br>7/1~12/31 為一區間<br>※若因為度數誤植或是該填寫上的內容疏漏，導致客人客訴或造成退費的問題，將記予一支大過，及當月扣點2000</p>
-            </div>
-          <div class="article" data-tags="管理 銷售" data-title="親屬及朋友配鏡，未依規定拍照上傳對應內容 1. 配鏡三聯單 2.鏡框 3.鏡片袋 ※鏡框及鏡片袋不可遮檔住三聯單內容">
-                <h2>親屬及朋友配鏡，未依規定拍照上傳對應內容<br>1. 配鏡三聯單 2.鏡框 3.鏡片袋<br>※鏡框及鏡片袋不可遮檔住三聯單內容。 </h2>
-                <p>(扣承件 50 點 / 主管 50 點)</p>
-            </div>
-          <div class="article" data-tags="品檢 交件" data-title="眼鏡盒提供交件時，未仔細確認鏡盒瑕疵狀況，如發霉及拉鍊閉合異常。 ">
-                <h2>眼鏡盒提供交件時，未仔細確認鏡盒瑕疵狀況，如發霉及拉鍊閉合異常。 </h2>
-                <p>(扣品檢人員 50 點/主管 50 點)</p>
-            </div>
-          <div class="article" data-tags="環境 管理 磨片 驗光" data-title="每日下班未確實巡視器材電源及店內設備關閉 (磨片/驗光/外場分區罰則)">
-                <h2>每日下班未確實巡視器材電源及店內設備關閉。<br>(磨片/驗光/外場分區罰則) </h2>
-                <p>※如磨片室儀器未確實關閉，當日磨片人員扣 100 點/公積金 50 點<br>※如驗光室儀器未確實關閉，當日驗光人員扣100點/公積金50點<br>※如外場設備未確實關閉，主管扣150點/公積金200點</p>
-            </div>
-          <div class="article" data-tags="磨片 管理" data-title="延遲現取時間(超時)超過公司規範/延誤/耽誤/拖/磨片/製作 5副內壓件時間不得超過30分鐘 、7副內壓件時間不得超過40分鐘 、10副內壓件時間不得超過60分鐘 、超過10副以上時間才可壓1個小時。 薄鋼、半框兩副以上可而外計算多10分鐘壓件時間。 正常框形皆須以上述規範時間內完成，若遇特殊框形、特殊處理（包膜、手工拋光、倒邊削薄）需延後時間要與當店主管確認。 ※特殊框型包含：CF特殊薄鋼框/高彎度鏡框/金屬無螺絲框">
-                <h2>現取時間超過公司規範<br>5副內壓件時間不得超過30分鐘 、<br>7副內壓件時間不得超過40分鐘 、<br>10副內壓件時間不得超過60分鐘 、<br>超過10副以上時間才可壓1個小時。<br>薄鋼、半框兩副以上<br>可而外計算多10分鐘壓件時間。 <br>正常框形皆須以上述規範時間內完成，<br>若遇特殊框形、特殊處理<br>（包膜、手工拋光、倒邊削薄）<br>需延後時間要與當店主管確認。 <br>※特殊框型包含：CF特殊薄鋼框/高彎度鏡框/金屬無螺絲框</h2>
-                <p>(主管取消當月10%點數加給/磨片人員扣 200 點)</p>
-            </div>
-          <div class="article" data-tags="磨片 管理" data-title="若磨片人員刻意放慢磨片速度增加待磨片盤數，藉此想增加壓件時間或多次遭專員發現壓件時間延遲">
-                <h2>若磨片人員刻意放慢磨片速度增加待磨片盤數，<br>藉此想增加壓件時間或多次遭專員發現壓件時間延遲</h2>
-                <p>(主管加給取消/磨片人員扣400點)</p>
-            </div>
-          <div class="article" data-tags="資料" data-title="顧客資訊系統個資輸入錯誤，姓名/電話等基本資料錯誤/個資/打單/客資/客戶">
-                <h2>顧客資訊系統個資輸入錯誤，<br>姓名/電話等基本資料錯誤</h2>
-                <p>(扣公積金200點)</p>
-            </div>
-          <div class="article" data-tags="資料" data-title="顧客度數指定度數,擅自更改度數。/三聯單/修改/偷度/銷售/品檢">
-                <h2>顧客度數指定度數,擅自更改度數。</h2>
-                <p>(扣銷售人員 500 點/磨片人員 100 點/品檢人員100點)</p>
-            </div>
-          <div class="article" data-tags="管理 出勤" data-title="上班時間擅自外出,並未通知當店主管及專員/離開/離場/未告知/失蹤/擅離職守">
-                <h2>上班時間擅自外出,並未通知當店主管及專員。</h2>
-                <p>(該員工扣 500 點/主管扣 100 點)※若主管發現主動回報專員及總公司，主管不扣罰</p>
-            </div>
-	  <div class="article" data-tags="資料" data-title="顧客/客戶資料資訊系統度數/配鏡資料/參數/度數/散光/軸度/PD/ADD/用途/輸入錯誤/處方/打單/客資/客戶/退費/大過">
-                <h2>顧客資料資訊系統處方相關輸入錯誤，<br>包含度數/散光/軸度/ADD/PD/用途</h2>
-                <p>(當月前兩次扣公積金點數扣300點)<br>(第三次起每次扣公積金點數扣500點)<br>(若為配鏡處方資相關資料漏打則扣公積金200點)<br>▲若因為度數輸入錯誤，導致客人客訴或退費等問題，<br>將記予一支大過，及當月扣點公積金2000</p>
-            </div>
-	  <div class="article" data-tags="出勤" data-title="當日出缺勤於11:40分前未傳、未確實回報">
-                <h2>當日出缺勤於11:40分前未傳、未確實回報</h2>
-                <p>(主管扣100點)</p>
-            </div>
-	  <div class="article" data-tags="管理" data-title="飲料機、咖啡機原料(巧克力、果汁、葡萄、綠茶、奶粉、糖、豆、抹茶)未注意先進先出，導致食品保存期限過期/食材">
-                <h2>飲料機、咖啡機原料未注意先進先出，<br>導致原料食品保存期限過期</h2>
-                <p>(依照過期原料數量/進貨價格扣公積金)</p>
-            </div>
-	  <div class="article" data-tags="管理" data-title="備品盤點未確實，盤點表未於每周三下班前上傳至群組/店內備品庫存數量高於公司規定可擺放庫存">
-                <h2>備品盤點未確實，盤點表未於每周三下班前上傳至群組<br>店內備品庫存數量高於公司規定可擺放庫存 </h2>
-                <p>(初犯扣公積金250點/累犯扣公積金500點)</p>
-	     </div>
-	  <div class="article" data-tags="管理" data-title="店內文宣 DM 傳單 廣告 海報 未確實擺放及更新包包吊牌未確實更新">
-                <h2>店內文宣 DM 未確實擺放及更新包包吊牌未確實更新</h2>
-                <p>(扣公積金 100 點/主管 100 點)<br>※按數量累加計算 </p>
-	     </div>
-	  <div class="article" data-tags="管理 出勤" data-title="店內遙控器、鑰匙未確實交接，沒開門、鐵捲門，超過11:20未正常營業、遲到">
-                <h2>店內鑰匙未確實交接，導致超過11:20為正常營業</h2>
-                <p>(當日上班人員皆以遲到計算/扣當月遲到績效點數)<br>(扣公積金 500 點/主管 100 點)<br>※按數量累加計算 </p>
-	     </div>
-	  <div class="article" data-tags="管理" data-title="門市發生客訴案件(包含所有線上平台/現場)經查證屬實">
-                <h2>門市發生客訴案件(包含所有線上平台/現場)經查證屬實</h2>
-                <p>第一次<br>(扣公積金 1000 點/主管 300 點)<br>三個月內發生第二次客訴<br>(扣公積金 2000 點/主管 500 點)<br>※依客訴情節嚴重性不排除有額外處分</p>
-	     </div>
-	  <div class="article" data-tags="管理 磨片" data-title="海定鏡片瑕疵未主動回報google表單 鏡片車損/訂錯/瑕疵/售服/重新下單時單號輸入錯誤 (單號未註明損或返)">
-                <h2>海訂鏡片瑕疵未主動回報google表單<br>鏡片車損/訂錯/瑕疵/售服/重新下單時單號輸入錯誤<br>(單號未註明損或返)</h2>
-                <p>(扣公積金200點/主管100點)<br>*以上皆按件計算</p>
-	     </div>
-	  <div class="article" data-tags="管理" data-title="錄影前服裝儀容未準備完成(包含對講機配戴)當日值班人員無故未參加錄影，領帶及工牌未攜帶、女生頭髮檔住工牌，上班未畫淡妝(明顯氣色不佳)，男生制服後擺未紮好">
-                <h2>錄影前服裝儀容未準備完成(包含對講機配戴)當日值班人員無故未參加錄影<br>上班未確實佩戴對講機，領帶及工牌未攜帶、<br>女生頭髮檔住工牌，上班未畫淡妝(明顯氣色不佳)，男生制服後擺未紮好。</h2>
-                <p>(扣個人100點/公積金50點/主管50點)<br>※專員會依每日口號影片進行扣點<br>※主管每日需入內帶領員工拍攝</p>
-	     </div>
-            <!-- 可以添加更多文章 -->
-        </div>
-	<!-- 沒有找到相關內容的提示 -->
-	<p id="noResultsMessage" style="display: none;">很抱歉、小精靈們沒有找到相關內容</p>
-    </main>
-    <!-- 背景畫布 -->
-    <canvas id="backgroundCanvas"></canvas>
-    <canvas id="fishCanvas"></canvas>
-    <footer>
-       <p>當前版本：v20250715<br>與我聯繫：<a href="mailto:xd67332@gmail.com" style="color: silver;">xd67332@gmail.com</a></p>
-       <a href="employee_search.html" class="game-button">員工資訊</a>
-       <a href="Turntable.html" class="game-button">命運轉盤</a>
-       <a href="cards.html" class="game-button">抽籤點名</a>
-       <a href="s.html" class="game-button">周易卜卦</a>
-       <a href="arena.html" class="game-button">競技場</a>
-       <a href="Tool.html" class="game-button">小工具</a>
-    </footer>
+
+<div class="container">
+  <!-- 解鎖區域 -->
+  <h1 id="unlockTitle">請點擊解鎖</h1>
+  <div class="grid" id="grid">
+    <div class="dot" data-value="1" onclick="selectDot(1, this)"></div>
+    <div class="dot" data-value="2" onclick="selectDot(2, this)"></div>
+    <div class="dot" data-value="3" onclick="selectDot(3, this)"></div>
+    <div class="dot" data-value="4" onclick="selectDot(4, this)"></div>
+    <div class="dot" data-value="5" onclick="selectDot(5, this)"></div>
+    <div class="dot" data-value="6" onclick="selectDot(6, this)"></div>
+    <div class="dot" data-value="7" onclick="selectDot(7, this)"></div>
+    <div class="dot" data-value="8" onclick="selectDot(8, this)"></div>
+    <div class="dot" data-value="9" onclick="selectDot(9, this)"></div>
+  </div>
+
+  <p id="errorMessage" class="error hidden">連接錯誤，請重試。</p>
+  <div id="unlockMessage" class="unlock-message hidden">解鎖成功</div>
+
+
+  <audio id="audioPlayer" src="m/click1.mp3"></audio>
+  <audio id="successAudio" src="m/Inok1.mp3"></audio>
+
+  <!-- 搜索區域 -->
+  <div id="searchSection" class="hidden">
+    <h1 id="searchTitle">員工查詢</h1>
+  <div class="search-container">
+    <input type="text" id="employeeIdInput" placeholder="輸入工號..." onkeyup="searchEmployees()">
+    <input type="text" id="employeeNameInput" placeholder="輸入姓名..." onkeyup="searchEmployees()">
+  </div>
+  <div class="search-container">
+    <select id="branchSelect" onchange="searchEmployees()">
+      <option value="">選擇分店</option>
+      <option value="總店">總店</option>
+      <option value="大竹">大竹</option>
+      <option value="南崁">南崁</option>
+      <option value="中壢">中壢</option>
+      <option value="經國">經國</option>
+      <option value="板橋">板橋</option>
+      <option value="竹北">竹北</option>
+      <option value="新泰">新泰</option>
+      <option value="永和">永和</option>
+      <option value="西門">西門</option>
+      <option value="楊梅">楊梅</option>
+      <option value="三峽">三峽</option>
+      <option value="龍安">龍安</option>
+      <option value="環東">環東</option>
+      <option value="龍潭">龍潭</option>
+      <option value="公益">公益</option>
+      <option value="八德">八德</option>
+      <option value="福科">福科</option>
+      <option value="桃鶯">桃鶯</option>
+      <option value="龜山">龜山</option>
+      <option value="正光">正光</option>
+      <option value="南昌">南昌</option>
+      <option value="崇德">崇德</option>
+      <option value="彰化">彰化</option>
+      <option value="留停">留停</option>
+    </select>
+    <select id="categorySelect" onchange="searchEmployees()">
+        <option value="">選擇類群</option>
+        <option value="manager">主管</option>
+        <option value="opto">驗光人員</option>
+        <option value="depot">倉儲</option>
+        <option value="trainee">建教生</option>
+        <option value="Tra">技術訓</option>
+        <option value="suspended">停職</option>
+    </select>
+    </div>
+    <div id="searchResults" class="results"></div>
+    </div>
+    <div id="searchCount" class="search-count hidden"></div>
+<footer>
+    <p>當前版本：v20250809<br>
+    問題聯繫：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
+   <a href="Deta.html" class="game-button">扣項細則</a>
+  <div class="footer-center">
+    <img src="img/R2O.gif" alt="GIF Animation">
+  </div>
+</footer>
+
 <script>
-// 搜索功能
-function searchArticles() {
-    var input, filter, articles, article, title, i, txtValue;
-    var noResultsMessage = document.getElementById('noResultsMessage');
-    input = document.getElementById('searchInput');
-    filter = input.value.toUpperCase();  // 獲取搜索框的輸入並轉換為大寫
-    articles = document.getElementById('articles');  // 文章區域
-    article = articles.getElementsByClassName('article');  // 文章列表
-    var found = false;  // 記錄是否有找到結果
-    // 遍歷所有文章，檢查標題是否匹配搜索條件
-    for (i = 0; i < article.length; i++) {
-        title = article[i].getAttribute('data-title');  // 獲取文章的標題
-        txtValue = title;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            article[i].style.display = "";  // 顯示符合條件的文章
-            found = true;  // 找到匹配的結果
-        } else {
-            article[i].style.display = "none";  // 隱藏不匹配的文章
-        }
+  const employees = [
+    { branch: "總店", id: '1', name: "劉酈萱", dateOfEntry: "2022-1-1" },
+    { branch: "經國", id: '2', name: "賴柏滔", dateOfEntry: "2017-2-1" , manager:"♠️" , opto:"👓" },
+    { branch: "經國", id: '7', name: "李彥杰", dateOfEntry: "2018-12-1" , Tra:"🖊️" , opto:"👓" },
+    { branch: "環東", id: '22', name: "馮韻庭", dateOfEntry: "2022-8-15" , Tra:"🖊️" },
+    { branch: "總店", id: '25', name: "黃玫瑛", dateOfEntry: "2018-10-15" },
+    { branch: "總店", id: '30', name: "邱國益", dateOfEntry: "2018-6-1" },
+    { branch: "總店", id: '33', name: "楊宜霏", dateOfEntry: "2017-7-15" },
+    { branch: "經國", id: '34', name: "石鈺眞", dateOfEntry: "2018-8-25" , Tra:"🖊️" },
+    { branch: "總店", id: '36', name: "李靜琴", dateOfEntry: "2016-10-11" },
+    { branch: "西門", id: '38', name: "吳國維", dateOfEntry: "2019-4-4" , Tra:"🖊️" },
+    { branch: "西門", id: '39', name: "黃彥賓", dateOfEntry: "2019-6-4" , manager:"♠️" , opto:"👓" },
+    { branch: "總店", id: '43', name: "劉軒伍", dateOfEntry: "2017-5-2" },
+    { branch: "龜山", id: '51', name: "劉琦", dateOfEntry: "2023-7-1" , Tra:"🖊️" },
+    { branch: "總店", id: '53', name: "洪國揚", dateOfEntry: "2019-5-4" },
+    { branch: "桃鶯", id: '56', name: "郭文在", dateOfEntry: "2019-5-7" , manager:"♠️" },
+    { branch: "中壢", id: '64', name: "劉婷婷", dateOfEntry: "2019-5-27" , manager:"♠️" },
+    { branch: "板橋", id: '66', name: "曹瑜庭", dateOfEntry: "2019-6-1" , manager:"♠️" },
+    { branch: "南崁", id: '70', name: "林秉燊", dateOfEntry: "2019-6-3" , manager:"♠️" },
+    { branch: "總店", id: '80', name: "黃廷佑", dateOfEntry: "2025-2-10" },
+    { branch: "板橋", id: '88', name: "陳宣妤", dateOfEntry: "2019-7-4" , Tra:"🖊️" },
+    { branch: "中壢", id: '111', name: "張凱鈞", dateOfEntry: "2020-1-6" , opto:"👓" },
+    { branch: "留停", id: '122', name: "楊繼增", dateOfEntry: "2021-7-9" , opto:"👓" , suspended:"❄" },
+    { branch: "總店", id: '129', name: "王韋翔", dateOfEntry: "2020-4-20" },
+    { branch: "板橋", id: '139', name: "林秝榆", dateOfEntry: "2025-4-01" },
+    { branch: "新泰", id: '156', name: "簡志有", dateOfEntry: "2020-7-1" , opto:"👓" },
+    { branch: "永和", id: '157', name: "林學儀", dateOfEntry: "2020-7-1" , manager:"♠️" , opto:"👓" },
+    { branch: "西門", id: '159', name: "周彤瑾", dateOfEntry: "2020-7-1" , opto:"👓" },
+    { branch: "留停", id: '164', name: "胡書豪", dateOfEntry: "2020-7-20" , Tra:"🖊️" , suspended:"❄" },
+    { branch: "經國", id: '177', name: "黃維震", dateOfEntry: "2020-8-6" , manager:"♠️" },
+    { branch: "桃鶯", id: '194', name: "周品如", dateOfEntry: "2022-8-1" , Tra:"🖊️" , opto:"👓" },
+    { branch: "總店", id: '196', name: "何柏穎", dateOfEntry: "2020-9-10" },
+    { branch: "永和", id: '199', name: "楊宸齡", dateOfEntry: "2020-9-21" , opto:"👓" },
+    { branch: "龍安", id: '207', name: "曹喻涵", dateOfEntry: "2020-11-2" , Tra:"🖊️" },
+    { branch: "三峽", id: '209', name: "林育滕", dateOfEntry: "2020-11-4" , manager:"♠️" },
+    { branch: "板橋", id: '212', name: "呂欣庭", dateOfEntry: "2020-11-10" , manager:"♠️" },
+    { branch: "龍安", id: '214', name: "姜宛榕", dateOfEntry: "2020-11-17" , Tra:"🖊️" },
+    { branch: "總店", id: '215', name: "陳鈞益", dateOfEntry: "2020-11-24" },
+    { branch: "南崁", id: '216', name: "林倢煊", dateOfEntry: "2020-11-24" },
+    { branch: "永和", id: '218', name: "王斌", dateOfEntry: "2020-12-1" },
+    { branch: "永和", id: '223', name: "田記維", dateOfEntry: "2024-9-26" , opto:"👓" },
+    { branch: "楊梅", id: '238', name: "李希蕓", dateOfEntry: "2022-9-1" , Tra:"🖊️" },
+    { branch: "龜山", id: '242', name: "陳維興", dateOfEntry: "2021-3-10" , manager:"♠️" },
+    { branch: "新泰", id: '248', name: "林芷若", dateOfEntry: "2021-3-15" , manager:"♠️" },
+    { branch: "留停", id: '261', name: "陳圓佳", dateOfEntry: "2022-4-15" , Tra:"🖊️" , suspended:"❄" },
+    { branch: "西門", id: '262', name: "沈冠杰", dateOfEntry: "2021-5-6" },
+    { branch: "新泰", id: '263', name: "鄧暐達", dateOfEntry: "2021-5-10" , manager:"♠️" , Tra:"🖊️" },
+    { branch: "龜山", id: '270', name: "楊惟珽", dateOfEntry: "2021-7-26" , opto:"👓" },
+    { branch: "龜山", id: '271', name: "宋品言", dateOfEntry: "2021-7-26" , opto:"👓" },
+    { branch: "板橋", id: '275', name: "蔡宜衡", dateOfEntry: "2021-8-2" , opto:"👓" },
+    { branch: "竹北", id: '278', name: "黃羽豪", dateOfEntry: "2021-8-9" , manager:"♠️" , opto:"👓" , suspended:"❄" },
+    { branch: "龍潭", id: '280', name: "陳嘉宏", dateOfEntry: "2022-10-3" , opto:"👓" },
+    { branch: "三峽", id: '281', name: "以蜜.新固", dateOfEntry: "2021-8-25" , opto:"👓" },
+    { branch: "楊梅", id: '282', name: "李冠霖", dateOfEntry: "2021-9-1" , manager:"♠️" },
+    { branch: "八德", id: '286', name: "胡哲誌", dateOfEntry: "2021-9-11" , manager:"♠️" , opto:"👓" },
+    { branch: "龍潭", id: '301', name: "郭玉文", dateOfEntry: "2021-10-18" , Tra:"🖊️" },
+    { branch: "福科", id: '306', name: "黃俊䥵", dateOfEntry: "2021-11-1" , manager:"♠️" , opto:"👓" },
+    { branch: "南昌", id: '307', name: "謝宗穎", dateOfEntry: "2021-11-1" , manager:"♠️" , opto:"👓" },
+    { branch: "楊梅", id: '311', name: "黃怡慧", dateOfEntry: "2021-11-1" , opto:"👓" },
+    { branch: "楊梅", id: '318', name: "張義捷", dateOfEntry: "2021-11-22" , Tra:"🖊️" },
+    { branch: "楊梅", id: '319', name: "彭聖容", dateOfEntry: "2021-11-22" , Tra:"🖊️" },
+    { branch: "龍安", id: '333', name: "吳翊溥", dateOfEntry: "2021-12-20" },
+    { branch: "新泰", id: '337', name: "鄭竣之", dateOfEntry: "2022-1-3" , Tra:"🖊️" },
+    { branch: "楊梅", id: '342', name: "洪敏榕", dateOfEntry: "2022-1-17" , Tra:"🖊️" },
+    { branch: "龍潭", id: '357', name: "徐昌隆", dateOfEntry: "2022-3-1" , Tra:"🖊️" },
+    { branch: "大竹", id: '359', name: "杜冠霆", dateOfEntry: "2022-3-1" , manager:"♠️" },
+    { branch: "南昌", id: '360', name: "陳韋恩", dateOfEntry: "2022-3-1" , Tra:"🖊️" },
+    { branch: "桃鶯", id: '362', name: "林純鴻", dateOfEntry: "2022-3-1" , opto:"👓" },
+    { branch: "正光", id: '373', name: "褚詠心", dateOfEntry: "2022-4-6" , Tra:"🖊️" },
+    { branch: "龍潭", id: '382', name: "薛舜鴻", dateOfEntry: "2022-4-26" , manager:"♠️" , opto:"👓" },
+    { branch: "龍潭", id: '386', name: "姚櫳軍", dateOfEntry: "2024-1-8" , Tra:"🖊️" },
+    { branch: "正光", id: '391', name: "陳珊珊", dateOfEntry: "2022-5-17" , manager:"♠️" },
+    { branch: "龍潭", id: '395', name: "江家瑜", dateOfEntry: "2022-5-21" , Tra:"🖊️" },
+    { branch: "環東", id: '405', name: "林奕煒", dateOfEntry: "2022-6-20" , manager:"♠️" },
+    { branch: "總店", id: '406', name: "黃晨瑜", dateOfEntry: "2022-6-20" , depot:"📦" },
+    { branch: "公益", id: '408', name: "邱岱倫", dateOfEntry: "2022-6-29" , Tra:"🖊️" },
+    { branch: "竹北", id: '411', name: "王雁青", dateOfEntry: "2022-7-4" , manager:"♠️" , Tra:"🖊️" },
+    { branch: "崇德", id: '413', name: "方昫植", dateOfEntry: "2022-7-4" , opto:"👓" },
+    { branch: "新泰", id: '415', name: "洪雪真", dateOfEntry: "2022-7-11" , suspended:"❄" },
+    { branch: "環東", id: '418', name: "李承祖", dateOfEntry: "2022-8-1" , opto:"👓" },
+    { branch: "公益", id: '419', name: "林冠廷", dateOfEntry: "2022-8-1" , Tra:"🖊️" , opto:"👓" },
+    { branch: "崇德", id: '420', name: "陳柏翰", dateOfEntry: "2022-8-1" , manager:"♠️" , opto:"👓" },
+    { branch: "中壢", id: '424', name: "簡孟宸", dateOfEntry: "2022-8-5" },
+    { branch: "竹北", id: '434', name: "詹芷榆", dateOfEntry: "2022-9-1" , Tra:"🖊️" },
+    { branch: "環東", id: '437', name: "鍾淇淇", dateOfEntry: "2022-9-1" , Tra:"🖊️" },
+    { branch: "龍安", id: '441', name: "陳靚娟", dateOfEntry: "2022-9-15" , manager:"♠️" , opto:"👓" },
+    { branch: "板橋", id: '448', name: "林蘇", dateOfEntry: "2022-10-1" , Tra:"🖊️" , opto:"👓" },
+    { branch: "龍安", id: '454', name: "鄧圓坊", dateOfEntry: "2022-10-11" , Tra:"🖊️" },
+    { branch: "西門", id: '458', name: "李依軒", dateOfEntry: "2022-11-1" , Tra:"🖊️" },
+    { branch: "中壢", id: '463', name: "劉哲宇", dateOfEntry: "2022-11-24" , Tra:"🖊️" },
+    { branch: "中壢", id: '466', name: "林仁昱", dateOfEntry: "2022-12-12" , Tra:"🖊️" },
+    { branch: "竹北", id: '472', name: "謝紫琳", dateOfEntry: "2023-1-11" , Tra:"🖊️" },
+    { branch: "彰化", id: '475', name: "許雅瑄", dateOfEntry: "2023-2-1" , manager:"♠️"  , Tra:"🖊️" },
+    { branch: "三峽", id: '481', name: "王歡歡", dateOfEntry: "2023-2-6" , Tra:"🖊️" , opto:"👓" },
+    { branch: "新泰", id: '483', name: "陳姿尹", dateOfEntry: "2023-2-13" , Tra:"🖊️" },
+    { branch: "三峽", id: '491', name: "張純菲", dateOfEntry: "2023-3-1" , Tra:"🖊️" },
+    { branch: "三峽", id: '493', name: "林家瑋", dateOfEntry: "2023-3-1" , manager:"♠️" },
+    { branch: "留停", id: '497', name: "王羽萱", dateOfEntry: "2023-3-8" , Tra:"🖊️" , suspended:"❄" },
+    { branch: "永和", id: '498', name: "顏俊漢", dateOfEntry: "2023-3-13" },
+    { branch: "南昌", id: '504', name: "何霈沂", dateOfEntry: "2023-3-20" , Tra:"🖊️" },
+    { branch: "竹北", id: '506', name: "劉怡涵", dateOfEntry: "2023-4-1"  , Tra:"🖊️" },
+    { branch: "竹北", id: '507', name: "林孟穎", dateOfEntry: "2025-8-1" },
+    { branch: "楊梅", id: '509', name: "管孟琳", dateOfEntry: "2023-4-6" , opto:"👓" },
+    { branch: "三峽", id: '512', name: "董又禎", dateOfEntry: "2023-4-10" , Tra:"🖊️" },
+    { branch: "崇德", id: '520', name: "楊楚柔", dateOfEntry: "2023-5-1" , Tra:"🖊️" },
+    { branch: "福科", id: '521', name: "蔡旻錡", dateOfEntry: "2023-5-1" , Tra:"🖊️" , opto:"👓" },
+    { branch: "竹北", id: '524', name: "張儀芳", dateOfEntry: "2023-5-2" },
+    { branch: "板橋", id: '526', name: "林克樺", dateOfEntry: "2023-5-8" },
+    { branch: "永和", id: '527', name: "蕭琇蕙", dateOfEntry: "2023-5-9" , manager:"♠️" },
+    { branch: "板橋", id: '535', name: "張元實", dateOfEntry: "2023-6-1" , opto:"👓" },
+    { branch: "環東", id: '538', name: "王智昱", dateOfEntry: "2023-6-5" , Tra:"🖊️" },
+    { branch: "彰化", id: '542', name: "李宜鍵", dateOfEntry: "2023-6-17" , opto:"👓" },
+    { branch: "竹北", id: '545', name: "邱郁茹", dateOfEntry: "2023-6-26" , Tra:"🖊️" },
+    { branch: "永和", id: '550', name: "陳黎明", dateOfEntry: "2025-2-15" , Tra:"🖊️" },
+    { branch: "南昌", id: '553', name: "張丞沅", dateOfEntry: "2023-7-3" , Tra:"🖊️" },
+    { branch: "大竹", id: '558', name: "尤耀賢", dateOfEntry: "2023-7-5" , Tra:"🖊️" },
+    { branch: "南崁", id: '559', name: "楊湘雯", dateOfEntry: "2023-7-10" , Tra:"🖊️" },
+    { branch: "八德", id: '563', name: "周啟勝", dateOfEntry: "2023-7-17" },
+    { branch: "八德", id: '568', name: "高育萱", dateOfEntry: "2023-8-1" , Tra:"🖊️" },
+    { branch: "福科", id: '569', name: "李儀萱", dateOfEntry: "2023-8-1" , Tra:"🖊️" },
+    { branch: "八德", id: '570', name: "鄔雅竹", dateOfEntry: "2023-8-1" , Tra:"🖊️" },
+    { branch: "環東", id: '573', name: "邱垂旻", dateOfEntry: "2023-8-2" , Tra:"🖊️" },
+    { branch: "大竹", id: '577', name: "廖筱晏", dateOfEntry: "2023-8-16" , Tra:"🖊️" },
+    { branch: "崇德", id: '579', name: "戴佳真", dateOfEntry: "2023-8-21" , Tra:"🖊️" },
+    { branch: "中壢", id: '581', name: "張庭毓", dateOfEntry: "2023-8-21" , Tra:"🖊️" },
+    { branch: "竹北", id: '582', name: "鄭安妤", dateOfEntry: "2023-8-30" , opto:"👓" },
+    { branch: "公益", id: '583', name: "沈采渝", dateOfEntry: "2023-9-1" , manager:"♠️" },
+    { branch: "環東", id: '584', name: "莊芊慧", dateOfEntry: "2023-9-1" , opto:"👓" },
+    { branch: "永和", id: '585', name: "鄭塏頻", dateOfEntry: "2023-9-1" , manager:"♠️" },
+    { branch: "新泰", id: '587', name: "曾予萱", dateOfEntry: "2023-9-11" , Tra:"🖊️" },
+    { branch: "公益", id: '592', name: "簡秀羽", dateOfEntry: "2023-9-15" , Tra:"🖊️" , opto:"👓" },
+    { branch: "福科", id: '597', name: "江盈瑩", dateOfEntry: "2023-9-20" , Tra:"🖊️" },
+    { branch: "正光", id: '599', name: "江旻蓁", dateOfEntry: "2023-10-11" , Tra:"🖊️" },
+    { branch: "龜山", id: '601', name: "邱琳娟", dateOfEntry: "2023-10-16" , Tra:"🖊️" },
+    { branch: "福科", id: '603', name: "鄧筱芊", dateOfEntry: "2023-10-24" },
+    { branch: "經國", id: '604', name: "陳宥蓁", dateOfEntry: "2023-10-25" , opto:"👓" },
+    { branch: "龜山", id: '605', name: "余承恩", dateOfEntry: "2023-11-1" , opto:"👓" },
+    { branch: "龍安", id: '606', name: "黃畇睿", dateOfEntry: "2023-11-1" , opto:"👓" },
+    { branch: "正光", id: '608', name: "鄭博允", dateOfEntry: "2023-11-6" , Tra:"🖊️" },
+    { branch: "龍潭", id: '610', name: "徐悅誠", dateOfEntry: "2023-11-13" },
+    { branch: "西門", id: '613', name: "莊翔智", dateOfEntry: "2023-12-4" , Tra:"🖊️" },
+    { branch: "中壢", id: '617', name: "陳宓", dateOfEntry: "2023-12-19" , opto:"👓" },
+    { branch: "西門", id: '618', name: "李慧君", dateOfEntry: "2023-12-21" , manager:"♠️" },
+    { branch: "總店", id: '619', name: "施旻秀", dateOfEntry: "2023-12-26" , depot:"📦" },
+    { branch: "八德", id: '620', name: "蘇宥哲", dateOfEntry: "2024-1-1" , Tra:"🖊️" },
+    { branch: "福科", id: '628', name: "鍾昱德", dateOfEntry: "2024-2-15" , Tra:"🖊️" },
+    { branch: "竹北", id: '632', name: "江宇強", dateOfEntry: "2024-2-19" },
+    { branch: "彰化", id: '634', name: "林震緯", dateOfEntry: "2024-2-19" , opto:"👓" },
+    { branch: "南崁", id: '636', name: "張得君", dateOfEntry: "2024-3-1" , opto:"👓" },
+    { branch: "崇德", id: '640', name: "劉冠麟", dateOfEntry: "2024-3-11" , Tra:"🖊️" },
+    { branch: "板橋", id: '644', name: "陳文儒", dateOfEntry: "2024-4-1" },
+    { branch: "新泰", id: '650', name: "李彥嶔", dateOfEntry: "2024-4-8" , Tra:"🖊️" },
+    { branch: "龍安", id: '652', name: "江佩真", dateOfEntry: "2024-4-8" , Tra:"🖊️" },
+    { branch: "三峽", id: '657', name: "簡君哲", dateOfEntry: "2024-4-15" , Tra:"🖊️" },
+    { branch: "八德", id: '659', name: "鄭宇婕", dateOfEntry: "2024-4-18" , Tra:"🖊️" },
+    { branch: "竹北", id: '662', name: "邱子恬", dateOfEntry: "2024-4-29" },
+    { branch: "南崁", id: '664', name: "曾彥綾", dateOfEntry: "2024-5-1" , Tra:"🖊️" },
+    { branch: "八德", id: '666', name: "徐瑄彤", dateOfEntry: "2024-5-1" },
+    { branch: "福科", id: '667', name: "吳彥瑢", dateOfEntry: "2024-5-1" , opto:"👓" },
+    { branch: "經國", id: '669', name: "黎儀燔", dateOfEntry: "2024-5-1" },
+    { branch: "中壢", id: '671', name: "莊宜君", dateOfEntry: "2024-5-9" },
+    { branch: "公益", id: '672', name: "古伊涵", dateOfEntry: "2024-5-13" , opto:"👓" },
+    { branch: "桃鶯", id: '673', name: "夏子琇", dateOfEntry: "2024-5-13" },
+    { branch: "正光", id: '674', name: "許有緹", dateOfEntry: "2024-5-20" , Tra:"🖊️" },
+    { branch: "永和", id: '678', name: "羅以軒", dateOfEntry: "2024-6-11" },
+    { branch: "公益", id: '689', name: "蘇宸志", dateOfEntry: "2024-7-1" },
+    { branch: "板橋", id: '690', name: "王喬安", dateOfEntry: "2024-7-1"  , Tra:"🖊️" },
+    { branch: "楊梅", id: '695', name: "羅元鴻", dateOfEntry: "2024-7-15" , Tra:"🖊️" },
+    { branch: "西門", id: '696', name: "陳佳郁", dateOfEntry: "2024-8-1" },
+    { branch: "經國", id: '698', name: "李亭儀", dateOfEntry: "2024-8-1" },
+    { branch: "崇德", id: '702', name: "江福餘", dateOfEntry: "2024-8-7" , opto:"👓" },
+    { branch: "板橋", id: '704', name: "邱彥斐", dateOfEntry: "2024-8-20" },
+    { branch: "龍潭", id: '705', name: "藍莉鈞", dateOfEntry: "2024-9-1" , Tra:"🖊️" },
+    { branch: "桃鶯", id: '712', name: "徐紫筠", dateOfEntry: "2024-10-01" , Tra:"🖊️" },
+    { branch: "南崁", id: '713', name: "丘育瑄", dateOfEntry: "2024-10-01" , opto:"👓" },
+    { branch: "公益", id: '714', name: "邱旻瑄", dateOfEntry: "2024-10-21" , Tra:"🖊️" },
+    { branch: "龍潭", id: '716', name: "范振淵", dateOfEntry: "2024-11-01" , opto:"👓" },
+    { branch: "八德", id: '722', name: "戴一帆", dateOfEntry: "2024-11-12" , opto:"👓" },
+    { branch: "楊梅", id: '723', name: "翁藜甄", dateOfEntry: "2024-11-12" },
+    { branch: "桃鶯", id: '728', name: "林詠昱", dateOfEntry: "2024-12-02" },
+    { branch: "楊梅", id: '729', name: "葛守訓", dateOfEntry: "2024-12-09" , Tra:"🖊️" },
+    { branch: "西門", id: '731', name: "胡惠琪", dateOfEntry: "2024-12-23" , opto:"👓" },
+    { branch: "三峽", id: '732', name: "駱亦君", dateOfEntry: "2025-1-02" , Tra:"🖊️" },
+    { branch: "中壢", id: '733', name: "王旖庭", dateOfEntry: "2025-1-06" },
+    { branch: "彰化", id: '734', name: "白欽吉", dateOfEntry: "2025-1-13" },
+    { branch: "中壢", id: '735', name: "楊涵深", dateOfEntry: "2025-2-03" , opto:"👓" },
+    { branch: "環東", id: '739', name: "林譽儒", dateOfEntry: "2025-2-10" },
+    { branch: "楊梅", id: '740', name: "羅毓昀", dateOfEntry: "2025-2-24" , opto:"👓" },
+    { branch: "南崁", id: '742', name: "林筱庭", dateOfEntry: "2025-3-03" },
+    { branch: "龜山", id: '743', name: "俞文杰", dateOfEntry: "2025-3-03" },
+    { branch: "桃鶯", id: '745', name: "徐明佑", dateOfEntry: "2025-3-03" },
+    { branch: "彰化", id: '746', name: "陳舒維", dateOfEntry: "2025-3-03" },
+    { branch: "八德", id: '747', name: "吳怡萱", dateOfEntry: "2025-3-03" , opto:"👓" },
+    { branch: "彰化", id: '748', name: "葉珮庭", dateOfEntry: "2025-3-03" },
+    { branch: "彰化", id: '750', name: "盧懷瑾", dateOfEntry: "2025-3-03" , opto:"👓" },
+    { branch: "大竹", id: '751', name: "趙玟婷", dateOfEntry: "2025-3-03" },
+    { branch: "中壢", id: '756', name: "王淑貞", dateOfEntry: "2025-3-12" },
+    { branch: "崇德", id: '757', name: "賴以純", dateOfEntry: "2025-3-17" },
+    { branch: "大竹", id: '759', name: "江翌帆", dateOfEntry: "2025-4-01" },
+    { branch: "環東", id: '761', name: "張軒齊", dateOfEntry: "2025-4-01" },
+    { branch: "西門", id: '765', name: "陳柏勳", dateOfEntry: "2025-5-01" },
+    { branch: "竹北", id: '766', name: "張峻瑋", dateOfEntry: "2025-5-05" , opto:"👓" },
+    { branch: "南崁", id: '768', name: "王俞茜", dateOfEntry: "2025-5-19" , opto:"👓" },
+    { branch: "經國", id: '769', name: "陳玟翎", dateOfEntry: "2025-5-19" },
+    { branch: "經國", id: '771', name: "黃怡雯", dateOfEntry: "2025-5-26" },
+    { branch: "大竹", id: '773', name: "陳舒函", dateOfEntry: "2025-6-1" },
+    { branch: "南崁", id: '776', name: "王泓睿", dateOfEntry: "2025-6-4" },
+    { branch: "環東", id: '777', name: "張筑雯", dateOfEntry: "2025-6-12" },
+    { branch: "崇德", id: '778', name: "施云淨", dateOfEntry: "2025-6-16" },
+    { branch: "正光", id: '779', name: "呂佳浩", dateOfEntry: "2025-7-1" , opto:"👓" },
+    { branch: "彰化", id: '780', name: "吳承勳", dateOfEntry: "2025-7-1" },
+    { branch: "大竹", id: '781', name: "賴禹菱", dateOfEntry: "2025-7-1" },
+    { branch: "彰化", id: '785', name: "王宏平 ", dateOfEntry: "2025-7-30" },
+    { branch: "永和", id: '786', name: "呂家榛", dateOfEntry: "2025-8-1" },
+    { branch: "正光", id: '787', name: "鄔佳諺", dateOfEntry: "2025-8-1" },
+    { branch: "竹北", id: '788', name: "李建勳", dateOfEntry: "2025-8-4" }
+  ];
+
+  const correctPassword = [2, 4, 5, 7];
+  let currentInput = [];
+  let previousDot = null;
+
+  function selectDot(value, element) {
+    var audio = document.getElementById('audioPlayer');
+    audio.play();
+    element.classList.add('active');
+    currentInput.push(value);
+
+    if (previousDot) {
+      drawLine(previousDot, element);
     }
-    // 如果找到匹配的文章，隱藏“沒有找到相關內容”的提示
-    if (found) {
-        noResultsMessage.style.display = "none";
-    } else {
-        noResultsMessage.style.display = "block";  // 否則顯示提示
+
+    previousDot = element;
+
+    if (currentInput.length === 4) {
+      checkPassword();
     }
-}
-    document.getElementById('searchInput').addEventListener('input', function() {
-        setTimeout(searchArticles, 100);  // 100 毫秒搜索刷新延遲
-    });
-// 獲取所有標籤按鈕與文章
-const tags = document.querySelectorAll(".tag");
-const articles = document.querySelectorAll(".article");
-let selectedTags = [];
-
-// 創建「顯示所有」按鈕
-const clearFilter = document.createElement("button");
-clearFilter.textContent = "顯示所有";
-clearFilter.classList.add("tag", "clear-tag");
-document.querySelector(".tags-container").appendChild(clearFilter);
-
-// 點擊標籤事件
-tags.forEach(tag => {
-  tag.addEventListener("click", () => {
-    const tagValue = tag.dataset.tag; // 獲取標籤的值
-
-    // 若標籤已選中則移除，否則加入
-    if (selectedTags.includes(tagValue)) {
-      selectedTags = selectedTags.filter(t => t !== tagValue);
-      tag.classList.remove("active");
-    } else {
-      selectedTags.push(tagValue);
-      tag.classList.add("active");
-    }
-
-    // 篩選文章
-    filterArticles();
-  });
-});
-
-// 點擊「顯示所有」按鈕事件
-clearFilter.addEventListener("click", () => {
-  // 重置選中的標籤
-  selectedTags = [];
-  tags.forEach(tag => tag.classList.remove("active"));
-
-  // 顯示所有文章
-  articles.forEach(article => {
-    article.style.display = "block";
-  });
-});
-
-// 篩選文章的邏輯
-function filterArticles() {
-  if (selectedTags.length === 0) {
-    // 沒有選中任何標籤時顯示所有文章
-    articles.forEach(article => {
-      article.style.display = "block";
-    });
-    return;
   }
 
-  // 依據選中的標籤篩選文章
-  articles.forEach(article => {
-    const articleTags = article.dataset.tags.split(" "); // 假設文章標籤以空格分隔
-    const shouldShow = selectedTags.every(tag => articleTags.includes(tag));
-    article.style.display = shouldShow ? "block" : "none";
-  });
+  function checkPassword() {
+    if (JSON.stringify(currentInput) === JSON.stringify(correctPassword)) {
+      var successAudio = document.getElementById('successAudio');
+      successAudio.play();
+      document.getElementById('unlockMessage').classList.remove('hidden');
+      document.getElementById('searchSection').classList.remove('hidden');
+      document.getElementById('errorMessage').classList.add('hidden');
+      document.getElementById('grid').classList.add('hidden');
+      document.getElementById('unlockTitle').classList.add('hidden');
+      document.getElementById('searchTitle').classList.remove('hidden');
+      
+      setTimeout(() => {
+        document.getElementById('unlockMessage').classList.add('hidden');
+      }, 3000);
+    } else {
+      document.getElementById('errorMessage').classList.remove('hidden'); // 顯示錯誤訊息
+  
+      setTimeout(() => {
+        document.getElementById('errorMessage').classList.add('hidden');
+      }, 2000);
+      resetDots();
+    }
+    currentInput = [];
+    previousDot = null;
+  }
+
+  function drawLine(fromDot, toDot) {  // 密碼線條造型
+    const grid = document.getElementById('grid');
+    const fromRect = fromDot.getBoundingClientRect();
+    const toRect = toDot.getBoundingClientRect();
+
+    const fromX = fromRect.left + fromRect.width / 2;
+    const fromY = fromRect.top + fromRect.height / 2;
+    const toX = toRect.left + toRect.width / 2;
+    const toY = toRect.top + toRect.height / 2;
+
+    const length = Math.sqrt((toX - fromX) ** 2 + (toY - fromY) ** 2);
+    const angle = Math.atan2(toY - fromY, toX - fromX) * (180 / Math.PI);
+
+    const line = document.createElement('div');
+    line.classList.add('line');
+    line.style.width = `${length}px`;
+    line.style.transform = `rotate(${angle}deg)`;
+    line.style.left = `${fromX - grid.getBoundingClientRect().left}px`;
+    line.style.top = `${fromY - grid.getBoundingClientRect().top}px`;
+
+    grid.appendChild(line);
+    }
+
+    function resetDots() {   // 密碼輸入錯誤刷新重置
+      document.querySelectorAll('.dot').forEach(dot => {
+        dot.classList.remove('active');
+    });
+    document.querySelectorAll('.line').forEach(line => line.remove());
+    }
+
+    function searchEmployees() {
+      const inputId = document.getElementById('employeeIdInput').value.trim();   // 取得工號輸入值
+      const inputName = document.getElementById('employeeNameInput').value.trim(); // 取得姓名輸入值
+      const selectedBranch = document.getElementById('branchSelect').value;  // 分店選擇值
+      const selectedCategory = document.getElementById('categorySelect').value; // 屬性分類選擇值
+      const resultsDiv = document.getElementById('searchResults');
+      const searchCountDiv = document.getElementById('searchCount');
+      resultsDiv.innerHTML = '';
+
+    const filteredEmployees = employees.filter(emp => {
+      const matchId = !inputId || emp.id.includes(inputId);   // 工號匹配
+      const matchName = !inputName || emp.name.includes(inputName); // 姓名匹配
+      const matchBranch = !selectedBranch || emp.branch === selectedBranch; // 分公司匹配
+      const matchCategory = !selectedCategory || emp[selectedCategory]; // 屬性分類匹配
+      return matchId && matchName && matchBranch && matchCategory;
+   });
+
+   // 顯示搜尋結果數量
+    if (filteredEmployees.length > 0) {
+      const suspendedCount = filteredEmployees.filter(emp => emp.suspended).length;
+      searchCountDiv.textContent = `該搜尋結果共 ${filteredEmployees.length} 員，其中停職共 ${suspendedCount} 員`;
+      searchCountDiv.classList.remove('hidden');
+    } else {
+      searchCountDiv.classList.add('hidden');
+    }
+
+    if (filteredEmployees.length > 0) {
+        filteredEmployees.forEach(emp => {
+            const resultItem = document.createElement('div');
+            resultItem.classList.add('result-item');
+            
+            const branchSpan = document.createElement('span');
+            branchSpan.textContent = `${emp.branch}`;
+            branchSpan.classList.add('branch');
+            
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = `In: ${emp.dateOfEntry}`;
+            dateSpan.classList.add('date');
+
+            const idSpan = document.createElement('span');
+            idSpan.textContent = `${emp.id}`;
+            idSpan.classList.add('id');
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = `${emp.name}`;
+            nameSpan.classList.add('name');
+
+            resultItem.appendChild(branchSpan);
+            resultItem.appendChild(dateSpan);
+            resultItem.appendChild(idSpan);
+            resultItem.appendChild(nameSpan);
+
+
+            // 主管符號
+            if (emp.manager) {
+                const managerSpan = document.createElement('span');
+                managerSpan.textContent = `${emp.manager}`;
+                managerSpan.classList.add('manager', 'tooltip');
+                managerSpan.setAttribute('data-tooltip', '主管');
+                resultItem.appendChild(managerSpan);
+            }
+
+            // 驗光符號
+            if (emp.opto) {
+                const optoSpan = document.createElement('span');
+                optoSpan.textContent = `${emp.opto}`;
+                optoSpan.classList.add('opto', 'tooltip');
+                optoSpan.setAttribute('data-tooltip', '驗光人員');
+                resultItem.appendChild(optoSpan);
+            }
+
+            // 訓別符號
+            if (emp.Tra) {
+                const TraSpan = document.createElement('span');
+                TraSpan.textContent = `${emp.Tra}`;
+                TraSpan.classList.add('Tra', 'tooltip');
+                TraSpan.setAttribute('data-tooltip', '技術訓');
+                resultItem.appendChild(TraSpan);
+            }
+
+            // 停職符號
+            if (emp.suspended) {
+                const suspendedSpan = document.createElement('span');
+                suspendedSpan.textContent = `${emp.suspended}`;
+                suspendedSpan.classList.add('suspended', 'tooltip');
+                suspendedSpan.setAttribute('data-tooltip', '停職');
+                resultItem.appendChild(suspendedSpan);
+            }
+
+            // 建教生符號✏️
+            if (emp.trainee) {
+                const traineeSpan = document.createElement('span');
+                traineeSpan.textContent = `${emp.trainee}`;
+                traineeSpan.classList.add('trainee', 'tooltip');
+                traineeSpan.setAttribute('data-tooltip', '建教生');
+                resultItem.appendChild(traineeSpan);
+            }
+
+            // 倉儲符號
+            if (emp.depot) {
+                const depotSpan = document.createElement('span');
+                depotSpan.textContent = `${emp.depot}`;
+                depotSpan.classList.add('depot', 'tooltip');
+                depotSpan.setAttribute('data-tooltip', '倉儲');
+                resultItem.appendChild(depotSpan);
+            }
+
+            resultsDiv.appendChild(resultItem);
+        });
+    } else {
+        resultsDiv.textContent = '無符合條件的員工';
+    }
 }
 
-// 背景畫布
-// 背景畫布
-var fishCanvas = document.getElementById('fishCanvas');
-var fishCtx = fishCanvas.getContext('2d');
-var fishes = [];
-var fishCount = 7;
-var time = 0;
-var ripples = [];
-var maxRippleSize = 80; 
-var rippleSpawnRate = 0.0035; 
-fishCanvas.width = window.innerWidth;
-fishCanvas.height = window.innerHeight;
-var highlights = [];
+//* 點擊顯示提示框，隨後再次點擊隱藏提示框 *//
+document.querySelectorAll('.tooltip').forEach(item => {
+    item.addEventListener('click', function() {
+        const tooltipText = this.querySelector('.tooltiptext');
+        tooltipText.style.visibility = tooltipText.style.visibility === 'visible' ? 'hidden' : 'visible';
+        tooltipText.style.opacity = tooltipText.style.opacity === '1' ? '0' : '1';
 
-setInterval(function() {
-    var cols = Math.floor(fishCanvas.width / 50);
-    var rows = Math.floor(fishCanvas.height / 50);
-    var randomCol = Math.floor(Math.random() * cols);
-    var randomRow = Math.floor(Math.random() * rows);
-    highlights.push({
-         i: randomCol * 50,  // 基底 X 座標
-         j: randomRow * 50,  // 基底 Y 座標
-         start: Date.now()   // 開始時間（毫秒）
+        // 點擊外部時隱藏提示框
+        document.addEventListener('click', function hideTooltip(event) {
+            if (!item.contains(event.target)) {
+                tooltipText.style.visibility = 'hidden';
+                tooltipText.style.opacity = '0';
+                document.removeEventListener('click', hideTooltip);
+            }
+        });
     });
-}, 850);//隨機亮起頻率
-
-window.addEventListener('resize', function() {
-    fishCanvas.width = window.innerWidth;
-    fishCanvas.height = window.innerHeight;
 });
 
-for (var i = 0; i < fishCount; i++) {
-    fishes.push({
-        x: Math.random() * fishCanvas.width,
-        y: Math.random() * fishCanvas.height,
-        size: Math.random() * 25 + 10,
-        speedX: (Math.random() - 0.5) * 2,
-        speedY: (Math.random() - 0.5) * 2
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("name") || e.target.classList.contains("id")) {
+    const text = e.target.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const tooltip = document.createElement("div");
+      tooltip.textContent = "已複製";
+      tooltip.style.position = "absolute";
+      tooltip.style.background = "#444";
+      tooltip.style.color = "#fff";
+      tooltip.style.padding = "5px 10px";
+      tooltip.style.borderRadius = "5px";
+      tooltip.style.fontSize = "14px";
+      tooltip.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+      tooltip.style.zIndex = "1000";
+      tooltip.style.transition = "opacity 0.5s ease";
+      tooltip.style.opacity = "1";
+
+      const rect = e.target.getBoundingClientRect();
+      tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - 25}px`;
+      tooltip.style.top = `${rect.top + window.scrollY - 30}px`;
+
+      document.body.appendChild(tooltip);
+
+      setTimeout(() => {
+        tooltip.style.opacity = "0";
+        setTimeout(() => tooltip.remove(), 500);
+      }, 1000);
     });
-}
-
-function drawFish(fish) {
-    var gradient = fishCtx.createRadialGradient(fish.x, fish.y, fish.size * 0.3, fish.x, fish.y, fish.size);
-    gradient.addColorStop(0, 'rgba(38, 68, 68, 0.6)');
-    gradient.addColorStop(1, 'rgba(38, 68, 68, 0.06)');
-
-    fishCtx.beginPath();
-    fishCtx.arc(fish.x, fish.y, fish.size, 0, 2 * Math.PI);
-    fishCtx.fillStyle = gradient;
-
-    fishCtx.shadowBlur = fish.size * 2; 
-    fishCtx.shadowColor = 'rgba(68, 68, 68, 0.5)';
-
-    fishCtx.fill();
-    fishCtx.shadowBlur = 0;
-}
-
-function drawWaterFlow() {
-    time += 0.02;
-    fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
-    fishCtx.globalAlpha = 0.1;
-    for (var i = 0; i < fishCanvas.width; i += 50) {
-        for (var j = 0; j < fishCanvas.height; j += 50) {
-            var waveX = Math.sin(i * 0.01 + time) * 5; // X 軸波動
-            var waveY = Math.cos(j * 0.01 + time) * 5; // Y 軸波動
-            var opacity = 0.1 + (Math.sin(i * 0.005 + j * 0.005 + time) * 0.35); // 透明度變化
-
-            fishCtx.fillStyle = `rgba(90, 240, 255, ${opacity})`;
-            fishCtx.fillRect(i + waveX, j + waveY, 50, 50);
-        }
-    }
-    fishCtx.globalAlpha = 1;
-    var now = Date.now();
-    for (var h = highlights.length - 1; h >= 0; h--) {
-        var hl = highlights[h];
-        var elapsed = (now - hl.start) / 1000; 
-        if (elapsed >= 3) {
-            highlights.splice(h, 1);
-            continue;
-        }
-        var overlayOpacity = 0;
-        if (elapsed < 1) {//隨機亮起規則
-            overlayOpacity = 0.04 * (elapsed / 1);
-        } else if (elapsed < 2) {
-            overlayOpacity = 0.04;
-        } else if (elapsed < 3) {
-            overlayOpacity = 0.04 * (1 - (elapsed - 2) / 1);
-        }
-        var glowOpacity = overlayOpacity;
-
-        var waveX = Math.sin(hl.i * 0.01 + time) * 5;
-        var waveY = Math.cos(hl.j * 0.01 + time) * 5;
-        var maxGlowBlur = 60; //光芒值
-        var glowBlur = maxGlowBlur * (glowOpacity / 0.1); 
-
-        fishCtx.save();
-        fishCtx.shadowBlur = glowBlur;
-        fishCtx.shadowColor = `rgba(255, 255, 255, ${glowOpacity})`;
-        fishCtx.fillStyle = `rgba(85, 205, 255, ${overlayOpacity})`;
-        fishCtx.fillRect(hl.i + waveX, hl.j + waveY, 50, 50);
-        fishCtx.restore();
-    }
-}
-
-function updateFishes() {
-    // 清除畫布 (背景與流動效果在 drawWaterFlow() 裡重繪)
-    fishCtx.clearRect(0, 0, fishCanvas.width, fishCanvas.height);
-    drawWaterFlow(); 
-    drawWaterRipple(); 
-    for (var i = 0; i < fishes.length; i++) {
-        var fish = fishes[i];
-        fish.x += fish.speedX * 0.5; 
-        fish.y += fish.speedY * 0.5 + Math.sin(fish.x * 0.01) * 0.3; 
-
-        if (fish.x > fishCanvas.width) fish.x = 0;
-        if (fish.x < 0) fish.x = fishCanvas.width;
-        if (fish.y > fishCanvas.height) fish.y = 0;
-        if (fish.y < 0) fish.y = fishCanvas.height;
-        drawFish(fish);
-        if (Math.random() < rippleSpawnRate) { 
-            ripples.push({
-                x: fish.x,
-                y: fish.y,
-                size: 15,
-                alpha: 0.1 
-            });
-        }
-    }
-    drawWaterRipple();
-    requestAnimationFrame(updateFishes);
-}
-
-function drawWaterRipple() {
-    for (var i = ripples.length - 1; i >= 0; i--) {
-        var ripple = ripples[i];
-        fishCtx.beginPath();
-        fishCtx.arc(ripple.x, ripple.y, ripple.size, 0, Math.PI * 2);
-        fishCtx.strokeStyle = `rgba(55, 155, 155, ${ripple.alpha})`;
-        fishCtx.lineWidth = 2;
-        fishCtx.stroke();
-        ripple.size += 0.2;
-        ripple.alpha -= 0.0008; 
-        if (ripple.size > maxRippleSize || ripple.alpha <= 0) {
-            ripples.splice(i, 1);
-        }
-    }
-}
-
-updateFishes();
-
+  }
+});
 </script>
+
 </body>
 </html>
-       
+
+
+
+
