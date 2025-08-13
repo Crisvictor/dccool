@@ -474,7 +474,7 @@
     <div id="searchResults" class="results"></div>
     </div>
     <div id="searchCount" class="search-count hidden"></div>
-<footer>
+<footer id="pageFooter" class="hidden">
     <p>當前版本：v20250809<br>
     問題聯繫：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
    <a href="Deta.html" class="game-button">扣項細則</a>
@@ -733,6 +733,7 @@
       document.getElementById('grid').classList.add('hidden');
       document.getElementById('unlockTitle').classList.add('hidden');
       document.getElementById('searchTitle').classList.remove('hidden');
+      document.getElementById('pageFooter').classList.remove('hidden');
       
       setTimeout(() => {
         document.getElementById('unlockMessage').classList.add('hidden');
