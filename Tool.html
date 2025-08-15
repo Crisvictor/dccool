@@ -99,6 +99,7 @@
       z-index: 10000;
     }
     /*卷軸樣式*/
+    #crossTool,
     #timeTool,
     #eventsList,
     #binaryTool,
@@ -110,8 +111,9 @@
     #exchangeTool input,
     #exchangeTool select {
       scrollbar-width: thin;
-      scrollbar-color: #29cfa8 rgba(255,255,255,0.08);
+      scrollbar-color: #0a634e rgba(255,255,255,0.08);
     }
+    #crossTool::-webkit-scrollbar,
     #timeTool::-webkit-scrollbar,
     #eventsList::-webkit-scrollbar,
     #binaryTool::-webkit-scrollbar,
@@ -125,6 +127,7 @@
       width: 8px;
       height: 8px;
     }
+    #crossTool::-webkit-scrollbar-track,
     #timeTool::-webkit-scrollbar-track,
     #eventsList::-webkit-scrollbar-track,
     #binaryTool::-webkit-scrollbar-track,
@@ -138,6 +141,7 @@
       background: rgba(255,255,255,0.08);
       border-radius: 4px;
     }
+    #crossTool::-webkit-scrollbar-thumb,
     #timeTool::-webkit-scrollbar-thumb,
     #eventsList::-webkit-scrollbar-thumb,
     #binaryTool::-webkit-scrollbar-thumb,
@@ -151,6 +155,7 @@
       background: #29cfa8;
       border-radius: 4px;
     }
+    #crossTool::-webkit-scrollbar-thumb:hover,
     #timeTool::-webkit-scrollbar-thumb:hover,
     #eventsList::-webkit-scrollbar-thumb:hover,
     #binaryTool::-webkit-scrollbar-thumb:hover,
@@ -224,7 +229,8 @@
       flex:1;padding:8px 0;background:#013836;border:none;color:#fff;font-weight:bold;
       border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);
     }
-    #morseAudioPanel input[type="range"]{
+    #morseAudioPanel input[type="range"],
+    #crossTool       input[type="range"]{
       -webkit-appearance:none;
       appearance:none;
       width:100%;
@@ -237,14 +243,16 @@
       border-radius:999px;
       outline:none;
     }
-    #morseAudioPanel input[type="range"]::-webkit-slider-runnable-track{
+    #morseAudioPanel input[type="range"]::-webkit-slider-runnable-track,
+    #crossTool       input[type="range"]::-webkit-slider-runnable-track{
       height:var(--track-h);
       background:transparent;
       border-radius:999px;
     }
-    #morseAudioPanel input[type="range"]::-webkit-slider-thumb{
+    #morseAudioPanel input[type="range"]::-webkit-slider-thumb,
+    #crossTool       input[type="range"]::-webkit-slider-thumb{
       -webkit-appearance:none;
-      width:var(--thumb-sz); height:var(--thumb-sz);
+          width:var(--thumb-sz); height:var(--thumb-sz);
       border-radius:50%;
       background:var(--accent);
       border:2px solid rgba(0,0,0,.55);
@@ -252,38 +260,46 @@
       margin-top:calc((var(--track-h) - var(--thumb-sz))/2);
       transition:transform .08s ease, box-shadow .15s ease, filter .15s ease;
     }
-    #morseAudioPanel input[type="range"]:hover::-webkit-slider-thumb{
+    #morseAudioPanel input[type="range"]:hover::-webkit-slider-thumb,
+    #crossTool       input[type="range"]:hover::-webkit-slider-thumb{
       transform:scale(1.06);
       box-shadow:0 0 0 4px rgba(41,207,168,.28), 0 10px 18px rgba(0,0,0,.55);
     }
-    #morseAudioPanel input[type="range"]:active::-webkit-slider-thumb{
+    #morseAudioPanel input[type="range"]:active::-webkit-slider-thumb,
+    #crossTool       input[type="range"]:active::-webkit-slider-thumb{
       transform:scale(.98);
       box-shadow:inset 0 2px 4px rgba(0,0,0,.5), 0 6px 14px rgba(0,0,0,.45);
     }
-    #morseAudioPanel input[type="range"]:focus-visible{
+    #morseAudioPanel input[type="range"]:focus-visible,
+    #crossTool       input[type="range"]:focus-visible{
       box-shadow:0 0 0 2px rgba(41,207,168,.55);
       border-radius:999px;
     }
-    #morseAudioPanel input[type="range"]::-moz-range-track{
+    #morseAudioPanel input[type="range"]::-moz-range-track,
+    #crossTool       input[type="range"]::-moz-range-track{
       height:var(--track-h);
       background:rgba(255,255,255,.15);
       border-radius:999px;
     }
-    #morseAudioPanel input[type="range"]::-moz-range-progress{
+    #morseAudioPanel input[type="range"]::-moz-range-progress,
+    #crossTool       input[type="range"]::-moz-range-progress{
       height:var(--track-h);
       background:#29cfa8;
       border-radius:999px;
     }
-    #morseAudioPanel input[type="range"]::-moz-range-thumb{
+    #morseAudioPanel input[type="range"]::-moz-range-thumb,
+    #crossTool       input[type="range"]::-moz-range-thumb{
       width:var(--thumb-sz); height:var(--thumb-sz);
       border-radius:50%;
       background:#29cfa8;
       border:2px solid rgba(0,0,0,.55);
-    box-shadow:0 0 0 3px rgba(41,207,168,.2), 0 6px 14px rgba(0,0,0,.45);
+      box-shadow:0 0 0 3px rgba(41,207,168,.2), 0 6px 14px rgba(0,0,0,.45);
       transition:transform .08s ease, box-shadow .15s ease, filter .15s ease;
     }
-    #morseAudioPanel input[type="range"]:hover::-moz-range-thumb{ transform:scale(1.06); }
-    #morseAudioPanel input[type="range"]:active::-moz-range-thumb{ transform:scale(.98); }
+    #morseAudioPanel input[type="range"]:hover::-moz-range-thumb,
+    #crossTool       input[type="range"]:hover::-moz-range-thumb{ transform:scale(1.06); }
+    #morseAudioPanel input[type="range"]:active::-moz-range-thumb,
+    #crossTool       input[type="range"]:active::-moz-range-thumb{ transform:scale(.98); }
     #audioActions {
       display: flex;
       gap: 10px;
@@ -686,6 +702,201 @@
       outline:none;
       box-shadow:0 0 0 2px rgba(41,207,168,.6);
     }
+
+    /* 光學十字 */
+    #crossTool{
+      width:45%;
+      max-height:85vh;
+      background:rgba(0,0,0,.7);
+      margin:0 auto;
+      padding:12px 16px;
+      color:#fff;
+      border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,.6);
+      font-family:sans-serif;
+      overflow-y:auto;
+    }
+    #crossTool h2{
+     margin:0 0 10px 0;
+      font-size:13px;
+     text-align:center;
+      text-shadow:0 1px 3px rgba(0,0,0,.7);
+    }
+    #crossTool input[readonly]{
+      opacity:.85;
+      pointer-events:none;
+      background:rgba(255,255,255,.07);
+    }
+    #crossTool .cross-panel{
+      background:rgba(41,207,168,.12);
+      padding:10px;
+      border-radius:6px;
+      box-shadow:0 2px 6px rgba(0,0,0,.5);
+      margin-bottom:10px;
+    }
+    #crossTool .cross-label{
+      font-size:12px;
+      margin-bottom:6px;
+      opacity:.9;
+    }
+    #crossTool .cross-row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    #crossTool .cross-row input{
+    flex: 0 0 43px;
+    width: 43px;
+    min-width: 40px;
+    padding: 8px 3px;
+    font-size: 13px;
+    }
+    #crossTool input{
+    flex:1;
+      min-width:120px;
+      background:rgba(0,0,0,.35);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.25);
+      border-radius:6px;
+      padding:8px 4px;
+      outline:none;
+      box-shadow:0 2px 6px rgba(0,0,0,.35) inset;
+    }
+    #crossSVG{
+      width:100%;
+      height:auto;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:6px;
+    }
+    #crossTool .cross-size{
+      display:flex;
+      align-items:center;
+      gap:5px;
+    }    
+    #crossTool .cross-label-inline{
+      display:inline-block;
+      margin:0;
+      white-space:nowrap;
+      font-size:12px;
+      opacity:.9;
+    }
+    #crossTool .cross-size input[type="range"]{
+      flex:1;
+      min-width:50px;
+    }
+    #crossSizeVal{
+      min-width:50px;
+      text-align:right;
+      display:inline-block;
+    }
+    .toric-hint{
+      margin-top:8px;
+      padding:8px 10px;
+      border-radius:8px;
+      background:rgba(255,184,0,.12);
+      border:1px solid rgba(255,184,0,.35);
+      color:#ffd36b;
+      font-size:12px;
+      line-height:1.5;
+      box-shadow:0 2px 6px rgba(0,0,0,.25) inset;
+    }
+    #crossSVG .axis-line{ stroke:#1d9ca0; stroke-width:3; }
+    #crossSVG .perp-line{ stroke:#a2d3df; stroke-width:3; }
+    #labAxis,#labPerp{ text-anchor:middle; dominant-baseline:middle; }
+    #crossSVG .axis-line,#crossSVG .perp-line{ vector-effect:non-scaling-stroke; }
+    #labAxis{ fill:#1d9ca0; font-size:12px; }
+    #labPerp{ fill:#a2d3df; font-size:12px; }
+    #crossTool .toric-panel{ margin-top:12px; background: rgba(41,207,168,.14); box-shadow: 0 2px 6px rgba(0,0,0,.25) inset; }
+    #crossTool .toric-row{ display:flex; align-items:center; gap:10px; }
+    #crossTool .toric-row input,
+    #crossTool .toric-row select{
+      flex:1; min-width:40px;
+      background:rgba(0,0,0,.35);
+      color:#fff; border:1px solid rgba(255,255,255,.15);
+      border-radius:6px; padding:6px 4px;
+    }
+    #crossTool .toric-row .toric-lab{ white-space:nowrap; font-size:12px; opacity:.9; }
+    #crossTool .toric-note{ margin-top:8px; font-size:12px; opacity:.8; }
+    #crossTool .toric-out{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+    #crossTool .toric-sep{align-self:center;opacity:.8}
+    #crossTool .toric-line{background:transparent;border:1px solid rgba(255,255,255,.18); border-radius:8px;padding:10px 12px}
+    #crossTool .toric-line.active{border-color:#29cfa8;box-shadow:0 0 0 2px rgba(41,207,168,.2) inset}
+    #crossTool .frac{min-width:240px;display:flex;flex-direction:column;align-items:center}
+    #crossTool .frac .num,#crossTool .frac .den{white-space:nowrap;color:#fff}
+    #crossTool .frac .bar{width:100%;border-top:1px solid rgba(255,255,255,.35);margin:4px 0}
+    #crossTool .arc-tag{color:#29cfa8;font-weight:700}
+    #toricMinusLine, #toricPlusLine { position: relative; }
+    #toricMinusLine::before, #toricPlusLine::before{
+      content: attr(data-badge);
+      position: absolute;
+      top: 6px; left: 10px;
+      padding: 2px 8px;
+      font-size: 11px;
+      color: #e7fff7;
+      background: rgba(5,110,100,.25);
+      border: 1px solid rgba(41,207,168,.2);
+      border-radius: 999px;
+      pointer-events: none;
+      display: none;
+    }
+    #toricMinusLine.show-badge::before,
+    #toricPlusLine.show-badge::before{ display: block; }
+    #toricPlusLine.active::before,
+    #toricMinusLine.active::before{
+      background: rgba(41,207,168,.15);
+      border-color: rgba(41,207,168,.29);
+    }
+    #toricMinusLine.show-badge, 
+    #toricPlusLine.show-badge{
+      padding-top: 38px;    
+    }
+    #toricBackPanel.toric-panel{
+      margin-top:14px;
+      background:rgba(75, 93, 99, 0.2);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:8px;
+      padding:12px;
+    }
+    #toricBackPanel .toric-title{
+      margin:0 0 8px 0; font-size:13px; color:#fff; opacity:.9; text-align:center;
+    }
+    #toricBackPanel .toric-row{ display:flex; gap:10px; align-items:center; margin-bottom:8px; }
+    #toricBackPanel select, 
+    #toricBackPanel input{
+      background:rgba(0,0,0,.35); color:#fff; border:1px solid rgba(255,255,255,.18);
+      border-radius:6px; padding:6px 4px; outline:none; min-width:0 !important; 
+    }
+    #toricBackPanel .axis-input{ width:30px; text-align:center; }
+    #toricBackPanel .num-input{ width:30px; text-align:right; }
+    #toricBackPanel .tb-frac .line{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    #toricBackPanel .tb-out{ margin-top:10px; display:grid; gap:8px; }
+    #toricBackPanel .tb-out .mono{ width:100%; background:rgba(255,255,255,.06); }
+    #toricBackPanel .tb-frac{ display:flex; flex-direction:column; gap:6px;}
+    #toricBackPanel .tb-frac .num .line {gap: 4px!important;}
+    #toricBackPanel .tb-frac .num .axis-input { width: 48px!important;  padding: 4px 4px!important;}
+    #toricBackPanel .tb-frac .num .num-input { width: 68px!important;  padding: 4px 4px!important;}
+    #toricBackPanel .tb-frac .den .line input.num-input { width: 68px!important;}
+    #toricBackPanel .tb-frac .num{ order:1; }
+    #toricBackPanel .tb-frac .bar{ order:2; height:1px; background:rgba(255,255,255,.25); }
+    #toricBackPanel .tb-frac .den{ order:3; }
+
+    #toricBackPanel .tb-frac.back-mode .den{ order:1; }
+    #toricBackPanel .tb-frac.back-mode .bar{ order:2; }
+    #toricBackPanel .tb-frac.back-mode .num{ order:3; }
+    .toric-hint.is-error{
+      display:block !important;
+      margin-top:8px;
+      padding:8px 10px;
+      border-radius:8px;
+      background:rgba(255,184,0,.12);
+      border:1px solid rgba(255,184,0,.35);
+      color:#ffd36b;
+      font-size:12px;
+      line-height:1.5;
+    }
+
     /* 追加覆寫 */
     .time-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
     .time-row label{margin:0;width:auto;}
@@ -757,6 +968,8 @@
       body{overflow:auto;}
       #toolSelector{padding:15px 0}
       #toolSelector button{margin:0 3px;padding:11px 12px;font-size:13px;; flex: 0 0 22.5%;}
+      #crossTool{ width:80vw; max-height:85vh; padding:16px 18px; }
+      #crossTool input{ min-width:80px; }
      
       #timeTool,#morseTool,#binaryTool,#codeTool,#exchangeTool,#unitTool{width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto;}
       /* 捲軸高度調整 */
@@ -782,6 +995,8 @@
       .mode-btn{font-size:12px;}
       .mode-btn.active{font-size:14px;}
       .duration-group input{width:50px;}
+      #crossTool{ padding:14px 16px; }
+      #crossTool input{ min-width:100px; }
     }
   </style>
 </head>
@@ -794,6 +1009,7 @@
     <div id="toolSelector">
       <button id="tool1Btn" class="active">時間管理</button>
       <button id="tool6Btn">單位換算</button>
+      <button id="tool7Btn">光學十字</button>
       <button id="tool5Btn">QR／條碼</button>
       <button id="tool4Btn">匯率轉換</button>
       <button id="tool2Btn">摩斯電碼</button>
@@ -1038,6 +1254,125 @@
           <div id="constValue" class="const-value"></div>
         </div>
       </div>
+    </div>
+  </div>
+  <div id="tool7Container" class="tool-container">
+    <div id="crossTool">
+      <h2>光學十字轉換器</h2>
+      <div class="cross-panel">
+        <div class="cross-label">正/負柱鏡表示</div>
+        <div class="cross-row">
+          <input id="pS" type="number" step="0.25" placeholder="S">
+          <span>DS /</span>
+          <input id="pC" type="number" step="0.25" placeholder="C≥0">
+          <span>DC x </span>
+          <input id="pA" type="number" step="1" min="0" max="180" placeholder="軸(0–180)">
+        </div>
+      </div>
+      <div class="cross-panel">
+        <div class="cross-label">正/負柱鏡表示</div>
+        <div class="cross-row">
+          <input id="mS" type="number" step="0.25" placeholder="S" readonly>
+          <span>DS /</span>
+          <input id="mC" type="number" step="0.25" placeholder="C≤0" readonly>
+          <span>DC x </span>
+          <input id="mA" type="number" step="1" min="0" max="180" placeholder="軸(0–180)" readonly>
+        </div>
+      </div>
+      <div class="cross-panel">
+        <div class="cross-label">子午線表示</div>
+        <div class="cross-row">
+          <input id="kD1" type="number" step="0.25" placeholder="D">
+          <span>D @</span>
+          <input id="kA"  type="number" step="1" min="0" max="180" placeholder="軸(0–180)">
+          <span>；</span>
+          <input id="kD2" type="number" step="0.25" placeholder="D">
+          <span>D @</span>
+          <input id="kA2" type="number" step="1" min="0" max="180" placeholder="軸(可自填或自動=前者+90)">
+        </div>
+      </div>
+      <div class="cross-panel">
+        <div class="cross-label">光學十字</div>
+        <div class="cross-panel">
+          <div class="cross-row cross-size">
+            <label for="crossSize" class="cross-label-inline">調整大小</label>
+            <input id="crossSize" type="range" min="20" max="100" value="60" step="5">
+            <span id="crossSizeVal">60%</span>
+          </div>
+        </div>
+        <svg id="crossSVG" viewBox="0 0 240 240">
+          <defs>
+            <marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <circle cx="3" cy="3" r="1" fill="#0C4743"></circle>
+            </marker>
+          </defs>
+          <g transform="translate(120,120)">
+            <g id="crossG" transform="rotate(0)">
+              <line class="axis-line" x1="-90" y1="0" x2="90" y2="0" marker-start="url(#arrow)" marker-end="url(#arrow)"></line>
+              <line class="perp-line" x1="0" y1="-90" x2="0" y2="90" marker-start="url(#arrow)" marker-end="url(#arrow)"></line>
+            </g>
+            <text id="labAxis" x="0" y="-10"></text>
+            <text id="labPerp" x="0" y="-10"></text>
+          </g>
+        </svg>
+      </div>
+      <div class="panel toric-panel">
+        <div class="cross-label" style="margin-bottom:8px;">環曲面表示法</div>
+        <div class="toric-row">
+          <label class="toric-lab">設定球弧</label>
+          <input id="toricSphere" type="number" min="0" step="0.25" inputmode="decimal" placeholder="輸入D值">
+          <label class="toric-lab">球弧設定於</label>
+          <select id="toricLoc">
+          <option value="front">前表面</option>
+          <option value="back">後表面</option>
+          </select>
+        </div>
+        <div class="toric-note">基弧／正交弧：絕對值較小者為基弧</div>
+        <div class="toric-out">
+          <div id="toricMinusLine" class="toric-line"></div>
+          <div id="toricPlusLine"  class="toric-line"></div>
+          <div id="toricHint" class="toric-hint" style="display:none;"></div>
+        </div>
+      </div>
+      <div id="toricBackPanel" class="toric-panel">
+        <h3 class="toric-title">環曲面表示 → 正/負柱鏡表示</h3>
+        <div class="toric-row">
+          <label>形式
+            <select id="tbForm">
+              <option value="front">正散形式（前表散光）</option>
+              <option value="back">負散形式（後表散光）</option>
+            </select>
+          </label>
+        </div>
+        <div class="frac tb-frac">
+          <div class="num">
+            <div class="line">
+              <input id="tbBase"  class="num-input" type="number" step="0.25" placeholder="基弧">
+              <span>DC×</span>
+              <input id="tbAxis1" class="axis-input" type="number" min="1" max="180" step="1" placeholder="軸">
+              <span> ／ </span>
+              <input id="tbCross" class="num-input" type="number" step="0.25" placeholder="正交弧">
+              <span>DC×</span>
+              <input id="tbAxis2" class="axis-input" type="number" min="1" max="180" step="1" placeholder="軸">
+            </div>
+          </div>
+          <div class="bar"></div>
+          <div class="den">
+            <div class="line">
+              <input id="tbSphere" class="num-input" type="number" step="0.25" placeholder="球弧">
+              <span>DS</span>
+            </div>
+          </div>
+        </div>
+        <div class="tb-out">
+          <label>負柱鏡形式：
+            <input id="tbMinusOut" type="text" class="mono" readonly>
+          </label>
+          <label>正柱鏡形式：
+            <input id="tbPlusOut"  type="text" class="mono" readonly>
+          </label>
+        </div>
+      </div>  
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
@@ -1601,7 +1936,7 @@ syncAudioUI();
     function updateBinary() {
       if (lockBin) return;
       lockBin = true;
-      let d = decIn.value.trim().replace(/,/g, ''); // 允許逗號
+      let d = decIn.value.trim().replace(/,/g, ''); 
       if (d === '') {
         binIn.value = '';
         lockBin = false;
@@ -1609,7 +1944,7 @@ syncAudioUI();
       }
       // 處理小數點
       const parts = d.split('.');
-      const intNum = parseInt(parts[0], 10);//最多處理小數點後兩位
+      const intNum = parseInt(parts[0], 10);
       const intBin = isNaN(intNum) ? '' : intNum.toString(2);
       let fracBin = '';
       if (parts[1] !== undefined) {
@@ -1640,7 +1975,7 @@ syncAudioUI();
         const parts = raw.split(/([,\.\/])/);
         const result = parts.map(part => {
           if (/^[,\.\/]$/.test(part)) {
-            return part; // 保留分隔符
+            return part;
           }
         const b = part.replace(/[^01]/g, '');
           if (b === '') return '';
@@ -2278,6 +2613,425 @@ renderConst();
 
 constCat.addEventListener('change', ()=>{ fillItems(); renderConst(); });
 constItem.addEventListener('change', renderConst);
+
+  /* === 光學十字邏輯 === */
+(() => {
+  const pS = document.getElementById('pS');
+  if (!pS) return;
+
+  const pC = document.getElementById('pC');
+  const pA = document.getElementById('pA');
+  const mS = document.getElementById('mS');
+  const mC = document.getElementById('mC');
+  const mA = document.getElementById('mA');
+  const kD1 = document.getElementById('kD1');
+  const kA  = document.getElementById('kA');
+  const kD2 = document.getElementById('kD2');
+  const kA2 = document.getElementById('kA2');
+
+  const crossG  = document.getElementById('crossG');
+  const labAxis = document.getElementById('labAxis');
+  const labPerp = document.getElementById('labPerp');
+  const toricSphere   = document.getElementById('toricSphere');
+  const toricLoc      = document.getElementById('toricLoc');
+  const toricMinusEl  = document.getElementById('toricMinusLine');
+  const toricPlusEl   = document.getElementById('toricPlusLine');
+  const toricExplain  = document.getElementById('toricExplain');
+  const isFront = (toricLoc?.value === 'front');
+  const sepEl   = document.getElementById('toricSep');
+  const SELECTOR_MODE = 'sphere';// 改成 'toric' 可切到「散光在前/後」
+
+  const sizeInput = document.getElementById('crossSize');
+  const sizeLabel = document.getElementById('crossSizeVal');
+  let   scale     = sizeInput ? Number(sizeInput.value)/100 : 1;
+
+  const BASE_LEN  = 70;
+  const LABEL_PAD = 9;
+  [pS,pC,pA,mS,mC,mA,kA,kA2,kD1,kD2].forEach(el=>{
+    if (!el) return;
+    el.type = 'text';
+    if (el===pA || el===mA || el===kA || el===kA2) el.setAttribute('inputmode','numeric');
+    else el.setAttribute('inputmode','decimal');
+  });
+  [mS,mC,mA].forEach(el=>{ if(el){ el.readOnly = true; } });
+  let updating = false;
+  let editingEl = null;
+  let curS = 0, curC = -1.5, curA = 180;
+
+  const round2 = x => Number(x).toFixed(2);
+  const isZero = v => Math.abs(Number(v)) < 0.005;
+  const fmtSC  = x => (Number(x) >= 0 ? '+' : '') + round2(x).replace(/\.00$/,'');
+  const fmtInputD = v => isZero(v) ? '0.00' : fmtSC(v);
+  const fmtA3  = a => String(a).padStart(3,'0');
+  const fmtLabelD = v => isZero(v) ? 'Plano' : `${fmtSC(v)}D`;
+
+  const normAxis = a => { let x = Math.round(Number(a)||0)%180; if(x<0)x+=180; return x===0?180:x; };
+  const axisRaw0_179 = a => { let x = Math.round(Number(a)||0)%180; if(x<0)x+=180; return x; };
+  const axisSwap90 = a => { const A = normAxis(a); return A>90 ? A-90 : A+90; };
+  const parseNum = v => {
+    const s = String(v??'').trim()
+      .replace(/[^\d+\-.,\u2212]/g,'')  
+      .replace('\u2212','-')             
+      .replace(/,/g,'.');           
+    const n = parseFloat(s);
+    return isFinite(n) ? n : NaN;
+  };
+  function transpose(S,C,A){ return { S:S+C, C:-C, A:axisSwap90(A) }; }
+  function updateLabels(S,C,A){
+    const th  = axisRaw0_179(A) * Math.PI/180;
+    const thP = th + Math.PI/2;
+    const R   = BASE_LEN * scale;
+    const pad = LABEL_PAD;
+    const sAxis = (Math.sin(th)  < 0) ?  1 : -1;
+    const sPerp = (Math.sin(thP) < 0) ?  1 : -1;
+
+    labAxis.setAttribute('transform',
+      `rotate(${th*180/Math.PI}) translate(${sAxis*(R+pad)},0) rotate(${-th*180/Math.PI})`
+    );
+    labAxis.textContent = `${fmtLabelD(S)} @${fmtA3(normAxis(A))}`;
+
+    labPerp.setAttribute('transform',
+      `rotate(${thP*180/Math.PI}) translate(${sPerp*(R+pad)},0) rotate(${-thP*180/Math.PI})`
+    );
+    labPerp.textContent = `${fmtLabelD(S+C)} @${fmtA3(normAxis(axisSwap90(A)))}`;
+  }
+  function updateCross(S,C,A){
+    curS=S; curC=C; curA=A;
+    const a = axisRaw0_179(A);
+    crossG.setAttribute('transform', `rotate(${a}) scale(${scale})`);
+    updateLabels(S,C,A);
+  }
+  function updateAllFromPrimary(){
+    if (updating) return;
+    const S0 = parseNum(pS.value);
+    const C0 = parseNum(pC.value);
+    const A0 = parseNum(pA.value);
+    if (!isFinite(S0) || !isFinite(C0) || !isFinite(A0)){
+      [mS,mC,mA,kD1,kA,kD2,kA2].forEach(el => el && (el.value=''));
+      updateCross(0,0,0);
+      return;
+    }
+    const A = normAxis(A0);
+    updating = true;
+    if (editingEl !== pS) pS.value = fmtInputD(S0);
+    if (editingEl !== pC) pC.value = fmtInputD(C0);
+    if (editingEl !== pA) pA.value = fmtA3(A);
+    const t = transpose(S0, C0, A);
+    mS.value = fmtInputD(t.S);
+    mC.value = fmtInputD(t.C);
+    mA.value = fmtA3(t.A);
+    if (editingEl !== kD1) kD1.value = fmtInputD(S0);
+    if (editingEl !== kA ) kA .value = fmtA3(A);
+    if (editingEl !== kD2) kD2.value = fmtInputD(S0 + C0);
+    if (editingEl !== kA2) kA2.value = fmtA3(normAxis(A + 90));
+
+    updateCross(S0, C0, A);
+    updating = false;
+  }
+  function updateAllFromMeridians(){
+    if (updating) return;
+    const D1 = parseNum(kD1.value);
+    const A1 = parseNum(kA.value);
+    const D2 = parseNum(kD2.value);
+    if (!isFinite(D1) || !isFinite(A1) || !isFinite(D2)){
+      [pS,pC,pA,mS,mC,mA].forEach(el => el && (el.value=''));
+      updateCross(0,0,0);
+      return;
+    }
+    const A = normAxis(A1);
+    const S = D1;
+    const C = D2 - D1;
+    updating = true;
+
+    if (editingEl !== pS) pS.value = fmtInputD(S);
+    if (editingEl !== pC) pC.value = fmtInputD(C);
+    if (editingEl !== pA) pA.value = fmtA3(A);
+
+    const t = transpose(S, C, A);
+    mS.value = fmtInputD(t.S);
+    mC.value = fmtInputD(t.C);
+    mA.value = fmtA3(t.A);
+
+    if (editingEl !== kA2) kA2.value = fmtA3(normAxis(A + 90));
+    if (editingEl !== kD1) kD1.value = fmtInputD(S);
+    if (editingEl !== kA ) kA .value = fmtA3(A);
+    if (editingEl !== kD2) kD2.value = fmtInputD(S + C);
+
+    updateCross(S, C, A);
+    updating = false;
+  }
+
+const fmtRx = (S,C,A) => {
+  const s = (Math.abs(S)<0.005) ? '0.00' : ((S>=0?'+':'') + Number(S).toFixed(2));
+  const c = (Math.abs(C)<0.005) ? '0.00' : ((C>=0?'+':'') + Number(C).toFixed(2));
+  const a = String(normAxis(A)).padStart(3,'0');
+  return `${s}DS ${c}DC ×${a}`;
+};
+
+function pickBaseAndCross(a,b){
+  return (Math.abs(a) <= Math.abs(b))
+    ? { base:a, cross:b }
+    : { base:b, cross:a };
+}
+function updateToric(){
+  if (!toricSphere || !toricMinusEl || !toricPlusEl) return;
+  const BsAbs = Math.abs(parseNum(toricSphere.value));
+  const S0 = parseNum(pS.value), C0 = parseNum(pC.value), A0 = parseNum(pA.value);
+  if (!isFinite(BsAbs) || !isFinite(S0) || !isFinite(C0) || !isFinite(A0)){
+    toricMinusEl.innerHTML = toricPlusEl.innerHTML = '';
+    toricMinusEl.style.display = toricPlusEl.style.display = 'none';
+    return;
+  }
+  const A = normAxis(A0);
+  const M = (C0 <= 0) ? { S:S0,    C:C0,   A }
+                      : { S:S0+C0, C: C0,  A: axisSwap90(A) };
+  const D_axis = M.S;
+  const D_perp = M.S + M.C;
+  const isFrontSel = (toricLoc?.value === 'front');
+  let Sph, T_axis, T_perp;
+  if (SELECTOR_MODE === 'sphere') {
+    Sph    = isFrontSel ? +BsAbs : -BsAbs;
+    T_axis = D_axis - Sph;
+    T_perp = D_perp - Sph;
+  } else { 
+    const toricOnFront = isFrontSel;
+    const sgn = toricOnFront ? +1 : -1;
+    T_axis = sgn * Math.abs(D_axis);
+    T_perp = sgn * Math.abs(D_perp);
+    Sph = D_axis - T_axis; 
+  }
+  const baseIsAxis = Math.abs(T_axis) <= Math.abs(T_perp);
+  const baseVal  = baseIsAxis ? T_axis : T_perp;
+  const baseAxis = baseIsAxis ? A      : axisSwap90(A);
+  const crossVal = baseIsAxis ? T_perp : T_axis;
+  const crossAxis= baseIsAxis ? axisSwap90(A) : A;
+  const fmtDCx = (v, ax) => `${fmtInputD(v)}DC×${fmtA3(ax)}`;
+  const fmtDS  = v => `${fmtInputD(v)}DS`;
+  const frac   = (top,bottom) =>
+    `<div class="frac"><div class="num">${top}</div><div class="bar"></div><div class="den">${bottom}</div></div>`;
+  const topDCs   = `${fmtDCx(baseVal,  axisSwap90(baseAxis))} ／ ${fmtDCx(crossVal, axisSwap90(crossAxis))}`;
+  const bottomDS = `${fmtDS(Sph)}`;
+  toricMinusEl.innerHTML = frac(topDCs, bottomDS); 
+  toricPlusEl .innerHTML = frac(bottomDS, topDCs); 
+  const showRight = isFrontSel;
+  toricPlusEl.style.display  = showRight ? '' : 'none';
+  toricMinusEl.style.display = showRight ? 'none' : '';
+  toricPlusEl.dataset.badge  = '負散形式（後表散光）';
+  toricMinusEl.dataset.badge = '正散形式（前表散光）';
+  toricPlusEl.classList.toggle('show-badge',  showRight);
+  toricMinusEl.classList.toggle('show-badge', !showRight);
+  toricPlusEl.classList.toggle('active',  showRight);
+  toricMinusEl.classList.toggle('active', !showRight);
+  const sepEl = document.getElementById('toricSep');
+  if (sepEl) sepEl.style.display = 'none';
+  const EPS = 0.005;
+  const s1 = Math.abs(T_axis) < EPS ? 0 : Math.sign(T_axis);
+  const s2 = Math.abs(T_perp) < EPS ? 0 : Math.sign(T_perp);
+  let hint = '';
+  const sphereOnFront = (toricLoc?.value === 'front');
+  if ((s1 * s2) <= 0 && (s1 !== 0 || s2 !== 0)) {
+    hint = `散光面兩子午符號相異，該透鏡正確之球弧設定為${sphereOnFront ? '後表面' : '前表面'}`;
+  } else {
+    const allPos = (s1 > 0 && s2 > 0);
+    const allNeg = (s1 < 0 && s2 < 0);
+    if (sphereOnFront && allPos) hint = '該透鏡變成雙凸透鏡，正確之球弧設定為後表面';
+    if (!sphereOnFront && allNeg) hint = '該透鏡變成雙凹透鏡，正確之球弧設定為前表面';
+  }
+setToricHint(hint);
+}
+
+toricSphere?.addEventListener('input',  updateToric);
+toricLoc   ?.addEventListener('change', updateToric);
+const toricHint = document.getElementById('toricHint');
+function setToricHint(msg){
+  if (!toricHint) return;
+  if (msg) { toricHint.textContent = msg; toricHint.style.display = ''; }
+  else     { toricHint.textContent = '';  toricHint.style.display = 'none'; }
+}
+const __endPrimary   = updateAllFromPrimary;
+const __endMeridians = updateAllFromMeridians;
+updateAllFromPrimary = function(){ __endPrimary.call(this);   updateToric(); };
+updateAllFromMeridians = function(){ __endMeridians.call(this); updateToric(); };
+updateToric();
+
+  [pS,pC,pA,kD1,kA,kD2,kA2].forEach(el => el && el.addEventListener('focus', () => { editingEl = el; }));
+
+  [pS,pC,pA,kD1,kA,kD2,kA2].forEach(el => el && el.addEventListener('blur', () => {
+    if (el===pS || el===pC || el===kD1 || el===kD2){
+      const n = parseNum(el.value);
+      if (isFinite(n)) el.value = fmtInputD(n);
+    } else if (el===pA || el===kA || el===kA2){
+      const n = parseNum(el.value);
+      if (isFinite(n)) el.value = fmtA3(normAxis(n));
+    }
+    editingEl = null;
+  }));
+
+  [pS,pC,pA].forEach(el => el.addEventListener('input', updateAllFromPrimary));
+  [kD1,kA,kD2,kA2].forEach(el => el.addEventListener('input', updateAllFromMeridians));
+
+  sizeInput?.addEventListener('input', () => {
+    scale = Number(sizeInput.value)/100;
+    if (sizeLabel) sizeLabel.textContent = `${Math.round(scale*100)}%`;
+    updateCross(curS,curC,curA);
+  });
+
+  pS.value = '0.00'; pC.value = '-1.50'; pA.value = '180';
+  mS.value = '-1.50'; mC.value = '+1.50'; mA.value = '090';
+  updateAllFromPrimary();
+})();
+(() => {
+  const $ = id => document.getElementById(id);
+  const tbForm   = $('tbForm');
+  const tbBase   = $('tbBase');   
+  const tbAxis1  = $('tbAxis1');  
+  const tbCross  = $('tbCross'); 
+  const tbAxis2  = $('tbAxis2');     
+  const tbSphere = $('tbSphere');   
+  const outMinus = $('tbMinusOut');
+  const outPlus  = $('tbPlusOut');  
+
+  const EPS = 0.005;
+  const num = v => {
+    const n = parseFloat(String(v).replace(/[^\d+-.]/g,''));
+    return Number.isFinite(n) ? n : NaN;
+  };
+  const clamp180 = a => {
+    let x = Math.round(num(a) || 0) % 180;
+    if (x <= 0) x += 180;
+    return x;
+  };
+  const axis90 = a => {
+    const A = clamp180(a);
+    return A > 90 ? A - 90 : A + 90;
+  };
+  const fmtA3 = a => String(clamp180(a)).padStart(3,'0');
+  const fmtSigned0 = v => {
+    if (!Number.isFinite(v)) return '';
+    if (Math.abs(v) < EPS) return '0.00';
+    return (v > 0 ? '+' : '-') + Math.abs(v).toFixed(2);
+  };
+  const A1 = document.getElementById('tbAxis1'); 
+  const A2 = document.getElementById('tbAxis2'); 
+  if (!A1 || !A2) return;
+    const norm180 = n => {       
+    let a = Math.round(Number(n)||0) % 180;
+    if (a <= 0) a += 180;
+    return a;
+  };
+  const pad3 = a => String(a).padStart(3,'0');
+  function formatAxis(el){
+    if (!el || el.value === '') return;
+    el.value = pad3(norm180(el.value));
+  }
+  function autoPairFrom(changed){
+    if (changed === A1 && (!A2.value || A2.dataset.auto === '1')) {
+      const a2 = norm180(Number(A1.value) + 90);
+      A2.value = pad3(a2);
+      A2.dataset.auto = '1';
+    } else if (changed === A2 && (!A1.value || A1.dataset.auto === '1')) {
+      const a1 = norm180(Number(A2.value) - 90);
+      A1.value = pad3(a1);
+      A1.dataset.auto = '1';
+    }
+  }
+  ['blur','change'].forEach(evt => {
+    A1.addEventListener(evt, () => { formatAxis(A1); autoPairFrom(A1); A1.dataset.auto='0'; });
+    A2.addEventListener(evt, () => { formatAxis(A2); autoPairFrom(A2); A2.dataset.auto='0'; });
+  });
+  window.padToricBackAxes = function(){
+    formatAxis(A1);
+    formatAxis(A2);
+  };
+  
+  let syncing = false;
+  function syncAxis(who){
+    if (syncing) return;
+    syncing = true;
+    const a1 = num(tbAxis1.value);
+    const a2 = num(tbAxis2.value);
+    if (who === 'a1' && Number.isFinite(a1)) tbAxis2.value = axis90(a1);
+    if (who === 'a2' && Number.isFinite(a2)) tbAxis1.value = axis90(a2);
+    syncing = false;
+  }
+  tbAxis1.addEventListener('input', () => { syncAxis('a1'); updateToricBack(); });
+  tbAxis2.addEventListener('input', () => { syncAxis('a2'); updateToricBack(); });
+
+  [tbBase, tbCross, tbSphere].forEach(el=>{
+    if (!el) return;
+    if (el.type !== 'text') { try{ el.type='text'; }catch(e){} }
+    el.setAttribute('inputmode','decimal');
+    el.addEventListener('blur', () => {
+      const x = num(el.value);
+      if (Number.isFinite(x)) el.value = fmtSigned0(x);
+    });
+  });
+
+  function updateToricBack(){
+    const mode = (tbForm.value || 'front');
+    const S0 = num(tbSphere.value);
+    let   B0 = num(tbBase.value);
+    let   X0 = num(tbCross.value);
+    let   A1 = num(tbAxis1.value);
+    let   A2 = num(tbAxis2.value);
+
+    const a1ok = Number.isFinite(A1), a2ok = Number.isFinite(A2);
+    if (a1ok && !a2ok) A2 = axis90(A1);
+    if (!a1ok && a2ok) A1 = axis90(A2);
+
+    if (![S0,B0,X0,A1,A2].every(Number.isFinite)) {
+      outMinus.value = ''; outPlus.value = '';
+      return;
+    }
+
+    if (Math.abs(B0) > Math.abs(X0)) { [B0,X0] = [X0,B0]; [A1,A2] = [A2,A1]; }
+    const sgn = x => (Math.abs(x) < EPS ? 0 : (x>0? +1 : -1));
+    const sS  = sgn(S0);
+    const sB  = sgn(B0);
+    const sX  = sgn(X0);
+    const errs = [];
+
+    if (mode === 'back'){
+      if (sB >= 0.005 || sX >= 0.005) errs.push('後表散光：散光面應為負值');
+      if (sS <= -0.005)            errs.push('後表散光：球弧應為正值');
+    } else {           
+      if (sB <= -0.005 || sX <= -0.005) errs.push('前表散光：散光面應為正值');
+      if (sS >= 0.005)            errs.push('前表散光：球弧應為負值');
+    }
+    if (sB * sX < 0) errs.push('散光面兩子午符號相異（鞍形），非新月形');
+
+    if (errs.length){
+      alert(errs.join('\n'));
+      outMinus.value = ''; outPlus.value = '';
+      return;
+    }
+
+    const F1 = S0 + B0; 
+    const F2 = S0 + X0; 
+
+    let Sminus, Cminus, Aminus, Splus, Cplus, Aplus;
+    if (F1 >= F2){
+      Sminus = F1; Cminus = F2 - F1; Aminus = A1; 
+      Splus  = F2; Cplus  = F1 - F2; Aplus  = A2;  
+    }else{
+      Sminus = F2; Cminus = F1 - F2; Aminus = A2;
+      Splus  = F1; Cplus  = F2 - F1; Aplus  = A1;
+    }
+    outMinus.value = `${fmtSigned0(Sminus)}DS/${fmtSigned0(Cminus)}DC × ${fmtA3(Aminus)}`;
+    outPlus .value = `${fmtSigned0(Splus )}DS/${fmtSigned0(Cplus )}DC × ${fmtA3(Aplus )}`;
+  }
+  ['input','change'].forEach(ev=>{
+    [tbForm,tbBase,tbCross,tbSphere].forEach(el=>{
+      el && el.addEventListener(ev, updateToricBack, {passive:true});
+    });
+  });
+  [tbBase,tbCross,tbSphere].forEach(el=>{
+    if (el && el.value.trim()!==''){
+      const v = num(el.value); if (Number.isFinite(v)) el.value = fmtSigned0(v);
+    }
+  });
+  updateToricBack();
+})();
   /* === 小工具列邏輯 === */
   const tabBtns = Array.from(document.querySelectorAll('#toolSelector button'));
   const containers = tabBtns.map(b =>
