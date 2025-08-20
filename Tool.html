@@ -881,7 +881,16 @@
     #toricBackPanel .tb-frac .num{ order:1; }
     #toricBackPanel .tb-frac .bar{ order:2; height:1px; background:rgba(255,255,255,.25); }
     #toricBackPanel .tb-frac .den{ order:3; }
-
+    .mini-sign-btn{
+      margin-left:6px; padding:4px 8px;
+      font-size:12px; line-height:1;
+      color:#eafff7; background:rgba(41,207,168,.18);
+      border:1px solid rgba(41,207,168,.45);
+      border-radius:6px; cursor:pointer; user-select:none;
+      transition:transform .08s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .mini-sign-btn:hover{ background:rgba(41,207,168,.28); box-shadow:0 2px 8px rgba(0,0,0,.3); }
+    .mini-sign-btn:active{ transform:scale(.98); }
     #toricBackPanel .tb-frac.back-mode .den{ order:1; }
     #toricBackPanel .tb-frac.back-mode .bar{ order:2; }
     #toricBackPanel .tb-frac.back-mode .num{ order:3; }
@@ -896,6 +905,36 @@
       font-size:12px;
       line-height:1.5;
     }
+    .is-invalid{
+    outline:2px solid #ffb84d !important;
+    box-shadow:0 0 0 2px rgba(255,184,0,.35) inset !important;
+    }
+    #tbMsg{
+      margin-top:8px; padding:8px 10px;
+      border-radius:8px;
+      background:rgba(255,184,0,.12);
+      border:1px solid rgba(255,184,0,.35);
+      color:#ffd36b; font-size:12px; line-height:1.5;
+    }
+    #toricBackPanel .tb-form-row{
+      display:flex; align-items:center; gap:10px;margin-bottom:8px;
+    }
+    #toricBackPanel .tb-form-row > label{ min-width:48px; }
+    #tbClearBtn{
+      margin-left:auto;
+      padding:6px 12px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.06);
+      color:#fff;
+      cursor:pointer;
+      transition:transform .08s ease, box-shadow .15s ease, background .15s ease;
+    }
+    #tbClearBtn:hover{
+     background:rgba(255,255,255,.12);
+      box-shadow:0 4px 12px rgba(0,0,0,.25) inset;
+    }
+    #tbClearBtn:active{ transform:scale(.98); }
 
     /* 追加覆寫 */
     .time-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
@@ -1258,15 +1297,15 @@
   </div>
   <div id="tool7Container" class="tool-container">
     <div id="crossTool">
-      <h2>光學十字轉換器</h2>
+      <h2>光學十字轉換器（ 規則性散光 ）</h2>
       <div class="cross-panel">
         <div class="cross-label">正/負柱鏡表示</div>
         <div class="cross-row">
           <input id="pS" type="number" step="0.25" placeholder="S">
           <span>DS /</span>
-          <input id="pC" type="number" step="0.25" placeholder="C≥0">
+          <input id="pC" type="number" step="0.25" placeholder="C">
           <span>DC x </span>
-          <input id="pA" type="number" step="1" min="0" max="180" placeholder="軸(0–180)">
+          <input id="pA" type="number" step="1" min="0" max="180" placeholder="軸">
         </div>
       </div>
       <div class="cross-panel">
@@ -1274,9 +1313,9 @@
         <div class="cross-row">
           <input id="mS" type="number" step="0.25" placeholder="S" readonly>
           <span>DS /</span>
-          <input id="mC" type="number" step="0.25" placeholder="C≤0" readonly>
+          <input id="mC" type="number" step="0.25" placeholder="C" readonly>
           <span>DC x </span>
-          <input id="mA" type="number" step="1" min="0" max="180" placeholder="軸(0–180)" readonly>
+          <input id="mA" type="number" step="1" min="0" max="180" placeholder="軸" readonly>
         </div>
       </div>
       <div class="cross-panel">
@@ -1284,11 +1323,11 @@
         <div class="cross-row">
           <input id="kD1" type="number" step="0.25" placeholder="D">
           <span>D @</span>
-          <input id="kA"  type="number" step="1" min="0" max="180" placeholder="軸(0–180)">
+          <input id="kA"  type="number" step="1" min="0" max="180" placeholder="軸">
           <span>；</span>
           <input id="kD2" type="number" step="0.25" placeholder="D">
           <span>D @</span>
-          <input id="kA2" type="number" step="1" min="0" max="180" placeholder="軸(可自填或自動=前者+90)">
+          <input id="kA2" type="number" step="1" min="0" max="180" placeholder="軸">
         </div>
       </div>
       <div class="cross-panel">
@@ -1320,7 +1359,7 @@
         <div class="cross-label" style="margin-bottom:8px;">環曲面表示法</div>
         <div class="toric-row">
           <label class="toric-lab">設定球弧</label>
-          <input id="toricSphere" type="number" min="0" step="0.25" inputmode="decimal" placeholder="輸入D值">
+          <input id="toricSphere" type="number" min="0" step="0.25" inputmode="decimal" placeholder="輸入D值(絕對值)">
           <label class="toric-lab">球弧設定於</label>
           <select id="toricLoc">
           <option value="front">前表面</option>
@@ -1336,13 +1375,13 @@
       </div>
       <div id="toricBackPanel" class="toric-panel">
         <h3 class="toric-title">環曲面表示 → 正/負柱鏡表示</h3>
-        <div class="toric-row">
-          <label>形式
-            <select id="tbForm">
+          <div class="tb-row tb-form-row">
+            <label>形式</label>
+              <select id="tbForm">
               <option value="front">正散形式（前表散光）</option>
               <option value="back">負散形式（後表散光）</option>
             </select>
-          </label>
+          <button id="tbClearBtn" type="button" class="tb-clear-btn" aria-label="清除本區欄位">清除</button>
         </div>
         <div class="frac tb-frac">
           <div class="num">
@@ -1364,6 +1403,7 @@
             </div>
           </div>
         </div>
+        <div id="tbMsg" style="display:none"></div>
         <div class="tb-out">
           <label>負柱鏡形式：
             <input id="tbMinusOut" type="text" class="mono" readonly>
@@ -2632,31 +2672,61 @@ constItem.addEventListener('change', renderConst);
   const crossG  = document.getElementById('crossG');
   const labAxis = document.getElementById('labAxis');
   const labPerp = document.getElementById('labPerp');
-  const toricSphere   = document.getElementById('toricSphere');
-  const toricLoc      = document.getElementById('toricLoc');
-  const toricMinusEl  = document.getElementById('toricMinusLine');
-  const toricPlusEl   = document.getElementById('toricPlusLine');
-  const toricExplain  = document.getElementById('toricExplain');
-  const isFront = (toricLoc?.value === 'front');
-  const sepEl   = document.getElementById('toricSep');
-  const SELECTOR_MODE = 'sphere';// 改成 'toric' 可切到「散光在前/後」
+
+  const toricSphere  = document.getElementById('toricSphere');
+  const toricLoc     = document.getElementById('toricLoc');
+  const toricMinusEl = document.getElementById('toricMinusLine');
+  const toricPlusEl  = document.getElementById('toricPlusLine');
+  const SELECTOR_MODE = 'sphere';
 
   const sizeInput = document.getElementById('crossSize');
   const sizeLabel = document.getElementById('crossSizeVal');
-  let   scale     = sizeInput ? Number(sizeInput.value)/100 : 1;
 
+  let scale = sizeInput ? Number(sizeInput.value)/100 : 1;
   const BASE_LEN  = 70;
   const LABEL_PAD = 9;
-  [pS,pC,pA,mS,mC,mA,kA,kA2,kD1,kD2].forEach(el=>{
-    if (!el) return;
-    el.type = 'text';
-    if (el===pA || el===mA || el===kA || el===kA2) el.setAttribute('inputmode','numeric');
-    else el.setAttribute('inputmode','decimal');
+  [pS,pC,pA,mS,mC,mA,kD1,kA,kD2,kA2,toricSphere].forEach(el=>{
+    try { el.type = 'text'; } catch(_) {}
+    el.setAttribute('inputmode','tel');
+    el.addEventListener('input', () => {
+      const caret = el.selectionStart;
+      const cleaned = (el===pA || el===mA || el===kA || el===kA2)
+        ? cleanTel(el.value).replace(/^-/, '') 
+        : cleanTel(el.value);
+      el.value = cleaned;
+      try { el.setSelectionRange(caret, caret); } catch(_) {}
+    }, {passive:true});
   });
-  [mS,mC,mA].forEach(el=>{ if(el){ el.readOnly = true; } });
+  [mS,mC,mA].forEach(el=>{ if (el) el.readOnly = true; });
+  
+  function injectSignBtn(input, onFlip) {
+    if (!input) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mini-sign-btn';
+    btn.textContent = '±';
+    input.insertAdjacentElement('afterend', btn);
+    btn.addEventListener('click', () => {
+      const v = parseNum(input.value);
+      if (!Number.isFinite(v)) return;
+      const nv = -v;
+      input.value = isZero(nv) ? '0.00' : fmtInputD(nv);
+      if (typeof onFlip === 'function') onFlip();
+      input.dispatchEvent(new Event('input',  {bubbles:true}));
+      input.dispatchEvent(new Event('change', {bubbles:true}));
+    });
+  }
+  injectSignBtn(pS, () => updateAllFromPrimary());
+  injectSignBtn(pC, () => updateAllFromPrimary());
+  injectSignBtn(kD1, () => updateAllFromMeridians());
+  injectSignBtn(kD2, () => updateAllFromMeridians());
+
+
   let updating = false;
   let editingEl = null;
-  let curS = 0, curC = -1.5, curA = 180;
+  let toricSphereTouched = false;
+  const numInputs  = [pS,pC,mS,mC,kD1,kD2].filter(Boolean);
+  const axisInputs = [pA,mA,kA,kA2].filter(Boolean);
 
   const round2 = x => Number(x).toFixed(2);
   const isZero = v => Math.abs(Number(v)) < 0.005;
@@ -2665,17 +2735,88 @@ constItem.addEventListener('change', renderConst);
   const fmtA3  = a => String(a).padStart(3,'0');
   const fmtLabelD = v => isZero(v) ? 'Plano' : `${fmtSC(v)}D`;
 
-  const normAxis = a => { let x = Math.round(Number(a)||0)%180; if(x<0)x+=180; return x===0?180:x; };
+  const normAxis = a => { let x = Math.round(Number(a)||0)%180; if(x<=0)x+=180; return x; };
   const axisRaw0_179 = a => { let x = Math.round(Number(a)||0)%180; if(x<0)x+=180; return x; };
   const axisSwap90 = a => { const A = normAxis(a); return A>90 ? A-90 : A+90; };
+
+  const cleanSignedDecimal = s => {
+    s = String(s ?? '')
+      .replace(/\u2212|–|—/g,'-')
+      .replace(/[^\d\.\-]/g,'');
+    let neg = false;
+    if (s.startsWith('-')) { neg = true; s = s.slice(1); }
+    s = s.replace(/-/g,'');
+    const parts = s.split('.');
+    const head = parts.shift() || '';
+    const tail = parts.join('');
+    let out = head.replace(/^0+(\d)/,'$1');
+    if (tail) out += '.' + tail.replace(/\./g,'');
+    if (out === '' || out === '.') out = '0';
+    return (neg ? '-' : '') + out;
+  };
+  const cleanAxisTyping = s => String(s ?? '').replace(/[^\d]/g,'').slice(0,3);
+  const cleanTel = (s) => {
+    s = String(s ?? '')
+        .replace(/[−–—]/g, '-')  
+        .replace(/,/g, '.')      
+        .replace(/[^\d.\-]/g, ''); 
+    s = s.replace(/(?!^)-/g, '');
+    const firstDot = s.indexOf('.');
+    if (firstDot !== -1) {
+      s = s.slice(0, firstDot + 1) + s.slice(firstDot + 1).replace(/\./g, '');
+    }
+    return s;
+  };
   const parseNum = v => {
-    const s = String(v??'').trim()
-      .replace(/[^\d+\-.,\u2212]/g,'')  
-      .replace('\u2212','-')             
-      .replace(/,/g,'.');           
+    const s = cleanSignedDecimal(v);
     const n = parseFloat(s);
     return isFinite(n) ? n : NaN;
   };
+  function clearToricUI(){
+    if (toricMinusEl) { toricMinusEl.innerHTML=''; toricMinusEl.style.display='none'; }
+    if (toricPlusEl ) { toricPlusEl .innerHTML=''; toricPlusEl .style.display='none'; }
+    setToricHint('');
+  }  
+  toricSphere?.addEventListener('input', () => {
+    toricSphereTouched = true;
+    updateToric();
+  });
+  toricLoc?.addEventListener('change', () => {
+    updateToric();
+  });
+
+function parseNumSoft(v){
+  const s = String(v ?? '')
+    .replace(/\u2212/g, '-')    
+    .replace(/[^\d+.\-]/g, '')  
+    .replace(/(?!^)-/g, '');     
+  const n = parseFloat(s);
+  return Number.isFinite(n) ? n : NaN;
+}
+  
+  function formatField(el){
+    if (!el) return;
+    const v = parseNum(el.value);
+    if (!Number.isFinite(v)) return;
+    if (axisInputs.includes(el)) {
+      el.value = fmtA3(normAxis(v));
+    } else {
+      el.value = fmtInputD(v);          
+    }
+  }
+  function formatAllExcept(except){
+    [...numInputs, ...axisInputs].forEach(el=>{
+      if (el && el !== except) formatField(el);
+    });
+  }
+  let lastFocused = null;
+  [...numInputs, ...axisInputs].forEach(el=>{
+    el.addEventListener('focus', () => {
+      if (lastFocused && lastFocused !== el) formatField(lastFocused);
+      editingEl   = el;    
+      lastFocused = el;
+    });
+  });
   function transpose(S,C,A){ return { S:S+C, C:-C, A:axisSwap90(A) }; }
   function updateLabels(S,C,A){
     const th  = axisRaw0_179(A) * Math.PI/180;
@@ -2761,21 +2902,26 @@ constItem.addEventListener('change', renderConst);
     updating = false;
   }
 
-const fmtRx = (S,C,A) => {
-  const s = (Math.abs(S)<0.005) ? '0.00' : ((S>=0?'+':'') + Number(S).toFixed(2));
-  const c = (Math.abs(C)<0.005) ? '0.00' : ((C>=0?'+':'') + Number(C).toFixed(2));
-  const a = String(normAxis(A)).padStart(3,'0');
-  return `${s}DS ${c}DC ×${a}`;
-};
+  const fmtRx = (S,C,A) => {
+    const s = (Math.abs(S)<0.005) ? '0.00' : ((S>=0?'+':'') + Number(S).toFixed(2));
+    const c = (Math.abs(C)<0.005) ? '0.00' : ((C>=0?'+':'') + Number(C).toFixed(2));
+    const a = String(normAxis(A)).padStart(3,'0');
+    return `${s}DS ${c}DC ×${a}`;
+  };
 
-function pickBaseAndCross(a,b){
-  return (Math.abs(a) <= Math.abs(b))
-    ? { base:a, cross:b }
-    : { base:b, cross:a };
-}
-function updateToric(){
+  function pickBaseAndCross(a,b){
+    return (Math.abs(a) <= Math.abs(b))
+      ? { base:a, cross:b }
+      : { base:b, cross:a };
+  }
+  function updateToric(){
   if (!toricSphere || !toricMinusEl || !toricPlusEl) return;
-  const BsAbs = Math.abs(parseNum(toricSphere.value));
+  const Bs = parseNum(toricSphere?.value);
+  if (!toricSphereTouched || !Number.isFinite(Bs)) {
+    clearToricUI();
+    return;
+  }
+  const BsAbs = Math.abs(Bs);
   const S0 = parseNum(pS.value), C0 = parseNum(pC.value), A0 = parseNum(pA.value);
   if (!isFinite(BsAbs) || !isFinite(S0) || !isFinite(C0) || !isFinite(A0)){
     toricMinusEl.innerHTML = toricPlusEl.innerHTML = '';
@@ -2875,13 +3021,25 @@ updateToric();
     if (sizeLabel) sizeLabel.textContent = `${Math.round(scale*100)}%`;
     updateCross(curS,curC,curA);
   });
+  const __origUpdateAllFromPrimary = updateAllFromPrimary;
+  updateAllFromPrimary = function(){
+    __origUpdateAllFromPrimary.call(this);
+    formatAllExcept(editingEl);
+  };
 
+  const __origUpdateAllFromMeridians = updateAllFromMeridians;
+  updateAllFromMeridians = function(){
+    __origUpdateAllFromMeridians.call(this);
+    formatAllExcept(editingEl);
+  };
   pS.value = '0.00'; pC.value = '-1.50'; pA.value = '180';
   mS.value = '-1.50'; mC.value = '+1.50'; mA.value = '090';
   updateAllFromPrimary();
 })();
+
 (() => {
   const $ = id => document.getElementById(id);
+  const tbPanel = document.getElementById('toricBackPanel');
   const tbForm   = $('tbForm');
   const tbBase   = $('tbBase');   
   const tbAxis1  = $('tbAxis1');  
@@ -2890,12 +3048,12 @@ updateToric();
   const tbSphere = $('tbSphere');   
   const outMinus = $('tbMinusOut');
   const outPlus  = $('tbPlusOut');  
+  const tbFrac = document.querySelector('#toricBackPanel .tb-frac');
+  const tbClearBtn = document.getElementById('tbClearBtn');
+  const tbHint   = $('tbHint'); 
+  
 
   const EPS = 0.005;
-  const num = v => {
-    const n = parseFloat(String(v).replace(/[^\d+-.]/g,''));
-    return Number.isFinite(n) ? n : NaN;
-  };
   const clamp180 = a => {
     let x = Math.round(num(a) || 0) % 180;
     if (x <= 0) x += 180;
@@ -2905,12 +3063,111 @@ updateToric();
     const A = clamp180(a);
     return A > 90 ? A - 90 : A + 90;
   };
-  const fmtA3 = a => String(clamp180(a)).padStart(3,'0');
-  const fmtSigned0 = v => {
-    if (!Number.isFinite(v)) return '';
-    if (Math.abs(v) < EPS) return '0.00';
-    return (v > 0 ? '+' : '-') + Math.abs(v).toFixed(2);
+    const cleanSignedDecimal = s => {
+    s = String(s ?? '')
+      .replace(/\u2212|–|—/g,'-')
+      .replace(/[^\d\.\-]/g,'');
+    let neg = false;
+    if (s.startsWith('-')) { neg = true; s = s.slice(1); }
+    s = s.replace(/-/g,'');
+    const parts = s.split('.');
+    const head = parts.shift() || '';
+    const tail = parts.join('');
+    let out = head.replace(/^0+(\d)/,'$1');
+    if (tail) out += '.' + tail.replace(/\./g,'');
+    if (out === '' || out === '.') out = '0';
+    return (neg ? '-' : '') + out;
   };
+  const num = v => {
+    const s = cleanSignedDecimal(v);
+    const n = parseFloat(s);
+    return Number.isFinite(n) ? n : NaN;
+  };
+
+  const setWarn = (el, on) => { if (el) el.classList.toggle('warn', !!on); };
+  const setHint = msg => {
+    if (!tbHint) return;
+    if (msg) { tbHint.textContent = msg; tbHint.style.display = ''; }
+    else { tbHint.textContent = ''; tbHint.style.display = 'none'; }
+  };
+
+  [tbBase, tbCross, tbSphere].forEach(el=>{
+    if (!el) return;
+    try { el.type = 'text'; } catch(e){}
+    el.setAttribute('inputmode','tel');
+    el.addEventListener('input', () => { el.value = cleanSignedDecimal(el.value); });
+    el.addEventListener('blur',  () => {
+      const v = num(el.value);
+      if (Number.isFinite(v)) el.value = fmtSigned0(v);
+    });
+  });
+
+  [tbAxis1, tbAxis2].forEach(el=>{
+    if (!el) return;
+    try { el.type = 'text'; } catch(e){}
+    el.setAttribute('inputmode','numeric');
+    el.addEventListener('input', () => {
+      el.value = String(el.value).replace(/[^\d]/g,'').slice(0,3);
+    });
+    el.addEventListener('blur', () => { el.value = fmtA3(el.value); });
+  });
+
+  function forceTextTel(el){
+    if (!el) return;
+    try { el.type = 'text'; } catch(e){}
+    el.setAttribute('inputmode','tel');
+  }
+  [ tbSphere, tbBase, tbCross ].forEach(forceTextTel);
+  function addSignBtn(el){
+    if (!el || el.dataset.hasSign==='1') return;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'mini-sign-btn';
+    b.textContent = '±';
+    b.addEventListener('click', () => {
+        cutSound.currentTime = 0;
+        cutSound.play();
+      const v = num(el.value);
+      if (!Number.isFinite(v)) return;
+      const nv = (Math.abs(v) < EPS) ? 0 : -v;
+      el.value = fmtSigned0(nv);
+      el.dispatchEvent(new Event('input', {bubbles:true}));
+      el.dispatchEvent(new Event('change',{bubbles:true}));
+    });
+    el.insertAdjacentElement('afterend', b);
+   el.dataset.hasSign='1';
+  }
+  [ tbSphere, tbBase, tbCross ].forEach(addSignBtn);
+  
+  function clearInvalid(){
+    [tbSphere,tbBase,tbCross,tbAxis1,tbAxis2].forEach(el=>el&&el.classList.remove('is-invalid'));
+  }
+  function markInvalid(arr){ arr.forEach(el=>el&&el.classList.add('is-invalid')); }
+  ['tbBase','tbCross','tbSphere'].forEach(id => bindSignBtn(document.getElementById(id)));
+
+  function bindSignBtn(input){
+    if (!input) return;
+    const root = tbPanel || document;
+    let btn = root.querySelector(`.mini-sign-btn[data-target="${input.id}"]`)
+           || (input.nextElementSibling?.classList?.contains('mini-sign-btn') ? input.nextElementSibling : null);
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+        cutSound.currentTime = 0;
+        cutSound.play();
+      let v = num(input.value);
+      if (!Number.isFinite(v)) v = 0;
+      input.value = fmtSigned0(-v);
+      updateToricBack();
+    });
+  }
+  [tbBase, tbCross, tbSphere].forEach(bindSignBtn);
+
+  const fmtA3 = a => String(clamp180(a)).padStart(3,'0');
+  function fmtSigned0(n){
+    if (!Number.isFinite(n)) return '';
+    if (Math.abs(n) < 0.005) return '0.00';
+    return (n >= 0 ? '+' : '-') + Math.abs(n).toFixed(2);
+  }
   const A1 = document.getElementById('tbAxis1'); 
   const A2 = document.getElementById('tbAxis2'); 
   if (!A1 || !A2) return;
@@ -2920,10 +3177,38 @@ updateToric();
     return a;
   };
   const pad3 = a => String(a).padStart(3,'0');
+
+  function bindSignButton(input){
+    if (!input) return;
+    const btn = (input.nextElementSibling && input.nextElementSibling.classList?.contains('mini-sign-btn'))
+      ? input.nextElementSibling
+      : document.querySelector(`.mini-sign-btn[data-target="${input.id}"]`);
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      try{ cutSound.currentTime = 0; cutSound.play(); }catch(e){}
+      const val = parseNumSoft(input.value);
+      if (!Number.isFinite(val)) return;
+      const flipped = -val;
+      input.value = fmtSigned0(flipped);
+      input.dispatchEvent(new Event('input',  { bubbles:true }));
+      input.dispatchEvent(new Event('change', { bubbles:true }));
+      if (input === pS || input === pC || input === pA) {
+        updateAllFromPrimary();
+      } else if (input === kD1 || input === kD2 || input === kA || input === kA2) {
+        updateAllFromMeridians();
+      }
+    });
+  }
+  [pS, pC, kD1, kD2].forEach(bindSignButton);
+
   function formatAxis(el){
     if (!el || el.value === '') return;
     el.value = pad3(norm180(el.value));
   }
+  function applyTBLayout(){ const isBack = tbForm.value === 'back'; tbFrac.classList.toggle('back-mode', isBack); }
+  tbForm.addEventListener('change', () => { applyTBLayout(); updateToricBack(); });
+  applyTBLayout();
+
   function autoPairFrom(changed){
     if (changed === A1 && (!A2.value || A2.dataset.auto === '1')) {
       const a2 = norm180(Number(A1.value) + 90);
@@ -2943,19 +3228,18 @@ updateToric();
     formatAxis(A1);
     formatAxis(A2);
   };
-  
   let syncing = false;
   function syncAxis(who){
     if (syncing) return;
     syncing = true;
     const a1 = num(tbAxis1.value);
     const a2 = num(tbAxis2.value);
-    if (who === 'a1' && Number.isFinite(a1)) tbAxis2.value = axis90(a1);
-    if (who === 'a2' && Number.isFinite(a2)) tbAxis1.value = axis90(a2);
+    if (who === 'a1' && Number.isFinite(a1)) tbAxis2.value = fmtA3(axis90(a1));
+    if (who === 'a2' && Number.isFinite(a2)) tbAxis1.value = fmtA3(axis90(a2));
     syncing = false;
   }
-  tbAxis1.addEventListener('input', () => { syncAxis('a1'); updateToricBack(); });
-  tbAxis2.addEventListener('input', () => { syncAxis('a2'); updateToricBack(); });
+  tbAxis1?.addEventListener('input', () => { syncAxis('a1'); updateToricBack(); });
+  tbAxis2?.addEventListener('input', () => { syncAxis('a2'); updateToricBack(); });
 
   [tbBase, tbCross, tbSphere].forEach(el=>{
     if (!el) return;
@@ -2966,9 +3250,21 @@ updateToric();
       if (Number.isFinite(x)) el.value = fmtSigned0(x);
     });
   });
-
+  function setTBHint(msg){
+    if (!tbMsg) return;
+    if (msg && msg.trim()){
+      tbMsg.textContent = msg;
+      tbMsg.style.display = 'block';
+    }else{
+      tbMsg.textContent = '';
+      tbMsg.style.display = 'none';
+    }
+  }
+  const markBad = (el, bad) => { if (el) el.classList.toggle('is-invalid', !!bad); };
   function updateToricBack(){
-    const mode = (tbForm.value || 'front');
+    setTBHint('');
+    [tbBase,tbCross,tbSphere].forEach(el=>markBad(el,false));
+    const mode = (tbForm.value || 'front');   
     const S0 = num(tbSphere.value);
     let   B0 = num(tbBase.value);
     let   X0 = num(tbCross.value);
@@ -2978,37 +3274,35 @@ updateToric();
     const a1ok = Number.isFinite(A1), a2ok = Number.isFinite(A2);
     if (a1ok && !a2ok) A2 = axis90(A1);
     if (!a1ok && a2ok) A1 = axis90(A2);
-
     if (![S0,B0,X0,A1,A2].every(Number.isFinite)) {
       outMinus.value = ''; outPlus.value = '';
       return;
     }
-
     if (Math.abs(B0) > Math.abs(X0)) { [B0,X0] = [X0,B0]; [A1,A2] = [A2,A1]; }
     const sgn = x => (Math.abs(x) < EPS ? 0 : (x>0? +1 : -1));
-    const sS  = sgn(S0);
-    const sB  = sgn(B0);
-    const sX  = sgn(X0);
+    const sS  = sgn(S0), sB = sgn(B0), sX = sgn(X0);
     const errs = [];
-
-    if (mode === 'back'){
-      if (sB >= 0.005 || sX >= 0.005) errs.push('後表散光：散光面應為負值');
-      if (sS <= -0.005)            errs.push('後表散光：球弧應為正值');
-    } else {           
-      if (sB <= -0.005 || sX <= -0.005) errs.push('前表散光：散光面應為正值');
-      if (sS >= 0.005)            errs.push('前表散光：球弧應為負值');
-    }
-    if (sB * sX < 0) errs.push('散光面兩子午符號相異（鞍形），非新月形');
-
-    if (errs.length){
-      alert(errs.join('\n'));
-      outMinus.value = ''; outPlus.value = '';
-      return;
-    }
-
-    const F1 = S0 + B0; 
-    const F2 = S0 + X0; 
-
+      if (mode === 'back'){       
+        if (sB > 0) { errs.push('後表散光：基弧應為負值'); markBad(tbBase, true); }
+        if (sX > 0) { errs.push('後表散光：正交弧應為負值'); markBad(tbCross, true); }
+        if (sS < 0) { errs.push('後表散光：球弧應為正值'); markBad(tbSphere,true); }
+      } else {     
+        if (sB < 0) { errs.push('前表散光：基弧應為正值'); markBad(tbBase, true); }
+        if (sX < 0) { errs.push('前表散光：正交弧應為正值'); markBad(tbCross, true); }
+        if (sS > 0) { errs.push('前表散光：球弧應為負值'); markBad(tbSphere,true); }
+      }
+      if (sB * sX < 0) {
+        errs.push('散光面兩子午符號相異（鞍形），非新月形');
+        markBad(tbBase, true); markBad(tbCross, true);
+      }
+      if (errs.length){
+        outMinus.value = '';
+        outPlus.value  = '';
+        setTBHint(errs.join('；'));
+        return;
+      }
+    const F1 = S0 + B0;
+    const F2 = S0 + X0;
     let Sminus, Cminus, Aminus, Splus, Cplus, Aplus;
     if (F1 >= F2){
       Sminus = F1; Cminus = F2 - F1; Aminus = A1; 
@@ -3020,18 +3314,28 @@ updateToric();
     outMinus.value = `${fmtSigned0(Sminus)}DS/${fmtSigned0(Cminus)}DC × ${fmtA3(Aminus)}`;
     outPlus .value = `${fmtSigned0(Splus )}DS/${fmtSigned0(Cplus )}DC × ${fmtA3(Aplus )}`;
   }
-  ['input','change'].forEach(ev=>{
-    [tbForm,tbBase,tbCross,tbSphere].forEach(el=>{
-      el && el.addEventListener(ev, updateToricBack, {passive:true});
+
+    ['input','change'].forEach(ev=>{
+      [tbForm,tbBase,tbCross,tbSphere].forEach(el=>{
+        el && el.addEventListener(ev, updateToricBack, {passive:true});
+      });
     });
-  });
-  [tbBase,tbCross,tbSphere].forEach(el=>{
-    if (el && el.value.trim()!==''){
-      const v = num(el.value); if (Number.isFinite(v)) el.value = fmtSigned0(v);
-    }
-  });
-  updateToricBack();
+    [tbBase,tbCross,tbSphere].forEach(el=>{
+      if (el && el.value.trim()!==''){
+        const v = num(el.value); if (Number.isFinite(v)) el.value = fmtSigned0(v);
+      }
+    });
+    tbClearBtn?.addEventListener('click', () => {
+      try{ cutSound.currentTime=0; cutSound.play(); }catch(e){}
+      [tbBase, tbAxis1, tbCross, tbAxis2, tbSphere].forEach(el => { if (el) el.value = ''; });
+      if (typeof setHint === 'function') setHint('');
+      if (outMinus) outMinus.value = '';
+      if (outPlus)  outPlus.value  = '';
+      if (typeof updateToricBack === 'function') updateToricBack();
+    });
+    updateToricBack();
 })();
+
   /* === 小工具列邏輯 === */
   const tabBtns = Array.from(document.querySelectorAll('#toolSelector button'));
   const containers = tabBtns.map(b =>
