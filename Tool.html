@@ -815,7 +815,7 @@
       flex:1; min-width:40px;
       background:rgba(0,0,0,.35);
       color:#fff; border:1px solid rgba(255,255,255,.15);
-      border-radius:6px; padding:6px 4px;
+      border-radius:6px; padding:6px 2px;
     }
     #crossTool .toric-row .toric-lab{ white-space:nowrap; font-size:12px; opacity:.9; }
     #crossTool .toric-note{ margin-top:8px; font-size:12px; opacity:.8; }
@@ -882,7 +882,7 @@
     #toricBackPanel .tb-frac .bar{ order:2; height:1px; background:rgba(255,255,255,.25); }
     #toricBackPanel .tb-frac .den{ order:3; }
     .mini-sign-btn{
-      margin-left:6px; padding:4px 8px;
+      margin-left:2px; padding:4px 8px;
       font-size:12px; line-height:1;
       color:#eafff7; background:rgba(41,207,168,.18);
       border:1px solid rgba(41,207,168,.45);
@@ -905,6 +905,22 @@
       font-size:12px;
       line-height:1.5;
     }
+    .cl-panel{ background: rgba(41,207,168,.12); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.35); backdrop-filter: blur(2px);}  
+    .cl-title { margin: 0 0 10px 0; font-size: 13px; text-align: center; color: #fff; opacity: .9;}
+    .cl-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px;}
+    .cl-row + .cl-row{ margin-top:10px; }
+    .cl-field{ display:flex; align-items:center; gap:6px; }
+    .cl-field--right{ margin-left:auto!important; }
+    .cl-title{ text-align: left !important; margin: 0 0 10px 0; font-size: 13px; color: #fff; opacity: .9;}
+    .cl-label,.cl-unit{ color:#fff; opacity:.85; font-size:12px; }
+    .cl-input,.cl-select,.cl-output { background: rgba(0,0,0,.25); color: #fff; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; padding: 8px;}
+    .cl-select--short  { width: 80px; }
+    #clPanel .cl-field input#clVD{ flex: 0 0 54px !important; width: 54px !important; min-width: 54px !important; max-width: 54px !important;} 
+    .cl-output-pair{ align-items: stretch; }
+    .cl-group{ display:flex; align-items:center; gap:10px; flex:1; min-width:260px; }
+    .cl-output-label{ min-width:120px; color:#fff; opacity:.9; display:flex; align-items:center; }
+    .cl-output{ flex:1; }
+    .cl-output-sep{ opacity:.6; padding:0 6px; }
     .is-invalid{
     outline:2px solid #ffb84d !important;
     box-shadow:0 0 0 2px rgba(255,184,0,.35) inset !important;
@@ -1009,7 +1025,13 @@
       #toolSelector button{margin:0 3px;padding:11px 12px;font-size:13px;; flex: 0 0 22.5%;}
       #crossTool{ width:80vw; max-height:85vh; padding:16px 18px; }
       #crossTool input{ min-width:80px; }
-     
+      .cl-output-pair{ flex-direction: column; gap:6px; }
+      .cl-output-sep{ display:block; text-align:center; margin:4px 0; }
+      #clToricOut,#clSphOut{ flex: 1 1 100% !important; width: 100% !important;}
+      .cl-row--output { flex-direction: column; align-items: stretch; gap: 6px;}
+      #toricPanel .unit-row input,#crossPanel .unit-row input{ flex: 0 0 auto; width: auto;}
+      #kA, #kA2, #mA, #pA{flex: 0 0 26px !important;  width: 26px !important;  min-width: 26px !important;  max-width: 26px !important;}
+      #kD1, #kD2{flex: 0 0 40px !important;  width: 40px !important;  min-width: 40px !important;  max-width: 40px !important;}
       #timeTool,#morseTool,#binaryTool,#codeTool,#exchangeTool,#unitTool{width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto;}
       /* 捲軸高度調整 */
       #eventsList{max-height:40vh;}
@@ -1064,8 +1086,8 @@
       <button id="resetBtn" title="重整">↻</button>
       <h2>時間管理工具</h2>
       <div id="modeSelector">
-        <button class="mode-btn active" data-mode="arrive">何時到達</button>
-        <button class="mode-btn" data-mode="depart">何時出發</button>
+        <button class="mode-btn active" data-mode="arrive">何時出發</button>
+        <button class="mode-btn" data-mode="depart">何時到達</button>
       </div>
       <div class="time-row" id="rowStart">
         <label>開始時間</label>
@@ -1324,7 +1346,7 @@
           <input id="kD1" type="number" step="0.25" placeholder="D">
           <span>D @</span>
           <input id="kA"  type="number" step="1" min="0" max="180" placeholder="軸">
-          <span>；</span>
+          <span>∕</span>
           <input id="kD2" type="number" step="0.25" placeholder="D">
           <span>D @</span>
           <input id="kA2" type="number" step="1" min="0" max="180" placeholder="軸">
@@ -1355,6 +1377,36 @@
           </g>
         </svg>
       </div>
+      <div id="clPanel" class="panel cl-panel">
+        <h3 class="cl-title">隱形眼鏡轉換</h3>
+          <div class="cl-row cl-head">
+            <label class="cl-field">
+              <span class="cl-label">頂點距(VD)：</span>
+              <input id="clVD" type="number" min="0" step="0.5" value="12">
+              <span class="cl-unit">mm</span>
+            </label>
+            <label class="cl-field cl-field--right">
+              <span class="cl-label">數值捨入：</span>
+              <select id="clStep" class="cl-select cl-select--short">
+                <option value="0.25">0.25 D</option>
+                <option value="0.50">0.50 D</option>
+                <option value="1.00">1.00 D</option>
+              </select>
+            </label>
+          </div>
+          <div class="cl-row cl-row--output cl-output-pair">
+            <div class="cl-group">
+              <label class="cl-output-label">散光隱眼處方</label>
+              <input id="clToricOut" type="text" class="cl-output" readonly>
+            </div>
+            <span class="cl-output-sep"></span>
+            <div class="cl-group">
+              <label class="cl-output-label">無散光（等價球面）</label>
+              <input id="clSphOut" type="text" class="cl-output" readonly>
+            <span class="cl-output-sep"></span>
+            </div>
+          </div>
+        </div>
       <div class="panel toric-panel">
         <div class="cross-label" style="margin-bottom:8px;">環曲面表示法</div>
         <div class="toric-row">
@@ -2672,6 +2724,10 @@ constItem.addEventListener('change', renderConst);
   const crossG  = document.getElementById('crossG');
   const labAxis = document.getElementById('labAxis');
   const labPerp = document.getElementById('labPerp');
+  const clVD      = document.getElementById('clVD');     
+  const clStepSel = document.getElementById('clStep');    
+  const clToric   = document.getElementById('clToricOut'); 
+  const clSphOnly = document.getElementById('clSphOut');   
 
   const toricSphere  = document.getElementById('toricSphere');
   const toricLoc     = document.getElementById('toricLoc');
@@ -2784,16 +2840,50 @@ constItem.addEventListener('change', renderConst);
   toricLoc?.addEventListener('change', () => {
     updateToric();
   });
+  function fmtSigned0(n){
+    if (!Number.isFinite(n)) return '';
+    if (Math.abs(n) < 0.005) return '0.00';
+    return (n >= 0 ? '+' : '-') + Math.abs(n).toFixed(2);
+  }
+    function roundToStep(x, step){
+    if (!isFinite(x)) return NaN;
+    return Math.round(x/step)*step;
+  }
+  function effAtCornea(F, d_mm){
+    const d = (Number(d_mm)||0)/1000; 
+    return F / (1 - d*F);
+  } 
 
-function parseNumSoft(v){
-  const s = String(v ?? '')
-    .replace(/\u2212/g, '-')    
-    .replace(/[^\d+.\-]/g, '')  
-    .replace(/(?!^)-/g, '');     
-  const n = parseFloat(s);
-  return Number.isFinite(n) ? n : NaN;
-}
-  
+  function updateCL(){
+    if (!clToric || !clSphOnly) return;
+    const S = parseNum(pS?.value);
+    const C = parseNum(pC?.value);
+    const A = parseNum(pA?.value);
+    if (!isFinite(S) || !isFinite(C) || !isFinite(A)){
+      clToric.value = ''; clSphOnly.value = '';
+      return;
+    }
+    const vd   = parseFloat(clVD?.value) || 12;          
+    const step = parseFloat(clStepSel?.value) || 0.25;      
+    const F1 = effAtCornea(S,      vd);
+    const F2 = effAtCornea(S + C,  vd);
+    const rF1 = roundToStep(F1, step);
+    const rF2 = roundToStep(F2, step);
+    let Sm, Cm, Ax;
+    if (rF1 >= rF2){
+      Sm = rF1; Cm = rF2 - rF1; Ax = normAxis(A);     
+    }else{
+      Sm = rF2; Cm = rF1 - rF2; Ax = normAxis(axisSwap90(A)); 
+    }
+    clToric.value = `${fmtSigned0(Sm)}DS/${fmtSigned0(Cm)}DC × ${fmtA3(Ax)}`;
+    const SE_spec = S + C/2;
+    const SE_cl   = roundToStep(effAtCornea(SE_spec, vd), step);
+    clSphOnly.value = `${fmtSigned0(SE_cl)}DS`;
+  }
+  clVD?.addEventListener('input',  updateCL);
+  clStepSel?.addEventListener('change', updateCL);
+  [pS,pC,pA].forEach(el => el?.addEventListener('input', updateCL));
+
   function formatField(el){
     if (!el) return;
     const v = parseNum(el.value);
@@ -2850,6 +2940,7 @@ function parseNumSoft(v){
     if (!isFinite(S0) || !isFinite(C0) || !isFinite(A0)){
       [mS,mC,mA,kD1,kA,kD2,kA2].forEach(el => el && (el.value=''));
       updateCross(0,0,0);
+      updating=false;updateCL();
       return;
     }
     const A = normAxis(A0);
@@ -2877,6 +2968,7 @@ function parseNumSoft(v){
     if (!isFinite(D1) || !isFinite(A1) || !isFinite(D2)){
       [pS,pC,pA,mS,mC,mA].forEach(el => el && (el.value=''));
       updateCross(0,0,0);
+      updating=false; updateCL();
       return;
     }
     const A = normAxis(A1);
@@ -3035,6 +3127,7 @@ updateToric();
   pS.value = '0.00'; pC.value = '-1.50'; pA.value = '180';
   mS.value = '-1.50'; mC.value = '+1.50'; mA.value = '090';
   updateAllFromPrimary();
+  updateCL();
 })();
 
 (() => {
@@ -3177,7 +3270,6 @@ updateToric();
     return a;
   };
   const pad3 = a => String(a).padStart(3,'0');
-
   function bindSignButton(input){
     if (!input) return;
     const btn = (input.nextElementSibling && input.nextElementSibling.classList?.contains('mini-sign-btn'))
@@ -3186,8 +3278,7 @@ updateToric();
     if (!btn) return;
     btn.addEventListener('click', () => {
       try{ cutSound.currentTime = 0; cutSound.play(); }catch(e){}
-      const val = parseNumSoft(input.value);
-      if (!Number.isFinite(val)) return;
+      if (!(typeof val === 'number' && isFinite(val))) return;
       const flipped = -val;
       input.value = fmtSigned0(flipped);
       input.dispatchEvent(new Event('input',  { bubbles:true }));
