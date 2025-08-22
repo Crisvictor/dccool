@@ -706,7 +706,7 @@
     /* 光學十字 */
     #crossTool{
       width:45%;
-      max-height:85vh;
+      max-height:91vh;
       background:rgba(0,0,0,.7);
       margin:0 auto;
       padding:12px 16px;
@@ -882,7 +882,7 @@
     #toricBackPanel .tb-frac .bar{ order:2; height:1px; background:rgba(255,255,255,.25); }
     #toricBackPanel .tb-frac .den{ order:3; }
     .mini-sign-btn{
-      margin-left:2px; padding:4px 8px;
+      margin-left:2px; padding:4px 6.5px;
       font-size:12px; line-height:1;
       color:#eafff7; background:rgba(41,207,168,.18);
       border:1px solid rgba(41,207,168,.45);
@@ -915,7 +915,7 @@
     .cl-label,.cl-unit{ color:#fff; opacity:.85; font-size:12px; }
     .cl-input,.cl-select,.cl-output { background: rgba(0,0,0,.25); color: #fff; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; padding: 8px;}
     .cl-select--short  { width: 80px; }
-    #clPanel .cl-field input#clVD{ flex: 0 0 54px !important; width: 54px !important; min-width: 54px !important; max-width: 54px !important;} 
+    #clPanel .cl-field input#clVD{ flex: 0 0 44px !important; width: 44px !important; min-width: 44px !important; max-width: 44px !important;} 
     .cl-output-pair{ align-items: stretch; }
     .cl-group{ display:flex; align-items:center; gap:10px; flex:1; min-width:260px; }
     .cl-output-label{ min-width:120px; color:#fff; opacity:.9; display:flex; align-items:center; }
@@ -1023,7 +1023,7 @@
       body{overflow:auto;}
       #toolSelector{padding:15px 0}
       #toolSelector button{margin:0 3px;padding:11px 12px;font-size:13px;; flex: 0 0 22.5%;}
-      #crossTool{ width:80vw; max-height:85vh; padding:16px 18px; }
+      #crossTool{ width:85vw; max-height:85vh; padding:16px 18px; }
       #crossTool input{ min-width:80px; }
       .cl-output-pair{ flex-direction: column; gap:6px; }
       .cl-output-sep{ display:block; text-align:center; margin:4px 0; }
@@ -1033,6 +1033,7 @@
       #kA, #kA2, #mA, #pA{flex: 0 0 26px !important;  width: 26px !important;  min-width: 26px !important;  max-width: 26px !important;}
       #kD1, #kD2{flex: 0 0 40px !important;  width: 40px !important;  min-width: 40px !important;  max-width: 40px !important;}
       #timeTool,#morseTool,#binaryTool,#codeTool,#exchangeTool,#unitTool{width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto;}
+
       /* 捲軸高度調整 */
       #eventsList{max-height:40vh;}
       .unit-row label,#constantsPanel .const-row label{ width:75px; min-width:75px; }
@@ -1347,6 +1348,8 @@
           <span>D @</span>
           <input id="kA"  type="number" step="1" min="0" max="180" placeholder="軸">
           <span>∕</span>
+        </div>
+        <div class="cross-row">
           <input id="kD2" type="number" step="0.25" placeholder="D">
           <span>D @</span>
           <input id="kA2" type="number" step="1" min="0" max="180" placeholder="軸">
@@ -1381,12 +1384,12 @@
         <h3 class="cl-title">隱形眼鏡轉換</h3>
           <div class="cl-row cl-head">
             <label class="cl-field">
-              <span class="cl-label">頂點距(VD)：</span>
+              <span class="cl-label">頂點距(VD)</span>
               <input id="clVD" type="number" min="0" step="0.5" value="12">
               <span class="cl-unit">mm</span>
             </label>
             <label class="cl-field cl-field--right">
-              <span class="cl-label">數值捨入：</span>
+              <span class="cl-label">值捨入：</span>
               <select id="clStep" class="cl-select cl-select--short">
                 <option value="0.25">0.25 D</option>
                 <option value="0.50">0.50 D</option>
@@ -1411,7 +1414,7 @@
         <div class="cross-label" style="margin-bottom:8px;">環曲面表示法</div>
         <div class="toric-row">
           <label class="toric-lab">設定球弧</label>
-          <input id="toricSphere" type="number" min="0" step="0.25" inputmode="decimal" placeholder="輸入D值(絕對值)">
+          <input id="toricSphere" type="number" min="0" step="0.25" inputmode="decimal" placeholder="?D(絕對值)">
           <label class="toric-lab">球弧設定於</label>
           <select id="toricLoc">
           <option value="front">前表面</option>
@@ -2566,16 +2569,16 @@ function convertUnit(){
   },
   oph: {
     n_index:     { name:'折射率公式',           latex:'n = \\dfrac{c}{v}', value:'c：真空光速；v：介質中相速' },
-    light_speed: { name:'光速公式', latex:'c = \\lambda\\,\\nu', value:'c：真空光速 299,792,458 m/s；λ：波長；ν：頻率' },
-    wave_speed: { name:'波速公式', latex:'v = \\lambda\\,\\nu', value:'v：波速；λ：波長；ν：頻率' },
+    light_speed: { name:'光速公式',             latex:'c = \\lambda\\,\\nu', value:'c：真空光速 299,792,458 m/s；λ：波長；ν：頻率' },
+    wave_speed:  { name:'波速公式',             latex:'v = \\lambda\\,\\nu', value:'v：波速；λ：波長；ν：頻率' },
     snell:       { name:'施奈爾定律',           latex:'n_1\\,\\sin i = n_2\\,\\sin r', value:'i：入射角；r：折射角' },
-    critical_angle: { name: '全反射臨界角', latex: '\\theta_c = \\arcsin\\!\\left(\\dfrac{n_2}{n_1}\\right),\\quad (n_1>n_2)', value: 'θ_c：臨界角；n₁：入射介質折射率；n₂：較稀折射率'},
-    power:       { name:'屈光度公式', latex:'D = \\dfrac{1}{f}', value:'D：屈光度（D）；f：焦距（m，符號依高斯記號）' },
-    newton:      { name:'牛頓關係式（薄透鏡）', latex:'x\\,x\' = f\\,f\'', value:'x：物點至第一焦點距；x\'：像點至第二焦點距' },
-    refr_surf:   { name:'曲率折射面公式',       latex:'\\dfrac{n_2}{v} - \\dfrac{n_1}{u} = \\dfrac{n_2 - n_1}{R}', value:'u/v：物/像距；R：曲率半徑（符號依高斯記號）' },
-    f1_surface:  { name:'第一焦點（折射面）',   latex:'f = -\\dfrac{n_1\\,R}{\\,n_2 - n_1\\,}', value:'物方焦距' },
-    f2_surface:  { name:'第二焦點（折射面）',   latex:'f\' = \\dfrac{n_2\\,R}{\\,n_2 - n_1\\,}', value:'像方焦距' },
-    magnification: { name: '橫向放大率',     latex: 'm = \\dfrac{y\'}{y} = -\\dfrac{d_i}{d_o}', value: 'm：橫向放大率；y\'/y：像高/物高；d_i/d_o：像距/物距（高斯符號）'},
+    critical_angle: { name: '全反射臨界角',     latex: '\\theta_c = \\arcsin\\!\\left(\\dfrac{n_2}{n_1}\\right),\\quad (n_1>n_2)', value: 'θ_c：臨界角；n₁：入射介質折射率；n₂：較稀折射率'},
+    power:       { name:'屈光度公式',           latex:'D = \\dfrac{1}{f}', value:'D：屈光度（D）；f：焦距（m，符號依高斯記號）' },
+    newton:      { name:'牛頓關係式（薄透鏡）',  latex:'x\\,x\' = f\\,f\'', value:'x：物點至第一焦點距；x\'：像點至第二焦點距' },
+    refr_surf:   { name:'曲率折射面公式',        latex:'\\dfrac{n_2}{v} - \\dfrac{n_1}{u} = \\dfrac{n_2 - n_1}{R}', value:'u/v：物/像距；R：曲率半徑（符號依高斯記號）' },
+    f1_surface:  { name:'第一焦點（折射面）',    latex:'f = -\\dfrac{n_1\\,R}{\\,n_2 - n_1\\,}', value:'物方焦距' },
+    f2_surface:  { name:'第二焦點（折射面）',    latex:'f\' = \\dfrac{n_2\\,R}{\\,n_2 - n_1\\,}', value:'像方焦距' },
+    magnification: { name: '橫向放大率',        latex: 'm = \\dfrac{y\'}{y} = -\\dfrac{d_i}{d_o}', value: 'm：橫向放大率；y\'/y：像高/物高；d_i/d_o：像距/物距（高斯符號）'},
     total_mag:   { name: '總放大率（厚透鏡）',    latex: "M_{\\mathrm{thick}} = \\left(\\dfrac{L}{L'}\\right)_{1}\\times\\left(\\dfrac{L}{L'}\\right)_{2}", value: '以聚散度表示：兩表面之 (L/L′) 相乘；L 為入射聚散度，L′ 為出射聚散度（單位 D）'},
     vergence:    { name:'聚散度關係式',         latex:'L\' = L + F', value:'L = n/l；L\' = n\'/l\'; F：屈光力' },
     vertex_shift:    { name:'頂點距前移/後移（隱眼公式）', latex:'F_2 = \\dfrac{F_1}{1 - d\\,F_1}', value:'d 單位(m)；鏡片向眼移動 d>0。例：眼鏡→隱眼換算' },
@@ -2589,15 +2592,15 @@ function convertUnit(){
     H1:          { name:'第一主平面位置',       latex:'H = -\\dfrac{t}{n}\\,\\dfrac{F_2}{F_e}', value:'自第一表面量出（向右為正）' },
     H2:          { name:'第二主平面位置',       latex:'H\' = \\dfrac{t}{n}\\,\\dfrac{F_1}{F_e}', value:'自第二表面量出（向右為正）' },
     SM:          { name:'眼鏡放大率',           latex:'\\mathrm{SM} \\approx \\underbrace{\\dfrac{1}{1 - \\dfrac{t}{n}F_1}}_{\\text{Shape}}\\;\\times\\;\\underbrace{\\dfrac{1}{1 - d_v F_e}}_{\\text{Power}}', value:'d_v：頂點距（m）' },
-    prism_min:   { name:'稜鏡最小偏向角',       latex:'\\delta_{\\min} = 2\\,\\arcsin\\!\\big(n\\,\\sin\\tfrac{A}{2}\\big) - A', value:'A：稜鏡頂角（弧度）' },
+    prism_min:   { name:'稜鏡最小偏向角',        latex:'\\delta_{\\min} = 2\\,\\arcsin\\!\\big(n\\,\\sin\\tfrac{A}{2}\\big) - A', value:'A：稜鏡頂角（弧度）' },
     prism_disp:  { name:'稜鏡偏移距離（薄稜鏡）', latex:'\\Delta \\approx L\\,\\tan\\delta,\\quad \\delta \\approx (n-1)A', value:'L：到幕距；A：頂角（小角度近似）' },
     prentice:    { name:'Prentice 法則',        latex:'P = c\\,F', value:'P：稜鏡度（△）；c：偏心量（cm）；F：D' },
     prism_base:  { name:'鏡片稜鏡基底厚度',      latex: '\\Delta = \\dfrac{100\\,g\\,(n-1)}{d}', value:'Δ：稜鏡度；g：基底厚度差；d：鏡片直徑（g、d 同單位）；n：折射率' },
-    prism_compo: { name:'合成稜鏡（座標）',     latex:'P = \\sqrt{P_x^2 + P_y^2},\\; \\theta = \\operatorname{atan2}(P_y,P_x)', value:'θ：由 +x 逆時針' },
-    prism_decomp:{ name:'分解稜鏡（座標）',     latex:'P_x = P\\cos\\theta,\\; P_y = P\\sin\\theta', value:'將稜鏡分解為水平/垂直分量' },
-    thick_hint:  { name:'厚透鏡提示（等效法）', latex:'\\boxed{\\;F_e,\\ H,\\ H\'\\;\\Rightarrow\\; \\text{以主平面作薄透鏡成像}\\;}', value:'以主平面替代求像' },
+    prism_compo: { name:'合成稜鏡（座標）',      latex:'P = \\sqrt{P_x^2 + P_y^2},\\; \\theta = \\operatorname{atan2}(P_y,P_x)', value:'θ：由 +x 逆時針' },
+    prism_decomp:{ name:'分解稜鏡（座標）',      latex:'P_x = P\\cos\\theta,\\; P_y = P\\sin\\theta', value:'將稜鏡分解為水平/垂直分量' },
+    thick_hint:  { name:'厚透鏡提示（等效法）',  latex:'\\boxed{\\;F_e,\\ H,\\ H\'\\;\\Rightarrow\\; \\text{以主平面作薄透鏡成像}\\;}', value:'以主平面替代求像' },
     mirror:      { name:'面鏡反射公式（球面鏡）', latex:'\\dfrac{1}{f} = \\dfrac{1}{s} + \\dfrac{1}{s\'},\\quad f = \\dfrac{R}{2}', value:'符號依高斯記號' },
-    lensmaker:{ name:'薄透鏡造鏡者公式', latex:'F = \\left(\\dfrac{n}{n_0}-1\\right)\\!\\left(\\dfrac{1}{R_1}-\\dfrac{1}{R_2}\\right)', value:'n_0 為周圍介質' },
+    lensmaker:   { name:'薄透鏡造鏡者公式', latex:'F = \\left(\\dfrac{n}{n_0}-1\\right)\\!\\left(\\dfrac{1}{R_1}-\\dfrac{1}{R_2}\\right)', value:'n_0 為周圍介質' },
     oblique_astig: { name: '斜散光差（斜向像差）', latex: 'F_{\\mathrm{eff}} = F\\left(1 + \\dfrac{\\sin^{2}\\Theta}{2n}\\right)', value: 'Θ：入射角；n：折射率；F：名義屈光力。前傾：F@180；面彎：F@090'},
     oblique_astig_power: { name: '斜散光差屈光力（斜向像差）', latex: 'F_{\\mathrm{OA}} = F\\,\\tan^{2}\\Theta', value: 'Θ：斜視角；F：名義屈光力'}
   },
@@ -2608,6 +2611,7 @@ function convertUnit(){
     polar_block:     { name:'Malus定律（偏光遮光率）', latex:'T = \\dfrac{I}{I_0} = \\cos^{2}\\!\\theta,\\quad B = 1 - T = \\sin^{2}\\!\\theta', value:'θ：偏振方向相對角；T：透過率；B：遮光率' },
     vogel:           { name:'沃格爾公式（基弧選擇）', latex:'\\mathrm{BC} = \\begin{cases} SE + 6.00, & \\text{正鏡} \\\\ \\dfrac{SE}{2} + 6.00, & \\text{負鏡} \\end{cases}', value:'BC：基弧（D）；SE：球等效（D）；經典 Vogel 配鏡經驗式' },
     edge_thickness:  { name:'鏡片邊緣厚度（近似）', latex:'t_e \\approx t_c + \\dfrac{|F|\\,D^{2}}{2000\\,(n-1)}', value:'負鏡近似；D：有效徑(mm)；n：折射率；F：屈光力(D)。正鏡中心厚度增加同項' },
+    abbe_dispersion: { name: '色散力／阿貝數', latex: 'V_{d} = \\dfrac{n_{d}-1}{n_{F}-n_{C}},\\quad \\omega = \\dfrac{1}{V_{d}}', value: 'n_F=486.1nm（F 線）, n_d=587.6nm（d 線）, n_C=656.3nm（C 線）。Vd 越大 → 色散越小；色散力 ω=1/Vd。'},
     lca:             { name:'縱向色像差', latex:'\\mathrm{LCA} = \\dfrac{F}{V}', value:'LCA：縱向色像差（D）；F：屈光力（D）；V：阿貝數' },
     tca:             { name:'橫向色像差', latex:'\\mathrm{TCA} = \\dfrac{c\\,F}{V}', value:'TCA：色像差(△)；c：偏心量(cm)；F：屈光力(D)；V：阿貝數' },
     accommodation_power: { name:'調節幅度', latex:'AA = \\dfrac{1}{l_{\\mathrm{NP}}} - \\dfrac{1}{l_{\\mathrm{FP}}}', value:'AA：調節幅度（D）；l_NP：近點距離（m）；l_FP：遠點距離（m，正視者 ≈ ∞ ⇒ 0D）' },
@@ -2630,6 +2634,9 @@ function convertUnit(){
     sheard_train:    { name: 'Sheard’s 訓練稜鏡', latex: '\\Delta_{\\mathrm{train}} = 2\\,\\lvert\\mathrm{phoria}\\rvert', value: '給予「反向」基底（對抗斜位方向）；單位 △，請註明測試距離'},
     percival_train:  { name: 'Percival’s 訓練稜鏡', latex: '\\Delta_{\\mathrm{train}} = \\dfrac{G_{\\mathrm{blur}}}{2}', value: 'G_blur：斜位方向「較大的模糊點」；給予反向基底；單位 △'},
     one_to_one_train: { name: '1:1 Rule 訓練稜鏡', latex: '\\Delta_{\\mathrm{train}} = \\mathrm{Recovery}_{\\mathrm{opp}}', value: '取「對向」(補償方向) 的還原點(recovery)數值作為訓練量；單位 △'},
+    anterior_chamber_depth_ultrasound: { name: '前房深度計算', latex: '\\mathrm{ACD} = \\dfrac{v_{\\mathrm{aq}}\\,\\Delta t}{2}', value: 'v_{aq}：房水音速（37°C）≈ 1532 m/s；Δt：自角膜後表面到水晶體前表面之「去回」時間差（超音波圖常見讀值）。' + '若 Δt 以 μs，則 ACD[mm] ≈ 0.766 × Δt[μs]（因 1532 m/s = 1.532 mm/μs，取一半）。' + '例：Δt=4.0 μs → ACD ≈ 3.06 mm。參考音速：角膜 1550 m/s、房水 1532 m/s、水晶體 1641 m/s（37°C）。' },
+    spectacle_fov_no_prism: { name: '視覺視場（眼鏡視場，無稜鏡）', latex: '2\\,\\theta = 2\\,\\arctan\\!\\left(\\dfrac{W/2}{\\,VD + r_e\\,}\\right)', value: 'W：鏡片（或鏡框有效孔徑）寬；VD：頂點距；r_e：眼球迴轉半徑（約 13–14 mm）。'},
+    spectacle_fov_with_prism: { name: '實際視場（含稜鏡影響）', latex: "2\\,\\theta' \\approx 2\\,\\arctan\\!\\left(\\dfrac{W/2}{\\,VD + r_e\\,}\\right) \\;\\pm\\; \\Delta\\theta_{\\text{prism}}", value: '遠視易出現環形盲區 → 視場縮小；近視易有環形複影 → 視場增大。△θprism：大小與稜鏡量及視距幾何配置相關。'},
     prism_notation:  { name: '斜視醫囑簡寫', latex: '\\text{備忘}', value: 'D = 遠；N 或 ′ = 近；E = 內斜；X = 外斜；H = 上斜；P = 隱斜；T = 斜視；alt = 交替性；(T) = 間歇性'}
   },
   refr: {
