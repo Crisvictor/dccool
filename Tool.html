@@ -702,6 +702,23 @@
       outline:none;
       box-shadow:0 0 0 2px rgba(41,207,168,.6);
     }
+    .const-mini-table {
+      width: 100%;
+      border-collapse: collapse;
+     font-size: 13px;
+     margin-top: 6px;
+    }
+    .const-mini-table th,
+    .const-mini-table td {
+      border: 1px solid rgba(255,255,255,.15);
+      padding: 6px 8px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .const-mini-table th {
+      background: rgba(255,255,255,.08);
+      font-weight: 600;
+    }
 
     /* 光學十字 */
     #crossTool{
@@ -2584,6 +2601,9 @@ function convertUnit(){
     vertex_shift:    { name:'頂點距前移/後移（隱眼公式）', latex:'F_2 = \\dfrac{F_1}{1 - d\\,F_1}', value:'d 單位(m)；鏡片向眼移動 d>0。例：眼鏡→隱眼換算' },
     accom_vergence:  { name:'調節之聚散度關係式', latex:'L + F_A = F_{\\mathrm{FP}},\\quad L=\\tfrac{1}{l},\\; F_{\\mathrm{FP}}=\\tfrac{1}{l_{\\mathrm{FP}}}', value:'l：物距(m)；F_A：角膜平面調節(D)；遠點屈光度 F_FP（近視為負）' },
     ametropia_verg:  { name:'屈光不正之聚散度關係式', latex:'L\' = L + F_{\\text{eye}},\\quad L=\\tfrac{n}{l},\\; L\'=\\tfrac{n\'}{l\'}', value:'完全成像於視網膜需 L\' 與眼軸相符；1/L 為遠點距，1/L\' 近似對應眼軸長（模型眼）' },
+    convex_lens_imaging: { name: '凸透鏡成像（薄透鏡，f>0）', table: { headers: ['物距 s', '像位置 s′', '像別'], rows: [['s > 2f','f < s′ < 2f', '實像、倒立、縮小'],['s = 2f','s′ = 2f','實像、倒立、等大'],['f < s < 2f','s′ > 2f','實像、倒立、放大'],['s = f','s′ → ∞','平行光（無成像）'],['0 < s < f','s′<0（物側）','虛像、正立、放大']]},note: '凹透鏡成像：任意物距皆得虛像、正立、縮小，像位在物側（s′ < 0，m 介於 0 與 1）。'},
+    concave_mirror_imaging: { name: '凹面鏡成像（焦距 f>0，以主軸約定）',table: {headers: ['物距 s', '像位置 s′', '像別'],rows: [['s > 2f', 'f < s′ < 2f','實像、倒立、縮小'],['s = 2f','s′ = 2f','實像、倒立、等大'],['f < s < 2f','s′ > 2f','實像、倒立、放大'],['s = f','s′ → ∞', '平行光（無成像）'],['0 < s < f','s′ < 0（鏡後）','虛像、正立、放大']]},note: '凸面鏡：任意物距皆得虛像、正立、縮小，像位在鏡後；平面鏡：虛像、正立、等大，像距=物距。'},
+    purkinje_images: { name: '普金傑像（Purkinje Images）', table: {headers: ['編號', '反射界面', '像別', '亮度/大小', '隨物移動'], rows: [['I','角膜前表','虛像、正立','最亮、較大','同向'],['II', '角膜後表','虛像、正立', '最小、極暗','同向'],['III','晶體前表','虛像、正立','中等','同向'],['IV','晶體後表', '實像、倒立','極暗、極小','反向']]}},
     thin_img:    { name:'薄透鏡成像',           latex:'\\dfrac{1}{f} = \\dfrac{1}{d_o} + \\dfrac{1}{d_i}', value:'f：焦距；d_o/d_i：物/像距' },
     nominal:     { name:'標稱屈光力',           latex:'F_t = F_1 + F_2', value:'薄透鏡近似值屈光力（忽略厚度影響）' },
     Fe:          { name:'等效屈光力',           latex:'F_e = F_1 + F_2 - \\dfrac{t}{n}\\,F_1 F_2', value:'厚鏡等效單薄透鏡之屈光力' },
@@ -2600,14 +2620,17 @@ function convertUnit(){
     prism_decomp:{ name:'分解稜鏡（座標）',      latex:'P_x = P\\cos\\theta,\\; P_y = P\\sin\\theta', value:'將稜鏡分解為水平/垂直分量' },
     thick_hint:  { name:'厚透鏡提示（等效法）',  latex:'\\boxed{\\;F_e,\\ H,\\ H\'\\;\\Rightarrow\\; \\text{以主平面作薄透鏡成像}\\;}', value:'以主平面替代求像' },
     mirror:      { name:'面鏡反射公式（球面鏡）', latex:'\\dfrac{1}{f} = \\dfrac{1}{s} + \\dfrac{1}{s\'},\\quad f = \\dfrac{R}{2}', value:'符號依高斯記號' },
-    lensmaker:   { name:'薄透鏡造鏡者公式', latex:'F = \\left(\\dfrac{n}{n_0}-1\\right)\\!\\left(\\dfrac{1}{R_1}-\\dfrac{1}{R_2}\\right)', value:'n_0 為周圍介質' },
-    oblique_astig: { name: '斜散光差（斜向像差）', latex: 'F_{\\mathrm{eff}} = F\\left(1 + \\dfrac{\\sin^{2}\\Theta}{2n}\\right)', value: 'Θ：入射角；n：折射率；F：名義屈光力。前傾：F@180；面彎：F@090'},
-    oblique_astig_power: { name: '斜散光差屈光力（斜向像差）', latex: 'F_{\\mathrm{OA}} = F\\,\\tan^{2}\\Theta', value: 'Θ：斜視角；F：名義屈光力'}
+    lensmaker:   { name:'薄透鏡造鏡者公式',       latex:'F = \\left(\\dfrac{n}{n_0}-1\\right)\\!\\left(\\dfrac{1}{R_1}-\\dfrac{1}{R_2}\\right)', value:'n_0 為周圍介質' },
+    oblique_astig: { name: '斜散光差（斜向像差）', latex: 'F_{\\mathrm{eff}} = F\\left(1 + \\dfrac{\\sin^{2}\\theta}{2n}\\right)', value: 'θ：入射角；n：折射率；F：名義屈光力。前傾：F@180；面彎：F@090'},
+    oblique_astig_power: { name: '斜散光差屈光力（斜向像差）', latex: 'F_{\\mathrm{OA}} = F\\,\\tan^{2}\\theta', value: 'θ：斜視角；F：名義屈光力'}
   },
   vis:{
     hof_avg:         { name:'Hofstetter（平均值）', latex:'AA_{\\text{avg}}(A) = 18.5 - 0.3A\\;\\mathrm{D}', value:'A：年齡（歲）；AA：調節幅度（D）' },
-    hof_max:         { name:'Hofstetter（最大值）', latex:'AA_{\\text{max}}(A) = 25 - 0.4A\\;\\mathrm{D}', value:'A：年齡（歲）' },
-    hof_min:         { name:'Hofstetter（最小值）', latex:'AA_{\\text{min}}(A) = 15 - 0.25A\\;\\mathrm{D}', value:'A：年齡（歲）' },
+    hof_max:         { name:'Hofstetter（最大值）', latex:'AA_{\\text{max}}(A) = 25 - 0.4A\\;\\mathrm{D}', value:'A：年齡（歲）；AA：調節幅度（D）' },
+    hof_min:         { name:'Hofstetter（最小值）', latex:'AA_{\\text{min}}(A) = 15 - 0.25A\\;\\mathrm{D}', value:'A：年齡（歲）；AA：調節幅度（D）；最小值臨床較常應用' },
+    donders_table:   { name: "Donder's table（年齡調節幅度）",  table: { headers: ["年齡(歲)", "調節幅度 (D)"], rows: [ [10, 14.0],[15, 12.0],[20, 10.0],[25, 8.5],[30, 7.0],[35, 5.5],[40, 4.5],[45, 3.5],[50, 2.5],[55, 1.75],[60, 1.00],[65, 0.50],[70, 0.25],[75, 0]]},note: "經典估計，個體差異可達 ±2D，僅供參考。"},
+    mbs:             { name: '最小鏡坯尺寸（MBS）', latex: '\\mathrm{MBS} = \\mathrm{FPD} - \\mathrm{PD} + \\mathrm{ED} + 2', value: 'MBS：鏡坯最小直徑（mm）；FPD：框幾何中心距（Frame PD, mm）；PD：瞳距（mm）；ED：鏡圈最大直徑（mm）；+2 mm 為加工預留量。'},
+    decentration_h:  { name: '屈光加工水平移心', latex: 'H = \\dfrac{\\mathrm{FD} - \\mathrm{PD}}{2}', value: 'H：每眼水平移心量（mm）；FD：框距/框瞳距（FPD, mm）；PD：雙眼瞳距（mm）。單眼計算：H_R = \\tfrac{\\mathrm{FPD}}{2} - \\mathrm{MPD}_R；H_L = \\tfrac{\\mathrm{FPD}}{2} - \\mathrm{MPD}_L。'},
     polar_block:     { name:'Malus定律（偏光遮光率）', latex:'T = \\dfrac{I}{I_0} = \\cos^{2}\\!\\theta,\\quad B = 1 - T = \\sin^{2}\\!\\theta', value:'θ：偏振方向相對角；T：透過率；B：遮光率' },
     vogel:           { name:'沃格爾公式（基弧選擇）', latex:'\\mathrm{BC} = \\begin{cases} SE + 6.00, & \\text{正鏡} \\\\ \\dfrac{SE}{2} + 6.00, & \\text{負鏡} \\end{cases}', value:'BC：基弧（D）；SE：球等效（D）；經典 Vogel 配鏡經驗式' },
     edge_thickness:  { name:'鏡片邊緣厚度（近似）', latex:'t_e \\approx t_c + \\dfrac{|F|\\,D^{2}}{2000\\,(n-1)}', value:'負鏡近似；D：有效徑(mm)；n：折射率；F：屈光力(D)。正鏡中心厚度增加同項' },
@@ -2620,14 +2643,22 @@ function convertUnit(){
     reflectance_normal: { name:'反射率（法線入射）', latex:'R = \\left(\\dfrac{n_1 - n_2}{n_1 + n_2}\\right)^{2}', value:'n₁、n₂：兩介質折射率；R：能量反射率' },
     transmittance:   { name:'透光率', latex:'T = \\dfrac{I}{I_0} \\approx (1 - R_1)(1 - R_2)\\,e^{-\\alpha x}', value:'I/I₀：出/入射強度；R₁,R₂：兩表面反射率；α：吸收係數；x：厚度' },
     ar_thickness:    { name:'AR 鍍膜', latex:'t = \\dfrac{\\lambda_0}{4 n_{\\mathrm{film}}}', value:'設計波長 λ₀；n_film：鍍膜折射率；單層厚為設計波長的四分之一' },
+    dk_value:        { name: '氧氣滲透係數（Dk）',latex: 'Dk\\;[\\text{Barrer}] \\,=\\, 10^{-11}\\,\\dfrac{\\mathrm{cm}^2\\,\\mathrm{mL}\\,O_2}{\\mathrm{s}\\,\\mathrm{mL}\\,\\mathrm{mmHg}}', value: 'DK=擴散係數(D)*溶解係數(K)，單位：Barrer（材料與溫度相關，隱形眼鏡材料常以 35 °C 標示）上述公式為Barrer的定義'},
+    dk_over_t:       { name: '氧氣傳輸率（Dk/t）', latex: '\\dfrac{Dk}{t}\\;[\\text{Barrer}/\\text{cm}] \\,=\\, 10^{-9}\\,\\dfrac{\\mathrm{cm}^2\\,\\mathrm{mL}\\,O_2}{\\mathrm{s}\\,\\mathrm{mL}\\,\\mathrm{mmHg}}',table: { headers: ['研究者', '避免類型', '透氧指標'], rows: [['Holden–Mertz','日戴水腫',  '≥ 24×10⁻⁹'],['Holden–Mertz','長戴8%水腫','≥ 24×10⁻⁹'],['Holden–Mertz','長戴4%水腫','≥ 87×10⁻⁹'],['Harvitt–Bonanno',    '日戴水腫',  '≥ 35×10⁻⁹'],['Harvitt–Bonanno','長戴水腫','≥ 125×10⁻⁹'],['Papas','輪部血管增生','≥ 125×10⁻⁹'],['Morgan–Efron','日戴中央水腫','≥ 20×10⁻⁹'],['Morgan–Efron','日戴周邊水腫','≥ 33×10⁻⁹'],]},note: 't或L：代表鏡片中央厚度或局部厚度（cm），單位：Barrer/cm。上述公式為Barrer/cm的定義與DK/t期望值研究整理。',},
+    eop:             { name: '等效氧份百分比（EOP）', latex: '\\mathrm{EOP}=f\\!\\left(\\dfrac{Dk}{t}\\right)', value: 'f：不同的研究模型給出的不同的假設與生理參數，大氣氧21%=EOP最大21%，日戴避免水腫 EOP≥ 9.9%；長戴避免4%水腫EOP≥17.9%（Holden–Mertz 門檻）'},
+    corneal_kr:      { name: '角膜RK轉換', latex: 'K\\,[\\mathrm{D}] = \\dfrac{337.5}{r\\,[\\mathrm{mm}]}\\quad;\\quad r\\,[\\mathrm{mm}] = \\dfrac{337.5}{K\\,[\\mathrm{D}]}', value: '採慣用折射率常數 n_k = 1.3375。'},
     hr_quarter:      { name:'增強反射鍍膜', latex: 'd_H=\\frac{\\lambda_0}{4n_H},\\; d_L=\\frac{\\lambda_0}{4n_L};\\quad R=\\left(\\frac{(n_H/n_L)^{2N}-(n_s/n_0)}{(n_H/n_L)^{2N}+(n_s/n_0)}\\right)^2', value: 'N：HL 對數；設計於 λ₀、正入射最優；對比越大與層數越多，R 越高；鍍膜多用高/低折射率交替的四分之一波堆疊。'},
     near_pd:         { name:'近用 PD（工作距離換算）', latex:'\\mathrm{NPD} \\approx \\mathrm{DPD}\\,\\frac{z}{z+v} = \\mathrm{DPD}\\,\\frac{\\mathrm{PD}_{cm}}{\\mathrm{PD}_{cm}+v_m\\,CD}', value:'DPD：遠用PD(mm)；z：工作距離(m)；v_m≈0.027 m（頂點→旋轉中心）；PD_cm=DPD/10；CD：近物刺激(△)。40cm 快速近似：NPD≈DPD−3 mm'},
+    add_final:       { name: 'ADD 最終附加', latex: '\\mathrm{ADD}_{\\mathrm{final}} = \\mathrm{FCC} + \\dfrac{\\mathrm{NRA} + \\mathrm{PRA}}{2}', value: 'FCC：交叉圓柱（近點）結果；NRA/PRA：正/負相對調節；單位皆為屈光度（D）。'},
     fva_total:       { name:'融合性輻輳幅度 FVA（Total）', latex:'\\mathrm{FVA}_{\\mathrm{total}} = \\mathrm{PFV}_{\\text{break}} + \\lvert\\mathrm{NFV}_{\\text{break}}\\rvert', value:'單位 △；請註明測試距離（例：@40 cm）' },
     conv_amp_npc:    { name:'內聚幅度（NPC 法）', latex:'A_{\\mathrm{conv}} = \\dfrac{PD_{\\mathrm{cm}}}{NPC_{\\mathrm{m}}}', value:'PD：瞳距(cm)；NPC：近點輻輳距離(m)(須加上眼球迴轉半徑與頂點距離)；輸出單位 △' },
+    npa_npc_compare: { name: "NPA 與 NPC 比較", table: { headers: ["", "NPA調節近點", "NPC聚合近點"], rows: [["觀察終點", "模糊點", "破裂點／回復點"],["視標", "調節性視標", "先非調節性"],["測驗","單/雙眼都要","僅雙眼"]]},note: "NPC-先非調節性視標，沒過再使用調節性視標。"},
     va_recalc:       { name:'視力值換算', latex:'\\mathrm{VA}_{new} = \\mathrm{VA}\\times \\dfrac{d_{\\text{actual}}}{d_{\\text{standard}}}', value:'以距離比修正視力：實際距離/標準距離' },
     ac_a_grad:       { name:'AC/A（梯度法）', latex:'\\dfrac{AC}{A} = \\dfrac{\\Delta\\Phi}{\\Delta L}\\;\\Big(\\frac{\\triangle}{\\mathrm{D}}\\Big)', value:'\\Delta\\Phi：相位變化(△)；\\Delta L：加減鏡(D)。備註：可能高估 A 使 AC/A 偏低；期望≈4/1' },
     ac_a_calc:       { name:'AC/A（計算型）', latex:'\\dfrac{AC}{A} = PD_{\\text{cm}} + (\\Phi_n - \\Phi_d)\\,W,\\quad W=\\dfrac{1}{d\\,(\\mathrm{m})}', value:'PD：瞳距(cm)；\\Phi：近/遠相位(△，ESO為+)；d：測試距離(m)。期望≈6/1' },
     cd_quick:        { name:'CD（近物刺激）', latex:'\\mathrm{CD} \\approx \\dfrac{PD}{4} - 1', value:'快速估算於 40 cm；PD：瞳距(mm)。更一般：CD(△)=PD(cm)/距離(m)' },
+    frame_comp_prism: { name: '框架眼鏡補償異位', table: { headers: ['方式', '注意'], rows: [['處方紓解稜鏡', '稜鏡規則（公式分析）'],['調整瞳距', '屈光度'],['調整球面度數', 'AC/A']]}},
+    power_comp_phoria: { name: '屈光度補償眼位', table: { headers: ['', '近視', '遠視'], rows: [['內斜', '弱矯', '強矯'],['外斜', '強矯', '弱矯']]},note:"需參考AC/A與雙眼視機能影響"},
     sheard:          { name:'Sheard’s 法則', latex:'\\text{Reserve}_{\\text{comp}} \\ge 2\\,\\lvert\\text{phoria}\\rvert,\\quad P_{\\min}=\\tfrac{2E-R}{3}', value:'補償性融合儲備≥2×斜位；處方稜鏡：E=斜位(△)，R=對側模糊點(△)；常用於EXO' },
     percival:        { name:'Percival’s 法則', latex:'\\quad P_{\\min}=\\tfrac{G}{3}-\\tfrac{2L}{3}',value: '以模糊點(blur)為依據：G＝斜位較大的模糊點」，L＝反向較小的模糊點。判準：需求應位於融合範圍的中間三分之一；若 P_{min}≤0 則不需稜鏡；常用於ESO' },
     one_to_one:      { name:'1:1 法則', latex:'\\mathrm{BO}_{\\min} = \\dfrac{\\mathrm{ESO} - \\mathrm{BI}_{\\mathrm{recovery}}}{2}', value:'近距 ESO：最小 BO 儲備 ≈ (ESO − BI 還原點)/2（單位 △）'},
@@ -2637,7 +2668,7 @@ function convertUnit(){
     anterior_chamber_depth_ultrasound: { name: '前房深度計算', latex: '\\mathrm{ACD} = \\dfrac{v_{\\mathrm{aq}}\\,\\Delta t}{2}', value: 'v_{aq}：房水音速（37°C）≈ 1532 m/s；Δt：自角膜後表面到水晶體前表面之「去回」時間差（超音波圖常見讀值）。' + '若 Δt 以 μs，則 ACD[mm] ≈ 0.766 × Δt[μs]（因 1532 m/s = 1.532 mm/μs，取一半）。' + '例：Δt=4.0 μs → ACD ≈ 3.06 mm。參考音速：角膜 1550 m/s、房水 1532 m/s、水晶體 1641 m/s（37°C）。' },
     spectacle_fov_no_prism: { name: '視覺視場（眼鏡視場，無稜鏡）', latex: '2\\,\\theta = 2\\,\\arctan\\!\\left(\\dfrac{W/2}{\\,VD + r_e\\,}\\right)', value: 'W：鏡片（或鏡框有效孔徑）寬；VD：頂點距；r_e：眼球迴轉半徑（約 13–14 mm）。'},
     spectacle_fov_with_prism: { name: '實際視場（含稜鏡影響）', latex: "2\\,\\theta' \\approx 2\\,\\arctan\\!\\left(\\dfrac{W/2}{\\,VD + r_e\\,}\\right) \\;\\pm\\; \\Delta\\theta_{\\text{prism}}", value: '遠視易出現環形盲區 → 視場縮小；近視易有環形複影 → 視場增大。△θprism：大小與稜鏡量及視距幾何配置相關。'},
-    prism_notation:  { name: '斜視醫囑簡寫', latex: '\\text{備忘}', value: 'D = 遠；N 或 ′ = 近；E = 內斜；X = 外斜；H = 上斜；P = 隱斜；T = 斜視；alt = 交替性；(T) = 間歇性'}
+    prism_notation: { name: "斜視醫囑簡寫（Prism notation）", table: { headers: ["縮寫", "意義"], rows: [["D", "遠（distance）"],["N / ′", "近（near）"],["E", "內斜（eso-）"],["X", "外斜（exo-）"],["H", "上斜（hyper-）"],["P", "隱斜（phoria）"],["T", "斜視（tropia）"],["alt", "交替性（alternating）"],["(T)", "間歇性（intermittent）"]]},note: "臨床處方常用縮寫；可搭配稜鏡大小與方向書寫，例如：6△ BO @ D。"}
   },
   refr: {
     cr39:        { name:'CR-39（標準樹脂）',            latex:'n \\approx 1.499', value:'d 線（589 nm）、20°C 近似' },
@@ -2657,7 +2688,9 @@ function convertUnit(){
     end_evp:       { name: '最佳閱讀距離(EVD) / 等效視度(EVP)', latex: '\\frac{l_{old}}{VA_{old}} = \\frac{l_{new}}{VA_{new}},\\quad \\mathrm{END}=l_{new},\\quad \\mathrm{EVP}=\\frac{1}{\\mathrm{END}}', value: 'l_old：原距離(m)；VA_old：原視力；l_new：新距離(m)；VA_new：新視力（故 l_new = l_old \\cdot VA_{new}/VA_{old}）'},
     jnd:           { name:'恰能分辨差（JND）', latex:'\\mathrm{JND\\ (D)} \\approx \\dfrac{\\text{Snellen 分母}}{100}', value:'例：20/200 ⇒ JND≈2.00D（試片步距≈±1.00D）' },
     fov_simple:    { name:'視野寬度（近似）', latex:'\\mathrm{FOV} \\approx \\dfrac{\\varnothing}{v}\\,f', value:'\\varnothing：鏡片直徑；v：頂點距；f：凸透鏡焦距（粗略近似）' },
+    reading_speed_targets: { name: '閱讀速度與目標', table: { headers: ['閱讀速度', '視力保留', '閱讀目標往下'], rows: [['快速閱讀', '3：1','5 log steps'],['流暢閱讀', '2：1','3 log steps'],['點式閱讀','1.3：1','1 log steps']]}},
     kestenbaum:    { name:'Kestenbaum 規則（近用估算）', latex: 'F_{\\mathrm{near}} \\approx \\dfrac{1}{\\mathrm{VA}_{\\mathrm{dec}}} = \\dfrac{\\text{Snellen}_{\\mathrm{den}}}{\\text{Snellen}_{\\mathrm{num}}}\\;\\mathrm{D}', value: '例：20/200→10D；6/60→10D。為初步估算，臨床常需 ×1.5～2 以達舒適閱讀。'},
+    telescope_compare: { name: '伽利略 & 克卜勒望遠鏡比較表', table: { headers: ['指標', '伽利略', '克卜勒'], rows: [['光學結構', '凸物+凹目(正立)', '凸物+凸目(倒像)'],['鏡筒長度', '較短', '較長'],['視野', '較小', '較大'],['近視放大率', '減少', '增加'],['遠視放大率', '增加', '減少']]},note: '未矯正近視兩種望遠鏡皆縮短鏡筒長度，遠視則反之；結論：未矯正遠視 → 伽利略較合適；未矯正近視 → 克卜勒較合適。'},
     tube_len:      { name:'望遠鏡鏡筒長', latex:'L_{tube}^{\\mathrm{Kepler}}=f_o+f_e,\\quad L_{tube}^{\\mathrm{Galileo}}=f_o-|f_e|', value:'f_o：物鏡焦距；f_e：目鏡焦距' },
     telescope_M:   { name: '望遠鏡放大倍率', latex: 'M = -\\dfrac{F_e}{F_o} = \\dfrac{f_o}{f_e} = \\dfrac{D_{\\mathrm{obj}}}{D_{\\mathrm{exit}}}', value: 'F_o/F_e：物鏡/目鏡屈光力（D）；f_o/f_e：物鏡/目鏡焦距；D_obj/D_exit：入/出瞳直徑。Kepler 倒像取負號，實務多報 |M|。'},
     telescope_near:{ name:'望遠鏡近用（加近用鏡）', latex:'l \\approx \\dfrac{1}{F_{cap}}', value:'加裝近用鏡 F_cap（D）後可在 l=1/F_cap（m）處閱讀' },
@@ -2679,8 +2712,8 @@ const constValue = document.getElementById('constValue');
 
 function fillCats(){
   constCat.innerHTML = '';
-  constCat.add(new Option('眼鏡光學（Ophthalmic）','oph'));
-  constCat.add(new Option('視光學（Optometry）','vis'));
+  constCat.add(new Option('視覺光學（Visual Optics）','oph'));
+  constCat.add(new Option('視光學綜論（Optometry Overview）','vis'));
   constCat.add(new Option('低視力學（low vision）','lv'));
   constCat.add(new Option('折射率（Refractive index）','refr'));
   constCat.add(new Option('光學（Optics）','optics'));
@@ -2704,6 +2737,35 @@ function renderConst(){
   constFormula.innerHTML = `\\(${obj.latex}\\)`;
   constValue.textContent = obj.value;
   if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([constFormula]);
+}
+function buildMiniTable(tbl) {
+  const thead = `<thead><tr>${
+    tbl.headers.map(h => `<th>${h}</th>`).join('')
+  }</tr></thead>`;
+  const tbody = `<tbody>${
+    tbl.rows.map(r => `<tr>${
+      r.map(c => `<td>${c}</td>`).join('')
+    }</tr>`).join('')
+  }</tbody>`;
+  return `<table class="const-mini-table">${thead}${tbody}</table>`;
+}
+
+function renderConst() {
+  const cat  = constCat.value;
+  const key  = constItem.value;
+  const item = CONST_DB[cat]?.[key];
+  if (!item) return;
+  constName.textContent = item.name || '';
+  constFormula.innerHTML = item.latex ? `\\(${item.latex}\\)` : '';
+  if (item.table) {
+    constValue.innerHTML = buildMiniTable(item.table) +
+      (item.note ? `<div style="margin-top:6px;opacity:.8;">${item.note}</div>` : '');
+  } else {
+    constValue.textContent = item.value || (item.note || '');
+  }
+  if (window.MathJax && constFormula.innerHTML) {
+    MathJax.typesetPromise?.([constFormula]);
+  }
 }
 
 fillCats();
