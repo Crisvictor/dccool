@@ -2978,26 +2978,29 @@ constItem.addEventListener('change', renderConst);
   });
   function transpose(S,C,A){ return { S:S+C, C:-C, A:axisSwap90(A) }; }
   function updateLabels(S,C,A){
-    const th  = axisRaw0_179(A) * Math.PI/180;
+    const th  = -axisRaw0_179(A) * Math.PI/180; 
     const thP = th + Math.PI/2;
     const R   = BASE_LEN * scale;
     const pad = LABEL_PAD;
-    const sAxis = (Math.sin(th)  < 0) ?  1 : -1;
-    const sPerp = (Math.sin(thP) < 0) ?  1 : -1;
+    const sideForTop = t => (Math.sin(t) >= 0 ? -1 : 1);  // sin>0 代表往下，取 -1 翻到上面
+    const sAxis = sideForTop(th);
+    const sPerp = sideForTop(thP);
 
-    labAxis.setAttribute('transform',
+    const fmtA3H = a => String(axisRaw0_179(a)).padStart(3,'0');
+    labAxis.setAttribute(
+      'transform',
       `rotate(${th*180/Math.PI}) translate(${sAxis*(R+pad)},0) rotate(${-th*180/Math.PI})`
     );
-    labAxis.textContent = `${fmtLabelD(S)} @${fmtA3(normAxis(A))}`;
-
-    labPerp.setAttribute('transform',
+    labAxis.textContent = `${fmtLabelD(S)} @${fmtA3H(A)}`;
+    labPerp.setAttribute(
+      'transform',
       `rotate(${thP*180/Math.PI}) translate(${sPerp*(R+pad)},0) rotate(${-thP*180/Math.PI})`
     );
-    labPerp.textContent = `${fmtLabelD(S+C)} @${fmtA3(normAxis(axisSwap90(A)))}`;
+    labPerp.textContent = `${fmtLabelD(S+C)} @${fmtA3H(axisSwap90(A))}`;
   }
   function updateCross(S,C,A){
     curS=S; curC=C; curA=A;
-    const a = axisRaw0_179(A);
+    const a = -axisRaw0_179(A);
     crossG.setAttribute('transform', `rotate(${a}) scale(${scale})`);
     updateLabels(S,C,A);
   }
