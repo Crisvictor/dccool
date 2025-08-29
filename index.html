@@ -353,6 +353,12 @@
         transform: translateX(0) scaleX(1);
       }
     }
+    .grid, .dot {
+      touch-action: none;                 
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     .search-count {
       background-color: #2f4f4f; 
@@ -405,18 +411,18 @@
 
 <div class="container">
   <!-- 解鎖區域 -->
-  <h1 id="unlockTitle">請點擊解鎖</h1>
-  <div class="grid" id="grid">
-    <div class="dot" data-value="1" onclick="selectDot(1, this)"></div>
-    <div class="dot" data-value="2" onclick="selectDot(2, this)"></div>
-    <div class="dot" data-value="3" onclick="selectDot(3, this)"></div>
-    <div class="dot" data-value="4" onclick="selectDot(4, this)"></div>
-    <div class="dot" data-value="5" onclick="selectDot(5, this)"></div>
-    <div class="dot" data-value="6" onclick="selectDot(6, this)"></div>
-    <div class="dot" data-value="7" onclick="selectDot(7, this)"></div>
-    <div class="dot" data-value="8" onclick="selectDot(8, this)"></div>
-    <div class="dot" data-value="9" onclick="selectDot(9, this)"></div>
-  </div>
+  <h1 id="unlockTitle">請壓住滑動解鎖</h1>
+<div class="grid" id="grid">
+  <div class="dot" data-value="1"></div>
+  <div class="dot" data-value="2"></div>
+  <div class="dot" data-value="3"></div>
+  <div class="dot" data-value="4"></div>
+  <div class="dot" data-value="5"></div>
+  <div class="dot" data-value="6"></div>
+  <div class="dot" data-value="7"></div>
+  <div class="dot" data-value="8"></div>
+  <div class="dot" data-value="9"></div>
+</div>
 
   <p id="errorMessage" class="error hidden">連接錯誤，請重試。</p>
   <div id="unlockMessage" class="unlock-message hidden">解鎖成功</div>
@@ -701,84 +707,234 @@
     { branch: "正光", id: '787', name: "鄔佳諺", dateOfEntry: "2025-8-1" },
     { branch: "竹北", id: '788', name: "李建勳", dateOfEntry: "2025-8-4" }
   ];
+const HIT_RATIO = 0.76;         
+const REQUIRED_LEN = 4;     
 
-  const correctPassword = [2, 4, 5, 7];
-  let currentInput = [];
-  let previousDot = null;
+const SECRET_PI = Uint8Array.from([7,2,9,4,5,6,1,8,3]); 
+const mapId = (i) => SECRET_PI[i - 1];
+const PEPPER = atob('cDNwUGVyIzIwMjU='); 
+const STORED_HEX = atob('YmNmZDIzNTZhNzNlNzA3ZGY5YmQ5YmViYTYzOGVlNGVhNDIxOTFlYzM5MjNiZGJjZGM2OTY1YmQwMjVjMzA2YQ==');
 
-  function selectDot(value, element) {
-    var audio = document.getElementById('audioPlayer');
-    audio.play();
-    element.classList.add('active');
-    currentInput.push(value);
 
-    if (previousDot) {
-      drawLine(previousDot, element);
-    }
+async function sha256Hex(str) {
+  const data = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function verifyPattern(inputNums) {
+  const logical = inputNums.map(mapId).join('-');
+  const hex = await sha256Hex(PEPPER + '|' + logical);
+  return hex === STORED_HEX;
+}
 
-    previousDot = element;
+// -------- 狀態 --------
+let currentInput = [];
+let previousDot = null;
+let skipNextEndError = false;
+let dotGeom = [];
+let centerByEl = new Map();
 
-    if (currentInput.length === 4) {
-      checkPassword();
+
+function computeDotGeom() {
+  dotGeom = dots.map(el => {
+    const r = el.getBoundingClientRect();
+    const radius = Math.min(r.width, r.height) / 2 * HIT_RATIO;
+    const info = { el, cx: r.left + r.width/2, cy: r.top + r.height/2, radius };
+    centerByEl.set(el, info);
+    return info;
+  });
+}
+function hitTestDot(x, y) {
+  let best = null, bestD2 = Infinity;
+  for (const d of dotGeom) {
+    const dx = x - d.cx, dy = y - d.cy;
+    const d2 = dx*dx + dy*dy;
+    if (d2 <= d.radius * d.radius && d2 < bestD2) {
+      best = d; bestD2 = d2;
     }
   }
+  return best ? best.el : null;
+}
 
-  function checkPassword() {
-    if (JSON.stringify(currentInput) === JSON.stringify(correctPassword)) {
-      var successAudio = document.getElementById('successAudio');
-      successAudio.play();
-      document.getElementById('unlockMessage').classList.remove('hidden');
-      document.getElementById('searchSection').classList.remove('hidden');
-      document.getElementById('errorMessage').classList.add('hidden');
-      document.getElementById('grid').classList.add('hidden');
-      document.getElementById('unlockTitle').classList.add('hidden');
-      document.getElementById('searchTitle').classList.remove('hidden');
-      document.getElementById('pageFooter').classList.remove('hidden');
-      
-      setTimeout(() => {
-        document.getElementById('unlockMessage').classList.add('hidden');
-      }, 3000);
-    } else {
-      document.getElementById('errorMessage').classList.remove('hidden'); // 顯示錯誤訊息
-  
-      setTimeout(() => {
-        document.getElementById('errorMessage').classList.add('hidden');
-      }, 2000);
-      resetDots();
+
+async function checkPassword() {
+  const ok = await verifyPattern(currentInput);
+  if (ok) {
+    var successAudio = document.getElementById('successAudio');
+    successAudio.play();
+    document.getElementById('unlockMessage').classList.remove('hidden');
+    document.getElementById('searchSection').classList.remove('hidden');
+    document.getElementById('errorMessage').classList.add('hidden');
+    document.getElementById('grid').classList.add('hidden');
+    document.getElementById('unlockTitle').classList.add('hidden');
+    document.getElementById('searchTitle').classList.remove('hidden');
+    document.getElementById('pageFooter').classList.remove('hidden');
+    setTimeout(() => document.getElementById('unlockMessage').classList.add('hidden'), 3000);
+  } else {
+    const em = document.getElementById('errorMessage');
+    em?.classList.remove('hidden');
+    setTimeout(() => em?.classList.add('hidden'), 2000);
+    resetDots();
+  }
+  currentInput = [];
+  previousDot = null;
+}
+
+// -------- 畫線 / 重置（保留你的原樣）--------
+function drawLine(fromDot, toDot) {
+  const grid = document.getElementById('grid');
+  const fromRect = fromDot.getBoundingClientRect();
+  const toRect = toDot.getBoundingClientRect();
+
+  const fromX = fromRect.left + fromRect.width / 2;
+  const fromY = fromRect.top + fromRect.height / 2;
+  const toX = toRect.left + toRect.width / 2;
+  const toY = toRect.top + toRect.height / 2;
+
+  const length = Math.sqrt((toX - fromX) ** 2 + (toY - fromY) ** 2);
+  const angle = Math.atan2(toY - fromY, toX - fromX) * (180 / Math.PI);
+
+  const line = document.createElement('div');
+  line.classList.add('line');
+  line.style.width = `${length}px`;
+  line.style.transform = `rotate(${angle}deg)`;
+  line.style.left = `${fromX - grid.getBoundingClientRect().left}px`;
+  line.style.top  = `${fromY - grid.getBoundingClientRect().top }px`;
+
+  grid.appendChild(line);
+}
+function resetDots() {
+  document.querySelectorAll('.dot').forEach(dot => dot.classList.remove('active'));
+  document.querySelectorAll('.line').forEach(line => line.remove());
+}
+
+const gridEl = document.getElementById('grid');
+const dots = [...gridEl.querySelectorAll('.dot')];
+const dotById = Object.fromEntries(dots.map(d => [d.dataset.value, d]));
+const bridge = {
+  '1-3':2,'3-1':2, '1-7':4,'7-1':4, '3-9':6,'9-3':6, '7-9':8,'9-7':8,
+  '1-9':5,'9-1':5, '3-7':5,'7-3':5, '2-8':5,'8-2':5, '4-6':5,'6-4':5
+};
+let drawing = false;
+let cursorLine = null;
+let pointerIdInUse = null;
+
+function makeCursorLine() {
+  if (cursorLine) return cursorLine;
+  cursorLine = document.createElement('div');
+  cursorLine.className = 'line';
+  cursorLine.style.opacity = '0.7';
+  gridEl.appendChild(cursorLine);
+  return cursorLine;
+}
+function updateCursorLine(fromDot, clientX, clientY) {
+  if (!fromDot) return;
+  const gridRect = gridEl.getBoundingClientRect();
+  const from = fromDot.getBoundingClientRect();
+  const fromX = from.left + from.width / 2;
+  const fromY = from.top + from.height / 2;
+  const dx = clientX - fromX;
+  const dy = clientY - fromY;
+  const len = Math.hypot(dx, dy);
+  const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+
+  const line = makeCursorLine();
+  line.style.width = `${len}px`;
+  line.style.transform = `rotate(${ang}deg)`;
+  line.style.left = `${fromX - gridRect.left}px`;
+  line.style.top  = `${fromY - gridRect.top }px`;
+}
+function clearCursorLine() {
+  if (cursorLine) { cursorLine.remove(); cursorLine = null; }
+}
+
+function addDot(dotEl) {
+  const id = dotEl.dataset.value;
+  if (currentInput.includes(+id)) return;
+
+  if (previousDot) {
+    const prevId = previousDot.dataset.value;
+    const key = `${prevId}-${id}`;
+    const mid = bridge[key];
+    if (mid && !currentInput.includes(+mid)) {
+      const midEl = dotById[mid];
+      midEl.classList.add('active');
+      currentInput.push(+mid);
+      drawLine(previousDot, midEl);
+      previousDot = midEl;
     }
+    drawLine(previousDot, dotEl);
+  }
+
+  var audio = document.getElementById('audioPlayer');
+  audio.currentTime = 0; audio.play();
+  dotEl.classList.add('active');
+  currentInput.push(+id);
+  previousDot = dotEl;
+
+  if (currentInput.length === REQUIRED_LEN) {
+    skipNextEndError = true;
+    drawing = false;
+    gridEl.releasePointerCapture?.(pointerIdInUse);
+    pointerIdInUse = null;
+    clearCursorLine();
+    checkPassword();
+  }
+}
+
+function startPattern(e) {
+  e.preventDefault();
+  skipNextEndError = false;
+  computeDotGeom();
+  if (drawing) return;
+  drawing = true;
+  pointerIdInUse = e.pointerId;
+  gridEl.setPointerCapture?.(pointerIdInUse);
+
+  resetDots();
+  currentInput = [];
+  previousDot = null;
+
+  const targetDot = hitTestDot(e.clientX, e.clientY);
+  if (targetDot) addDot(targetDot);
+}
+function movePattern(e) {
+  if (!drawing || e.pointerId !== pointerIdInUse) return;
+  updateCursorLine(previousDot, e.clientX, e.clientY);
+  const targetDot = hitTestDot(e.clientX, e.clientY);
+  if (targetDot) addDot(targetDot);
+}
+function endPattern(e) {
+  if (skipNextEndError) { skipNextEndError = false; return; }
+  if (!drawing || e.pointerId !== pointerIdInUse) return;
+
+  drawing = false;
+  pointerIdInUse = null;
+  clearCursorLine();
+
+  if (currentInput.length > 0 && currentInput.length < REQUIRED_LEN) {
+    const em = document.getElementById('errorMessage');
+    em?.classList.remove('hidden');
+    setTimeout(() => em?.classList.add('hidden'), 1500);
+    resetDots();
     currentInput = [];
     previousDot = null;
   }
+}
 
-  function drawLine(fromDot, toDot) {  // 密碼線條造型
-    const grid = document.getElementById('grid');
-    const fromRect = fromDot.getBoundingClientRect();
-    const toRect = toDot.getBoundingClientRect();
+gridEl.addEventListener('pointerdown', startPattern, { passive: false });
+gridEl.addEventListener('pointermove', movePattern,   { passive: false });
+window.addEventListener('pointerup',   endPattern,    { passive: false });
 
-    const fromX = fromRect.left + fromRect.width / 2;
-    const fromY = fromRect.top + fromRect.height / 2;
-    const toX = toRect.left + toRect.width / 2;
-    const toY = toRect.top + toRect.height / 2;
-
-    const length = Math.sqrt((toX - fromX) ** 2 + (toY - fromY) ** 2);
-    const angle = Math.atan2(toY - fromY, toX - fromX) * (180 / Math.PI);
-
-    const line = document.createElement('div');
-    line.classList.add('line');
-    line.style.width = `${length}px`;
-    line.style.transform = `rotate(${angle}deg)`;
-    line.style.left = `${fromX - grid.getBoundingClientRect().left}px`;
-    line.style.top = `${fromY - grid.getBoundingClientRect().top}px`;
-
-    grid.appendChild(line);
-    }
-
-    function resetDots() {   // 密碼輸入錯誤刷新重置
-      document.querySelectorAll('.dot').forEach(dot => {
-        dot.classList.remove('active');
-    });
-    document.querySelectorAll('.line').forEach(line => line.remove());
-    }
+['gesturestart','gesturechange','gestureend'].forEach(type => {
+  document.addEventListener(type, ev => ev.preventDefault(), { passive: false });
+});
+let lastTouchEnd = 0;
+gridEl.addEventListener('touchend', ev => {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) ev.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
 
     function searchEmployees() {
       const inputId = document.getElementById('employeeIdInput').value.trim();   // 取得工號輸入值
@@ -946,7 +1102,6 @@ document.addEventListener("click", function(e) {
 
 </body>
 </html>
-
 
 
 
