@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="icon" href="img/865.ico" type="image/x-icon">
   <link rel="shortcut icon" href="img/865.ico" type="image/x-icon">
   <title>員工查詢</title>
@@ -20,7 +20,8 @@
       flex-direction: column;
       padding: 20px;
     }
-
+    html { -webkit-text-size-adjust: 100%; }
+    
     .container {
       max-width: 600px;
       margin: 20px;
@@ -400,7 +401,12 @@
       .container {
         padding: 15px;
       }
-
+      input, textarea, select, button {
+        font-size: 16px !important;
+        line-height: 1.2;
+        min-height: 44px; /* 同時提升可點性 */
+      }
+      
       button {
         font-size: 14px;
       }
