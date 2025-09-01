@@ -709,11 +709,11 @@
     { branch: "竹北", id: '788', name: "李建勳", dateOfEntry: "2025-8-4" },
     { branch: "八德", id: '790', name: "賴依竫", dateOfEntry: "2025-8-25" },
     { branch: "彰化", id: '791', name: "陳法蓉", dateOfEntry: "2025-9-1" },
-    { branch: "南崁", id: '792', name: "范家恩", dateOfEntry: "2025-9-1" },
+    { branch: "南崁", id: '792', name: "范家恩", dateOfEntry: "2025-9-1" , trainee:"✏️" },
     { branch: "竹北", id: '793', name: "陸雅祺", dateOfEntry: "2025-9-1" },
-    { branch: "八德", id: '794', name: "王可媗", dateOfEntry: "2025-9-1" },
-    { branch: "八德", id: '795', name: "楊祖雲", dateOfEntry: "2025-9-1" },
-    { branch: "新泰", id: '796', name: "呂俞葳", dateOfEntry: "2025-9-1" },
+    { branch: "八德", id: '794', name: "王可媗", dateOfEntry: "2025-9-1" , trainee:"✏️" },
+    { branch: "八德", id: '795', name: "楊祖雲", dateOfEntry: "2025-9-1" , trainee:"✏️" },
+    { branch: "新泰", id: '796', name: "呂俞葳", dateOfEntry: "2025-9-1" , trainee:"✏️" },
     { branch: "西門", id: '797', name: "賈珺葳", dateOfEntry: "2025-9-1" },
     { branch: "龍潭", id: '798', name: "林暉恩", dateOfEntry: "2025-9-1" },
   ];
@@ -1035,7 +1035,7 @@ gridEl.addEventListener('touchend', ev => {
                 resultItem.appendChild(suspendedSpan);
             }
 
-            // 建教生符號✏️
+            // 建教生符號trainee:✏️
             if (emp.trainee) {
                 const traineeSpan = document.createElement('span');
                 traineeSpan.textContent = `${emp.trainee}`;
@@ -1112,6 +1112,7 @@ document.addEventListener("click", function(e) {
 
 </body>
 </html>
+
 
 
 
