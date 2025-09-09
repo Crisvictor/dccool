@@ -969,6 +969,58 @@
     }
     #tbClearBtn:active{ transform:scale(.98); }
 
+    /* 稜鏡轉換 */
+    #tool8Container .panel.prism-panel{
+      background: rgba(5,23,46,.35);
+      border: 1px solid rgba(255,255,255,.08);
+     border-radius: 10px;
+     padding: 12px;
+     margin-top: 14px;
+   }
+   #tool8Container .panel-title{
+     font-size: 14px; color:#dff; opacity:.92; margin-bottom:8px;
+   }
+   #tool8Container .subhead{
+     margin:10px 0 6px; font-size:12px; color:#9fe; opacity:.9;
+   }
+   #tool8Container .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+   #tool8Container .row.g label{ display:flex; align-items:center; gap:6px; }
+   #tool8Container input, #tool8Container select{
+     background: rgba(0,0,0,.28); color:#fff; border:1px solid rgba(255,255,255,.15);
+     border-radius:6px; padding:6px 8px;
+   }
+  #tool8Container .btn{
+    padding:6px 10px; border-radius:6px; border:1px solid rgba(41,207,168,.5);
+    background:rgba(41,207,168,.2); color:#bff; cursor:pointer;
+  }
+  #tool8Container .result-line{
+    width:100%; min-height:28px; display:flex; align-items:center;
+    padding:6px 8px; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.12);
+    border-radius:6px; color:#fff;
+  }
+  #tool8Container .mini-plot{ margin-top:10px; }
+  #tool8Container .mini-plot svg{ width:100%; height:160px; }
+  #tool8Container .mini-plot .axis{ stroke:rgba(255,255,255,.25); stroke-width:.8; }
+  #tool8Container .mini-plot .dot{ fill:#29cfa8; }
+  #tool8Container .mini-plot .vec{ stroke:#29cfa8; stroke-width:2; }
+  #tool8Container .mini-plot-legend{ font-size:11px; color:#9fe; opacity:.85; margin-top:4px; }
+  .prism-tool .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .prism-tool .row.two-cols{align-items:flex-end}
+  .prism-tool .row.two-cols .col{flex:1;min-width:220px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .prism-tool label{display:flex;align-items:center;gap:6px}
+  .prism-tool .row label > input,.prism-tool .row label > select {flex: 0 0 auto; width: auto;}
+  #prS, #prC {min-width: 70px;}
+  #tool8Container #prAxis { width: 36px !important; max-width: 36px !important; min-width: 36px !important; flex: 0 0 36px !important; text-align: center;}
+  #tool8Container #mvVmm,#tool8Container #mvHmm{ width: 48px !important; max-width: 48px !important; min-width: 48px !important; flex: 0 0 48px !important; text-align: right;}
+  #tool8Container #rvVpd,#tool8Container #rvHpd,#tool8Container #pvH,#tool8Container #pvH,#tool8Container #pvV,#tool8Container #pvR,#tool8Container #pvTheta{ width: 55px !important; max-width: 55px !important; min-width: 55px !important; flex: 0 0 55x !important; text-align: right;}
+  .prism-panel{background:rgba(10,30,35,.35);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;margin-top:10px}
+  .prism-panel .panel-title{font-size:13px;color:#cfe;opacity:.9;margin-bottom:8px}
+  .prism-panel .subttl{min-width:72px;color:#aff;font-size:12px}
+  .prism-tool .btn-primary{padding:8px 14px;border-radius:8px;border:1px solid rgba(41,207,168,.4);background:rgba(41,207,168,.2);color:#eafff7;cursor:pointer}
+  .prism-tool .btn-primary.wide{margin-left:auto}
+  .prism-tool .answer{margin-top:10px;color:#eafff7}
+  .pr-plot{width:100%;max-width:480px;background:rgba(255,255,255,.04);border-radius:6px;margin-top:8px}
+
     /* 追加覆寫 */
     .time-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
     .time-row label{margin:0;width:auto;}
@@ -1037,19 +1089,21 @@
     }
     /* ==== 手機版調整（<= 768px）==== */
     @media (max-width:768px){
-      body{overflow:auto;}
-      #toolSelector{padding:15px 0}
-      #toolSelector button{margin:0 3px;padding:11px 12px;font-size:13px;; flex: 0 0 22.5%;}
+      body{ overflow:auto; }
+      #toolSelector{ padding:15px 0 }
+      #toolSelector button{margin:0 3px;padding:11px 12px;font-size:13px;; flex: 0 0 22.5%; }
       #crossTool{ width:85vw; max-height:85vh; padding:16px 18px; }
       #crossTool input{ min-width:80px; }
+      .prism-tool .btn-primary.wide{ margin-left:0 !important; }
       .cl-output-pair{ flex-direction: column; gap:6px; }
       .cl-output-sep{ display:block; text-align:center; margin:4px 0; }
-      #clToricOut,#clSphOut{ flex: 1 1 100% !important; width: 100% !important;}
-      .cl-row--output { flex-direction: column; align-items: stretch; gap: 6px;}
-      #toricPanel .unit-row input,#crossPanel .unit-row input{ flex: 0 0 auto; width: auto;}
-      #kA, #kA2, #mA, #pA{flex: 0 0 26px !important;  width: 26px !important;  min-width: 26px !important;  max-width: 26px !important;}
-      #kD1, #kD2{flex: 0 0 40px !important;  width: 40px !important;  min-width: 40px !important;  max-width: 40px !important;}
-      #timeTool,#morseTool,#binaryTool,#codeTool,#exchangeTool,#unitTool{width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto;}
+      #clToricOut,#clSphOut{ flex: 1 1 100% !important; width: 100% !important; }
+      .cl-row--output { flex-direction: column; align-items: stretch; gap: 6px; }
+      #tool8Container .row{ gap:8px !important; }
+      #toricPanel .unit-row input,#crossPanel .unit-row input{ flex: 0 0 auto; width: auto; }
+      #kA, #kA2, #mA, #pA{ flex: 0 0 26px !important;  width: 26px !important;  min-width: 26px !important;  max-width: 26px !important; }
+      #kD1, #kD2{ flex: 0 0 40px !important;  width: 40px !important;  min-width: 40px !important;  max-width: 40px !important; }
+      #timeTool,#morseTool,#binaryTool,#codeTool,#exchangeTool,#unitTool{ width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto; }
 
       /* 捲軸高度調整 */
       #eventsList{max-height:40vh;}
@@ -1089,6 +1143,7 @@
       <button id="tool1Btn" class="active">時間管理</button>
       <button id="tool6Btn">單位換算</button>
       <button id="tool7Btn">光學十字</button>
+      <button id="tool8Btn">稜鏡轉換</button>
       <button id="tool5Btn">QR／條碼</button>
       <button id="tool4Btn">匯率轉換</button>
       <button id="tool2Btn">摩斯電碼</button>
@@ -1485,6 +1540,152 @@
           </label>
         </div>
       </div>  
+    </div>  
+  </div>
+  <div id="tool8Container" class="tool-container">
+    <div id="crossTool">
+      <h2>稜鏡換算</h2>
+      <div class="panel prism-panel">
+        <div class="panel-title">稜鏡估量（Prentice Rule）</div>
+          <div class="row rx-row">
+            <label>眼別
+              <select id="prEye">
+                <option value="OD">OD</option>
+                <option value="OS">OS</option>
+              </select>
+            </label>
+            <label>S
+              <select id="prS"></select>
+            </label>
+            <label>C
+              <select id="prC"></select>
+            </label>
+            <label>Axis
+             <input id="prAxis" type="text" inputmode="numeric" value="180" class="axis3">
+            </label>
+          </div>
+        <div class="panel prism-panel">
+          <div class="panel-title">正向（光學中心 → 瞳位）</div>
+          <div class="row two-cols">
+            <div class="col">
+              <div class="subttl">垂直位移</div>
+              <label>方向
+                <select id="mvVDir">
+                  <option value="up">上(Up)</option>
+                  <option value="down">下(Down)</option>
+                </select>
+              </label>
+              <label>距離
+                <input id="mvVmm" type="number" step="0.1" value="0">mm
+              </label>
+            </div>
+            <div class="col">
+              <div class="subttl">水平位移</div>
+              <label>方向
+                <select id="mvHDir">
+                  <option value="temporal">顳(Temporal)</option>
+                  <option value="nasal">鼻(Nasal)</option>
+                </select>
+              </label>
+              <label>距離
+                <input id="mvHmm" type="number" step="0.1" value="0">mm
+              </label>
+            </div>
+            <button id="btnPrCalc" class="btn">計算稜鏡</button>
+          </div>
+          <div class="answer" id="prAnsForward"></div>
+          <canvas id="prPlotF" class="pr-plot" width="420" height="220"></canvas>
+        </div>
+        <div class="panel prism-panel">
+          <div class="panel-title">反向（指定稜鏡 → 需要位移）</div>
+          <div class="row two-cols">
+            <div class="col">
+              <div class="subttl">垂直稜鏡</div>
+              <label>稜鏡量(△)
+                <input id="rvVpd" type="number" step="0.1" value="0">
+              </label>
+              <label>基底
+                <select id="rvVbase">
+                  <option value="BU">BU</option>
+                  <option value="BD">BD</option>
+                </select>
+              </label>
+            </div>
+            <div class="col">
+              <div class="subttl">水平稜鏡</div>
+              <label>稜鏡量(△)
+                <input id="rvHpd" type="number" step="0.1" value="0">
+              </label>
+              <label>基底
+                <select id="rvHbase">
+                  <option value="BO">BO</option>
+                  <option value="BI">BI</option>
+                </select>
+              </label>
+            </div>
+            <button id="btnPrRev" class="btn">回推位移</button>
+          </div>
+        <div class="answer" id="prAnsReverse"></div>
+          <canvas id="prPlotR" class="pr-plot" width="420" height="220"></canvas>
+        </div>
+      </div>
+      <div class="panel prism-panel">
+        <div class="panel-title">稜鏡合成 / 分解（V/H 轉換 360°表示）</div>
+        <div class="subhead">H/V → 大小角度</div>
+        <div class="row g">
+          <label>水平量(△)
+            <input id="pvH" type="text" inputmode="tel" placeholder="稜鏡量">
+          </label>
+          <label>水平基底
+            <select id="pvHbase">
+              <option value="BO">BO</option>
+              <option value="BI">BI</option>
+            </select>
+          </label>
+          <label>垂直量(△)
+            <input id="pvV" type="text" inputmode="tel" placeholder="稜鏡量">
+          </label>
+          <label>垂直基底
+            <select id="pvVbase">
+              <option value="BU">BU</option>
+              <option value="BD">BD</option>
+            </select>
+          </label>
+        <button id="pvCombineBtn" class="btn">合成</button>
+        </div>
+        <div class="row">
+          <div id="pvCombineOut" class="result-line"></div>
+        </div>
+        <div class="subhead">大小角度 → H/V</div>
+        <div class="row g">
+          <label class="pr-field">
+            眼別
+            <select id="pvEye">
+              <option value="OD">OD</option>
+              <option value="OS">OS</option>
+            </select>
+          </label>
+          <label>大小(△)
+            <input id="pvR" type="text" inputmode="tel" placeholder="稜鏡量">
+          </label>
+          <label>角度(°，0右/90上)
+            <input id="pvTheta" type="text" inputmode="numeric" placeholder="0~360">
+          </label>
+          <button id="pvDecompBtn" class="btn">分解</button>
+        </div>
+        <div class="row">
+          <div id="pvDecompOut" class="result-line"></div>
+        </div>
+        <div class="mini-plot">
+          <svg id="pvPlot" viewBox="-60 -60 120 120">
+            <line x1="-60" y1="0" x2="60" y2="0" class="axis"/>
+            <line x1="0" y1="-60" x2="0" y2="60" class="axis"/>
+            <line id="pvVec" x1="0" y1="0" x2="0" y2="0" class="vec"/>
+            <circle r="2.5" cx="0" cy="0" class="dot"/>
+          </svg>
+          <div class="mini-plot-legend">向量：0°→、90°↑、180°←、270°↓</div>
+        </div>
+      </div>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
@@ -2586,8 +2787,7 @@ function convertUnit(){
   },
   oph: {
     n_index:     { name:'折射率公式',           latex:'n = \\dfrac{c}{v}', value:'c：真空光速；v：介質中相速' },
-    light_speed: { name:'光速公式',             latex:'c = \\lambda\\,\\nu', value:'c：真空光速 299,792,458 m/s；λ：波長；ν：頻率' },
-    wave_speed:  { name:'波速公式',             latex:'v = \\lambda\\,\\nu', value:'v：波速；λ：波長；ν：頻率' },
+    light_speed: { name:'光速/波速公式',             latex:'c = \\lambda\\,\\nu ； v = \\lambda\\,\\nu', value:'c：真空光速 299,792,458 m/s； λ：波長； ν：頻率； υ：波速；' },
     snell:       { name:'施奈爾定律',           latex:'n_1\\,\\sin i = n_2\\,\\sin r', value:'i：入射角；r：折射角' },
     critical_angle: { name: '全反射臨界角',     latex: '\\theta_c = \\arcsin\\!\\left(\\dfrac{n_2}{n_1}\\right),\\quad (n_1>n_2)', value: 'θ_c：臨界角；n₁：入射介質折射率；n₂：較稀折射率'},
     power:       { name:'屈光度公式',           latex:'D = \\dfrac{1}{f}', value:'D：屈光度（D）；f：焦距（m，符號依高斯記號）' },
@@ -2982,7 +3182,7 @@ constItem.addEventListener('change', renderConst);
     const thP = th + Math.PI/2;
     const R   = BASE_LEN * scale;
     const pad = LABEL_PAD;
-    const sideForTop = t => (Math.sin(t) >= 0 ? -1 : 1);  // sin>0 代表往下，取 -1 翻到上面
+    const sideForTop = t => (Math.sin(t) >= 0 ? -1 : 1);
     const sAxis = sideForTop(th);
     const sPerp = sideForTop(thP);
 
@@ -3499,6 +3699,258 @@ updateToric();
     updateToricBack();
 })();
 
+  // =====稜鏡換算 =====
+(() => {
+  const $ = id => document.getElementById(id);
+  const EPS = 1e-6;
+  const parseNum = v => {
+    const s = String(v??'').trim().replace(/\u2212/g,'-').replace(/,/g,'.').replace(/[^\d+.\-]/g,'');
+    const n = parseFloat(s); return Number.isFinite(n) ? n : NaN;
+  };
+  const clamp180 = a => { let x = Math.round(parseNum(a)||0)%180; if (x<=0) x+=180; return x; };
+  const deg = r => r*180/Math.PI, rad = d => d*Math.PI/180;
+  const fmtA3 = a => String(clamp180(a)).padStart(3,'0');
+  const fmtSigned0 = v => (Math.abs(v)<0.005) ? '0.00' : ((v>=0?'+':'-')+Math.abs(v).toFixed(2));
+  const deg2rad = d => d * Math.PI/180;
+  const norm180 = a => { let x = Math.round(+a||0)%180; if (x<=0) x+=180; return x; };
+  const fmtPrism = v => `${Math.abs(v).toFixed(2)}△`;
+  // 球柱任意子午線屈光力：F(θ) = S + C sin²(θ - Axis)
+  const Fmer = (S,C,Axis,thetaDeg) => S + C * Math.pow(Math.sin(rad(thetaDeg - Axis)), 2);
+  function baseTextH(eye, signX){
+    if (eye==='OD') return signX>0 ? 'BO' : 'BI';
+    return signX>0 ? 'BI' : 'BO';
+  }
+  const baseTextV = signY => (signY>0 ? 'BU' : 'BD');
+ // UI refs
+const prEye   = document.getElementById('prEye');
+const prS     = document.getElementById('prS');
+const prC     = document.getElementById('prC');
+const prAxis  = document.getElementById('prAxis');
+
+const mvVDir  = document.getElementById('mvVDir');
+const mvVmm   = document.getElementById('mvVmm');
+const mvHDir  = document.getElementById('mvHDir');
+const mvHmm   = document.getElementById('mvHmm');
+const btnPrCalc = document.getElementById('btnPrCalc');
+const ansF    = document.getElementById('prAnsForward');
+const plotF   = document.getElementById('prPlotF');
+
+const rvVpd   = document.getElementById('rvVpd');
+const rvVbase = document.getElementById('rvVbase');
+const rvHpd   = document.getElementById('rvHpd');
+const rvHbase = document.getElementById('rvHbase');
+const btnPrRev  = document.getElementById('btnPrRev');
+const ansR    = document.getElementById('prAnsReverse');
+const plotR   = document.getElementById('prPlotR');
+
+(function populateRxSelects(){
+  // S: +20 → -20 ;  |S| <= 12 step 0.25, else step 0.50
+  const sOpts = [];
+  for (let v=20; v>=-20; ){
+    sOpts.push(v);
+    if (Math.abs(v) > 12) v -= 0.5; else v -= 0.25;
+  }
+  prS.innerHTML = sOpts
+    .map(v=>`<option value="${v.toFixed(2)}">${v>=0?'+':''}${v.toFixed(2)}</option>`)
+    .join('');
+
+  // C: 0 → -6 step 0.25（含 -0.00）
+  const cOpts = [];
+  for (let v=0; v>=-6; v-=0.25) cOpts.push(v);
+  prC.innerHTML = cOpts
+    .map(v=>`<option value="${v.toFixed(2)}">${v.toFixed(2)}</option>`)
+    .join('');
+
+  prS.value = "4.00";
+  prC.value = "-1.50";
+  prAxis.value = "180";
+})();
+
+
+// Sph-Cyl 在任意子午線的屈光力：F(θ) = S + C * sin^2(θ)（θ=該子午線與Cyl軸的夾角）
+function meridianPower(S,C, axisDeg, meridianDeg){
+  const theta = Math.abs(norm180(meridianDeg) - norm180(axisDeg));
+  const s2 = Math.sin(deg2rad(theta))**2;
+  return S + C*s2;
+}
+
+// 眼別：水平正向(+x)定義為「顳側」。OD = 右；OS = 左
+function horizBaseName(eye, sign){ // sign>0：顳側(temporal)；sign<0：鼻側(nasal)
+  if (sign === 0) return '—';
+  const temporal = sign>0;
+  if (eye === 'OD') return temporal ? 'BO' : 'BI';
+  return temporal ? 'BI' : 'BO'; // OS 左眼相反
+}
+function vertBaseName(sign){ // sign>0 上、sign<0 下
+  if (sign===0) return '—';
+  return sign>0 ? 'BU' : 'BD';
+}
+function baseSignFromName(eye, base){
+  if (base==='BU') return +1;
+  if (base==='BD') return -1;
+  if (base==='BO') return (eye==='OD') ? +1 : -1;
+  if (base==='BI') return (eye==='OD') ? -1 : +1;
+  return 0;
+}
+
+// 坐標與向量
+function drawPrPlot(canvas, vx, vy){
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.save();
+  ctx.translate(w/2, h/2);
+  ctx.strokeStyle = 'rgba(255,255,255,.25)';
+  ctx.lineWidth = 1;
+  // axes
+  ctx.beginPath(); ctx.moveTo(-w/2+10,0); ctx.lineTo(w/2-10,0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,-h/2+10); ctx.lineTo(0,h/2-10); ctx.stroke();
+
+  // vector scale（每 1∆ 10px）
+  const sx = vx*10, sy = -vy*10; // y向上為正，畫布相反
+  ctx.strokeStyle = '#29cfa8';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(sx,sy); ctx.stroke();
+  ctx.fillStyle = '#29cfa8';
+  ctx.font = '12px system-ui,Segoe UI,Arial';
+  const txt = `${vx.toFixed(2)}△H , ${vy.toFixed(2)}△V`;
+  ctx.fillText(txt, sx+6, sy-6);
+  ctx.restore();
+}
+// ---- 正向計算（位移 → 稜鏡）----
+function calcForward(){
+  const eye = prEye.value;
+  const S   = parseFloat(prS.value);
+  const C   = parseFloat(prC.value);
+  const A   = norm180(prAxis.value);
+
+  // 垂直子午線=90°、水平子午線=180°
+  const Fv = meridianPower(S, C, A, 90);
+  const Fh = meridianPower(S, C, A, 180);
+
+  // 位移（mm → cm），方向轉號
+  const dv_cm = Math.abs(parseFloat(mvVmm.value)||0) / 10;
+  const dh_cm = Math.abs(parseFloat(mvHmm.value)||0) / 10;
+  const sv = (mvVDir.value==='up') ? +1 : -1;
+  const sh = (mvHDir.value==='temporal') ? +1 : -1;
+
+  // Prentice：P = c(cm) * F(D)
+  const Pv = dv_cm * Fv * sv;
+  const Ph = dh_cm * Fh * sh;
+
+  const vBase = vertBaseName(Math.sign(Pv));
+  const hBase = horizBaseName(eye, Math.sign(Ph));
+
+  // 顯示
+  const out = [];
+  if (Math.abs(Pv) > 0.0005) out.push(`${Math.abs(Pv).toFixed(2)}△${vBase}`);
+  if (Math.abs(Ph) > 0.0005) out.push(`${Math.abs(Ph).toFixed(2)}△${hBase}`);
+  const vecMag = Math.hypot(Pv,Ph);
+  const vecAng = Math.atan2(Pv,Ph)*180/Math.PI; // 以水平方向0°起
+  ansF.textContent = out.length
+    ? `${eye}：${out.join(' ＋ ')}（合成 ≈ ${vecMag.toFixed(2)}△ @ ${vecAng.toFixed(0)}°）`
+    : `${eye}：0△`;
+
+  drawPrPlot(plotF, Ph, Pv);
+}
+
+// ---- 反向計算（稜鏡 → 位移）----
+function calcReverse(){
+  const eye = prEye.value;
+  const S   = parseFloat(prS.value);
+  const C   = parseFloat(prC.value);
+  const A   = norm180(prAxis.value);
+
+  const Fv = meridianPower(S, C, A, 90);
+  const Fh = meridianPower(S, C, A, 180);
+
+  const Pv = Math.abs(parseFloat(rvVpd.value)||0) * baseSignFromName(eye, rvVbase.value);
+  const Ph = Math.abs(parseFloat(rvHpd.value)||0) * baseSignFromName(eye, rvHbase.value);
+
+  const dv_mm = Fv===0 ? 0 : (Math.abs(Pv) / Math.abs(Fv)) * 10;
+  const dh_mm = Fh===0 ? 0 : (Math.abs(Ph) / Math.abs(Fh)) * 10;
+
+  const vDir = (Math.sign(Pv)>0) ? '上(Up)' : (Math.sign(Pv)<0 ? '下(Down)' : '—');
+  const hDir = (function(){
+    if (Math.sign(Ph)===0) return '—';
+    const temporal = (baseSignFromName(eye, (Math.sign(Ph)>0? (eye==='OD'?'BO':'BI') : (eye==='OD'?'BI':'BO'))) > 0);
+    return temporal ? '顳(Temporal)' : '鼻(Nasal)';
+  })();
+
+  ansR.textContent = `${eye}：垂直約 ${dv_mm.toFixed(2)} mm（${vDir}）；水平約 ${dh_mm.toFixed(2)} mm（${hDir}）`;
+
+  drawPrPlot(plotR, Ph, Pv);
+}
+
+prAxis.addEventListener('blur', ()=> prAxis.value = fmtA3(prAxis.value));
+
+btnPrCalc.addEventListener('click', calcForward);
+btnPrRev .addEventListener('click', calcReverse);
+
+drawPrPlot(plotF, 0, 0);
+drawPrPlot(plotR, 0, 0);
+
+  // === ② H/V 合成與分解 ===
+  const pvH=$('pvH'), pvHbase=$('pvHbase'), pvV=$('pvV'), pvVbase=$('pvVbase');
+  const pvCombineBtn=$('pvCombineBtn'), pvCombineOut=$('pvCombineOut');
+  const pvR=$('pvR'), pvTheta=$('pvTheta'), pvDecompBtn=$('pvDecompBtn'), pvDecompOut=$('pvDecompOut');
+  const pvVec=$('pvVec');
+
+  function setPvVec(R,theta){
+    const x = R*Math.cos(rad(theta));
+    const y = R*Math.sin(rad(theta));
+    pvVec.setAttribute('x1',0); pvVec.setAttribute('y1',0);
+    pvVec.setAttribute('x2', x.toFixed(2));
+    pvVec.setAttribute('y2', (-y).toFixed(2)); // SVG y 向下
+  }
+
+  // 水平/垂直 → 大小角度
+  function combinePrism(){
+    const H = parseNum(pvH.value);
+    const V = parseNum(pvV.value);
+    if (!Number.isFinite(H) || !Number.isFinite(V)) { pvCombineOut.textContent=''; return; }
+    const Hsign = (pvHbase.value==='BO') ? +1 : -1;   // 右為正
+    const Vsign = (pvVbase.value==='BU') ? +1 : -1;   // 上為正
+    const x = Hsign*Math.abs(H);
+    const y = Vsign*Math.abs(V);
+    const R = Math.sqrt(x*x+y*y);
+    let theta = deg(Math.atan2(y,x)); if (theta<0) theta+=360;
+    pvCombineOut.textContent = `${R.toFixed(2)}△ @ ${theta.toFixed(1)}°`;
+    setPvVec(R*10, theta); // 放大10倍畫圖
+  }
+
+  // 大小角度 → 水平/垂直
+  function decompPrism(){
+    const R = parseNum(pvR.value);
+    let theta = parseNum(pvTheta.value);
+    if (!Number.isFinite(R) || !Number.isFinite(theta)) {
+      pvDecompOut.textContent = '';
+      setPvVec(0, 0);
+      return;
+    }
+    const eye = (document.getElementById('pvEye')?.value || 'OD').toUpperCase();
+    theta = ((theta % 360) + 360) % 360;
+    const x = R * Math.cos(rad(theta));
+    const y = R * Math.sin(rad(theta));
+    let Hbase = '';
+    if (Math.abs(x) > 1e-6) {
+      if (eye === 'OD') Hbase = (x > 0) ? 'BO' : 'BI';
+      else              Hbase = (x > 0) ? 'BI' : 'BO';
+    }
+    let Vbase = '';
+    if (Math.abs(y) > 1e-6) Vbase = (y > 0) ? 'BU' : 'BD';
+    const hStr = (Math.abs(x) < 1e-6) ? `${fmtPrism(0)}`
+                                      : `${fmtPrism(x)} ${Hbase}`;
+    const vStr = (Math.abs(y) < 1e-6) ? `${fmtPrism(0)}`
+                                      : `${fmtPrism(y)} ${Vbase}`;
+    pvDecompOut.textContent = `水平：${hStr}；垂直：${vStr}`;
+    setPvVec(R * 10, theta);
+  }
+
+  pvCombineBtn?.addEventListener('click', combinePrism);
+  pvDecompBtn?.addEventListener('click', decompPrism);
+})();
   /* === 小工具列邏輯 === */
   const tabBtns = Array.from(document.querySelectorAll('#toolSelector button'));
   const containers = tabBtns.map(b =>
