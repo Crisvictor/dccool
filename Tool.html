@@ -3799,8 +3799,8 @@ const toPatientXSafe = (typeof toPatientX === 'function') ? toPatientX : _fallba
 function decLabelFromMM(eye, mmX, mmY){
   const sideH = (mmX === 0) ? '-'
     : (toPatientXSafe(eye, mmX) > 0
-        ? ((eye === 'OD') ? '往左(顳)' : '往左(鼻)')
-        : ((eye === 'OD') ? '往右(鼻)' : '往右(顳)'));
+        ? ((eye === 'OD') ? '往右(鼻)' : '往右(顳)')
+        : ((eye === 'OD') ? '往左(顳)' : '往左(鼻)'));
   const sideV = (mmY === 0) ? '-' : (mmY > 0 ? '往上' : '往下');
   return `${mmX.toFixed(1)}mm ${sideH} , ${mmY.toFixed(1)}mm ${sideV}`;
 }
@@ -4054,7 +4054,7 @@ drawPrPlot(plotR, 0, 0);
     const R = Math.hypot(x, y);
     let theta = deg(Math.atan2(y, x)); if (theta < 0) theta += 360;
     pvCombineOut.textContent = `${R.toFixed(2)}△ @ ${theta.toFixed(1)}°`;
-    setPvVec(R*7, theta); // 放大10倍畫圖
+    setPvVec(R*7, theta); 
   }
 
   // 角度 → 水平/垂直
