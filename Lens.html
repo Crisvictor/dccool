@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" href="img/optometry.png" type="image/x-icon">
+<link rel="shortcut icon" href="img/optometry.png" type="image/x-icon">
+<title>鏡片厚度模擬器</title>
+<style>
+  :root{
+    --bg:#0b1220;          /* 背景 */
+    --ink:#e5e7eb;         /* 主要文字 */
+    --muted:#94a3b8;       /* 次要文字 */
+    --card:#0f172a;        /* 卡片底色 */
+    --border:#1e293b;      /* 邊框色 */
+    --pri:#38bdf8;         /* 重點/焦點色 */
+    --ok:#22c55e;
+    --ng:#f87171;
+  }
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans TC",Arial;
+    background:radial-gradient(1200px 800px at 20% -10%,#0e1728 0%,#0b1220 55%),
+               radial-gradient(800px 800px at 90% 10%,#0a1a2f 0%,transparent 60%),
+               var(--bg);
+    color:var(--ink);
+  }
+  .wrap{max-width:1200px;margin:24px auto;padding:0 16px}
+  h1{font-size:22px;margin:0 0 12px;color:#f1f5f9}
+  .grid{display:grid;gap:16px}
+  .g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .card{
+    background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.02));
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:0 10px 35px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+    backdrop-filter:saturate(110%) blur(2px);
+  }
+  .card>.hd{
+    padding:12px 16px;
+    border-bottom:1px solid var(--border);
+    font-weight:600;
+    color:#cbd5e1;
+  }
+  .card>.bd{padding:12px 16px}
+  .row{display:grid;grid-template-columns:1fr 160px;align-items:center;gap:8px;margin:8px 0}
+  .row label{color:var(--muted);font-size:12px}
+  input,select{
+    width:100%;max-width:100%;box-sizing:border-box;
+    padding:8px 10px;
+    border:1px solid #334155;
+    background:#0b1628;
+    color:var(--ink);
+    border-radius:10px;font-size:14px;outline:none;
+    transition:border-color .15s, box-shadow .15s, background .15s;
+  }
+  input::placeholder{color:#71839a}
+  select option{background:#0b1628;color:var(--ink)}
+    input:focus,select:focus{
+    border-color:#60a5fa;
+    box-shadow:0 0 0 2px rgba(56,189,248,.25);
+    background:#0c1a31;
+  }
+  .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .kpi{
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+    padding:10px
+  }
+  .kpi .t{font-size:12px;color:var(--muted)}
+  .kpi .v{font-weight:700;margin-top:4px;color:#e2e8f0}
+  .canvas{
+    aspect-ratio:1/1;border-radius:16px;
+    border:1px solid var(--border);
+    background:radial-gradient(500px 400px at 60% 40%,rgba(148,163,184,.08),transparent 60%),
+               #0b1324;
+    display:flex;align-items:center;justify-content:center
+  }
+  .note{font-size:12px;color:var(--muted)}
+  .danger{color:var(--ng);font-weight:700}
+  @media (max-width:980px){.g-3{grid-template-columns:1fr}}
+  hr{border:0;border-top:1px dashed var(--border);margin:10px 0}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>鏡片厚度模擬器</h1>
+    <p class="note">用途：在訂製前，輸入度數/折射率與框參數，估算裁型後邊緣厚度是否足夠做出溝尖與車溝，並檢查鏡坯片徑是否足夠。<br>聲明：本教學工具為厚度幾何近似值，未含前後表面彎度（Base Curve）設定與折射面設計（如非球面與多焦）仍會產生誤差，實務仍需以加工經驗為準。</p>
+
+    <div class="grid g-3">
+      <div class="card">
+        <div class="hd">參數輸入 [訂製鏡片]</div>
+        <div class="bd">
+          <div class="row"><label>鏡片類型</label><select id="lensType"><option value="minus">近視</option><option value="plus">遠視</option></select></div>
+          <div class="row"><label>球鏡 D (±)</label><input id="D" type="number" step="0.25" value="-6"></div>
+          <div class="note" id="d_display">目前：-6.00 D</div>
+          <div class="row"><label>折射率 n</label>
+            <select id="n">
+              <option value="1.56">1.56</option>
+              <option value="1.61">1.61</option>
+              <option value="1.67" selected>1.67</option>
+              <option value="1.74">1.74</option>
+            </select>
+          </div>
+          <div class="row" data-for="minus"><label>指定中心厚 (mm)</label><input id="centerT" type="number" step="0.1" value="1.2" min="1.0" max="3.0"></div>
+          <div class="row" data-for="plus" style="display:none"><label>設定邊緣厚 (mm)</label><input id="edgeT" type="number" step="0.1" value="2.0" min="0.2" max="3.0"></div>
+          <div class="row"><label>鏡坯片徑 (mm)</label><input id="blankDia" type="number" step="1" value="65" min="50" max="80"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">平面視圖（鏡坯 / 裁型 ）</div>
+        <div class="bd">
+          <div class="canvas"><svg id="topView" width="340" height="340"></svg></div>
+          <p class="note">圖示：外圈＝鏡坯片徑；內圈＝裁型直徑（ED）；<br>綠/紅環＝邊緣厚達標/不足；鏡坯不足→外圈紅色。</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">裁型邊緣厚度（含偏心影響）</div>
+        <div class="bd">
+          <div class="canvas"><svg id="sectionView" width="340" height="340"></svg></div>
+          <p class="note">橫切面沿水平方向：左/右邊因偏心（PD ≠ A+DBL）<br>而產生不同邊緣厚度，評估最薄側是否可開車溝。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g-3" style="margin-top:16px">
+      <div class="card">
+        <div class="hd">參數輸入 [框參數] </div>
+        <div class="bd">
+          <div class="row"><label>有效直徑 ED (mm)</label><input id="ED" type="number" step="0.5" value="53" min="20" max="80"></div>
+          <div class="row"><label>框寬 A (mm)</label><input id="A" type="number" step="0.5" value="52" min="20" max="80"></div>
+          <div class="row"><label>中樑距 DBL (mm)</label><input id="DBL" type="number" step="0.5" value="18" min="10" max="40"></div>
+          <div class="row"><label>瞳距 PD (mm)</label><input id="PD" type="number" step="0.5" value="62" min="40" max="80"></div>
+          <div class="row"><label>預留加工 (mm)</label><input id="allowance" type="number" step="0.5" value="2" min="0" max="4"></div>
+
+          <div class="row"><label>框溝寬/車溝寬 (mm)</label><input id="grooveDepth" type="number" step="0.1" value="0.8" min="0.3" max="3"></div>
+          <div class="row"><label>最小剩餘厚度需求 (mm)</label><input id="minTip" type="number" step="0.1" value="1.0" min="0.3" max="2"></div>
+          <div class="row"><label>框型</label><select id="rimType"><option value="full">全框</option><option value="groove">車溝框</option></select></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">裁型 & 鏡坯評估</div>
+        <div class="bd kpis">
+          <div class="kpi"><div class="t">框心距 (A+DBL)</div><div id="k_framePD" class="v"></div></div>
+          <div class="kpi"><div class="t">單眼偏心</div><div id="k_dec" class="v"></div></div>
+          <div class="kpi"><div class="t">裁型直徑 ≈</div><div id="k_cutDia" class="v"></div></div>
+          <div class="kpi"><div class="t">鏡坯需求半徑</div><div id="k_reqR" class="v"></div></div>
+          <div class="kpi"><div class="t">鏡坯最小建議片徑</div><div id="k_minBlank" class="v"></div></div>
+          <div class="kpi"><div class="t">鏡坯是否足夠</div><div id="k_blankOK" class="v"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="hd">厚度 & 溝尖/車溝檢核（近似）</div>
+        <div class="bd kpis">
+          <div class="kpi"><div class="t">Δ（幾何近似）</div><div id="k_delta" class="v"></div></div>
+          <div class="kpi"><div class="t">中心厚估</div><div id="k_center" class="v"></div></div>
+          <div class="kpi"><div class="t">邊緣厚（薄側）</div><div id="k_edge" class="v"></div></div>
+          <div class="kpi"><div class="t">不含溝尖/車溝邊厚（薄側）</div><div id="k_tip" class="v"></div></div>
+          <div class="kpi"><div class="t">車溝/溝尖安全線</div><div id="k_halfSafety" class="v"></div></div>
+          <div class="kpi"><div class="t">結果</div><div id="k_result" class="v"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const $ = (id)=>document.getElementById(id);
+  const ids = ["lensType","D","n","centerT","edgeT","blankDia","ED","A","DBL","PD","allowance","grooveDepth","minTip","rimType"];
+  ids.forEach(id=>$(id).addEventListener('input', update));
+  $("lensType").addEventListener('change', ()=>{
+    const t = $("lensType").value;
+    document.querySelector('[data-for="minus"]').style.display = (t==='minus')?'' : 'none';
+    document.querySelector('[data-for="plus"]').style.display  = (t==='plus') ?'' : 'none';
+    update();
+  });
+
+  function clamp(v,min,max){ v=parseFloat(v); if(isNaN(v)) return min; return Math.min(Math.max(v,min),max); }
+
+  function calc(){
+    const lensType = $("lensType").value; // minus/plus
+    const D  = parseFloat($("D").value);
+    const n  = parseFloat($("n").value);
+    const centerT = clamp($("centerT").value,1.0,3.0);
+    const edgeT   = clamp($("edgeT").value,0.2,3.0);
+    const blankDia= clamp($("blankDia").value,50,80);
+
+    const ED = clamp($("ED").value,20,80);
+    const A  = clamp($("A").value,20,80);
+    const DBL= clamp($("DBL").value,10,40);
+    const PD = clamp($("PD").value,40,80);
+    const allowance = clamp($("allowance").value,0,4);
+
+    const grooveDepth = clamp($("grooveDepth").value,0.3,0.9);
+    const minTip = clamp($("minTip").value,0.8,2);
+    const rimType = $("rimType").value; // full/groove
+
+    const framePD = A + DBL;
+    const dec = Math.abs(framePD - PD)/2; // 單眼偏心
+
+    // === 使用標準 MBS 幾何 ===
+    const cutR = ED/2;               // 裁型半徑（以 ED/2 為準）
+    const rL = Math.max(0, cutR - dec); // 左側實際半徑（距鏡片中心）
+    const rR = cutR + dec;              // 右側實際半徑
+
+    // 最小鏡坯半徑需求：cutR + dec + allowance
+    const hReq = cutR + dec + allowance;
+    const minBlank = 2*hReq; // = ED + 2*dec + 2*allowance
+    const blankOK = (blankDia/2) >= hReq;
+
+    const absD = Math.abs(D);
+
+    // 以“薄側/最大半徑”作為參考半徑來計算 Δ
+    const rRef = Math.max(rL, rR); // 近視：最大半徑；遠視：薄側亦在較大半徑
+    const delta = (rRef*rRef*absD)/(2000*(n-1));
+
+    function tMinus(r){ return centerT + (r*r*absD)/(2000*(n-1)); }
+    function tPlus (r){ const rThin = Math.max(rL, rR); const center = edgeT + (rThin*rThin*absD)/(2000*(n-1)); return Math.max(0, center - (r*r*absD)/(2000*(n-1))); }
+
+    let tL, tR, estCenter, estEdgeMin;
+    if(lensType==='minus'){
+      estCenter = centerT;
+      tL = tMinus(rL); tR = tMinus(rR);
+      estEdgeMin = Math.min(tL, tR);
+    }else{
+      // 遠視：用最薄側半徑推回中心厚，確保薄側=輸入邊緣厚
+      estCenter = edgeT + delta; // delta 以 rRef 計
+      tL = tPlus(rL); tR = tPlus(rR);
+      estEdgeMin = Math.min(tL, tR); // 應與 edgeT 極接近
+    }
+
+    const tipRemain = estEdgeMin - grooveDepth; // 薄側尖端
+
+    // 車溝框安全（建議 ≥1.0 或使用者設定）
+    const need = Math.max(1.0, minTip);
+    const halfOK = tipRemain >= need;
+
+    return {lensType,D,n,centerT,edgeT,blankDia,ED,A,DBL,PD,allowance,grooveDepth,minTip,rimType,
+      framePD,dec,cutR,hReq,blankOK,delta,estCenter,estEdgeMin,tipRemain,halfOK,minBlank,rL,rR,need};
+  }
+
+  function drawTop(res){
+    const svg = $("topView");
+    const W=svg.viewBox.baseVal.width||340,H=svg.viewBox.baseVal.height||340; svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    svg.innerHTML='';
+    const cx=W/2, cy=H/2;
+    const blankR = Math.min(W,H)*0.42;
+    const rBlankReal = res.blankDia/2;
+
+    const rCut = (res.cutR / rBlankReal) * blankR; // 裁型半徑
+
+    // 鏡坯外圈（不足時紅色）
+    circle(svg,cx,cy,blankR,'none', res.blankOK ? '#cbd5e1' : '#ef4444', 2);
+
+    // 裁型圈（以框中心相對鏡坯中心之偏心顯示）
+    const dx = (res.dec / rBlankReal) * blankR; // 裁型圓心偏移
+    circle(svg,cx+dx,cy,rCut,'none','#374151',2);
+
+    // 溝槽達標（薄側）
+    const edgeColor = res.tipRemain>=res.need? '#22c55e' : '#ef4444';
+    circle(svg,cx+dx,cy,rCut+8,'none',edgeColor,8);
+
+    // 標註
+    text(svg,cx,cy-blankR-8,`鏡坯片徑 ${res.blankDia.toFixed(0)} mm`,'#99B3C2');
+    text(svg,cx+dx,cy-rCut+32,`裁型直徑 ≈ ${ (res.cutR*2).toFixed(1) } mm`,'#839681','middle');
+  }
+
+  function drawSection(res){
+    const svg=$("sectionView");
+    const W=svg.viewBox.baseVal.width||340,H=svg.viewBox.baseVal.height||340; svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    svg.innerHTML='';
+    const cx=W/2, baseY=H*0.75;
+
+    // 橫向比例：以最大半徑 rR 對應到視圖寬度 120px
+    const scaleX = 120 / Math.max(res.rR, res.cutR);
+    // 厚度比例：僅視覺化用（1mm→8px）
+    const scaleT = 8;
+
+    // 中央基準線
+    line(svg,cx-140,baseY,cx+140,baseY,'#e5e7eb',1);
+
+    // 左右邊緣位置（相對鏡片中心）
+    const xL = cx - res.rL*scaleX+20; const xR = cx + res.rR*scaleX-40;
+
+    const tL = thicknessAt(res,'L');
+    const tR = thicknessAt(res,'R');
+
+    // 繪製截面（矩形示意局部厚度）
+    rect(svg, xL-6, baseY - tL*scaleT, 12, tL*scaleT, '#93c5fd');
+    rect(svg, xR-6, baseY - tR*scaleT, 12, tR*scaleT, '#93c5fd');
+
+    // 車溝寬
+    rect(svg, xL-6, baseY - Math.max(0,tL-res.grooveDepth)*scaleT, 12, res.grooveDepth*scaleT, 'rgba(239,68,68,.6)');
+    rect(svg, xR-6, baseY - Math.max(0,tR-res.grooveDepth)*scaleT, 12, res.grooveDepth*scaleT, 'rgba(239,68,68,.6)');
+
+    // 標註
+    text(svg, xL, baseY+14, `左 r=${res.rL.toFixed(1)}mm\n邊厚=${tL.toFixed(2)}mm`, '#A9BED6', 'middle');
+    text(svg, xR, baseY+14, `右 r=${res.rR.toFixed(1)}mm\n邊厚=${tR.toFixed(2)}mm`, '#A9BED6', 'middle');
+    text(svg, cx, baseY+52, `溝尖寬/車溝寬 ${res.grooveDepth.toFixed(1)}mm；薄側剩餘 ${(res.estEdgeMin-res.grooveDepth).toFixed(2)}mm`, '#4FABB8','middle');
+  }
+
+  function thicknessAt(res, side){
+    const r = (side==='L')? res.rL : res.rR;
+    const absD = Math.abs(res.D);
+    const term = (r*r*absD)/(2000*(res.n-1));
+    if(res.lensType==='minus') return res.centerT + term;
+    const rThin = Math.max(res.rL, res.rR);
+    const center = res.edgeT + (rThin*rThin*absD)/(2000*(res.n-1));
+    return Math.max(0, center - term);
+  }
+
+  // 繪圖小工具
+  function circle(svg,cx,cy,r,fill,stroke,sw, dash){
+    const el=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    el.setAttribute('cx',cx);el.setAttribute('cy',cy);el.setAttribute('r',r);
+    el.setAttribute('fill',fill);el.setAttribute('stroke',stroke);el.setAttribute('stroke-width',sw);
+    if(dash) el.setAttribute('stroke-dasharray',dash);
+    svg.appendChild(el);
+  }
+  function line(svg,x1,y1,x2,y2,stroke,sw){
+    const el=document.createElementNS('http://www.w3.org/2000/svg','line');
+    el.setAttribute('x1',x1);el.setAttribute('y1',y1);el.setAttribute('x2',x2);el.setAttribute('y2',y2);
+    el.setAttribute('stroke',stroke);el.setAttribute('stroke-width',sw);svg.appendChild(el);
+  }
+  function rect(svg,x,y,w,h,fill){
+    const el=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    el.setAttribute('x',x);el.setAttribute('y',y);el.setAttribute('width',w);el.setAttribute('height',h);el.setAttribute('fill',fill);svg.appendChild(el);
+  }
+  function text(svg, x, y, str, fill, anchor, lineHeight = 14) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    el.setAttribute('x', x);
+    el.setAttribute('y', y);
+    el.setAttribute('fill', fill || '#111');
+    if (anchor) el.setAttribute('text-anchor', anchor);
+    el.style.fontSize = '12px';
+
+    const parts = String(str).split(/\n|\(換行\)/g);
+    parts.forEach((ln, i) => {
+      const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      tspan.setAttribute('x', x);
+      tspan.setAttribute('dy', i === 0 ? '0' : String(lineHeight));
+      tspan.textContent = ln;
+      el.appendChild(tspan);
+    });
+    svg.appendChild(el);
+  }
+
+  function update(){
+    const res = calc();
+
+    // 顯示度數（+/-）
+    $("d_display").textContent = '目前：' + ((res.D>0?'+':'') + (res.D||0).toFixed(2) + ' D');
+
+    // KPI
+    $("k_framePD").textContent = res.framePD.toFixed(1)+" mm";
+    $("k_dec").textContent     = res.dec.toFixed(2)+" mm";
+    $("k_cutDia").textContent  = (res.cutR*2).toFixed(1)+" mm";
+    $("k_reqR").textContent    = res.hReq.toFixed(1)+" mm";
+    $("k_minBlank").textContent= res.minBlank.toFixed(1)+" mm";
+    $("k_minBlank").className  = 'v' + (res.blankOK?'':' danger');
+    $("k_blankOK").textContent = (res.blankOK?"✅ 足夠":"❌ 不足");
+
+    $("k_delta").textContent   = res.delta.toFixed(2)+" mm";
+    $("k_center").textContent  = res.estCenter.toFixed(2)+" mm";
+    $("k_edge").textContent    = res.estEdgeMin.toFixed(2)+" mm";
+    $("k_tip").textContent     = (res.estEdgeMin - res.grooveDepth).toFixed(2)+" mm";
+
+    $("k_halfSafety").textContent = (res.tipRemain>=res.need?`✅ ≥ ${res.need} mm`:`⚠️ < ${res.need} mm`);
+
+    const rimOK = $("rimType").value==='groove' ? res.halfOK : (res.estEdgeMin - res.grooveDepth >= res.minTip);
+    $("k_result").textContent = rimOK?"✅ 可行 (近似)":"❌ 風險：厚度可能不足";
+
+    drawTop(res); drawSection(res);
+  }
+
+  update();
+})();
+</script>
+</body>
+</html>
