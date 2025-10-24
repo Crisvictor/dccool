@@ -2602,6 +2602,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnConvert = document.getElementById('convertUnitBtn');
   const btnClear   = document.getElementById('clearUnitBtn');
 
+function makeVAConverter(group) {
+  return {
+    // 任何單位 → MAR（透過 decimal 略過負號問題）
+    toMAR: (unit, v) => 1 / group[unit].toDec(Number(v)),
+    // MAR → 任何單位（先回到 decimal，再走原本 fromDec）
+    fromMAR: (unit, M) => group[unit].fromDec(1 / Number(M)),
+    // 通用：from 單位 → to 單位
+    convert: (value, fromUnit, toUnit) => {
+      const dec = group[fromUnit].toDec(Number(value)); // 先到 decimal
+      if (!isFinite(dec) || dec <= 0) return NaN;       // 防呆
+      return group[toUnit].fromDec(dec);                // 再到目標
+    }
+  };
+}
+
   function convertRK(val, from, to){
     const v = parseFloat(val);
     if (!isFinite(v) || v <= 0) return null;
@@ -2625,7 +2640,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const conv = maps.acuity?.[unit];
     if (!conv) return '';
     const out = conv.fromDec(V);
-    if (!isFinite(out) || out <= 0) return '';
+    if (!isFinite(out)) return '';
+    if (unit !== 'logMAR' && out <= 0) return '';
     if (unit === 's20') return `20/${Math.round(out)}`;
     if (unit === 's6')  return `6/${Math.round(out)}`;
     if (unit === 'H6m' || unit === 'H5m') return `${out.toFixed(2)} mm`;
@@ -2636,7 +2652,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const V = ACUITY_MAP[from]?.toDec(parseFloat(val));
     if (!isFinite(V) || V<=0) return '';
     const out = ACUITY_MAP[to]?.fromDec(V);
-    if (!isFinite(out) || out<=0) return '';
+    if (!isFinite(out)) return '';
+    if (to !== 'logMAR' && out <= 0) return '';
     if (to==='s20') return `20/${Math.round(20/V)}`;
     if (to==='s6')  return `6/${Math.round(6/V)}`;
     if (to==='H6m') return `${out.toFixed(2)} mm`;
@@ -2645,7 +2662,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function nearToDecimal(val, unit) {
     const v = parseFloat(val);
-    if (!isFinite(v) || v <= 0) return NaN;
+    if (!isFinite(v) || (unit !== 'logMAR' && v <= 0)) return NaN;
     const conv = maps?.nearva?.[unit];
    return (conv && typeof conv.toDec === 'function') ? conv.toDec(v) : NaN;
   }
@@ -4149,5 +4166,4 @@ drawPrPlot(plotR, 0, 0);
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.min.js" defer></script>
 </html>
-
 
