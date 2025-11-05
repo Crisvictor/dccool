@@ -1085,6 +1085,12 @@
     border-radius:6px; 
     color:#10bedd;
   }
+  #tool9Container .row + .row,
+  #tool9Container .row + .result-line,
+  #tool9Container .result-line + .row,
+  #tool9Container .result-line + .result-line{
+    margin-top: 12px;
+  }
   #tool9Container .mini-plot{ margin-top:10px; }
   #tool9Container .mini-plot svg{ width:100%; height:160px; }
   #tool9Container .mini-plot .axis{ stroke:rgba(255,255,255,.25); stroke-width:.8; }
@@ -1410,7 +1416,7 @@
   <div id="tool9Container" class="tool-container">
     <div id="arcTool" class="prism-tool">
       <h2 class="panel-title" style="text-align:center;margin-top:0;">
-        弧度計：由弧度計讀值 + 成鏡度數 → 求折射率 n
+        弧度計：由弧度計讀值 + 成鏡度數 → 求折射率
       </h2>
 
       <div class="panel prism-panel">
@@ -1435,27 +1441,24 @@
         </div>
 
         <div class="row" style="gap:8px;flex-wrap:wrap;">
-          <button id="arc_calcBtn" class="btn">計算 n</button>
-          <button id="arc_clearBtn" class="btn">清除</button>
-          <span class="subhead">符號慣例—凸面向外正、凹面負；採薄透鏡近似。</span>
+          <button id="arc_calcBtn" class="btn">執行計算</button>
+          <button id="arc_clearBtn" class="btn">清除數據</button>
+          <span class="subhead">符號慣例—凸面正、凹面負；採薄透鏡近似。</span>
         </div>
       </div>
 
       <div class="panel prism-panel">
         <div class="result-line">
-          <label>折射率 n</label>
+          <label>折射率</label>
           <span id="arc_nOut">—</span>
-          <button class="btn" data-copy-target="#arc_nOut">複製</button>
         </div>
         <div class="result-line">
           <label>前表面真實度數 F<sub>1</sub> (D)</label>
           <span id="arc_F1Out">—</span>
-          <button class="btn" data-copy-target="#arc_F1Out">複製</button>
         </div>
         <div class="result-line">
           <label>後表面真實度數 F<sub>2</sub> (D)</label>
           <span id="arc_F2Out">—</span>
-          <button class="btn" data-copy-target="#arc_F2Out">複製</button>
         </div>
       </div>
 
@@ -1479,7 +1482,6 @@
           <div class="result-line">
             <label>單面模式求得 n</label>
             <span id="arc_nSingleOut">—</span>
-            <button class="btn" data-copy-target="#arc_nSingleOut">複製</button>
           </div>
         </details>
       </div>
