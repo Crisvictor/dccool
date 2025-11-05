@@ -4378,25 +4378,35 @@ drawPrPlot(plotR, 0, 0);
         }
       });
     });
-  const playScore = (window.playScoreSound) 
-    ? window.playScoreSound 
-    : function () {
-        const audio = document.getElementById('scoreSound');
-        if (audio && typeof audio.play === 'function') {
-          try { audio.currentTime = 0; audio.play(); } catch (e) {}
-        }
-      };
+    const playScore = (window.playScoreSound)
+      ? window.playScoreSound
+      : function () {
+          const a = document.getElementById('scoreSound');
+          if (a && a.play) { try { a.currentTime = 0; a.play(); } catch(e){} }
+        };
 
-  const arcRoot = document.getElementById('arcTool');
-  if (!arcRoot) return;
-  arcRoot.addEventListener('click', (ev) => {
-    const el = ev.target;
-    if (!(el instanceof HTMLElement)) return;
+    const playCut = (window.playCutSound)
+      ? window.playCutSound
+      : function () {
+          const a = document.getElementById('cutSound');
+          if (a && a.play) { try { a.currentTime = 0; a.play(); } catch(e){} }
+        };
 
-    if (el.tagName.toLowerCase() === 'button') {
-      playScore();
-    }
-  }, true); 
+    const root = document.getElementById('arcTool');
+    if (!root) return;
+
+    root.addEventListener('click', (ev) => {
+      const el = ev.target;
+      if (!(el instanceof HTMLElement)) return;
+      if (el.tagName.toLowerCase() !== 'button') return;
+
+      if (el.id === 'arc_clearBtn') {
+        playCut();
+      } else {
+        if (el.getAttribute('data-noscore') === '1') return;
+        playScore();
+      }
+    }, true);
 })();
 
 
