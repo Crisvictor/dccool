@@ -1025,6 +1025,73 @@
   .prism-tool .answer{margin-top:10px;color:#eafff7}
   .pr-plot{width:100%;max-width:480px;background:rgba(255,255,255,.04);border-radius:6px;margin-top:8px}
 
+/* === 弧度計 === */
+  #arcTool.prism-tool{
+    width:45%;
+    max-height:91vh;
+    background:rgba(0,0,0,.7);
+    margin:0 auto;
+    padding:12px 16px;
+    color:#fff;
+    border-radius:8px;
+    box-shadow:0 4px 12px rgba(0,0,0,.6);
+    font-family:sans-serif;
+    overflow-y:auto;
+  }
+  #tool9Container .panel.prism-panel{
+    background: rgba(5,23,46,.35);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: 14px;
+  }
+  #tool9Container .panel-title{
+    font-size: 14px; color:#dff; opacity:.92; margin-bottom:8px;
+  }
+  #tool9Container .subhead{
+    margin:10px 0 6px; font-size:12px; color:#9fe; opacity:.9;
+  }
+  #tool9Container .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  #tool9Container .row.g label{ display:flex; align-items:center; gap:6px; }
+  #tool9Container input, 
+  #tool9Container select{
+    background: rgba(0,0,0,.28); 
+    color:#fff; 
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:6px; 
+    padding:6px 8px;
+  }
+  #tool9Container .btn{
+    padding:6px 10px; 
+    border-radius:6px; 
+    border:1px solid rgba(41,207,168,.5);
+    background:rgba(41,207,168,.2); 
+    color:#bff; 
+    cursor:pointer;
+  }
+  #tool9Container .btn:hover{
+    border:1px solid rgba(55,237,198,.5);
+    background:rgba(55,237,198,.2);
+  }
+  #tool9Container .result-line{
+    width:80%; 
+    min-height:28px; 
+    display:flex; 
+    align-items:center;
+    gap:8px;
+    padding:6px 8px; 
+    background:rgba(0,0,0,.22); 
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:6px; 
+    color:#10bedd;
+  }
+  #tool9Container .mini-plot{ margin-top:10px; }
+  #tool9Container .mini-plot svg{ width:100%; height:160px; }
+  #tool9Container .mini-plot .axis{ stroke:rgba(255,255,255,.25); stroke-width:.8; }
+  #tool9Container .mini-plot .dot{ fill:#29cfa8; }
+  #tool9Container .mini-plot .vec{ stroke:#29cfa8; stroke-width:2; }
+  #tool9Container .mini-plot-legend{ font-size:11px; color:#9fe; opacity:.85; margin-top:4px; }
+
     /* 追加覆寫 */
     .time-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
     .time-row label{margin:0;width:auto;}
@@ -1108,6 +1175,7 @@
       #kA, #kA2, #mA, #pA{ flex: 0 0 26px !important;  width: 26px !important;  min-width: 26px !important;  max-width: 26px !important; }
       #kD1, #kD2{ flex: 0 0 40px !important;  width: 40px !important;  min-width: 40px !important;  max-width: 40px !important; }
       #timeTool,#morseTool,#binaryTool,#codeTool,#exchangeTool,#unitTool{ width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto; }
+      #arcTool.prism-tool{ width:84vw; max-height:85vh; padding:16px 18px; margin:10px auto; }
 
       /* 捲軸高度調整 */
       #eventsList{max-height:40vh;}
@@ -1148,6 +1216,7 @@
       <button id="tool6Btn">單位換算</button>
       <button id="tool7Btn">光學十字</button>
       <button id="tool8Btn">稜鏡轉換</button>
+      <button id="tool9Btn">弧度計</button>
       <button id="tool5Btn">QR／條碼</button>
       <button id="tool4Btn">匯率轉換</button>
       <button id="tool2Btn">摩斯電碼</button>
@@ -1336,6 +1405,88 @@
       </div>
     </div>
   </div>
+
+  <!-- 弧度計 -->
+  <div id="tool9Container" class="tool-container">
+    <div id="arcTool" class="prism-tool">
+      <h2 class="panel-title" style="text-align:center;margin-top:0;">
+        弧度計：由弧度計讀值 + 成鏡度數 → 求折射率 n
+      </h2>
+
+      <div class="panel prism-panel">
+        <div class="row">
+          <label for="arc_nclock">弧度計校正折射率 n<sub>clock</sub></label>
+          <input id="arc_nclock" type="number" step="0.001" value="1.53" />
+        </div>
+
+        <div class="row">
+          <label for="arc_F1c">前表面弧度計讀值 F<sub>1c</sub> (D)</label>
+          <input id="arc_F1c" type="number" step="0.01" placeholder="例如 +6.00" />
+        </div>
+
+        <div class="row">
+          <label for="arc_F2c">後表面弧度計讀值 F<sub>2c</sub> (D)</label>
+          <input id="arc_F2c" type="number" step="0.01" placeholder="例如 -4.00" />
+        </div>
+
+        <div class="row">
+          <label for="arc_Ftotal">已知鏡片成鏡度數 F (D)</label>
+          <input id="arc_Ftotal" type="number" step="0.01" placeholder="薄透鏡近似，單焦點" />
+        </div>
+
+        <div class="row" style="gap:8px;flex-wrap:wrap;">
+          <button id="arc_calcBtn" class="btn">計算 n</button>
+          <button id="arc_clearBtn" class="btn">清除</button>
+          <span class="subhead">符號慣例—凸面向外正、凹面負；採薄透鏡近似。</span>
+        </div>
+      </div>
+
+      <div class="panel prism-panel">
+        <div class="result-line">
+          <label>折射率 n</label>
+          <span id="arc_nOut">—</span>
+          <button class="btn" data-copy-target="#arc_nOut">複製</button>
+        </div>
+        <div class="result-line">
+          <label>前表面真實度數 F<sub>1</sub> (D)</label>
+          <span id="arc_F1Out">—</span>
+          <button class="btn" data-copy-target="#arc_F1Out">複製</button>
+        </div>
+        <div class="result-line">
+          <label>後表面真實度數 F<sub>2</sub> (D)</label>
+          <span id="arc_F2Out">—</span>
+          <button class="btn" data-copy-target="#arc_F2Out">複製</button>
+        </div>
+      </div>
+
+      <div class="panel prism-panel">
+        <details>
+          <summary class="subhead">單面模式（可選）</summary>
+          <div class="row">
+            <label for="arc_Fc_single">單一表面弧度計讀值 F<sub>c</sub> (D)</label>
+            <input id="arc_Fc_single" type="number" step="0.01" placeholder="例如 +6.00" />
+          </div>
+          <div class="row">
+            <label for="arc_Ftrue_single">該表面真實度數 F<sub>true</sub> (D)</label>
+            <input id="arc_Ftrue_single" type="number" step="0.01" placeholder="若已知該面設計值" />
+          </div>
+          <div class="row" style="gap:8px;flex-wrap:wrap;">
+            <button id="arc_calcSingleBtn" class="btn">單面→n</button>
+            <span class="subhead">
+              n = 1 + (n<sub>clock</sub> − 1)·F<sub>true</sub>/F<sub>c</sub>
+            </span>
+          </div>
+          <div class="result-line">
+            <label>單面模式求得 n</label>
+            <span id="arc_nSingleOut">—</span>
+            <button class="btn" data-copy-target="#arc_nSingleOut">複製</button>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- 單位換算 -->
   <div id="tool6Container" class="tool-container">
     <div id="unitTool">
       <h2>單位換算</h2>
@@ -1394,6 +1545,8 @@
       </div>
     </div>
   </div>
+
+  <!-- 光學十字 -->
   <div id="tool7Container" class="tool-container">
     <div id="crossTool">
       <h2>光學十字轉換器（ 規則性散光 ）</h2>
@@ -1546,6 +1699,8 @@
       </div>  
     </div>  
   </div>
+
+  <!-- 稜鏡換算 -->
   <div id="tool8Container" class="tool-container">
     <div id="crossTool">
       <h2>稜鏡換算</h2>
@@ -4108,6 +4263,128 @@ drawPrPlot(plotR, 0, 0);
   pvCombineBtn?.addEventListener('click', combinePrism);
   pvDecompBtn?.addEventListener('click', decompPrism);
 })();
+
+
+// ===== 弧度計：計算折射率 =====
+// 公式（薄透鏡近似、單焦點）：
+//   F_total_true ≈ F1_true + F2_true
+//   弧度計以 n_clock 標定：F1c = (n_clock-1)/R1, F2c = (n_clock-1)/R2
+//   真實：F1_true = (n-1)/R1, F2_true = (n-1)/R2
+//   ⇒ F_total_true ≈ ((n-1)/(n_clock-1)) · (F1c + F2c)
+//   ⇒ n ≈ 1 + (n_clock-1) · F_total_true / (F1c + F2c)
+//
+// 單面模式（若已知單面真實設計度數 F_true 與該面弧度計讀值 Fc）：
+//   F_true / Fc = (n-1)/(n_clock-1) ⇒ n = 1 + (n_clock-1) · F_true / Fc
+
+(function () {
+  // 安全抓取元素
+  const $ = (sel) => document.querySelector(sel);
+
+  // 元件
+  const nclockEl = $('#arc_nclock');
+  const F1cEl    = $('#arc_F1c');
+  const F2cEl    = $('#arc_F2c');
+  const FtotEl   = $('#arc_Ftotal');
+
+  const calcBtn  = $('#arc_calcBtn');
+  const clearBtn = $('#arc_clearBtn');
+
+  const nOut   = $('#arc_nOut');
+  const F1Out  = $('#arc_F1Out');
+  const F2Out  = $('#arc_F2Out');
+
+  // 單面模式
+  const FcSingleEl    = $('#arc_Fc_single');
+  const FtrueSingleEl = $('#arc_Ftrue_single');
+  const calcSingleBtn = $('#arc_calcSingleBtn');
+  const nSingleOut    = $('#arc_nSingleOut');
+
+  // 播放音效（若你頁面已有封裝可直接沿用）
+  const ding = (window.playScoreSound || window.playclickSound || (()=>{}));
+
+  function fmt(v, digits=4) {
+    if (!isFinite(v)) return '—';
+    return (+v).toFixed(digits);
+  }
+
+  function calcIndexFromTwoSurfaces() {
+    const nclock = parseFloat(nclockEl.value);
+    const F1c    = parseFloat(F1cEl.value);
+    const F2c    = parseFloat(F2cEl.value);
+    const Ftot   = parseFloat(FtotEl.value);
+
+    if (![nclock, F1c, F2c, Ftot].every(v => isFinite(v))) {
+      nOut.textContent  = '—';
+      F1Out.textContent = '—';
+      F2Out.textContent = '—';
+      return;
+    }
+
+    const denom = (F1c + F2c);
+    if (Math.abs(denom) < 1e-9) {
+      nOut.textContent  = '無法計算（F1c+F2c 接近 0）';
+      F1Out.textContent = '—';
+      F2Out.textContent = '—';
+      return;
+    }
+
+    const n = 1 + (nclock - 1) * (Ftot / denom);
+    nOut.textContent = fmt(n, 4);
+
+    // 反推兩面真實度數
+    const scale = (n - 1) / (nclock - 1);
+    const F1 = F1c * scale;
+    const F2 = F2c * scale;
+
+    F1Out.textContent = fmt(F1, 2);
+    F2Out.textContent = fmt(F2, 2);
+
+    ding();
+  }
+
+  function clearAll() {
+    [F1cEl, F2cEl, FtotEl, FcSingleEl, FtrueSingleEl].forEach(el => { if (el) el.value=''; });
+    [nOut, F1Out, F2Out, nSingleOut].forEach(sp => { if (sp) sp.textContent='—'; });
+  }
+
+  function calcIndexSingle() {
+    const nclock = parseFloat(nclockEl.value);
+    const Fc     = parseFloat(FcSingleEl.value);
+    const Ftrue  = parseFloat(FtrueSingleEl.value);
+
+    if (![nclock, Fc, Ftrue].every(v => isFinite(v))) {
+      nSingleOut.textContent = '—';
+      return;
+    }
+    if (Math.abs(Fc) < 1e-9) {
+      nSingleOut.textContent = '無法計算（Fc=0）';
+      return;
+    }
+    const n = 1 + (nclock - 1) * (Ftrue / Fc);
+    nSingleOut.textContent = fmt(n, 4);
+    ding();
+  }
+
+  // 綁事件
+  if (calcBtn)  calcBtn.addEventListener('click',  calcIndexFromTwoSurfaces);
+  if (clearBtn) clearBtn.addEventListener('click', clearAll);
+  if (calcSingleBtn) calcSingleBtn.addEventListener('click', calcIndexSingle);
+
+  // 讓 Enter 也能觸發
+  ['#arc_F1c', '#arc_F2c', '#arc_Ftotal', '#arc_Fc_single', '#arc_Ftrue_single']
+    .forEach(sel => {
+      const el = $(sel);
+      if (!el) return;
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          if (sel.includes('_single')) calcIndexSingle(); else calcIndexFromTwoSurfaces();
+        }
+      });
+    });
+
+})();
+
+
   /* === 小工具列邏輯 === */
   const tabBtns = Array.from(document.querySelectorAll('#toolSelector button'));
   const containers = tabBtns.map(b =>
