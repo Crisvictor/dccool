@@ -4365,12 +4365,9 @@ drawPrPlot(plotR, 0, 0);
     ding();
   }
 
-  // 綁事件
   if (calcBtn)  calcBtn.addEventListener('click',  calcIndexFromTwoSurfaces);
   if (clearBtn) clearBtn.addEventListener('click', clearAll);
   if (calcSingleBtn) calcSingleBtn.addEventListener('click', calcIndexSingle);
-
-  // 讓 Enter 也能觸發
   ['#arc_F1c', '#arc_F2c', '#arc_Ftotal', '#arc_Fc_single', '#arc_Ftrue_single']
     .forEach(sel => {
       const el = $(sel);
@@ -4381,7 +4378,25 @@ drawPrPlot(plotR, 0, 0);
         }
       });
     });
+  const playScore = (window.playScoreSound) 
+    ? window.playScoreSound 
+    : function () {
+        const audio = document.getElementById('scoreSound');
+        if (audio && typeof audio.play === 'function') {
+          try { audio.currentTime = 0; audio.play(); } catch (e) {}
+        }
+      };
 
+  const arcRoot = document.getElementById('arcTool');
+  if (!arcRoot) return;
+  arcRoot.addEventListener('click', (ev) => {
+    const el = ev.target;
+    if (!(el instanceof HTMLElement)) return;
+
+    if (el.tagName.toLowerCase() === 'button') {
+      playScore();
+    }
+  }, true); 
 })();
 
 
