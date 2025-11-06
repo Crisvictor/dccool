@@ -103,6 +103,7 @@
     #timeTool,
     #eventsList,
     #binaryTool,
+    #arcTool,
     #binaryTool textarea,
     #morseTool,
     #morseTool textarea,
@@ -117,6 +118,7 @@
     #timeTool::-webkit-scrollbar,
     #eventsList::-webkit-scrollbar,
     #binaryTool::-webkit-scrollbar,
+    #arcTool::-webkit-scrollbar,
     #binaryTool textarea::-webkit-scrollbar,
     #morseTool::-webkit-scrollbar,
     #morseTool textarea::-webkit-scrollbar,
@@ -131,6 +133,7 @@
     #timeTool::-webkit-scrollbar-track,
     #eventsList::-webkit-scrollbar-track,
     #binaryTool::-webkit-scrollbar-track,
+    #arcTool::-webkit-scrollbar-track,
     #binaryTool textarea::-webkit-scrollbar-track,
     #morseTool::-webkit-scrollbar-track,
     #morseTool textarea::-webkit-scrollbar-track,
@@ -145,6 +148,7 @@
     #timeTool::-webkit-scrollbar-thumb,
     #eventsList::-webkit-scrollbar-thumb,
     #binaryTool::-webkit-scrollbar-thumb,
+    #arcTool::-webkit-scrollbar-thumb,
     #binaryTool textarea::-webkit-scrollbar-thumb,
     #morseTool::-webkit-scrollbar-thumb,
     #morseTool textarea::-webkit-scrollbar-thumb,
@@ -159,6 +163,7 @@
     #timeTool::-webkit-scrollbar-thumb:hover,
     #eventsList::-webkit-scrollbar-thumb:hover,
     #binaryTool::-webkit-scrollbar-thumb:hover,
+    #arcTool::-webkit-scrollbar-thumb:hover,
     #binaryTool textarea::-webkit-scrollbar-thumb:hover,
     #morseTool::-webkit-scrollbar-thumb:hover,
     #morseTool textarea::-webkit-scrollbar-thumb:hover,
@@ -1097,6 +1102,25 @@
   #tool9Container .mini-plot .dot{ fill:#29cfa8; }
   #tool9Container .mini-plot .vec{ stroke:#29cfa8; stroke-width:2; }
   #tool9Container .mini-plot-legend{ font-size:11px; color:#9fe; opacity:.85; margin-top:4px; }
+  #tool9Container .sign-toggle{
+    display: inline-flex;          
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 6px;   
+    line-height: 28px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex: 0 0 auto;
+    align-items: center; 
+    justify-content: center; 
+  }
+  #tool9Container input[type="number"],
+  #tool9Container input[type="text"],
+  #tool9Container select{
+    width:80px;
+  }
 
     /* 追加覆寫 */
     .time-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
@@ -1182,6 +1206,7 @@
       #kD1, #kD2{ flex: 0 0 40px !important;  width: 40px !important;  min-width: 40px !important;  max-width: 40px !important; }
       #timeTool,#morseTool,#binaryTool,#codeTool,#exchangeTool,#unitTool{ width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto; }
       #arcTool.prism-tool{ width:84vw; max-height:85vh; padding:16px 18px; margin:10px auto; }
+      #tool9Container .row .sign-toggle{ margin-left: 6px; }
 
       /* 捲軸高度調整 */
       #eventsList{max-height:40vh;}
@@ -1422,7 +1447,7 @@
       <div class="panel prism-panel">
         <div class="row">
           <label for="arc_nclock">弧度計校正折射率 n<sub>clock</sub></label>
-          <input id="arc_nclock" type="number" step="0.001" value="1.53" />
+          <input id="arc_nclock" type="number" step="0.01" value="1.53" />
         </div>
 
         <div class="row">
@@ -1437,17 +1462,14 @@
 
         <div class="row">
           <label for="arc_Ftotal">已知鏡片成鏡度數 F (D)</label>
-          <input id="arc_Ftotal" type="number" step="0.01" placeholder="薄透鏡近似，單焦點" />
+          <input id="arc_Ftotal" type="number" step="0.01" placeholder="近似度數" />
         </div>
 
         <div class="row" style="gap:8px;flex-wrap:wrap;">
           <button id="arc_calcBtn" class="btn">執行計算</button>
-          <button id="arc_clearBtn" class="btn">清除數據</button>
+          <button id="arc_clearBtn" class="btn" data-cut="1">清除數據</button>
           <span class="subhead">符號慣例—凸面正、凹面負；採薄透鏡近似。</span>
         </div>
-      </div>
-
-      <div class="panel prism-panel">
         <div class="result-line">
           <label>折射率</label>
           <span id="arc_nOut">—</span>
@@ -1462,29 +1484,55 @@
         </div>
       </div>
 
-      <div class="panel prism-panel">
-        <details>
-          <summary class="subhead">單面模式（可選）</summary>
-          <div class="row">
-            <label for="arc_Fc_single">單一表面弧度計讀值 F<sub>c</sub> (D)</label>
-            <input id="arc_Fc_single" type="number" step="0.01" placeholder="例如 +6.00" />
-          </div>
-          <div class="row">
-            <label for="arc_Ftrue_single">該表面真實度數 F<sub>true</sub> (D)</label>
-            <input id="arc_Ftrue_single" type="number" step="0.01" placeholder="若已知該面設計值" />
-          </div>
-          <div class="row" style="gap:8px;flex-wrap:wrap;">
-            <button id="arc_calcSingleBtn" class="btn">單面→n</button>
-            <span class="subhead">
-              n = 1 + (n<sub>clock</sub> − 1)·F<sub>true</sub>/F<sub>c</sub>
-            </span>
-          </div>
-          <div class="result-line">
-            <label>單面模式求得 n</label>
-            <span id="arc_nSingleOut">—</span>
-          </div>
-        </details>
-      </div>
+      <details class="panel prism-panel arc-accordion" id="arcModeA">
+        <summary class="panel-title">模式 A｜由鏡片度數 → 求弧度計讀值</summary>
+        <div class="row">
+          <label for="arcA_nclock">弧度計校正折射率 n<sub>clock</sub></label>
+          <input id="arcA_nclock" type="number" step="0.001" value="1.53" />
+        </div>
+        <div class="row">
+          <label for="arcA_Ftrue">該表面真實度數 F<sub>true</sub> (D)</label>
+          <input id="arcA_Ftrue" type="number" step="0.01" placeholder="例如 +6.00" />
+        </div>
+        <div class="row">
+          <label for="arcA_n">鏡片實際折射率 n</label>
+          <input id="arcA_n" type="number" step="0.001" placeholder="例如 1.60" />
+        </div>
+        <div class="row" style="gap:8px;flex-wrap:wrap;">
+          <button id="arcA_calcBtn" class="btn">執行換算</button>
+          <button id="arcA_clearBtn" class="btn" data-cut="1">清除數據</button>
+          <span class="subhead">公式：F<sub>c</sub> = (n<sub>clock</sub> − 1) · F<sub>true</sub> / (n − 1)</span>
+        </div>
+        <div class="result-line">
+          <label>鏡片弧度（弧度計讀值）F<sub>c</sub> (D)</label>
+          <span id="arcA_FcOut">—</span>
+        </div>
+      </details>
+
+      <details class="panel prism-panel arc-accordion" id="arcModeB">
+        <summary class="panel-title">模式 B｜由弧度計讀值 → 求鏡片度數</summary>
+        <div class="row">
+          <label for="arcB_nclock">弧度計校正折射率 n<sub>clock</sub></label>
+          <input id="arcB_nclock" type="number" step="0.001" value="1.53" />
+        </div>
+        <div class="row">
+          <label for="arcB_Fc">弧度計讀值 F<sub>c</sub> (D)</label>
+          <input id="arcB_Fc" type="number" step="0.01" placeholder="例如 +6.00" />
+        </div>
+        <div class="row">
+          <label for="arcB_n">鏡片實際折射率 n</label>
+          <input id="arcB_n" type="number" step="0.001" placeholder="例如 1.67" />
+        </div>
+        <div class="row" style="gap:8px;flex-wrap:wrap;">
+          <button id="arcB_calcBtn" class="btn">執行換算</button>
+          <button id="arcB_clearBtn" class="btn" data-cut="1">清除數據</button>
+          <span class="subhead">公式：F<sub>true</sub> = F<sub>c</sub> · (n − 1) / (n<sub>clock</sub> − 1)</span>
+        </div>
+        <div class="result-line">
+          <label>鏡片該表面真實度數 F<sub>true</sub> (D)</label>
+          <span id="arcB_FtrueOut">—</span>
+        </div>
+      </details>
     </div>
   </div>
 
@@ -4280,106 +4328,105 @@ drawPrPlot(plotR, 0, 0);
 
 (function () {
   // 安全抓取元素
-  const $ = (sel) => document.querySelector(sel);
+  const $ = (s)=> document.querySelector(s);
+  const root = document.getElementById('arcTool');
+  if (!root) return;
 
-  // 元件
-  const nclockEl = $('#arc_nclock');
-  const F1cEl    = $('#arc_F1c');
-  const F2cEl    = $('#arc_F2c');
-  const FtotEl   = $('#arc_Ftotal');
+  const fmtArc = (v, d=3) => (Number.isFinite(+v) ? (+v).toFixed(d) : '—');
 
-  const calcBtn  = $('#arc_calcBtn');
-  const clearBtn = $('#arc_clearBtn');
+  function arcCalcN(){
+    const nclock = parseFloat($('#arc_nclock')?.value);
+    const F1c    = parseFloat($('#arc_F1c')?.value);
+    const F2c    = parseFloat($('#arc_F2c')?.value);
+    const Ftot   = parseFloat($('#arc_Ftotal')?.value);
 
-  const nOut   = $('#arc_nOut');
-  const F1Out  = $('#arc_F1Out');
-  const F2Out  = $('#arc_F2Out');
+    const nOut  = $('#arc_nOut');
+    const F1Out = $('#arc_F1Out');
+    const F2Out = $('#arc_F2Out');
 
-  // 單面模式
-  const FcSingleEl    = $('#arc_Fc_single');
-  const FtrueSingleEl = $('#arc_Ftrue_single');
-  const calcSingleBtn = $('#arc_calcSingleBtn');
-  const nSingleOut    = $('#arc_nSingleOut');
-
-  // 播放音效（若你頁面已有封裝可直接沿用）
-  const ding = (window.playScoreSound || window.playclickSound || (()=>{}));
-
-  function fmt(v, digits=4) {
-    if (!isFinite(v)) return '—';
-    return (+v).toFixed(digits);
-  }
-
-  function calcIndexFromTwoSurfaces() {
-    const nclock = parseFloat(nclockEl.value);
-    const F1c    = parseFloat(F1cEl.value);
-    const F2c    = parseFloat(F2cEl.value);
-    const Ftot   = parseFloat(FtotEl.value);
-
-    if (![nclock, F1c, F2c, Ftot].every(v => isFinite(v))) {
-      nOut.textContent  = '—';
-      F1Out.textContent = '—';
-      F2Out.textContent = '—';
+    if (![nclock, F1c, F2c, Ftot].every(Number.isFinite)) {
+      if (nOut)  nOut.textContent  = '—';
+      if (F1Out) F1Out.textContent = '—';
+      if (F2Out) F2Out.textContent = '—';
       return;
     }
-
-    const denom = (F1c + F2c);
-    if (Math.abs(denom) < 1e-9) {
-      nOut.textContent  = '無法計算（F1c+F2c 接近 0）';
-      F1Out.textContent = '—';
-      F2Out.textContent = '—';
+    const denom = F1c + F2c;
+    if (Math.abs(denom) < 1e-9 || Math.abs(nclock - 1) < 1e-9) {
+      if (nOut)  nOut.textContent  = '無法計算';
+      if (F1Out) F1Out.textContent = '—';
+      if (F2Out) F2Out.textContent = '—';
       return;
     }
 
     const n = 1 + (nclock - 1) * (Ftot / denom);
-    nOut.textContent = fmt(n, 4);
+    if (nOut) nOut.textContent = fmtArc(n, 4);
 
-    // 反推兩面真實度數
     const scale = (n - 1) / (nclock - 1);
-    const F1 = F1c * scale;
-    const F2 = F2c * scale;
-
-    F1Out.textContent = fmt(F1, 2);
-    F2Out.textContent = fmt(F2, 2);
-
-    ding();
+    if (F1Out) F1Out.textContent = fmtArc(F1c * scale, 2);
+    if (F2Out) F2Out.textContent = fmtArc(F2c * scale, 2);
   }
 
-  function clearAll() {
-    [F1cEl, F2cEl, FtotEl, FcSingleEl, FtrueSingleEl].forEach(el => { if (el) el.value=''; });
-    [nOut, F1Out, F2Out, nSingleOut].forEach(sp => { if (sp) sp.textContent='—'; });
+  function arcClearMain(){
+    const keep = $('#arc_nclock'); if (keep) keep.value = keep.value || '1.53';
+    ['#arc_F1c', '#arc_F2c', '#arc_Ftotal'].forEach(s => { const el=$(s); if (el) el.value=''; });
+    ['#arc_nOut', '#arc_F1Out', '#arc_F2Out'].forEach(s => { const el=$(s); if (el) el.textContent='—'; });
   }
 
-  function calcIndexSingle() {
-    const nclock = parseFloat(nclockEl.value);
-    const Fc     = parseFloat(FcSingleEl.value);
-    const Ftrue  = parseFloat(FtrueSingleEl.value);
+  function arcCalcA(){
+    const nclock = parseFloat($('#arcA_nclock')?.value);
+    const Ftrue  = parseFloat($('#arcA_Ftrue')?.value);
+    const n      = parseFloat($('#arcA_n')?.value);
+    const out    = $('#arcA_FcOut');
+    if (![nclock, Ftrue, n].every(Number.isFinite) || Math.abs(n-1)<1e-9){ if(out) out.textContent='—'; return; }
+    const Fc = (nclock - 1) * (Ftrue / (n - 1));
+    if (out) out.textContent = fmtArc(Fc, 2);
+  }
+  function arcClearA(){
+    const keep = $('#arcA_nclock'); if (keep) keep.value = keep.value || '1.53';
+    ['#arcA_Ftrue', '#arcA_n'].forEach(s => { const el=$(s); if (el) el.value=''; });
+    const out = $('#arcA_FcOut'); if (out) out.textContent='—';
+  }
 
-    if (![nclock, Fc, Ftrue].every(v => isFinite(v))) {
-      nSingleOut.textContent = '—';
-      return;
+  function arcCalcB(){
+    const nclock = parseFloat($('#arcB_nclock')?.value);
+    const Fc     = parseFloat($('#arcB_Fc')?.value);
+    const n      = parseFloat($('#arcB_n')?.value);
+    const out    = $('#arcB_FtrueOut');
+    if (![nclock, Fc, n].every(Number.isFinite) || Math.abs(nclock-1)<1e-9){ if(out) out.textContent='—'; return; }
+    const Ftrue = Fc * ((n - 1) / (nclock - 1));
+    if (out) out.textContent = fmtArc(Ftrue, 2);
+  }
+  function arcClearB(){
+    const keep = $('#arcB_nclock'); if (keep) keep.value = keep.value || '1.53';
+    ['#arcB_Fc', '#arcB_n'].forEach(s => { const el=$(s); if (el) el.value=''; });
+    const out = $('#arcB_FtrueOut'); if (out) out.textContent='—';
+  }
+
+  root.addEventListener('click', (ev) => {
+    const btn = ev.target instanceof HTMLElement ? ev.target.closest('button') : null;
+    if (!btn) return;
+
+    switch (btn.id) {
+      case 'arc_calcBtn':      arcCalcN();   break; 
+      case 'arc_clearBtn':     arcClearMain(); break;
+      case 'arcA_calcBtn':     arcCalcA();   break;
+      case 'arcA_clearBtn':    arcClearA();  break;
+      case 'arcB_calcBtn':     arcCalcB();   break;
+      case 'arcB_clearBtn':    arcClearB();  break;
+      default: break;
     }
-    if (Math.abs(Fc) < 1e-9) {
-      nSingleOut.textContent = '無法計算（Fc=0）';
-      return;
-    }
-    const n = 1 + (nclock - 1) * (Ftrue / Fc);
-    nSingleOut.textContent = fmt(n, 4);
-    ding();
-  }
+  }, false);
 
-  if (calcBtn)  calcBtn.addEventListener('click',  calcIndexFromTwoSurfaces);
-  if (clearBtn) clearBtn.addEventListener('click', clearAll);
-  if (calcSingleBtn) calcSingleBtn.addEventListener('click', calcIndexSingle);
-  ['#arc_F1c', '#arc_F2c', '#arc_Ftotal', '#arc_Fc_single', '#arc_Ftrue_single']
-    .forEach(sel => {
-      const el = $(sel);
-      if (!el) return;
-      el.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          if (sel.includes('_single')) calcIndexSingle(); else calcIndexFromTwoSurfaces();
-        }
-      });
+  [['#arc_F1c','#arc_F2c','#arc_Ftotal', arcCalcN],
+   ['#arcA_Ftrue','#arcA_n',             arcCalcA],
+   ['#arcB_Fc',   '#arcB_n',             arcCalcB]
+  ].forEach(([a,b,fn])=>{
+    [a,b].forEach(sel=>{
+      const el = typeof sel==='string' ? $(sel) : null;
+      if (el) el.addEventListener('keydown', (e)=>{ if (e.key==='Enter') fn(); });
     });
+  });
+
     const playScore = (window.playScoreSound)
       ? window.playScoreSound
       : function () {
@@ -4394,15 +4441,58 @@ drawPrPlot(plotR, 0, 0);
           if (a && a.play) { try { a.currentTime = 0; a.play(); } catch(e){} }
         };
 
-    const root = document.getElementById('arcTool');
-    if (!root) return;
+    const signableIds = [
+      'arc_F1c',      // 前表面弧度計讀值 (D)
+      'arc_F2c',      // 後表面弧度計讀值 (D)
+      'arc_Ftotal',   // 成鏡度數 (D)
+      'arcA_Ftrue',   // 模式A：真實度數 (D)
+      'arcB_Fc'       // 模式B：弧度計讀值 (D)
+    ];
+    function injectToggle(id){
+      const input = document.getElementById(id);
+      if (!input) return;
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn sign-toggle'; 
+      btn.textContent = '±';
+      btn.setAttribute('aria-label','切換正負');
+      btn.dataset.target = '#'+id;
+
+      input.insertAdjacentElement('afterend', btn);
+    }
+
+    signableIds.forEach(injectToggle);
+
+    root.addEventListener('click', (e)=>{
+      const el = e.target;
+      if (!(el instanceof HTMLElement)) return;
+      if (!el.classList.contains('sign-toggle')) return;
+
+      const sel = el.dataset.target;
+      const input = sel ? root.querySelector(sel) : null;
+      if (!input) return;
+
+      const v = parseFloat(input.value);
+      if (Number.isFinite(v)) {
+        input.value = (-v).toString();
+        input.dispatchEvent(new Event('input', {bubbles:true}));
+      } else {
+        if (input.type === 'number' && input.value.trim() === '') {
+          input.value = '-0';
+          input.focus();
+          try { input.setSelectionRange(1, input.value.length); } catch(e){}
+          input.dispatchEvent(new Event('input', {bubbles:true}));
+        }
+      }
+    }, true); 
 
     root.addEventListener('click', (ev) => {
       const el = ev.target;
       if (!(el instanceof HTMLElement)) return;
       if (el.tagName.toLowerCase() !== 'button') return;
 
-      if (el.id === 'arc_clearBtn') {
+      if (el.getAttribute('data-cut') === '1') {
         playCut();
       } else {
         if (el.getAttribute('data-noscore') === '1') return;
