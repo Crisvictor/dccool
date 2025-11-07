@@ -1079,7 +1079,7 @@
     background:rgba(55,237,198,.2);
   }
   #tool9Container .result-line{
-    width:80%; 
+    width: 240px; 
     min-height:28px; 
     display:flex; 
     align-items:center;
@@ -1096,6 +1096,22 @@
   #tool9Container .result-line + .result-line{
     margin-top: 12px;
   }
+  #arcTool { position: relative; } 
+  #arcTool .arc-side-img,
+  #arcTool .arc-side-img2{
+    position: absolute;
+    max-height: 80%;
+    object-fit: contain;
+    opacity: .92;
+    filter: drop-shadow(0 6px 18px rgba(0,0,0,.45));
+    z-index: 2;             
+    pointer-events: none; 
+    user-select: none;
+    opacity: .15; 
+    transition: opacity .2s ease;
+  }
+  #arcTool .arc-side-img {top: 74px; left: calc(55% + 10px); width: min(20vw, 200px); }
+  #arcTool .arc-side-img2{top: 54px; left: calc(48% + 26px); width: min(20vw, 300px); }
   #tool9Container .mini-plot{ margin-top:10px; }
   #tool9Container .mini-plot svg{ width:100%; height:160px; }
   #tool9Container .mini-plot .axis{ stroke:rgba(255,255,255,.25); stroke-width:.8; }
@@ -1207,6 +1223,7 @@
       #timeTool,#morseTool,#binaryTool,#codeTool,#exchangeTool,#unitTool{ width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto; }
       #arcTool.prism-tool{ width:84vw; max-height:85vh; padding:16px 18px; margin:10px auto; }
       #tool9Container .row .sign-toggle{ margin-left: 6px; }
+      #arcTool .arc-side-img,#arcTool .arc-side-img2{ display: none; }
 
       /* 捲軸高度調整 */
       #eventsList{max-height:40vh;}
@@ -1443,7 +1460,8 @@
       <h2 class="panel-title" style="text-align:center;margin-top:0;">
         弧度計：由弧度計讀值 + 成鏡度數 → 求折射率
       </h2>
-
+      <img id="arcClockImg" class="arc-side-img" src="img/clock.png" alt="弧度計" loading="lazy">
+      <img id="arcClockImg" class="arc-side-img2" src="img/llens.png" alt="弧度計" loading="lazy">
       <div class="panel prism-panel">
         <div class="row">
           <label for="arc_nclock">弧度計校正折射率 n<sub>clock</sub></label>
@@ -1452,12 +1470,12 @@
 
         <div class="row">
           <label for="arc_F1c">前表面弧度計讀值 F<sub>1c</sub> (D)</label>
-          <input id="arc_F1c" type="number" step="0.01" placeholder="例如 +6.00" />
+          <input id="arc_F1c" type="number" step="0.01" placeholder="例 +6.00" />
         </div>
 
         <div class="row">
           <label for="arc_F2c">後表面弧度計讀值 F<sub>2c</sub> (D)</label>
-          <input id="arc_F2c" type="number" step="0.01" placeholder="例如 -4.00" />
+          <input id="arc_F2c" type="number" step="0.01" placeholder="例 -4.00" />
         </div>
 
         <div class="row">
@@ -1492,11 +1510,11 @@
         </div>
         <div class="row">
           <label for="arcA_Ftrue">該表面真實度數 F<sub>true</sub> (D)</label>
-          <input id="arcA_Ftrue" type="number" step="0.01" placeholder="例如 +6.00" />
+          <input id="arcA_Ftrue" type="number" step="0.01" placeholder="例 +6.00" />
         </div>
         <div class="row">
           <label for="arcA_n">鏡片實際折射率 n</label>
-          <input id="arcA_n" type="number" step="0.001" placeholder="例如 1.60" />
+          <input id="arcA_n" type="number" step="0.001" placeholder="例 1.60" />
         </div>
         <div class="row" style="gap:8px;flex-wrap:wrap;">
           <button id="arcA_calcBtn" class="btn">執行換算</button>
@@ -1517,11 +1535,11 @@
         </div>
         <div class="row">
           <label for="arcB_Fc">弧度計讀值 F<sub>c</sub> (D)</label>
-          <input id="arcB_Fc" type="number" step="0.01" placeholder="例如 +6.00" />
+          <input id="arcB_Fc" type="number" step="0.01" placeholder="例 +6.00" />
         </div>
         <div class="row">
           <label for="arcB_n">鏡片實際折射率 n</label>
-          <input id="arcB_n" type="number" step="0.001" placeholder="例如 1.67" />
+          <input id="arcB_n" type="number" step="0.001" placeholder="例 1.67" />
         </div>
         <div class="row" style="gap:8px;flex-wrap:wrap;">
           <button id="arcB_calcBtn" class="btn">執行換算</button>
