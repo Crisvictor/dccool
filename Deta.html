@@ -9,172 +9,262 @@
     <video autoplay muted loop playsinline id="background-video">
     <source src="v/HexUp.webm" type="video/webm">
     </video>
-    <style>
-        body {
-            font-family: "Noto Sans CJK TC", Arial, sans-serif; /* 設定主要字體 */
-            background-color: #121212;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background: rgba(21, 21, 21, 0.05);
-            padding: 20px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); 
-            border-radius: 10px; 
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-        h1 {
-            margin: 0;
-        }
-        h2 {
-            font-size: 24px;
-            color: #fff;
-        }
-        main {
-            padding: 20px;
-        }
-        .article {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1.5px solid #3e645b;
-            border-radius: 5px;
-        }
-        footer {
-            background-color: rgba(30, 30, 30, 0.4);
-            padding: 8px;
-            text-align: center;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            background-color: #333;
-            border: 1px solid #444;
-            color: #fff;
-            border-radius: 5px;
-        }
-        .search-result {
-            margin-top: 20px;
-        }
-        html, body {
-            height: 100%;
-            padding: 0;
-            overflow: auto; 
-            margin: 0; 
-		    }
-        #fishCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: -1; 
-        }
-        #searchInput {
-            margin: 20px;
-            padding: 10px;
-            width: 250px;
-            background-color: Black;
-            color: white; 
-            border: 1px solid white;
-        }
-        #noResultsMessage {
-            display: none;
-            color: LightCoral;
-            font-weight: bold;
-        }
-        .article {
-            margin: 20px;
-        }
-        .article p {
-            font-size: 14px;
-            line-height: 1.6;
-            position: relative; 
-            padding: 10px; 
-            background-color: rgba(10, 92, 92, 0.2);
-            border: 1px solid #87cda9;
-            border-radius: 6px; 
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); 
-            display: inline-block; 
-        }
-        .article p:hover {
-            background-color: rgba(0, 128, 128, 0.3);
-            transform: scale(1.05);
-            transition: all 0.3s ease;
-        }
-        #background-video {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          z-index: -1;
-	  filter: brightness(0.3);
-        }
-	.game-button {
-  	  position: relative; 
-   	  padding: 5px 10px;
-   	  background-color: #3a865b; 
-	  border: 1px solid #ddd;
-  	  color: #fff; 
-  	  border-radius: 5px;
- 	  text-decoration: none;
- 	  font-size: 14px;
-    	  margin-right: 10px; 
-    	  margin-top: 10px; 
- 	  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
- 	  transition: background-color 0.3s;
-  	  display: inline-block; 
-   	  z-index: 10;
-	}
-        .game-button:hover {
-          background-color: #6bbf91; 
-        }
-        .tags-container {
-          display: flex;
-          gap: 10px;
-          flex-wrap: wrap; 
-          margin: 20px; 
-          margin-bottom: 20px;
-        }
-        .tag {
-          background-color: #0e3835; /* 背景 */
-          color: white; /* 白色文字 */
-          font-size: 20px;
-          border: none;
-          padding: 8px 8px;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: background-color 0.3s;
-          border: 1px solid #0a0c0c;
-          z-index: 11;
-        }
-        .tag:hover {
-          background-color: #07615b; 
-          transform: translateY(-2px); 
-          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
-        }
-        .tag.active {
-          background-color: #24a4a4;
-          color: #fff;
-          font-weight: bold;
-          border: 1px solid #d3d3d3; 
-        }
-        .clear-tag {
-          background-color: #417587;
-          color: white;
-        }
-        .clear-tag:hover {
-          background-color: #4798b3;
-          color: white;
-          transform: translateY(-2px);
-          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4); 
-        }
+<style>
+    body {
+        font-family: "Noto Sans CJK TC", Arial, sans-serif; /* 設定主要字體 */
+        background-color: #121212;
+        color: #ffffff;
+        margin: 0;
+        padding: 0;
+    }
+    h1 {
+        margin: 0;
+    }
+    h2 {
+        font-size: 24px;
+        color: #fff;
+    }
+    main {
+        padding: 20px;
+    }
+    .article {
+        margin-bottom: 20px;
+        padding: 15px;
+        border: 1.5px solid #3e645b;
+        border-radius: 5px;
+        margin: 20px;
+    }
+    footer {
+        background-color: rgba(30, 30, 30, 0.4);
+        padding: 8px;
+        text-align: center;
+    }
+    input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        background-color: #333;
+        border: 1px solid #444;
+        color: #fff;
+        border-radius: 5px;
+    }
+    .search-result {
+        margin-top: 20px;
+    }
+    html, body {
+        height: 100%;
+        padding: 0;
+        overflow: auto; 
+        margin: 0; 
+    }
+    #fishCanvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1; 
+    }
+    #searchInput {
+        margin: 20px;
+        padding: 10px;
+        width: 250px;
+        background-color: Black;
+        color: white; 
+        border: 1px solid white;
+    }
+    #noResultsMessage {
+        display: none;
+        color: LightCoral;
+        font-weight: bold;
+    }
+    .article::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 8px;
+        bottom: 8px;
+        width: 6px;
+        border-radius: 3px;
+        background: #3e645b; 
+    }
+    .article p {
+        font-size: 14px;
+        line-height: 1.6;
+        position: relative; 
+        padding: 10px; 
+        background-color: rgba(10, 92, 92, 0.2);
+        border: 1px solid #87cda9;
+        border-radius: 6px; 
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); 
+        display: inline-block; 
+    }
+    .article[data-tags*="績效"] p {
+        background-color: rgba(174, 191, 107, 0.1);
+        border-color: #73B543;                  
+        box-shadow: 0 4px 6px rgba(0,0,0,0.4);    
+    }
+    .article[data-tags*="績效"] p:hover {
+        background-color: rgba(174, 191, 107, 0.2);
+        transform: scale(1.05);
+        transition: all 0.3s ease;
+    }
+    .article p:hover {
+        background-color: rgba(0, 128, 128, 0.3);
+        transform: scale(1.05);
+        transition: all 0.3s ease;
+    }
+    .article[data-tags*="績效"] {
+        background: rgba(174, 191, 107, 0.05);
+        border-color: #73B543;
+    }
 
-	@media (max-width: 768px) {
+    .article[data-tags*="加項"] {
+        background: rgba(107, 191, 145, 0.15);
+        border-color: #81c784;
+    }
+    #background-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      filter: brightness(0.3);
+    }
+  .menu-dropdown .game-button {
+    background-color: rgba(58, 134, 90, .3); 
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    color: #fff; 
+    display: block;
+    margin: 2px 0;
+    margin-right: 0;         
+    padding: 3px 8px;    
+    width: auto;          
+    font-size: 12px;
+    text-align: center;     
+    white-space: nowrap;  
+    z-index: 10;   
+  }
+  .menu-dropdown .game-button:hover {
+    background-color: rgba(107, 191, 145, .3);  
+  }
+  .tags-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap; 
+    margin: 20px; 
+    margin-bottom: 20px;
+  }
+  .tag {
+    background-color: #0e3835;
+    color: white; 
+    font-size: 20px;
+    border: none;
+    padding: 8px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border: 1px solid #0a0c0c;
+    z-index: 11;
+  }
+  .tag[data-tag="績效"] {
+    background: rgba(174, 191, 107, 0.3);
+    border-color: #73B543;
+  }
+  .tag[data-tag="績效"].active {
+    background: rgba(194, 211, 127, 0.9);
+  }
+  .tag[data-tag="績效"]:hover {
+    background: rgba(194, 211, 127, 0.5);
+  }
+  .tag[data-tag="加項"] {
+    background: rgba(107, 191, 145, 0.3);
+    border-color: #43a047;
+  }
+  .tag[data-tag="加項"].active {
+    background: rgba(127, 211, 165, 0.9);
+  }
+  .tag[data-tag="加項"]:hover {
+    background: rgba(127, 211, 165, 0.5);
+  }
+  .tag:hover {
+    background-color: #07615b; 
+    transform: translateY(-2px); 
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
+  }
+  .tag.active {
+    background-color: #24a4a4;
+    color: #fff;
+    border: 1px solid #d3d3d3; 
+  }
+  .clear-tag {
+    background-color: #417587;
+    color: white;
+  }
+  .clear-tag:hover {
+    background-color: #4798b3;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4); 
+  }
+  header {
+      background: rgba(21, 21, 21, 0.05);
+      padding: 20px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+  }
+  .menu-wrapper {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 30;
+  }
+  .menu-button {
+      padding: 6px 12px;
+      background-color: rgba(58, 134, 90, .3); 
+      border: 1px solid #ddd;
+      color: #fff;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+      transition: background-color 0.3s, transform 0.2s;
+  }
+
+  .menu-button:hover {
+      background-color: rgba(107, 191, 145, .3);  
+      transform: translateY(-1px);
+  }
+  .menu-dropdown {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      background-color: rgba(15, 30, 30, 0.95);
+      border: 1px solid #3e645b;
+      border-radius: 8px;
+      padding: 6px 6px;
+      display: none;      
+      flex-direction: column;
+      gap: 4px;
+      width: auto;          
+      box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+      z-index: 40;
+  }
+  .menu-dropdown.show {
+      display: flex;
+  }
+
+  @media (max-width: 768px) {
         body {
           font-size: 14px;
         }
@@ -192,15 +282,35 @@
           font-size: 12px; 
           padding: 5px 8px;
         }
+        .menu-button {
+          font-size: 13px;
+          padding: 5px 10px;
+        }
+        .menu-dropdown .game-button {
+          font-size: 12px;
+          padding: 5px 6px;
+        }
     }
     </style>
 </head>
 <body>
     <header>
         <h1>扣項實行細則</h1>
+        <div class="menu-wrapper">
+            <button id="mainMenuBtn" class="menu-button">≡</button>
+            <div id="mainMenuDropdown" class="menu-dropdown">
+                <a href="index.html" class="game-button">員工資訊</a>
+                <a href="Turntable.html" class="game-button">命運轉盤</a>
+                <a href="cards.html" class="game-button">抽籤點名</a>
+                <a href="s.html" class="game-button">周易卜卦</a>
+                <a href="arena.html" class="game-button">競技場</a>
+                <a href="Tool.html" class="game-button">小工具</a>
+                <a href="Lens.html" class="game-button">鏡片評估</a>
+            </div>
+        </div>
     </header>
     <main>
-	        <!-- 搜索欄 -->
+          <!-- 搜索欄 -->
         <input type="text" id="searchInput" onkeyup="searchArticles()" placeholder="搜索關鍵字...">
          <!-- 標籤系統 -->
         <div class="tags-container">
@@ -211,14 +321,16 @@
           <button class="tag" data-tag="品檢">品檢</button>
           <button class="tag" data-tag="管理">管理</button>
           <button class="tag" data-tag="鏡片">鏡片</button>
-	  <button class="tag" data-tag="鏡框">鏡框</button>
+          <button class="tag" data-tag="鏡框">鏡框</button>
           <button class="tag" data-tag="交件">交件</button>
           <button class="tag" data-tag="銷售">銷售</button>
           <button class="tag" data-tag="磨片">磨片</button>
-          <button class="tag" data-tag="出勤">出勤</button>		
+          <button class="tag" data-tag="出勤">出勤</button>
+          <button class="tag" data-tag="績效">績效</button> 
+          <button class="tag" data-tag="加項">加項</button>     
         </div>
-	        <!-- 搜索結果區域 -->
-        <div id="articles">		
+          <!-- 搜索結果區域 -->
+        <div id="articles">   
             <div class="article" data-tags="管理" data-title="迎賓及送客口號呼喊不完整、配鏡流程及買一送一活動未主動說明。 站哨期間無故擅離崗位，無法提供合理正當理由說明。">
                 <h2>迎賓及送客口號呼喊不完整、配鏡流程及買一送一活動未主動說明。<br>站哨期間無故擅離崗位，無法提供合理正當理由說明。</h2>
                 <p>(扣個人/主管 20 點)</p>
@@ -354,7 +466,7 @@
           <div class="article" data-tags="銷售" data-title="銷售結帳未與客人收取一半以上訂金且製作完成，包含放置在取件抽屜中超過一個月時間。">
                 <h2>銷售結帳未與客人收取一半以上訂金且製作完成，<br>包含放置在取件抽屜中超過一個月時間。</h2>
                 <p>扣承件人員 300 點/主管扣 300 點/公積金扣點<br>依據實際銷售金額(如客人取件付清尾款時將回補)</p>
-		  </div>
+      </div>
           <div class="article" data-tags="管理" data-title="員工著黑色外套非依公司規定的長度及樣式穿著，工牌未放置在外套上。">
                 <h2>員工著黑色外套非依公司規定的長度及樣式穿著，<br>工牌未放置在外套上。</h2>
                 <p>(扣個人 100 點/主管 50 點)</p>
@@ -415,7 +527,7 @@
                 <h2>每週的週二及週五環境打掃，<br>未在當日完成及上傳打掃檢查表。</h2>
                 <p>(扣公積金100點/主管100點)  </p>
             </div>
-		  <div class="article" data-tags="環境 管理" data-title="每週的週二及週五環境打掃 整潔 清潔 整理 負責區 掃區 專員到店巡視發現眼鏡展示區明顯灰塵，客用飲料區檯面殘留水漬及髒汙。現場環境髒亂，倉庫內場堆放雜物 ">
+           <div class="article" data-tags="環境 管理" data-title="每週的週二及週五環境打掃 整潔 清潔 整理 負責區 掃區 專員到店巡視發現眼鏡展示區明顯灰塵，客用飲料區檯面殘留水漬及髒汙。現場環境髒亂，倉庫內場堆放雜物 ">
                 <h2>專員到店巡視發現眼鏡展示區明顯灰塵，<br>客用飲料區檯面殘留水漬及髒汙。<br>現場環境髒亂，倉庫內場堆放雜物</h2>
                 <p>※以上缺失可累計扣點 (扣公積金100點/個人100點/主管50點)  </p>
             </div>
@@ -475,67 +587,108 @@
                 <h2>上班時間擅自外出,並未通知當店主管及專員。</h2>
                 <p>(該員工扣 500 點/主管扣 100 點)※若主管發現主動回報專員及總公司，主管不扣罰</p>
             </div>
-	  <div class="article" data-tags="資料" data-title="顧客/客戶資料資訊系統度數/配鏡資料/參數/度數/散光/軸度/PD/ADD/用途/輸入錯誤/處方/打單/客資/客戶/退費/大過">
+    <div class="article" data-tags="資料" data-title="顧客/客戶資料資訊系統度數/配鏡資料/參數/度數/散光/軸度/PD/ADD/用途/輸入錯誤/處方/打單/客資/客戶/退費/大過">
                 <h2>顧客資料資訊系統處方相關輸入錯誤，<br>包含度數/散光/軸度/ADD/PD/用途</h2>
                 <p>(當月前兩次扣公積金點數扣300點)<br>(第三次起每次扣公積金點數扣500點)<br>(若為配鏡處方資相關資料漏打則扣公積金200點)<br>▲若因為度數輸入錯誤，導致客人客訴或退費等問題，<br>將記予一支大過，及當月扣點公積金2000</p>
             </div>
-	  <div class="article" data-tags="出勤" data-title="當日出缺勤於11:40分前未傳、未確實回報">
+    <div class="article" data-tags="出勤" data-title="當日出缺勤於11:40分前未傳、未確實回報">
                 <h2>當日出缺勤於11:40分前未傳、未確實回報</h2>
                 <p>(主管扣100點)</p>
             </div>
-	  <div class="article" data-tags="管理" data-title="飲料機、咖啡機原料(巧克力、果汁、葡萄、綠茶、奶粉、糖、豆、抹茶)未注意先進先出，導致食品保存期限過期/食材">
+    <div class="article" data-tags="管理" data-title="飲料機、咖啡機原料(巧克力、果汁、葡萄、綠茶、奶粉、糖、豆、抹茶)未注意先進先出，導致食品保存期限過期/食材">
                 <h2>飲料機、咖啡機原料未注意先進先出，<br>導致原料食品保存期限過期</h2>
                 <p>(依照過期原料數量/進貨價格扣公積金)</p>
             </div>
-	  <div class="article" data-tags="管理 鏡框" data-title="備品盤點未確實，盤點表未於每周三下班前上傳至群組/店內備品庫存數量高於公司規定可擺放庫存/鏡框未確實盤點 鏡框盤點">
+    <div class="article" data-tags="管理 鏡框" data-title="備品盤點未確實，盤點表未於每周三下班前上傳至群組/店內備品庫存數量高於公司規定可擺放庫存/鏡框未確實盤點 鏡框盤點">
                 <h2>備品盤點未確實，盤點表未於每周三下班前上傳至群組<br>店內備品庫存數量高於公司規定可擺放庫存<br>鏡框未確實盤點 </h2>
                 <p>(初犯扣公積金250點/累犯扣公積金500點)</p>
-	     </div>
-	  <div class="article" data-tags="管理" data-title="店內文宣 DM 傳單 廣告 海報 未確實擺放及更新包包吊牌未確實更新">
+       </div>
+    <div class="article" data-tags="管理" data-title="店內文宣 DM 傳單 廣告 海報 未確實擺放及更新包包吊牌未確實更新">
                 <h2>店內文宣 DM 未確實擺放及更新包包吊牌未確實更新</h2>
                 <p>(扣公積金 100 點/主管 100 點)<br>※按數量累加計算 </p>
-	     </div>
-	  <div class="article" data-tags="管理 出勤" data-title="店內遙控器、鑰匙未確實交接，沒開門、鐵捲門，超過11:20未正常營業、遲到">
+       </div>
+    <div class="article" data-tags="管理 出勤" data-title="店內遙控器、鑰匙未確實交接，沒開門、鐵捲門，超過11:20未正常營業、遲到">
                 <h2>店內鑰匙未確實交接，導致超過11:20為正常營業</h2>
                 <p>(當日上班人員皆以遲到計算/扣當月遲到績效點數)<br>(扣公積金 500 點/主管 100 點)<br>※按數量累加計算 </p>
-	     </div>
-	  <div class="article" data-tags="管理" data-title="門市發生客訴案件(包含所有線上平台/現場)經查證屬實">
+       </div>
+    <div class="article" data-tags="管理" data-title="門市發生客訴案件(包含所有線上平台/現場)經查證屬實">
                 <h2>門市發生客訴案件(包含所有線上平台/現場)經查證屬實</h2>
                 <p>第一次<br>(扣公積金 1000 點/主管 300 點)<br>三個月內發生第二次客訴<br>(扣公積金 2000 點/主管 500 點)<br>※依客訴情節嚴重性不排除有額外處分</p>
-	     </div>
-	  <div class="article" data-tags="管理 磨片" data-title="海定鏡片瑕疵未主動回報google表單 鏡片車損/訂錯/瑕疵/售服/重新下單時單號輸入錯誤 (單號未註明損或返)">
+       </div>
+    <div class="article" data-tags="管理 磨片" data-title="海定鏡片瑕疵未主動回報google表單 鏡片車損/訂錯/瑕疵/售服/重新下單時單號輸入錯誤 (單號未註明損或返)">
                 <h2>海訂鏡片瑕疵未主動回報google表單<br>鏡片車損/訂錯/瑕疵/售服/重新下單時單號輸入錯誤<br>(單號未註明損或返)</h2>
                 <p>(扣公積金200點/主管100點)<br>*以上皆按件計算</p>
-	     </div>
-	  <div class="article" data-tags="管理" data-title="錄影前服裝儀容未準備完成(包含對講機配戴)當日值班人員無故未參加錄影，領帶及工牌未攜帶、女生頭髮檔住工牌，上班未畫淡妝(明顯氣色不佳)，男生制服後擺未紮好">
+       </div>
+    <div class="article" data-tags="管理" data-title="錄影前服裝儀容未準備完成(包含對講機配戴)當日值班人員無故未參加錄影，領帶及工牌未攜帶、女生頭髮檔住工牌，上班未畫淡妝(明顯氣色不佳)，男生制服後擺未紮好">
                 <h2>錄影前服裝儀容未準備完成(包含對講機配戴)當日值班人員無故未參加錄影<br>上班未確實佩戴對講機，領帶及工牌未攜帶、<br>女生頭髮檔住工牌，上班未畫淡妝(明顯氣色不佳)，男生制服後擺未紮好。</h2>
                 <p>(扣個人100點/公積金50點/主管50點)<br>※專員會依每日口號影片進行扣點<br>※主管每日需入內帶領員工拍攝</p>
-	     </div>
-	  <div class="article" data-tags="管理 出勤" data-title="門市班表異動未即時更新/值班人員/人數與假表不同/不相符/不符">
+       </div>
+    <div class="article" data-tags="管理 出勤" data-title="門市班表異動未即時更新/值班人員/人數與假表不同/不相符/不符">
                 <h2>門市班表異動未即時更新，<br>值班人數及人員與假表不同</h2>
                 <p>(每次扣主管200點)</p>
-	     </div>
-	  <div class="article" data-tags="管理 出勤" data-title="員工未依規定停放機車、汽車/禁止停放店門口/規定位置/車格/停車/車位/交通工具/通勤">
+       </div>
+    <div class="article" data-tags="管理 出勤" data-title="員工未依規定停放機車、汽車/禁止停放店門口/規定位置/車格/停車/車位/交通工具/通勤">
                 <h2>員工未依規定停放機車、汽車<br>※機車請依規定位置停放，<br>禁止停放店門口<br>※汽車禁止停放於公司車位及門口</h2>
                 <p>(扣個人200點/主管扣50點)</p>
-	     </div>
+       </div>
+      <div class="article" data-tags="績效" data-title="出勤異常、經常性請假(事假/病假)，特休放假未依公司規定申請">
+                <h2>出勤異常、經常性請假<br>(事假/病假)<br>未依公司規定申請</h2>
+                <p>◆門市人員/主管扣300點<br>◆驗光人員扣750點<br>◆驗光主管扣525點<br>※當月第四天遲到 扣總績效50%<br>門市人員/主管扣1000點<br>驗光人員扣2500點<br>驗光主管扣1750點<br>※當月第五天遲到 扣總績效100%<br>門市人員/主管扣2000點<br>驗光人員扣5000點<br>驗光主管扣3500點</p>
+      </div>
+      <div class="article" data-tags="績效" data-title="單月葉黄素未達基本盒數組數未達標">
+                <h2>單月葉黄素未達基本盒數</h2>
+                <p>◆門市人員/主管扣400點<br>A 級店 10 盒．B 級店 8 盒．C 級店 6 盒）<br>◆驗光人員扣750點<br>（A 級店 30 盒．B 級店 24 盒．C 級店 16 盒）<br>◆驗光主管扣525點<br>（A 級店 10 盒．B 級店 8 盒．C 級店 6 盒）</p>
+      </div>
+      <div class="article" data-tags="績效" data-title="因個人工作心態、服務表現不佳，造成客訴/員工/同仁">
+                <h2>因個人工作心態、服務表現不佳，<br>造成客訴</h2>
+                <p>◆門市人員/主管扣800點<br>◆驗光人員扣1000點<br>◆驗光主管扣700點</p>
+      </div>
+      <div class="article" data-tags="績效" data-title="在無工作執勤時，未主動協助現場工作(銷售/交件/品檢/招呼現場客人)無驗光/發呆/站/無事/沒事/閒">
+                <h2>在無工作執勤時，未主動協助現場工作<br>(銷售/交件/品檢/招呼現場客人)</h2>
+                <p>◆門市人員/主管扣500點<br>◆驗光人員扣750點<br>◆驗光主管扣525點</p>
+      </div>
+      <div class="article" data-tags="績效" data-title="未正確使用驗光儀器/器材(如視力箱防塵罩用完未蓋起、用原子筆戳觸控螢幕等)/焦度計/驗度儀/魔術箱/吊臂/瞳距儀/保護套">
+                <h2>未正確使用驗光儀器</h2>
+                <p>◆驗光人員扣500點<br>◆驗光主管扣350點</p>
+      </div>
+      <div class="article" data-tags="績效" data-title="驗光流程未按照公司基礎要求/SOP/AUTO/auto視力(一.電腦驗光，二.單眼/雙眼量測與新舊度 VA 紀錄，三.試戴架度數試戴)">
+                <h2>驗光流程未按照公司基礎要求<br>一.電腦驗光，<br>二.單眼/雙眼量測與新舊度 VA 紀錄<br>三.試戴架度數試戴</h2>
+                <p>◆驗光人員扣500點<br>◆驗光主管扣350點</p>
+      </div>
+      <div class="article" data-tags="績效" data-title="拒絕幫客人驗光服務/兒童/轉診/不驗/拒接/拒驗 / 驗光未陪同度數試戴/走出驗光室">
+                <h2>拒絕幫客人驗光服務<br>或驗光未陪同度數試戴</h2>
+                <p>◆驗光人員扣750點<br>◆驗光主管扣525點</p>
+      </div>
+      <div class="article" data-tags="加項" data-title="連續三個月內出缺勤無任何異常，無漏打卡狀况發生公司將另給予個人績效點數 生理假、喪假除外">
+                <h2>連續三個月內出缺勤無異常，<br>無漏打卡狀况<br> ★生理假、喪假除外</h2>
+                <p>◆門市人員/主管加400點<br>◆驗光人員加500點<br>◆驗光主管加525點</p>
+      </div>
+      <div class="article" data-tags="加項" data-title="連續三個月無因個人工作疏失被扣除績效考核項目點，公司將另給予個人績效點數">
+                <h2>連續三個月無因個人工作疏失<br> 被扣除績效考核項目</h2>
+                <p>◆門市人員/主管加400點<br>◆驗光人員加500點<br>◆驗光主管加525點</p>
+      </div>
+      <div class="article" data-tags="加項" data-title="單月個人葉黃素銷售 目標有達 30 組，公司將另給予個人績效點數">
+                <h2>單月個人葉黃素銷售<br>目標有達 30 組<br>公司將另給予個人績效點數</h2>
+                <p>◆門市人員/主管加400點</p>
+      </div>
+      <div class="article" data-tags="加項" data-title="該門市在一個月內無發生客訴事件，如服務態度不佳及驗光等候多時等問題，公司將另給予該店全體員工績效點數">
+                <h2>門市一個月內無發生客訴事件</h2>
+                <p>◆門市人員/主管加100點<br>◆驗光人員/主管加250點</p>
+      </div>
+      <div class="article" data-tags="加項" data-title="連續三個月全門市員工出缺勤表現無異常/連續三個月無客訴事件發生">
+                <h2>連續三個月全門市員工出缺勤無異常<br>連續三個月無客訴事件發生</h2>
+                <p>◆門市主管加300點<br>◆驗光主管加350點</p>
+      </div>
             <!-- 可以添加更多文章 -->
         </div>
-	<!-- 沒有找到相關內容的提示 -->
-	<p id="noResultsMessage" style="display: none;">很抱歉、小精靈們沒有找到相關內容</p>
+  <!-- 沒有找到相關內容的提示 -->
+  <p id="noResultsMessage" style="display: none;">很抱歉、小精靈們沒有找到相關內容</p>
     </main>
     <!-- 背景畫布 -->
     <canvas id="backgroundCanvas"></canvas>
     <canvas id="fishCanvas"></canvas>
     <footer>
-       <p>當前版本：v20250920<br>與我聯繫：<a href="mailto:xd67332@gmail.com" style="color: silver;">xd67332@gmail.com</a></p>
-       <a href="index.html" class="game-button">員工資訊</a>
-       <a href="Turntable.html" class="game-button">命運轉盤</a>
-       <a href="cards.html" class="game-button">抽籤點名</a>
-       <a href="s.html" class="game-button">周易卜卦</a>
-       <a href="arena.html" class="game-button">競技場</a>
-       <a href="Tool.html" class="game-button">小工具</a>
-	   <a href="Lens.html" class="game-button">鏡片評估</a>
+       <p>當前版本：v20251114<br>與我聯繫：<a href="mailto:xd67332@gmail.com" style="color: silver;">xd67332@gmail.com</a></p>
     </footer>
 <script>
 // 搜索功能
@@ -569,10 +722,23 @@ function searchArticles() {
         setTimeout(searchArticles, 100);  // 100 毫秒搜索刷新延遲
     });
 // 獲取所有標籤按鈕與文章
+const mainMenuBtn = document.getElementById('mainMenuBtn');
+const mainMenuDropdown = document.getElementById('mainMenuDropdown');
 const tags = document.querySelectorAll(".tag");
 const articles = document.querySelectorAll(".article");
 let selectedTags = [];
-
+if (mainMenuBtn && mainMenuDropdown) {
+    mainMenuBtn.addEventListener('click', function (e) {
+        e.stopPropagation(); // 避免立刻被 document click 關掉
+        mainMenuDropdown.classList.toggle('show');
+    });
+    mainMenuDropdown.addEventListener('click', function (e) {
+        e.stopPropagation();
+    });
+    document.addEventListener('click', function () {
+        mainMenuDropdown.classList.remove('show');
+    });
+}
 // 創建「顯示所有」按鈕
 const clearFilter = document.createElement("button");
 clearFilter.textContent = "顯示所有";
@@ -782,7 +948,6 @@ updateFishes();
 </body>
 </html>
        
-
 
 
 
