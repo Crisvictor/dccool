@@ -3131,7 +3131,7 @@ function convertUnit(){
     anterior_chamber_depth_ultrasound: { name: '前房深度計算', latex: '\\mathrm{ACD} = \\dfrac{v_{\\mathrm{aq}}\\,\\Delta t}{2}', value: 'v_{aq}：房水音速（37°C）≈ 1532 m/s；Δt：自角膜後表面到水晶體前表面之「去回」時間差（超音波圖常見讀值）。' + '若 Δt 以 μs，則 ACD[mm] ≈ 0.766 × Δt[μs]（因 1532 m/s = 1.532 mm/μs，取一半）。' + '例：Δt=4.0 μs → ACD ≈ 3.06 mm。參考音速：角膜 1550 m/s、房水 1532 m/s、水晶體 1641 m/s（37°C）。' },
     spectacle_fov_no_prism: { name: '視覺視場（眼鏡視場，無稜鏡）', latex: '2\\,\\theta = 2\\,\\arctan\\!\\left(\\dfrac{W/2}{\\,VD + r_e\\,}\\right)', value: 'W：鏡片（或鏡框有效孔徑）寬；VD：頂點距；r_e：眼球迴轉半徑（約 13–14 mm）。'},
     spectacle_fov_with_prism: { name: '實際視場（含稜鏡影響）', latex: "2\\,\\theta' \\approx 2\\,\\arctan\\!\\left(\\dfrac{W/2}{\\,VD + r_e\\,}\\right) \\;\\pm\\; \\Delta\\theta_{\\text{prism}}", value: '遠視易出現環形盲區 → 視場縮小；近視易有環形複影 → 視場增大。△θprism：大小與稜鏡量及視距幾何配置相關。'},
-    prism_notation: { name: "斜視醫囑簡寫（Prism notation）", table: { headers: ["縮寫", "意義"], rows: [["D", "遠（distance）"],["N / ′", "近（near）"],["E", "內斜（eso-）"],["X", "外斜（exo-）"],["H", "上斜（hyper-）"],["P", "隱斜（phoria）"],["T", "斜視（tropia）"],["alt", "交替性（alternating）"],["(T)", "間歇性（intermittent）"]]},note: "臨床處方常用縮寫；可搭配稜鏡大小與方向書寫，例如：6△ BO @ D。"}
+    prism_notation: { name: "斜視醫囑簡寫（Prism notation）", table: { headers: ["縮寫", "意義"], rows: [["D", "遠（distance）"],["N / ′", "近（near）"],["ortho", "正位"],["E", "內斜（eso-）"],["X", "外斜（exo-）"],["H", "上斜（hyper-）"],["P", "隱斜（phoria）"],["T", "斜視（tropia）"],["alt", "交替性（alternating）"],["(T)", "間歇性（intermittent）"]]},note: "臨床處方常用縮寫；可搭配稜鏡大小與方向書寫，例如：6△ BO @ D。"}
   },
   refr: {
     cr39:        { name:'CR-39（標準樹脂）',            latex:'n \\approx 1.499', value:'d 線（589 nm）、20°C 近似' },
@@ -4578,4 +4578,5 @@ drawPrPlot(plotR, 0, 0);
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.min.js" defer></script>
 </html>
+
 
