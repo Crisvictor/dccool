@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="icon" href="img/optometry.png" type="image/x-icon">
 <link rel="shortcut icon" href="img/optometry.png" type="image/x-icon">
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <title>鏡片厚度模擬器</title>
 <style>
   :root{
@@ -28,7 +30,7 @@
   }
   .wrap{max-width:1200px;margin:24px auto;padding:0 16px}
   h1{font-size:22px;margin:0 0 12px;color:#f1f5f9}
-  .grid{display:grid;gap:16px}
+  .grid{display:grid;gap:10px}
   .g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
   .card{
     background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.02));
@@ -40,10 +42,10 @@
   .card>.hd{
     padding:12px 16px;
     border-bottom:1px solid var(--border);
-    font-weight:600;
+    font-weight:580;
     color:#cbd5e1;
   }
-  .card>.bd{padding:12px 16px}
+  .card>.bd{padding:8px 16px}
   .row{display:grid;grid-template-columns:1fr 160px;align-items:center;gap:8px;margin:8px 0}
   .row label{color:var(--muted);font-size:12px}
   input,select{
@@ -62,21 +64,39 @@
     box-shadow:0 0 0 2px rgba(56,189,248,.25);
     background:#0c1a31;
   }
-  .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
   .kpi{
     border:1px solid var(--border);
-    border-radius:12px;
+    border-radius:8px;
     background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
-    padding:10px
+    padding:5px
   }
-  .kpi .t{font-size:12px;color:var(--muted)}
-  .kpi .v{font-weight:700;margin-top:4px;color:#e2e8f0}
+  .kpi .t{font-size:11px;color:var(--muted)}
+  .kpi .v{font-weight:700;margin-top:2px;color:#e2e8f0}
   .canvas{
     aspect-ratio:1/1;border-radius:16px;
     border:1px solid var(--border);
     background:radial-gradient(500px 400px at 60% 40%,rgba(148,163,184,.08),transparent 60%),
                #0b1324;
     display:flex;align-items:center;justify-content:center
+  }
+  .kpi-double{
+    display:flex;
+    flex-direction:column;
+    gap:11px;
+  }
+  .kpi-subcard{
+    padding-top:8px;
+    border-top:1px solid var(--border);
+  }
+  .kpi-subcard:first-child{
+    border-top:none;
+  }
+  .kpi-subtitle{
+    font-size:12px;
+    color:var(--muted);
+    font-weight:600;
+    margin-bottom:6px;
   }
   .note{font-size:12px;color:var(--muted)}
   .danger{color:var(--ng);font-weight:700}
@@ -133,6 +153,7 @@
         <div class="bd">
           <div class="row"><label>有效直徑 ED (mm)</label><input id="ED" type="number" step="0.5" value="53" min="20" max="80"></div>
           <div class="row"><label>框寬 A (mm)</label><input id="A" type="number" step="0.5" value="52" min="20" max="80"></div>
+          <div class="row"><label>框高 B (mm)</label><input id="B" type="number" step="0.5" value="35" min="20" max="80"></div>
           <div class="row"><label>中樑距 DBL (mm)</label><input id="DBL" type="number" step="0.5" value="18" min="10" max="40"></div>
           <div class="row"><label>瞳距 PD (mm)</label><input id="PD" type="number" step="0.5" value="62" min="40" max="80"></div>
           <div class="row"><label>預留加工 (mm)</label><input id="allowance" type="number" step="0.5" value="2" min="0" max="4"></div>
@@ -144,35 +165,88 @@
       </div>
 
       <div class="card">
-        <div class="hd">裁型 & 鏡坯評估</div>
-        <div class="bd kpis">
-          <div class="kpi"><div class="t">框心距 (A+DBL)</div><div id="k_framePD" class="v"></div></div>
-          <div class="kpi"><div class="t">單眼偏心</div><div id="k_dec" class="v"></div></div>
-          <div class="kpi"><div class="t">裁型直徑 ≈</div><div id="k_cutDia" class="v"></div></div>
-          <div class="kpi"><div class="t">鏡坯需求半徑</div><div id="k_reqR" class="v"></div></div>
-          <div class="kpi"><div class="t">鏡坯最小建議片徑</div><div id="k_minBlank" class="v"></div></div>
-          <div class="kpi"><div class="t">鏡坯是否足夠</div><div id="k_blankOK" class="v"></div></div>
+        <div class="hd">3D 厚度視覺（概念示意）</div>
+        <div class="bd">
+          <div id="threeWrap" style="width:100%;height:340px;border-radius:12px;border:1px solid var(--border);background:#0a1322;overflow:hidden"></div>
+          <p class="note">此 3D 為旋轉對稱概念示意：依厚度函式產生軸對稱鏡片（圓形）。不影響計算，僅供視覺化。</p>
         </div>
       </div>
-
+     
       <div class="card">
-        <div class="hd">厚度 & 溝尖/車溝檢核（近似）</div>
-        <div class="bd kpis">
-          <div class="kpi"><div class="t">Δ（幾何近似）</div><div id="k_delta" class="v"></div></div>
-          <div class="kpi"><div class="t">中心厚估</div><div id="k_center" class="v"></div></div>
-          <div class="kpi"><div class="t">邊緣厚（薄側）</div><div id="k_edge" class="v"></div></div>
-          <div class="kpi"><div class="t">不含溝尖/車溝邊厚（薄側）</div><div id="k_tip" class="v"></div></div>
-          <div class="kpi"><div class="t">車溝/溝尖安全線</div><div id="k_halfSafety" class="v"></div></div>
-          <div class="kpi"><div class="t">結果</div><div id="k_result" class="v"></div></div>
+        <div class="hd">裁型 / 鏡坯 & 厚度檢核</div>
+        <div class="bd kpi-double">
+
+          <!-- 上半：裁型 & 鏡坯評估 -->
+          <div class="kpi-subcard">
+            <div class="kpi-subtitle">裁型 & 鏡坯評估</div>
+            <div class="kpis">
+              <div class="kpi">
+                <div class="t">框心距 (A+DBL)</div>
+                <div id="k_framePD" class="v"></div>
+              </div>
+              <div class="kpi">
+                <div class="t">單眼偏心</div>
+                <div id="k_dec" class="v"></div>
+              </div>
+              <div class="kpi">
+                <div class="t">裁型直徑 ≈</div>
+                <div id="k_cutDia" class="v"></div>
+              </div>
+              <div class="kpi">
+                <div class="t">鏡坯需求半徑</div>
+                <div id="k_reqR" class="v"></div>
+              </div>
+              <div class="kpi">
+                <div class="t">鏡坯最小建議片徑</div>
+                <div id="k_minBlank" class="v"></div>
+              </div>
+              <div class="kpi">
+                <div class="t">鏡坯是否足夠</div>
+                <div id="k_blankOK" class="v"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 下半：厚度 & 溝尖/車溝檢核（近似） -->
+          <div class="kpi-subcard">
+            <div class="kpi-subtitle">厚度 & 溝尖/車溝檢核（近似）</div>
+            <div class="kpis">
+              <div class="kpi">
+                <div class="t">Δ（幾何近似）</div>
+                <div id="k_delta" class="v"></div>
+              </div>
+              <div class="kpi">
+                <div class="t">中心厚估</div>
+                <div id="k_center" class="v"></div>
+              </div>
+              <div class="kpi">
+                <div class="t">邊緣厚（薄側）</div>
+                <div id="k_edge" class="v"></div>
+              </div>
+              <div class="kpi">
+                <div class="t">不含溝尖/車溝邊厚（薄側）</div>
+                <div id="k_tip" class="v"></div>
+              </div>
+              <div class="kpi">
+                <div class="t">車溝/溝尖安全線</div>
+                <div id="k_halfSafety" class="v"></div>
+              </div>
+              <div class="kpi">
+                <div class="t">結果</div>
+                <div id="k_result" class="v"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
+
 <script>
 (function(){
   const $ = (id)=>document.getElementById(id);
-  const ids = ["lensType","D","n","centerT","edgeT","blankDia","ED","A","DBL","PD","allowance","grooveDepth","minTip","rimType"];
+  const ids = ["lensType","D","n","centerT","edgeT","blankDia","ED","A","B","DBL","PD","allowance","grooveDepth","minTip","rimType"];
   ids.forEach(id=>$(id).addEventListener('input', update));
   $("lensType").addEventListener('change', ()=>{
     const t = $("lensType").value;
@@ -191,8 +265,10 @@
     const edgeT   = clamp($("edgeT").value,0.2,3.0);
     const blankDia= clamp($("blankDia").value,50,80);
 
+
     const ED = clamp($("ED").value,20,80);
     const A  = clamp($("A").value,20,80);
+    const B  = clamp($("B").value,20,80);
     const DBL= clamp($("DBL").value,10,40);
     const PD = clamp($("PD").value,40,80);
     const allowance = clamp($("allowance").value,0,4);
@@ -204,15 +280,19 @@
     const framePD = A + DBL;
     const dec = Math.abs(framePD - PD)/2; // 單眼偏心
 
-    // === 使用標準 MBS 幾何 ===
-    const cutR = ED/2;               // 裁型半徑（以 ED/2 為準）
-    const rL = Math.max(0, cutR - dec); // 左側實際半徑（距鏡片中心）
-    const rR = cutR + dec;              // 右側實際半徑
+    // 水平方向：以框寬 A/2 為基準
+    const halfA = A / 2;
+    const rL = Math.max(0, halfA - dec); // 左邊實際到光學中心距離
+    const rR = halfA + dec;              // 右邊實際到光學中心距離
 
-    // 最小鏡坯半徑需求：cutR + dec + allowance
-    const hReq = cutR + dec + allowance;
-    const minBlank = 2*hReq; // = ED + 2*dec + 2*allowance
-    const blankOK = (blankDia/2) >= hReq;
+    // 斜邊 ED：用來算最大半徑與鏡坯需求
+    const cutR = ED/2;                  // 視覺上的裁型「等效圓半徑」
+    const rMax = cutR + dec;           // 最遠那一點（對角線 + 偏心）
+
+    // 鏡坯需求半徑、片徑（沿用原本概念）
+    const hReq = rMax + allowance;
+    const minBlank = 2 * hReq;
+    const blankOK  = (blankDia/2) >= hReq;
 
     const absD = Math.abs(D);
 
@@ -241,8 +321,8 @@
     const need = Math.max(1.0, minTip);
     const halfOK = tipRemain >= need;
 
-    return {lensType,D,n,centerT,edgeT,blankDia,ED,A,DBL,PD,allowance,grooveDepth,minTip,rimType,
-      framePD,dec,cutR,hReq,blankOK,delta,estCenter,estEdgeMin,tipRemain,halfOK,minBlank,rL,rR,need};
+    return {lensType,D,n,centerT,edgeT,blankDia,ED,A,B,DBL,PD,allowance,grooveDepth,minTip,rimType,
+      framePD,dec,cutR,hReq,blankOK,delta,estCenter,estEdgeMin,tipRemain,halfOK,minBlank,rL,rR,rMax,need};
   }
 
   function drawTop(res){
@@ -251,15 +331,24 @@
     svg.innerHTML='';
     const cx=W/2, cy=H/2;
     const blankR = Math.min(W,H)*0.42;
-    const rBlankReal = res.blankDia/2;
+    const rBlankReal = res.blankDia / 2; 
+    const scale = blankR / rBlankReal;    
+    // 框橢圓（boxing system：A×B）
+    const rxFrame = (res.A / 2) * scale;
+    const ryFrame = (res.B / 2) * scale;
+    const dx = (res.dec) * scale;
+    // 框形狀：橢圓
+    ellipse(svg, cx + dx, cy, rxFrame, ryFrame, 'none', '#4b5563', 2);
+    // ED 等效圓（虛線）
+    const rED = (res.ED / 2) * scale;
+    circle(svg, cx + dx, cy, rED, 'none', '#6b7280', 1, '4 4');
 
     const rCut = (res.cutR / rBlankReal) * blankR; // 裁型半徑
 
     // 鏡坯外圈（不足時紅色）
-    circle(svg,cx,cy,blankR,'none', res.blankOK ? '#cbd5e1' : '#ef4444', 2);
+    circle(svg, cx, cy, blankR, 'none', res.blankOK ? '#cbd5e1' : '#ef4444', 2);
 
     // 裁型圈（以框中心相對鏡坯中心之偏心顯示）
-    const dx = (res.dec / rBlankReal) * blankR; // 裁型圓心偏移
     circle(svg,cx+dx,cy,rCut,'none','#374151',2);
 
     // 溝槽達標（薄側）
@@ -307,16 +396,439 @@
     text(svg, cx, baseY+52, `溝尖寬/車溝寬 ${res.grooveDepth.toFixed(1)}mm；薄側剩餘 ${(res.estEdgeMin-res.grooveDepth).toFixed(2)}mm`, '#4FABB8','middle');
   }
 
-  function thicknessAt(res, side){
-    const r = (side==='L')? res.rL : res.rR;
+
+  function thicknessAtRadius(res, r){
     const absD = Math.abs(res.D);
-    const term = (r*r*absD)/(2000*(res.n-1));
-    if(res.lensType==='minus') return res.centerT + term;
-    const rThin = Math.max(res.rL, res.rR);
-    const center = res.edgeT + (rThin*rThin*absD)/(2000*(res.n-1));
-    return Math.max(0, center - term);
+    const term = (r*r*absD) / (2000*(res.n-1));
+
+    if(res.lensType === 'minus'){
+      return res.centerT + term;
+    }else{
+      // 遠視：用「薄側半徑」回推中心厚，確保薄側 = edgeT
+      const rThin = Math.max(res.rL, res.rR); // 或用 rMax 也行
+      const center = res.edgeT + (rThin*rThin*absD) / (2000*(res.n-1));
+      return Math.max(0, center - term);
+    }
   }
 
+  function thicknessAt(res, side){
+    const r = (side === 'L') ? res.rL : res.rR;
+    return thicknessAtRadius(res, r);
+  }
+
+  function ellipse(svg, cx, cy, rx, ry, fill, stroke, sw, dash){
+    const el = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+    el.setAttribute('cx',cx);
+    el.setAttribute('cy',cy);
+    el.setAttribute('rx',rx);
+    el.setAttribute('ry',ry);
+    el.setAttribute('fill',fill);
+    el.setAttribute('stroke',stroke);
+    el.setAttribute('stroke-width',sw);
+    if(dash) el.setAttribute('stroke-dasharray',dash);
+    svg.appendChild(el);
+  }
+
+let _L3D = null;
+
+function init3D(){
+  if (_L3D || !window.THREE) return;
+  const wrap = document.getElementById('threeWrap');
+  if (!wrap) return;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a1322);
+
+  const camera = new THREE.PerspectiveCamera(35, wrap.clientWidth / wrap.clientHeight, 0.1, 1000);
+  camera.position.set(0, 25, 85);
+
+  const renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+  wrap.innerHTML = '';
+  wrap.appendChild(renderer.domElement);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+
+  // lights
+  const key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(1,2,3);
+  const fil = new THREE.DirectionalLight(0x88ccff, 0.6); fil.position.set(-2,1,0);
+  const amb = new THREE.AmbientLight(0x334455, 0.6);
+  scene.add(key, fil, amb);
+
+  // subtle grid
+  const grid = new THREE.GridHelper(200, 20, 0x1f3045, 0x182435);
+  grid.position.y = -0.01; scene.add(grid);
+
+  _L3D = {wrap, scene, camera, renderer, controls,
+        mesh:null, ring:null, edge:null, slice:null, rim:null};
+
+  window.addEventListener('resize', ()=>{
+    if(!_L3D) return;
+    const {wrap, camera, renderer} = _L3D;
+    camera.aspect = wrap.clientWidth / wrap.clientHeight; 
+    camera.updateProjectionMatrix();
+    renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+  });
+
+  (function loop(){ if(!_L3D) return; requestAnimationFrame(loop); _L3D.controls.update(); _L3D.renderer.render(_L3D.scene, _L3D.camera); })();
+}
+
+    // 厚度模型
+  // 依厚度與度數建立「平凸 / 平凹」實心鏡片
+  function buildLensLatheGeometry(res){
+    if (!window.THREE) return null;
+
+    const n    = Number(res.n) || 0;
+    const D    = Number(res.D) || 0;
+    const absD = Math.abs(D);
+    if (!n || !D) {
+      // 沒有度數就不畫
+      return null;
+    }
+    const denom = 2000 * (n - 1) || 1;
+    const sag   = r => (r * r * absD) / denom;   // r 以 mm 計算幾何弧高
+
+    const rL    = Math.max(0, Number(res.rL)   || 0);
+    const rR    = Math.max(0, Number(res.rR)   || 0);
+    const cutR  = Math.max(0, Number(res.cutR) || 0);
+
+    // 鏡片實際半徑：以鏡坯片徑為主，沒有就用裁型 / rL / rR 補上
+    let rEdgeReal = Number(res.blankDia) ? Number(res.blankDia)/2 : 0;
+    if (!rEdgeReal) rEdgeReal = Math.max(rL, rR, cutR);
+
+    // 厚度函式：與 calc() / 2D 卡片邏輯一致
+    let tAt;
+    if (res.lensType === 'minus') {
+      // 負鏡：指定中心厚，邊厚 = centerT + sag(r)
+      const centerT = Number(res.centerT) || 0;
+      tAt = r => centerT + sag(r);                 // 中心薄，邊厚
+    } else {
+      // 正鏡：指定邊緣厚，用「最薄側半徑」回推中心厚
+      const edgeT = Number(res.edgeT) || 0;
+      const rThin = Math.max(rL, rR);              // 最薄側所在半徑
+      const center = edgeT + sag(rThin);           // 由薄側推回中心厚
+      tAt = r => Math.max(0, center - sag(r));     // 中心厚，邊薄
+    }
+
+    // 視覺縮放：半徑 / 厚度
+    const sR = 0.6;   // 半徑縮放
+    const sT = 0.8;   // 厚度縮放（覺得太扁可以調大）
+    const N  = 96;
+    const pts = [];
+
+    if (res.lensType === 'minus') {
+      // 🔵 負透鏡：前表平 / 後表凹
+      // 前表平面 y=0：外圈 -> 中心
+      for (let i = 0; i <= N; i++) {
+        const rr = rEdgeReal * (1 - i / N);   // rEdge..0
+        const X  = rr * sR;
+        const Y  = 0;
+        pts.push(new THREE.Vector2(X, Y));
+      }
+      // 前表中心 -> 後表中心（往下）
+      const t0 = tAt(0);
+      pts.push(new THREE.Vector2(0, -t0 * sT));
+      // 後表凹面：中心 -> 外圈
+      for (let i = 0; i <= N; i++) {
+        const rr = rEdgeReal * (i / N);       // 0..rEdge
+        const t  = tAt(rr);
+        const X  = rr * sR;
+        const Y  = -t * sT;
+        pts.push(new THREE.Vector2(X, Y));
+      }
+    } else {
+      // 🟢 正透鏡：前表凸 / 後表平
+      // 後表平面 y=0：外圈 -> 中心
+      for (let i = 0; i <= N; i++) {
+        const rr = rEdgeReal * (1 - i / N);
+        const X  = rr * sR;
+        const Y  = 0;
+        pts.push(new THREE.Vector2(X, Y));
+      }
+      // 後表中心 -> 前表中心（往上）
+      const t0 = tAt(0);
+      pts.push(new THREE.Vector2(0, t0 * sT));
+      // 前表凸面：中心 -> 外圈
+      for (let i = 0; i <= N; i++) {
+        const rr = rEdgeReal * (i / N);
+        const t  = tAt(rr);
+        const X  = rr * sR;
+        const Y  = t * sT;
+        pts.push(new THREE.Vector2(X, Y));
+      }
+    }
+
+    const geom = new THREE.LatheGeometry(pts, 128);
+    geom.computeVertexNormals();
+    geom.userData = {
+      rEdgeReal,  // 真實鏡片半徑 (mm)
+      sR,         // 半徑縮放
+      sT          // 厚度縮放
+    };
+    return geom;
+  }
+
+function update3D(res){
+  if (!window.THREE) return;
+  init3D();
+  if (!_L3D) return;
+
+  const scene = _L3D.scene;
+
+  // ---------- 清除舊物件 ----------
+  ["mesh","edge","ring","rim","slice"].forEach(key => {
+    const obj = _L3D[key];
+    if (!obj) { _L3D[key] = null; return; }
+
+    if (Array.isArray(obj)) {
+      obj.forEach(o => {
+        if (!o) return;
+        scene.remove(o);
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) o.material.dispose();
+      });
+    } else {
+      scene.remove(obj);
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) obj.material.dispose();
+    }
+    _L3D[key] = null;
+  });
+
+  // ---------- 建鏡片幾何 ----------
+  const g = buildLensLatheGeometry(res);
+  if (!g) return;
+
+  const rEdgeReal =
+    g.userData.rEdgeReal ||
+    (Number(res.blankDia) ? Number(res.blankDia) / 2
+                          : (Number(res.cutR) || (Number(res.ED) || 0) / 2 || 0));
+
+  const sR = g.userData.sR || g.userData.rScale || 0.6;
+  const sT = g.userData.sT || g.userData.tScale || 0.8;
+
+  // 厚度函式（跟 buildLensLatheGeometry 完全一致，後面 rim / 十字窗簾都會用到）
+  const n     = Number(res.n) || 0;
+  const D     = Number(res.D) || 0;
+  const absD  = Math.abs(D);
+  const denom = 2000 * (n - 1) || 1;
+  const sag   = r => (r * r * absD) / denom;
+
+  let tAt;
+  if (res.lensType === "minus") {
+    const centerT = Number(res.centerT) || 0;
+    tAt = r => centerT + sag(r);             // 負鏡：中心薄、邊厚
+  } else {
+    const edgeT = Number(res.edgeT) || 0;
+    const rThin = Math.max(Number(res.rL) || 0, Number(res.rR) || 0);
+    const center = edgeT + sag(rThin);
+    tAt = r => Math.max(0, center - sag(r)); // 正鏡：中心厚、邊薄
+  }
+
+  // ---------- 1. 鏡片本體 + 外輪廓 ----------
+  const lensMat = new THREE.MeshPhysicalMaterial({
+    color: 0xaad9ff,   // 淡藍
+    roughness: 0.25,
+    metalness: 0.0,
+    transmission: 0.4,
+    transparent: true,
+    opacity: 0.18,
+    side: THREE.DoubleSide
+  });
+  const mesh = new THREE.Mesh(g, lensMat);
+  mesh.position.y = 6;
+  mesh.renderOrder = 0;
+  scene.add(mesh);
+  _L3D.mesh = mesh;
+
+  const edgeGeo = new THREE.EdgesGeometry(g);
+  const edgeMat = new THREE.LineBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.2
+  });
+  const edgeLines = new THREE.LineSegments(edgeGeo, edgeMat);
+  edgeLines.position.copy(mesh.position);
+  edgeLines.renderOrder = 0;
+  scene.add(edgeLines);
+  _L3D.edge = edgeLines;
+
+  // ---------- 2. 側邊圓柱牆 ----------
+  if (rEdgeReal > 0) {
+    let hVis = 0;
+    let centerYOffset = 0;
+
+    if (res.lensType === "minus") {
+      // 近視：維持你原本喜歡的效果 → 多數情況用整個 boundingBox 高度
+      g.computeBoundingBox();
+      const bb = g.boundingBox;
+      if (bb) {
+        hVis = bb.max.y - bb.min.y;
+        centerYOffset = (bb.max.y + bb.min.y) / 2;
+      }
+    } else {
+      // 遠視：高度用「邊緣厚度」，而不是中心最凸點
+      const tEdge = tAt(rEdgeReal);   // mm
+      const tEdgeVis = tEdge * sT;    // 幾何座標高度
+      hVis = tEdgeVis;
+      centerYOffset = tEdgeVis / 2;   // 後表平在 y=0，前表在 +tEdge
+    }
+
+    if (hVis > 0.0001) {
+      const rWorld = rEdgeReal * sR * 1.002; // 稍微放大，避免 Z-fighting
+      const rimGeo = new THREE.CylinderGeometry(
+        rWorld, rWorld, hVis, 64, 1, true   // openEnded=true，只要側邊
+      );
+      const rimMat = new THREE.MeshBasicMaterial({
+        color: 0x7a9bcc,
+        transparent: true,
+        opacity: 0.15,
+        side: THREE.DoubleSide,
+        depthWrite: false
+      });
+      const rim = new THREE.Mesh(rimGeo, rimMat);
+      rim.position.y = mesh.position.y + centerYOffset;
+      rim.renderOrder = 1; 
+      scene.add(rim);
+      _L3D.rim = rim;
+    }
+  }
+
+  // ---------- 3. 裁型圈（高亮，不被鏡片吃掉） ----------
+  const cutRReal = Number(res.cutR) || (Number(res.ED) || 0) / 2;
+  const decReal  = Math.abs(Number(res.dec) || 0);
+
+  if (cutRReal > 0) {
+    const ringRadius = cutRReal * sR;
+    const ringGeo = new THREE.TorusGeometry(ringRadius, 0.6, 16, 160);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0x22c55e,
+      transparent: true,
+      opacity: 0.2,
+      depthTest: false, 
+      depthWrite: false
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = mesh.position.y;
+    ring.position.x = decReal * sR;
+    ring.renderOrder = 9;  
+    scene.add(ring);
+    _L3D.ring = ring;
+  }
+
+  // ---------- 4. 十字子午線「窗簾」厚度切面 ----------
+  const ringInside = (decReal + cutRReal) <= rEdgeReal + 1e-6;
+
+  function buildCurtain(sMinReal, sMaxReal, mode){
+    if (sMaxReal <= sMinReal) return null;
+
+    const NX = 64;
+    const top = [];
+    const bottom = [];
+
+    for (let i = 0; i <= NX; i++){
+      const tt = i / NX;
+      const sReal = sMinReal + (sMaxReal - sMinReal) * tt;
+
+      let xReal, zReal;
+      if (mode === "x") {
+        // 沿偏心方向：x = dec + s, z = 0
+        xReal = decReal + sReal;
+        zReal = 0;
+      } else {
+        // 垂直方向：x = dec, z = s
+        xReal = decReal;
+        zReal = sReal;
+      }
+
+      const rReal = Math.sqrt(xReal * xReal + zReal * zReal);
+      const thick = tAt(rReal);     // mm
+      const tVis  = thick * sT;     // 幾何座標高度
+
+      let yTopLocal, yBotLocal;
+      if (res.lensType === "minus") {
+        // 負鏡：前表平在 y=0，後表往下凹
+        yTopLocal = 0;
+        yBotLocal = -tVis;
+      } else {
+        // 正鏡：後表平在 y=0，前表往上凸
+        yBotLocal = 0;
+        yTopLocal = tVis;
+      }
+
+      const xWorld = xReal * sR;
+      const zWorld = zReal * sR;
+
+      top.push(   new THREE.Vector3(xWorld, yTopLocal,  zWorld));
+      bottom.push(new THREE.Vector3(xWorld, yBotLocal, zWorld));
+    }
+
+    const verts = [];
+    for (let i = 0; i < NX; i++){
+      const t1 = top[i],   t2 = top[i+1];
+      const b1 = bottom[i],b2 = bottom[i+1];
+
+      // 三角形 1
+      verts.push(
+        t1.x, t1.y, t1.z,
+        b1.x, b1.y, b1.z,
+        t2.x, t2.y, t2.z
+      );
+      // 三角形 2
+      verts.push(
+        b1.x, b1.y, b1.z,
+        b2.x, b2.y, b2.z,
+        t2.x, t2.y, t2.z
+      );
+    }
+
+    const sliceGeo = new THREE.BufferGeometry();
+    sliceGeo.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(verts, 3)
+    );
+    sliceGeo.computeVertexNormals();
+
+    const sliceMat = new THREE.MeshBasicMaterial({
+      color: ringInside ? 0x22c55e : 0xef4444, // 綠：鏡坯足夠；紅：鏡坯不足
+      transparent: true,
+      opacity: 0.55,
+      side: THREE.DoubleSide,
+      depthTest: false,   // ✅ 永遠在鏡片 / rim / 裁型圈上面
+      depthWrite: false
+    });
+
+    const slice = new THREE.Mesh(sliceGeo, sliceMat);
+    slice.position.y = mesh.position.y;
+    slice.renderOrder = 10;
+    scene.add(slice);
+    return slice;
+  }
+
+  const slices = [];
+
+  // 4-1 沿偏心方向的子午線
+  const xMinReal = Math.max(-rEdgeReal, decReal - cutRReal);
+  const xMaxReal = Math.min( rEdgeReal, decReal + cutRReal);
+  if (xMaxReal > xMinReal){
+    const sMinX = xMinReal - decReal;
+    const sMaxX = xMaxReal - decReal;
+    const sliceX = buildCurtain(sMinX, sMaxX, "x");
+    if (sliceX) slices.push(sliceX);
+  }
+
+  // 4-2 與偏心方向垂直的子午線
+  const zLimitLens = Math.sqrt(Math.max(0, rEdgeReal * rEdgeReal - decReal * decReal));
+  const zLimit = Math.min(cutRReal, zLimitLens);
+  if (zLimit > 0){
+    const sliceZ = buildCurtain(-zLimit, zLimit, "z");
+    if (sliceZ) slices.push(sliceZ);
+  }
+
+  _L3D.slice = slices;
+}
   // 繪圖小工具
   function circle(svg,cx,cy,r,fill,stroke,sw, dash){
     const el=document.createElementNS('http://www.w3.org/2000/svg','circle');
@@ -378,14 +890,13 @@
     const rimOK = $("rimType").value==='groove' ? res.halfOK : (res.estEdgeMin - res.grooveDepth >= res.minTip);
     $("k_result").textContent = rimOK?"✅ 可行 (近似)":"❌ 風險：厚度可能不足";
 
-    drawTop(res); drawSection(res);
+    drawTop(res); drawSection(res);update3D(res);
   }
 
-  update();
+  update();init3D();
 })();
 </script>
 </body>
 </html>
-
 
 
