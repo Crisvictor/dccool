@@ -107,7 +107,7 @@
 <body>
   <div class="wrap">
     <h1>鏡片厚度模擬器</h1>
-    <p class="note">用途：在訂製前，輸入度數/折射率與框參數，估算裁型後邊緣厚度是否足夠做出溝尖與車溝，並檢查鏡坯片徑是否足夠。<br>聲明：本教學工具為厚度幾何近似值，未含前後表面彎度（Base Curve）設定與折射面設計（如非球面與多焦）仍會產生誤差，實務仍需以加工經驗為準。</p>
+    <p class="note">用途：在訂製前，輸入度數/折射率與框參數，估算裁型後邊緣厚度是否足夠做出溝尖與車溝，並檢查鏡坯片徑是否足夠。<br>聲明：本教學工具為厚度幾何近似值，未含前後表面彎度（BC）設定與折射面設計（如非球面與多焦）仍會產生誤差，實務仍需以加工經驗為準。</p>
 
     <div class="grid g-3">
       <div class="card">
@@ -118,6 +118,7 @@
           <div class="note" id="d_display">目前：-6.00 D</div>
           <div class="row"><label>折射率 n</label>
             <select id="n">
+              <option value="1.50">1.50</option>
               <option value="1.56">1.56</option>
               <option value="1.61">1.61</option>
               <option value="1.67" selected>1.67</option>
@@ -294,31 +295,45 @@
     const minBlank = 2 * hReq;
     const blankOK  = (blankDia/2) >= hReq;
 
-    const absD = Math.abs(D);
+    const absD  = Math.abs(D);
+    const denom = 2000 * (n - 1) || 1;
+    const sag   = r => (r * r * absD) / denom;
 
-    // 以“薄側/最大半徑”作為參考半徑來計算 Δ
-    const rRef = Math.max(rL, rR); // 近視：最大半徑；遠視：薄側亦在較大半徑
-    const delta = (rRef*rRef*absD)/(2000*(n-1));
+    const rThin   = Math.max(rL, rR);   // 水平薄側 / 最大半徑
+    const blankR  = blankDia / 2;       // 鏡坯半徑
+    const rDesign = Math.max(rThin, blankR);
 
-    function tMinus(r){ return centerT + (r*r*absD)/(2000*(n-1)); }
-    function tPlus (r){ const rThin = Math.max(rL, rR); const center = edgeT + (rThin*rThin*absD)/(2000*(n-1)); return Math.max(0, center - (r*r*absD)/(2000*(n-1))); }
+    // Δ：以 rThin 為參考半徑，中心與該半徑的厚度差
+    const rRef  = rThin;
+    const delta = sag(rRef);            // 對近視/遠視都一樣是 sag(rRef)
 
-    let tL, tR, estCenter, estEdgeMin;
-    if(lensType==='minus'){
-      estCenter = centerT;
-      tL = tMinus(rL); tR = tMinus(rR);
-      estEdgeMin = Math.min(tL, tR);
-    }else{
-      // 遠視：用最薄側半徑推回中心厚，確保薄側=輸入邊緣厚
-      estCenter = edgeT + delta; // delta 以 rRef 計
-      tL = tPlus(rL); tR = tPlus(rR);
-      estEdgeMin = Math.min(tL, tR); // 應與 edgeT 極接近
+    function tMinus(r){
+      return centerT + sag(r);          // 近視：中心薄、邊緣厚
     }
 
-    const tipRemain = estEdgeMin - grooveDepth; // 薄側尖端
+    function tPlus(r){
+      // 遠視：設計讓 rDesign 處厚度 = edgeT，鏡坯越大 → 中心越厚
+      const center = edgeT + sag(rDesign);
+      const rr     = Math.min(r, rDesign);
+      return Math.max(0, center - sag(rr));
+    }
+
+    let tL, tR, estCenter, estEdgeMin;
+    if (lensType === 'minus') {
+      estCenter = centerT;
+      tL = tMinus(rL);
+      tR = tMinus(rR);
+    } else {
+      estCenter = tPlus(0);   // 中心厚估
+      tL = tPlus(rL);
+      tR = tPlus(rR);
+    }
+    estEdgeMin = Math.min(tL, tR);      // 左右最薄側邊厚
+
+    const tipRemain = estEdgeMin - grooveDepth; // 薄側尖端剩餘厚度
 
     // 車溝框安全（建議 ≥1.0 或使用者設定）
-    const need = Math.max(1.0, minTip);
+    const need   = Math.max(1.0, minTip);
     const halfOK = tipRemain >= need;
 
     return {lensType,D,n,centerT,edgeT,blankDia,ED,A,B,DBL,PD,allowance,grooveDepth,minTip,rimType,
@@ -398,16 +413,26 @@
 
 
   function thicknessAtRadius(res, r){
-    const absD = Math.abs(res.D);
-    const term = (r*r*absD) / (2000*(res.n-1));
+    const n    = Number(res.n) || 0;
+    const D    = Number(res.D) || 0;
+    const absD = Math.abs(D);
+    const denom = 2000 * (n - 1) || 1;
+    const sag   = radius => (radius * radius * absD) / denom;
 
-    if(res.lensType === 'minus'){
-      return res.centerT + term;
-    }else{
-      // 遠視：用「薄側半徑」回推中心厚，確保薄側 = edgeT
-      const rThin = Math.max(res.rL, res.rR); // 或用 rMax 也行
-      const center = res.edgeT + (rThin*rThin*absD) / (2000*(res.n-1));
-      return Math.max(0, center - term);
+    if (res.lensType === 'minus') {
+      // 近視：中心薄、邊緣厚
+      return Number(res.centerT) + sag(r);
+    } else {
+      // 遠視：設計「薄側邊緣厚度 edgeT」，
+      //       鏡坯越大 → 中心越厚，邊緣不會比 edgeT 更薄
+      const edgeT  = Number(res.edgeT) || 0;
+      const rThin  = Math.max(res.rL, res.rR);          // 薄側半徑（框）
+      const blankR = res.blankDia ? res.blankDia / 2 : rThin;  // 鏡坯半徑
+      const rDesign = Math.max(rThin, blankR);          // 設計半徑
+
+      const center = edgeT + sag(rDesign);              // rDesign 處厚度 = edgeT
+      const rr     = Math.min(r, rDesign);              // 超過就當在 rDesign
+      return Math.max(0, center - sag(rr));
     }
   }
 
@@ -476,98 +501,110 @@ function init3D(){
 
     // 厚度模型
   // 依厚度與度數建立「平凸 / 平凹」實心鏡片
-  function buildLensLatheGeometry(res){
-    if (!window.THREE) return null;
+function buildLensLatheGeometry(res){
+  // ---- 基本參數 ----
+  const n     = Number(res.n) || 0;
+  const D     = Number(res.D) || 0;
+  const absD  = Math.abs(D);
+  const denom = 2000 * (n - 1) || 1;        
+  const sag   = r => (r * r * absD) / denom;
 
-    const n    = Number(res.n) || 0;
-    const D    = Number(res.D) || 0;
-    const absD = Math.abs(D);
-    if (!n || !D) {
-      // 沒有度數就不畫
-      return null;
-    }
-    const denom = 2000 * (n - 1) || 1;
-    const sag   = r => (r * r * absD) / denom;   // r 以 mm 計算幾何弧高
+  const rL    = Number(res.rL)    || 0;           // 左側框半徑
+  const rR    = Number(res.rR)    || 0;           // 右側框半徑
+  const cutR  = Number(res.cutR)  || ((Number(res.ED) || 0) / 2);
+  const blankR= Number(res.blankDia) ? Number(res.blankDia) / 2 : cutR;
 
-    const rL    = Math.max(0, Number(res.rL)   || 0);
-    const rR    = Math.max(0, Number(res.rR)   || 0);
-    const cutR  = Math.max(0, Number(res.cutR) || 0);
-
-    // 鏡片實際半徑：以鏡坯片徑為主，沒有就用裁型 / rL / rR 補上
-    let rEdgeReal = Number(res.blankDia) ? Number(res.blankDia)/2 : 0;
-    if (!rEdgeReal) rEdgeReal = Math.max(rL, rR, cutR);
-
-    // 厚度函式：與 calc() / 2D 卡片邏輯一致
-    let tAt;
-    if (res.lensType === 'minus') {
-      // 負鏡：指定中心厚，邊厚 = centerT + sag(r)
-      const centerT = Number(res.centerT) || 0;
-      tAt = r => centerT + sag(r);                 // 中心薄，邊厚
-    } else {
-      // 正鏡：指定邊緣厚，用「最薄側半徑」回推中心厚
-      const edgeT = Number(res.edgeT) || 0;
-      const rThin = Math.max(rL, rR);              // 最薄側所在半徑
-      const center = edgeT + sag(rThin);           // 由薄側推回中心厚
-      tAt = r => Math.max(0, center - sag(r));     // 中心厚，邊薄
-    }
-
-    // 視覺縮放：半徑 / 厚度
-    const sR = 0.6;   // 半徑縮放
-    const sT = 0.8;   // 厚度縮放（覺得太扁可以調大）
-    const N  = 96;
-    const pts = [];
-
-    if (res.lensType === 'minus') {
-      // 🔵 負透鏡：前表平 / 後表凹
-      // 前表平面 y=0：外圈 -> 中心
-      for (let i = 0; i <= N; i++) {
-        const rr = rEdgeReal * (1 - i / N);   // rEdge..0
-        const X  = rr * sR;
-        const Y  = 0;
-        pts.push(new THREE.Vector2(X, Y));
-      }
-      // 前表中心 -> 後表中心（往下）
-      const t0 = tAt(0);
-      pts.push(new THREE.Vector2(0, -t0 * sT));
-      // 後表凹面：中心 -> 外圈
-      for (let i = 0; i <= N; i++) {
-        const rr = rEdgeReal * (i / N);       // 0..rEdge
-        const t  = tAt(rr);
-        const X  = rr * sR;
-        const Y  = -t * sT;
-        pts.push(new THREE.Vector2(X, Y));
-      }
-    } else {
-      // 🟢 正透鏡：前表凸 / 後表平
-      // 後表平面 y=0：外圈 -> 中心
-      for (let i = 0; i <= N; i++) {
-        const rr = rEdgeReal * (1 - i / N);
-        const X  = rr * sR;
-        const Y  = 0;
-        pts.push(new THREE.Vector2(X, Y));
-      }
-      // 後表中心 -> 前表中心（往上）
-      const t0 = tAt(0);
-      pts.push(new THREE.Vector2(0, t0 * sT));
-      // 前表凸面：中心 -> 外圈
-      for (let i = 0; i <= N; i++) {
-        const rr = rEdgeReal * (i / N);
-        const t  = tAt(rr);
-        const X  = rr * sR;
-        const Y  = t * sT;
-        pts.push(new THREE.Vector2(X, Y));
-      }
-    }
-
-    const geom = new THREE.LatheGeometry(pts, 128);
-    geom.computeVertexNormals();
-    geom.userData = {
-      rEdgeReal,  // 真實鏡片半徑 (mm)
-      sR,         // 半徑縮放
-      sT          // 厚度縮放
-    };
-    return geom;
+  // 鏡片實際邊緣半徑：取鏡坯 / 裁型 / 框中較大者
+  const rEdgeReal = Math.max(blankR, cutR, rL, rR);
+  if (!isFinite(rEdgeReal) || rEdgeReal <= 0){
+    return null;
   }
+
+  // ---- 厚度函式 thicknessAt(r)：mm 單位 ----
+  function thicknessAt(r){
+    if (res.lensType === 'minus'){
+      // 近視：中心薄、邊緣厚
+      const centerT = Number(res.centerT) || 0;   // 中央最薄厚度
+      return centerT + sag(r);                    // 越外圈越厚
+    } else {
+      // 遠視：設定「薄側邊緣厚度 edgeT」
+      // 鏡坯越大 → 中心要跟著變厚，邊緣不能比 edgeT 更薄
+      const edgeT = Number(res.edgeT) || 0;
+
+      const rThin   = Math.max(rL, rR);           // 框中真正「薄側」半徑
+      const rDesign = Math.max(rThin, blankR);    // 設計半徑：外圈用到的較大者
+
+      const center  = edgeT + sag(rDesign);       // 讓 rDesign 處厚度剛好 = edgeT
+      const rr      = Math.min(r, rDesign);       // 超出去就當 rDesign
+      return Math.max(0, center - sag(rr));       // 中央厚、邊緣不小於 edgeT
+    }
+  }
+
+  // ---- 3D 尺度：把 mm 轉成 three.js 座標 ----
+  const sR = 0.6;   // 半徑縮放
+  const sT = 0.8;   // 厚度縮放（要跟 update3D 裡 sT 預設一致）
+
+  const profile = [];
+  const STEPS   = 64;
+
+  if (res.lensType === 'minus'){
+    // 負透鏡：前表平 (y=0)，後表凹到負方向
+
+    // 1) 前表面：從中心 → 邊緣，都是平面 y=0
+    for (let i = 0; i <= STEPS; i++){
+      const u = i / STEPS;
+      const r = rEdgeReal * u;
+      const x = r * sR;
+      const y = 0;
+      profile.push(new THREE.Vector2(x, y));
+    }
+
+    // 2) 後表面：從邊緣 → 中心，依 thicknessAt(r) 畫出凹面
+    for (let i = STEPS; i >= 0; i--){
+      const u = i / STEPS;
+      const r = rEdgeReal * u;
+      const x = r * sR;
+      const t = thicknessAt(r);          // mm
+      const y = -t * sT;                 // 往下凹
+      profile.push(new THREE.Vector2(x, y));
+    }
+
+  } else {
+    // 正透鏡：後表平 (y=0)，前表凸到正方向
+
+    // 1) 前表面：從中心 → 邊緣，凸面 y = +thicknessAt(r)
+    for (let i = 0; i <= STEPS; i++){
+      const u = i / STEPS;
+      const r = rEdgeReal * u;
+      const x = r * sR;
+      const t = thicknessAt(r);          // mm
+      const y = t * sT;                  // 往上凸
+      profile.push(new THREE.Vector2(x, y));
+    }
+
+    // 2) 後表面：從邊緣 → 中心，平面 y=0
+    for (let i = STEPS; i >= 0; i--){
+      const u = i / STEPS;
+      const r = rEdgeReal * u;
+      const x = r * sR;
+      const y = 0;
+      profile.push(new THREE.Vector2(x, y));
+    }
+  }
+
+  // ---- 生成 Lathe 幾何 ----
+  const geom = new THREE.LatheGeometry(profile, 96);
+  geom.computeVertexNormals();
+
+  // 給 update3D 用的參考資訊
+  geom.userData.rEdgeReal = rEdgeReal;
+  geom.userData.sR        = sR;
+  geom.userData.sT        = sT;
+  geom.userData.rScale    = sR;
+  geom.userData.tScale    = sT;
+
+  return geom;
+}
 
 function update3D(res){
   if (!window.THREE) return;
@@ -602,33 +639,45 @@ function update3D(res){
 
   const rEdgeReal =
     g.userData.rEdgeReal ||
-    (Number(res.blankDia) ? Number(res.blankDia) / 2
-                          : (Number(res.cutR) || (Number(res.ED) || 0) / 2 || 0));
+    (Number(res.blankDia) ? Number(res.blankDia)/2
+                          : Math.max(
+                              Number(res.rL) || 0,
+                              Number(res.rR) || 0,
+                              Number(res.cutR) || 0,
+                              (Number(res.ED) || 0)/2
+                            ));
 
   const sR = g.userData.sR || g.userData.rScale || 0.6;
   const sT = g.userData.sT || g.userData.tScale || 0.8;
 
-  // 厚度函式（跟 buildLensLatheGeometry 完全一致，後面 rim / 十字窗簾都會用到）
-  const n     = Number(res.n) || 0;
-  const D     = Number(res.D) || 0;
-  const absD  = Math.abs(D);
-  const denom = 2000 * (n - 1) || 1;
-  const sag   = r => (r * r * absD) / denom;
+  // ---------- 統一厚度函式 thicknessAt(r) ----------
+  const nVal   = Number(res.n) || 0;
+  const DVal   = Number(res.D) || 0;
+  const absD   = Math.abs(DVal);
+  const denom  = 2000 * (nVal - 1) || 1;
+  const sag    = r => (r * r * absD) / denom;
 
-  let tAt;
-  if (res.lensType === "minus") {
-    const centerT = Number(res.centerT) || 0;
-    tAt = r => centerT + sag(r);             // 負鏡：中心薄、邊厚
-  } else {
-    const edgeT = Number(res.edgeT) || 0;
-    const rThin = Math.max(Number(res.rL) || 0, Number(res.rR) || 0);
-    const center = edgeT + sag(rThin);
-    tAt = r => Math.max(0, center - sag(r)); // 正鏡：中心厚、邊薄
+  function thicknessAt(r){
+    if (res.lensType === "minus"){
+      // 近視：中心薄、邊厚
+      const centerT = Number(res.centerT) || 0;
+      return centerT + sag(r);
+    } else {
+      // 遠視：設定薄側 edgeT，鏡坯越大 → 中心越厚，邊緣不會比 edgeT 更薄
+      const edgeT = Number(res.edgeT) || 0;
+      const rThin  = Math.max(Number(res.rL) || 0, Number(res.rR) || 0);    // 框薄側
+      const blankR = Number(res.blankDia) ? Number(res.blankDia)/2 : rThin;  // 鏡坯半徑
+      const rDesign = Math.max(rThin, blankR);                               // 設計半徑
+
+      const center = edgeT + sag(rDesign);      // 讓 rDesign 處剛好 = edgeT
+      const rr     = Math.min(r, rDesign);      // 超過就當 rDesign 處
+      return Math.max(0, center - sag(rr));
+    }
   }
 
   // ---------- 1. 鏡片本體 + 外輪廓 ----------
   const lensMat = new THREE.MeshPhysicalMaterial({
-    color: 0xaad9ff,   // 淡藍
+    color: 0xaad9ff,
     roughness: 0.25,
     metalness: 0.0,
     transmission: 0.4,
@@ -644,9 +693,9 @@ function update3D(res){
 
   const edgeGeo = new THREE.EdgesGeometry(g);
   const edgeMat = new THREE.LineBasicMaterial({
-    color: 0xffffff,
+    color: 0xaad9ff,
     transparent: true,
-    opacity: 0.2
+    opacity: 0.15
   });
   const edgeLines = new THREE.LineSegments(edgeGeo, edgeMat);
   edgeLines.position.copy(mesh.position);
@@ -654,73 +703,73 @@ function update3D(res){
   scene.add(edgeLines);
   _L3D.edge = edgeLines;
 
-  // ---------- 2. 側邊圓柱牆 ----------
-  if (rEdgeReal > 0) {
+  // ---------- 2. 側邊圓柱牆（近視保持舊效果，遠視用邊緣厚度） ----------
+  if (rEdgeReal > 0){
     let hVis = 0;
     let centerYOffset = 0;
 
-    if (res.lensType === "minus") {
-      // 近視：維持你原本喜歡的效果 → 多數情況用整個 boundingBox 高度
+    if (res.lensType === "minus"){
+      // 近視：直接用幾何 bounding box 高度
       g.computeBoundingBox();
       const bb = g.boundingBox;
-      if (bb) {
+      if (bb){
         hVis = bb.max.y - bb.min.y;
         centerYOffset = (bb.max.y + bb.min.y) / 2;
       }
     } else {
-      // 遠視：高度用「邊緣厚度」，而不是中心最凸點
-      const tEdge = tAt(rEdgeReal);   // mm
-      const tEdgeVis = tEdge * sT;    // 幾何座標高度
-      hVis = tEdgeVis;
-      centerYOffset = tEdgeVis / 2;   // 後表平在 y=0，前表在 +tEdge
+      // 遠視：用「邊緣厚度」決定圓柱高度
+      const tEdge = thicknessAt(rEdgeReal);   // mm
+      const tVis  = tEdge * sT;
+      hVis = tVis;
+      centerYOffset = tVis / 2;               // 後表平在 y=0，前表在 +tVis
     }
 
-    if (hVis > 0.0001) {
-      const rWorld = rEdgeReal * sR * 1.002; // 稍微放大，避免 Z-fighting
+    if (hVis > 0.0001){
+      const rWorld = rEdgeReal * sR * 1.003;
       const rimGeo = new THREE.CylinderGeometry(
-        rWorld, rWorld, hVis, 64, 1, true   // openEnded=true，只要側邊
+        rWorld, rWorld, hVis, 64, 1, true
       );
       const rimMat = new THREE.MeshBasicMaterial({
-        color: 0x7a9bcc,
+        color: 0xaad9ff,    
         transparent: true,
-        opacity: 0.15,
+        opacity: 0.1,       
         side: THREE.DoubleSide,
-        depthWrite: false
+        depthTest: true,   
+        depthWrite: true
       });
       const rim = new THREE.Mesh(rimGeo, rimMat);
       rim.position.y = mesh.position.y + centerYOffset;
-      rim.renderOrder = 1; 
+      rim.renderOrder = 0;
       scene.add(rim);
       _L3D.rim = rim;
     }
   }
 
-  // ---------- 3. 裁型圈（高亮，不被鏡片吃掉） ----------
-  const cutRReal = Number(res.cutR) || (Number(res.ED) || 0) / 2;
+  // ---------- 3. 裁型圈（高亮顯示） ----------
+  const cutRReal = Number(res.cutR) || (Number(res.ED) || 0)/2;
   const decReal  = Math.abs(Number(res.dec) || 0);
+  const ringInside = (decReal + cutRReal) <= rEdgeReal + 1e-6;
 
-  if (cutRReal > 0) {
+  if (cutRReal > 0){
     const ringRadius = cutRReal * sR;
     const ringGeo = new THREE.TorusGeometry(ringRadius, 0.6, 16, 160);
     const ringMat = new THREE.MeshBasicMaterial({
       color: 0x22c55e,
       transparent: true,
-      opacity: 0.2,
-      depthTest: false, 
+      opacity: 0.3,
+      depthTest: false,
       depthWrite: false
     });
     const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.rotation.x = Math.PI / 2;
+    ring.rotation.x = Math.PI/2;
     ring.position.y = mesh.position.y;
     ring.position.x = decReal * sR;
-    ring.renderOrder = 9;  
+    ring.renderOrder = 9;   // 在鏡片 / rim 之上，但低於切面
     scene.add(ring);
     _L3D.ring = ring;
   }
 
   // ---------- 4. 十字子午線「窗簾」厚度切面 ----------
-  const ringInside = (decReal + cutRReal) <= rEdgeReal + 1e-6;
-
   function buildCurtain(sMinReal, sMaxReal, mode){
     if (sMaxReal <= sMinReal) return null;
 
@@ -733,7 +782,7 @@ function update3D(res){
       const sReal = sMinReal + (sMaxReal - sMinReal) * tt;
 
       let xReal, zReal;
-      if (mode === "x") {
+      if (mode === "x"){
         // 沿偏心方向：x = dec + s, z = 0
         xReal = decReal + sReal;
         zReal = 0;
@@ -743,17 +792,17 @@ function update3D(res){
         zReal = sReal;
       }
 
-      const rReal = Math.sqrt(xReal * xReal + zReal * zReal);
-      const thick = tAt(rReal);     // mm
-      const tVis  = thick * sT;     // 幾何座標高度
+      const rReal = Math.sqrt(xReal*xReal + zReal*zReal);
+      const thick = thicknessAt(rReal);   // mm
+      const tVis  = thick * sT;           // 視覺高度
 
       let yTopLocal, yBotLocal;
-      if (res.lensType === "minus") {
-        // 負鏡：前表平在 y=0，後表往下凹
+      if (res.lensType === "minus"){
+        // 近視：前表平 y=0，後表往下凹
         yTopLocal = 0;
         yBotLocal = -tVis;
       } else {
-        // 正鏡：後表平在 y=0，前表往上凸
+        // 遠視：後表平 y=0，前表往上凸
         yBotLocal = 0;
         yTopLocal = tVis;
       }
@@ -796,7 +845,7 @@ function update3D(res){
       transparent: true,
       opacity: 0.55,
       side: THREE.DoubleSide,
-      depthTest: false,   // ✅ 永遠在鏡片 / rim / 裁型圈上面
+      depthTest: false,   // 一定畫在最上面
       depthWrite: false
     });
 
@@ -820,7 +869,7 @@ function update3D(res){
   }
 
   // 4-2 與偏心方向垂直的子午線
-  const zLimitLens = Math.sqrt(Math.max(0, rEdgeReal * rEdgeReal - decReal * decReal));
+  const zLimitLens = Math.sqrt(Math.max(0, rEdgeReal*rEdgeReal - decReal*decReal));
   const zLimit = Math.min(cutRReal, zLimitLens);
   if (zLimit > 0){
     const sliceZ = buildCurtain(-zLimit, zLimit, "z");
@@ -829,6 +878,7 @@ function update3D(res){
 
   _L3D.slice = slices;
 }
+
   // 繪圖小工具
   function circle(svg,cx,cy,r,fill,stroke,sw, dash){
     const el=document.createElementNS('http://www.w3.org/2000/svg','circle');
