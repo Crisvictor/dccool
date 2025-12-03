@@ -203,7 +203,7 @@
                 <div id="k_framePD" class="v"></div>
               </div>
               <div class="kpi">
-                <div class="t">單眼偏心</div>
+                <div class="t">水平偏心</div>
                 <div id="k_dec" class="v"></div>
               </div>
               <div class="kpi">
@@ -211,7 +211,7 @@
                 <div id="k_cutDia" class="v"></div>
               </div>
               <div class="kpi">
-                <div class="t">鏡坯需求半徑</div>
+                <div class="t">垂直偏心</div>
                 <div id="k_reqR" class="v"></div>
               </div>
               <div class="kpi">
@@ -631,7 +631,8 @@ function drawSection(res){
     const need        = Math.max(1.0, minTip);
     const tipRemain   = estEdgeMin - grooveDepth;
     const halfOK      = tipRemain >= need;
-
+    const halfB   = B / 2;
+    const vDecY   = pupilH - halfB; 
     // 鏡坯片徑檢核：也用四個方向的「最大半徑」來算
     const allowance = Number(res.allowance) || 0;
     const blankDia  = Number(res.blankDia)  || 0;  
@@ -648,6 +649,7 @@ function drawSection(res){
       maxBlankThick = thicknessAtRadius(res, 0);
     }
     // 寫回 res 給 KPI / 顯示用
+    res.vDecY         = vDecY;
     res.pupilH        = pupilH;
     res.rTop          = rTop;
     res.rBottom       = rBottom;
@@ -1212,27 +1214,26 @@ function update3D(res){
     applyVerticalDec(res);
     const thickDanger =
     (res.lensType === "minus") && (res.maxBlankThick > 12);    const thickText   = res.maxBlankThick.toFixed(2) + " mm";
+    const vDec = res.vDecY || 0;
+    const vDecText = (vDec > 0 ? "+" : (vDec < 0 ? "−" : "")) + Math.abs(vDec).toFixed(1) + " mm";
     // 顯示度數（+/-）
     $("d_display").textContent =
       "目前：" + ((res.D > 0 ? "+" : "") + (res.D || 0).toFixed(2) + " D");
-
-    // ===== 卡 1：裁型 / 鏡坯 & 厚度檢核 =====
+    // ===== 1：裁型 / 鏡坯 & 厚度檢核 =====
     $("k_framePD").textContent  = res.framePD.toFixed(1) + " mm";
     $("k_dec").textContent      = res.dec.toFixed(2)     + " mm";
     $("k_cutDia").innerHTML =
       thickDanger
         ? `${thickText} <span class="tag-warn">⚠️ 易出現光圈平台</span>`
         : thickText;
-    $("k_reqR").textContent     = res.hReq.toFixed(1)      + " mm"; 
+    $("k_reqR").textContent = vDecText;
     $("k_minBlank").textContent = res.minBlank.toFixed(1)  + " mm"; 
     $("k_minBlank").className   = "v" + (res.blankOK ? "" : " danger");
     $("k_blankOK").textContent  = res.blankOK ? "✅ 足夠" : "❌ 不足";
-
-    // ===== 卡 2：厚度 & 溝尖/車溝檢核（近似） =====
+    // ===== 2：厚度 & 溝尖/車溝檢核（近似） =====
     $("k_delta").textContent  = res.delta.toFixed(2)     + " mm"; 
     $("k_center").textContent = res.estCenter.toFixed(2) + " mm"; 
     $("k_edge").textContent   = res.estEdgeMin.toFixed(2)+ " mm"; 
-
     // 溝尖剩餘厚度（薄側）
     $("k_tip").textContent = res.tipRemain.toFixed(2) + " mm";    // = estEdgeMin - grooveDepth
 
@@ -1240,16 +1241,13 @@ function update3D(res){
       res.tipRemain >= res.need
         ? `✅ ≥ ${res.need} mm`
         : `⚠️ < ${res.need} mm`;
-
     const rimType = $("rimType").value;
     const rimOK =
       rimType === "groove"
         ? res.halfOK                             // ★ 已含上下偏心
         : (res.estEdgeMin - res.grooveDepth >= res.minTip);
-
     $("k_result").textContent =
       rimOK ? "✅ 可行 (近似)" : "❌ 風險：厚度可能不足";
-
     drawTop(res);
     drawSection(res);
     update3D(res);
