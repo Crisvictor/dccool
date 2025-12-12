@@ -70,7 +70,7 @@
     color:var(--muted);
     line-height:1.4;
   }
-  .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:4px;}
   .kpi{
     border:1px solid var(--border);
     border-radius:8px;
@@ -143,7 +143,7 @@
           </div>
           <div class="row" data-for="plusBC"><label>前彎 (D)</label><input id="BC" type="number" step="0.25" value="1" min="0" max="15"></div>
           <div class="note" id="bc_display"></div>
-          <div class="row" data-for="minus"><label>指定中心厚 (mm)</label><input id="centerT" type="number" step="0.1" value="1.2" min="1.0" max="3.0"></div>
+          <div class="row" data-for="minus"><label>指定中心厚 (mm)</label><input id="centerT" type="number" step="0.1" value="1.2" min="1.0" max="5.0"></div>
           <div class="row" data-for="plus" style="display:none"><label>設定邊緣厚 (mm)</label><input id="edgeT" type="number" step="0.1" value="2.0" min="0.2" max="3.0"></div>
           <div class="row"><label>鏡坯片徑 (mm)</label><input id="blankDia" type="number" step="1" value="65" min="50" max="80"></div>
           <div class="note" id="fieldHelp">提示：點擊欄位標題可以查看說明。</div>
@@ -229,25 +229,17 @@
             </div>
           </div>
 
-          <!-- 下半：厚度 & 溝尖/車溝檢核（近似） -->
+          <!-- 下半：厚度 & 溝尖/車溝檢核/SM放大倍率（近似） -->
           <div class="kpi-subcard">
             <div class="kpi-subtitle">厚度 & 溝尖/車溝檢核（近似）</div>
             <div class="kpis">
               <div class="kpi">
-                <div class="t">厚度差值△</div>
+                <div class="t">中心/邊緣厚度差值△</div>
                 <div id="k_delta" class="v"></div>
               </div>
               <div class="kpi">
                 <div class="t">中心厚估</div>
                 <div id="k_center" class="v"></div>
-              </div>
-              <div class="kpi">
-                <div class="t">邊緣厚（薄側）</div>
-                <div id="k_edge" class="v"></div>
-              </div>
-              <div class="kpi">
-                <div class="t">不含溝尖/車溝邊厚（薄側）</div>
-                <div id="k_tip" class="v"></div>
               </div>
               <div class="kpi">
                 <div class="t">車溝/溝尖安全線</div>
@@ -258,6 +250,19 @@
                 <div id="k_result" class="v"></div>
               </div>
             </div>
+          </div> 
+          <div class="kpi-subcard">
+            <div class="kpi-subtitle">SM放大倍率（近似）VD:12mm</div>
+            <div class="kpis">
+              <div class="kpi">
+                <div class="t">像倍率</div>
+                <div id="k_SM" class="v"></div>
+              </div>
+              <div class="kpi">
+                <div class="t">像倍率變化</div>
+                <div id="k_SMpct" class="v"></div>
+              </div> 
+            </div> 
           </div>
         </div>
       </div>
@@ -416,22 +421,15 @@
     const rThin = Math.max(rL, rR);
     // 中心厚（沿水平經線）
     const estCenter = thicknessAtRadius(res, 0, "horizontal");
+    res.estCenter   = estCenter;
     const tRef      = thicknessAtRadius(res, rThin, "horizontal");
-    const delta     = Math.abs(tRef - estCenter);
-    // 左右邊緣厚度（實際左右光學中心到框緣）
-    const tL = thicknessAt(res, "L");
-    const tR = thicknessAt(res, "R");
-    const estEdgeMin = Math.min(tL, tR);      // 左右最薄側邊厚
-    const tipRemain = estEdgeMin - grooveDepth; // 薄側尖端剩餘厚度
     // 車溝框安全（建議 ≥1.0 或使用者設定）
-    const need   = Math.max(1.0, minTip);
-    const halfOK = tipRemain >= need;
     return {
       lensType,D,Cyl,Axis,n,centerT,edgeT,blankDia,BC,
       frontPower, backAxisPower, backPerpPower, bcWarn,
       ED,A,B,DBL,PD,allowance,grooveDepth,minTip,rimType,pupilH,
-      framePD,dec,cutR,hReq,blankOK,delta,estCenter,estEdgeMin,tipRemain,
-      halfOK,minBlank,rL,rR,rMax,need
+      framePD,dec,cutR,hReq,blankOK,
+      minBlank,rL,rR,rMax
     };
   }
   // 以水平 0°、逆時針為正，計算該經線方向的總度數 F(θ)
@@ -536,7 +534,7 @@ function drawSection(res){
   const scaleT = 8;
   // ===== 下層：左右邊緣厚度（你原本的內容） =====
   // 中央基準線
-  line(svg, cx - 140, baseY, cx + 140, baseY, "#e5e7eb", 1);
+  line(svg, cx - 140, baseY, cx + 140, baseY, "#69B888", 1);
   // 左右邊緣位置（相對鏡片中心）
   const span = 60;   
   const xL   = cx - span;
@@ -608,7 +606,7 @@ function drawSection(res){
     const tTop = thicknessAtRadius(res, rTop, "vertical");
     const tBot = thicknessAtRadius(res, rBot, "vertical");
     // 上層基準線
-    line(svg, cx - 140, baseYTop, cx + 140, baseYTop, "#C6E398", 1);
+    line(svg, cx - 140, baseYTop, cx + 140, baseYTop, "#DAE398", 1);
     // 上/下 緣柱子位置
     const topGap = 120;           
     const xTop = cx - topGap/2;   // 上緣
@@ -674,6 +672,11 @@ function drawSection(res){
     const tBot = thicknessAtRadius(res, rBottom, "vertical"); // 垂直下
     //處理資料與呼叫整合
     const estEdgeMin = Math.min(tL, tR, tTop, tBot);
+    const estCenter =
+      (typeof res.estCenter === "number" && isFinite(res.estCenter))
+        ? res.estCenter
+        : thicknessAtRadius(res, 0, "horizontal");
+    const delta = Math.abs(estCenter - estEdgeMin);
     const grooveDepth = Number(res.grooveDepth) || 0;
     const minTip      = Number(res.minTip)      || 1.0;
     const need        = Math.max(1.0, minTip);
@@ -709,6 +712,8 @@ function drawSection(res){
     res.minBlank      = minBlank;
     res.blankOK       = blankOK;
     res.maxBlankThick = maxBlankThick;
+    res.delta         = delta;
+    res.estCenter     = estCenter; 
     return res;
   }
   // ---- 統一的環曲面模型：在 r, θ 位置回傳前表 / 後表 sag 與厚度 ----
@@ -883,7 +888,24 @@ function drawSection(res){
         return thicknessAtRadius(res, res.rL, "horizontal");
     }
   }
-
+  function spectacleMagnification(res){
+    const n  = Number(res.n) || 1.5;
+    const t  = (Number(res.centerT) || 0) / 1000;   // mm → m
+    const F1 = Number(res.frontPower) || 0;         // 前表度數（BC）
+    // 後頂點度數：先用球等效當粗略 Fv
+    const S   = Number(res.D)   || 0;
+    const C   = Number(res.Cyl) || 0;
+    const Fse = S + C / 2;                          // 球等效 D
+    // 鏡眼距 h（mm → m），若沒輸入就預設 12 mm
+    const h_mm = Number(res.vertex) || 12;
+    const h    = h_mm / 1000;
+    // Power factor & Shape factor
+    const PF = 1 / (1 - h * Fse);
+    const SF = 1 / (1 - (t / n) * F1);
+    const SM = PF * SF;
+    if (!isFinite(SM) || SM <= 0) return 1;      
+    return SM;
+  }
   function ellipse(svg, cx, cy, rx, ry, fill, stroke, sw, dash){
     const el = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
     el.setAttribute('cx',cx);
@@ -1429,8 +1451,8 @@ function update3D(res){
     D:   "球鏡 S (±)：-20.00~ +15.00 DS。正/負(近/遠視)請由鏡片類型切換",
     Cyl: "散光 C：輸入負散，決定後表散光量（環曲面後散形式）。",
     Axis:"軸度 A：0–180°，以水平為180°或0°皆可運算",
-    BC:  "鏡片前表面彎弧（1.00D ≈ 100彎）。近視可設置0~8D，遠視可設置0~15D，≧-5.00DS建議前彎0~1D，此系統遠視鏡片會設計成後散形式所以至少前彎≧DS",
-    centerT: "近視鏡坯中心厚度（mm）。綜合度數1.00D內建議2~2.5mm、高於6.00建議1~1.5mm",
+    BC:  "前表面彎弧（1.00D≈100彎）。近視可設置0~8D，≧-5.00DS建議前彎0~1D；而遠視可設置0~15D，此系統遠視鏡片會設計成後散形式所以限制前彎≧DS",
+    centerT: "近視鏡坯中心厚度（mm）。最小1~最大5.0mm，綜合度數-1.00D內建議2~3mm、高於-6.00D建議1~1.5mm",
     edgeT:   "遠視鏡坯邊緣厚度（mm）。最小0.3~最大3.0mm，調控基底厚度不可過薄、易在鏡框裝合上有問題",
     blankDia: "鏡坯直徑設定50~80 (mm)"
   };
@@ -1455,6 +1477,9 @@ function update3D(res){
   function update(){
     const res = calc();
     applyVerticalDec(res);
+    const SM = spectacleMagnification(res);
+    res.SM   = SM;
+    res.SM_pct = (SM - 1) * 100;
     const thickDanger =
     (res.lensType === "minus") && (res.maxBlankThick > 12);    const thickText   = res.maxBlankThick.toFixed(2) + " mm";
     const vDec = res.vDecY || 0;
@@ -1479,7 +1504,7 @@ function update3D(res){
         } else {
           // 有散光：顯示軸向 / 垂直柱軸兩個子午線
           html =
-            `前表：${fmtD(res.frontPower)}　(球弧)` +
+            `前表：${fmtD(res.frontPower)}(球弧)　` +
             `後表：約 ${fmtD(res.backAxisPower)}（基弧） / ${fmtD(res.backPerpPower)}（正交弧）`;
         }
       }
@@ -1502,10 +1527,9 @@ function update3D(res){
     // ===== 2：厚度 & 溝尖/車溝檢核（近似） =====
     $("k_delta").textContent  = res.delta.toFixed(2)     + " mm"; 
     $("k_center").textContent = res.estCenter.toFixed(2) + " mm"; 
-    $("k_edge").textContent   = res.estEdgeMin.toFixed(2)+ " mm"; 
-    // 溝尖剩餘厚度（薄側）
-    $("k_tip").textContent = res.tipRemain.toFixed(2) + " mm";    // = estEdgeMin - grooveDepth
-
+    /*$("k_edge").textContent   = res.estEdgeMin.toFixed(2)+ " mm"; */
+    /*$("k_tip").textContent = res.tipRemain.toFixed(2) + " mm";    // = estEdgeMin - grooveDepth */
+    // 溝尖檢測
     $("k_halfSafety").textContent =
       res.tipRemain >= res.need
         ? `✅ ≥ ${res.need} mm`
@@ -1517,6 +1541,10 @@ function update3D(res){
         : (res.estEdgeMin - res.grooveDepth >= res.minTip);
     $("k_result").textContent =
       rimOK ? "✅ 可行 (近似)" : "❌ 風險：厚度可能不足";
+    // ===== SM放大率 =====
+    $("k_SM").textContent     = `${res.SM.toFixed(3)} ×`;
+    $("k_SMpct").textContent  =
+      (res.SM_pct >= 0 ? "+" : "") + res.SM_pct.toFixed(1) + " %"; 
     function debugBackSurface(res){
       const S  = Number(res.D)   || 0;
       const C  = Number(res.Cyl) || 0;
@@ -1565,5 +1593,4 @@ function update3D(res){
 </script>
 </body>
 </html>
-
 
