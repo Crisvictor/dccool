@@ -610,7 +610,8 @@ function drawSection(res){
   const tipWidth    = Number(res.tipWidth)    || 1.0;     // 尖寬 (mm) —— 控制 Y 高度
   const grooveDepth = Number(res.grooveDepth) || 0.6;     // 溝深 (mm) —— 只用在剩餘厚度
   const grooveWidth = Number(res.grooveWidth) || 0.6;     // 溝寬 (mm) —— 控制 Y 高度
-// 最小剩餘厚度需求 (mm)
+  const minTip      = Number(res.minTip)      || 0;
+  const need        = Math.max(0, Number(res.minTip) || 0);        // 最小剩餘厚度需求 (mm)
   // 在某個基準線上畫出一支厚度柱＋側面溝尖 / 車溝示意
   function drawEdgeBar(baseLineY, xCenter, tEdge){
     if (!isFinite(tEdge) || tEdge <= 0) return;
@@ -625,7 +626,8 @@ function drawSection(res){
     const isLeft  = xCenter < cx;
     const xOuter  = isLeft ? rectX : (rectX + barW);
     // notch 垂直位置：從頂部往下固定比例（你原本的寫法）
-let   fromTopPx  = hPx / 2.4;
+    const needPx     = need * scaleT;
+    let   fromTopPx  = hPx / 2.4;
     const maxFromTop = (hPx * 1.7) / 3;
     if (fromTopPx > maxFromTop) fromTopPx = maxFromTop;
     // notch 中心高度
@@ -635,7 +637,8 @@ let   fromTopPx  = hPx / 2.4;
     const grooveHPx = Math.min(hPx, grooveWidth * scaleT);
     if (rimType === "full"){
       // 全框：使用者調整「尖寬」（垂直 Y），尖高 0.5mm 為固定向外深度（水平 X）
-      const depthPx       = Math.min(barW * 0.9, tipHeight * scaleT);
+      const depthRatioTip = 0.5;               // 用柱寬 50% 表示 0.5mm 視覺深度
+      const depthPx       = barW * depthRatioTip;
       const yTriTop = notchCenterY - triHPx / 2;
       const yTriBot = notchCenterY + triHPx / 2;
       const xEdge   = xOuter;                                       // 柱子外側
@@ -659,7 +662,7 @@ let   fromTopPx  = hPx / 2.4;
       // 垂直高度：依 grooveWidth 決定
       const gHeightPx = Math.min(hPx, grooveWidth * scaleT);
       // 水平深度：用 grooveDepth 換算，限制在柱寬 80% 以內
-      const gDepthPx  = Math.min(barW * 0.9, grooveDepth * scaleT);
+      const gDepthPx  = Math.min(barW * 0.8, grooveDepth * scaleX);
       // 溝中心高度用 notchCenterY（跟全框尖同一條高度線）
       const yMid   = notchCenterY;
       const yRect  = yMid - gHeightPx / 2;
@@ -673,12 +676,12 @@ let   fromTopPx  = hPx / 2.4;
         yRect,
         gDepthPx,                    // 水平寬度：溝深
         gHeightPx,                   // 垂直高度：溝寬
-        "rgba(2, 8, 23,0.85)"        // 方塊示意車溝
+        "rgba(2, 8, 23,0.85)"        // 紅色方塊示意車溝
       );
     }
   }
   // ===== 下層：左右邊緣厚度 =====
-  line(svg, cx - 140, baseY, cx + 140, baseY, "#89CC85", 1);
+  line(svg, cx - 140, baseY, cx + 140, baseY, "#e5e7eb", 1);
   const span = 60;
   const xL   = cx - span;
   const xR   = cx + span;
@@ -722,23 +725,28 @@ let   fromTopPx  = hPx / 2.4;
          `下 r≈${rBot.toFixed(1)}mm\n厚度≈${tBot.toFixed(2)}mm`,
          "#A9BED6","middle");
   }
-  // ===== 底部說明：框型側邊樣式（僅視覺） =====
-const estEdgeMin = Number(res.estEdgeMin);
-let label;
-if (rimType === "full") {
-  label =
-    `薄側厚度 ${estEdgeMin.toFixed(2)}mm
+  // ===== 底部說明：溝尖 / 車溝寬度與剩餘厚度 =====
+  const estEdgeMin = Number(res.estEdgeMin);
+  const cutDepth   = (rimType === "full") ? tipHeight : (rimType === "groove") ? grooveDepth : 0;
+  const tipRemain  = estEdgeMin - cutDepth;
+  let label;
+  if (rimType === "full") {
+    label =
+      `尖寬 ${tipWidth.toFixed(1)}mm；尖高約 ${tipHeight.toFixed(2)}mm\n` +
+      `薄側剩餘 ${tipRemain.toFixed(2)}mm（需求 ≥ ${need.toFixed(2)}mm）`;
+  } else if (rimType === "groove") {
+    label =
+      `溝寬 ${grooveWidth.toFixed(1)}mm；溝深約 ${grooveDepth.toFixed(2)}mm\n` +
+      `薄側剩餘 ${tipRemain.toFixed(2)}mm（需求 ≥ ${need.toFixed(2)}mm）`;
+  } else if (rimType === "rimless") {
+    label = `薄側厚度 ${estEdgeMin.toFixed(2)}mm`;
+  } else {
+    label =
+      `薄側剩餘 ${tipRemain.toFixed(2)}mm
 ` +
-    `全框溝尖：尖寬 ${tipWidth.toFixed(1)}mm，尖高 ${tipHeight.toFixed(2)}mm`;
-} else if (rimType === "groove") {
-  label =
-    `薄側厚度 ${estEdgeMin.toFixed(2)}mm
-` +
-    `車溝：溝寬 ${grooveWidth.toFixed(1)}mm，溝深 ${grooveDepth.toFixed(2)}mm`;
-} else {
-  label = `薄側厚度 ${estEdgeMin.toFixed(2)}mm`;
-}
-text(svg, cx, baseY + 52, label, "#4FABB8","middle");
+      `（需求 ≥ ${need.toFixed(2)}mm）`;
+  }
+  text(svg, cx, baseY + 52, label, "#4FABB8","middle");
 }
   function applyVerticalDec(res){
     const B = Number(res.B) || 0;
@@ -1030,7 +1038,90 @@ text(svg, cx, baseY + 52, label, "#4FABB8","middle");
     if(dash) el.setAttribute('stroke-dasharray',dash);
     svg.appendChild(el);
   }
-  function addEdgeProfile3D() {}
+  function addEdgeProfile3D(res, scene, baseMesh, rEdgeReal, sR, sT, centerYOffset=0){
+    if (!res || !scene || !baseMesh || !window.THREE) return null;
+
+    const rimType = String(res.rimType || "").toLowerCase();
+    if (rimType !== "full" && rimType !== "groove") return null;
+
+    // 以薄側厚度作為參考，決定溝尖/車溝在厚度方向（Y）的大致置中位置
+    let tRef = Number(res.estEdgeMin);
+    if (!isFinite(tRef) || tRef <= 0){
+      // 後備：用外緣半徑、水平經線估一個厚度
+      try{
+        tRef = thicknessAtPolar(res, rEdgeReal, 0);
+      }catch(e){
+        tRef = 2;
+      }
+    }
+    tRef = Math.max(0.4, tRef);
+
+    // lens 本體：local y=0 為前表、local y<0 為往後表
+    const yFront = 0;
+    const yBack  = -tRef * sT;
+    const yMid   = (yFront + yBack) / 2;
+
+    const tipHeight   = Math.max(0.05, Number(res.tipHeight)   || 0.5); // mm (徑向 X)
+    const grooveDepth = Math.max(0.05, Number(res.grooveDepth) || 0.6); // mm (徑向 X)
+    const tipSpan     = Math.max(0.10, Number(res.tipSpan)     || Number(res.tipWidth)   || 1.0); // mm (厚度 Y)
+    const grooveSpan  = Math.max(0.10, Number(res.grooveSpan)  || Number(res.grooveWidth)|| 1.0); // mm (厚度 Y)
+
+    const group = new THREE.Group();
+    group.position.y = baseMesh.position.y + centerYOffset;
+    group.renderOrder = 9;
+
+    // 外緣半徑（world）
+    const rBase = rEdgeReal * sR * 1.002;
+
+    const makeLathe = (pts, opacity=0.75) => {
+      const geo = new THREE.LatheGeometry(pts, 128);
+      const mat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        wireframe: true,
+        transparent: true,
+        opacity,
+        depthTest: false,
+        depthWrite: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -1,
+        polygonOffsetUnits: -1,
+        side: THREE.DoubleSide
+      });
+      const m = new THREE.Mesh(geo, mat);
+      m.renderOrder = 9;
+      return m;
+    };
+
+    if (rimType === "full"){
+      // 全框：外凸三角形溝尖（尖寬 = tipSpan, 尖高 = tipHeight）
+      const h = (tipSpan * sT) / 2;
+      const rTip = rBase + tipHeight * sR;
+
+      const pts = [
+        new THREE.Vector2(rBase, yMid - h),
+        new THREE.Vector2(rTip,  yMid),
+        new THREE.Vector2(rBase, yMid + h),
+        new THREE.Vector2(rBase, yMid - h)
+      ];
+      group.add(makeLathe(pts, 0.85));
+    } else if (rimType === "groove"){
+      // 車溝框：方形內凹槽（溝寬 = grooveSpan, 溝深 = grooveDepth）
+      const h = (grooveSpan * sT) / 2;
+      const rIn = Math.max(0.1, rBase - grooveDepth * sR);
+
+      const pts = [
+        new THREE.Vector2(rBase, yMid - h),
+        new THREE.Vector2(rBase, yMid + h),
+        new THREE.Vector2(rIn,   yMid + h),
+        new THREE.Vector2(rIn,   yMid - h),
+        new THREE.Vector2(rBase, yMid - h)
+      ];
+      group.add(makeLathe(pts, 0.80));
+    }
+
+    scene.add(group);
+    return group;
+  }
   let _L3D = null;
 
   function init3D(){
@@ -1193,7 +1284,7 @@ function update3D(res){
   if (!_L3D) return;
   const scene = _L3D.scene;
   // ---------- 先清掉舊物件 ----------
-  ["mesh","edge","rim","ring","slice"].forEach(key => {
+  ["mesh","edge","rim","ring","slice","edgeStyle"].forEach(key => {
     const obj = _L3D[key];
     if (!obj){ _L3D[key] = null; return; }
 
@@ -1225,6 +1316,7 @@ function update3D(res){
                             ));
   const sR = g.userData.sR || g.userData.rScale || 0.6;
   const sT = g.userData.sT || g.userData.tScale || 0.8;
+  const edgeStyles = [];
   // ---------- 1. 鏡片本體 ----------
   const lensMat = new THREE.MeshPhysicalMaterial({
     color: 0xaad9ff,
@@ -1328,11 +1420,10 @@ function update3D(res){
   }
   _L3D.edge = edgeObjects;
   const Cyl = Number(res.Cyl) || 0;
+  let centerYOffset = 0; // 供 rim 與 edgeProfile 共用（避免區塊外 ReferenceError）
   // ---------- 2. 側邊圓柱牆（讓鏡片像「實心」） ----------
   if (rEdgeReal > 0 && Math.abs(Cyl) < 0.01){
     let hVis = 0;
-    let centerYOffset = 0;
-
     if (res.lensType === "minus") {
       // 近視（無散光）：
       // 圓柱高度 = 鏡坯最厚厚度（maxBlankThick），不要被前表凸弧影響
@@ -1373,8 +1464,10 @@ function update3D(res){
       _L3D.rim = rim;
     }
   }
+  // ---------- 2.5 邊緣樣式（全框/車溝/無邊框） ----------
+  // 已移除「外圈線框/Lathe wireframe」以避免出現一圈方框 XX。
 
-  // ---------- 3. 偏心（水平 dec + 瞳高造成的垂直 dec） ----------
+// ---------- 3. 偏心（水平 dec + 瞳高造成的垂直 dec） ----------
   const B = Number(res.B) || 0;
   let pupilH = Number(res.pupilH);
   if (!isFinite(pupilH)) {
@@ -1524,6 +1617,164 @@ function update3D(res){
     slice.renderOrder = 10;
     scene.add(slice);
 
+    // --- 邊緣樣式（對應 2D：全框溝尖 / 車溝凹槽 / 無邊框不顯示） ---
+    const rimType = String(res.rimType || "").toLowerCase();
+    if (rimType === "full" || rimType === "groove"){
+      const pMinEnd = pointOnCurtain(sMinReal);
+      const pMaxEnd = pointOnCurtain(sMaxReal);
+
+      const tipHeight   = Math.max(0.05, Number(res.tipHeight)   || 0.5);
+      const grooveDepth = Math.max(0.05, Number(res.grooveDepth) || 0.6);
+
+      // 尖寬/溝寬：只控制「垂直高度」（Y 軸），垂直位置比照 2D
+      const span = (rimType === "full"
+        ? (Number(res.tipSpan) || Number(res.tipWidth) || 1.0)
+        : (Number(res.grooveSpan) || Number(res.grooveWidth) || 1.0)
+      );
+      const h = (Math.max(0.10, span) * sT) / 2;
+
+      // 軸向配色：水平綠 / 垂直黃
+      const axisColor = (mode === "x") ? 0x22c55e : 0xE0FC53;
+
+      const edgeGroup = new THREE.Group();
+      edgeGroup.position.y = mesh.position.y; // 與 slice 一致
+      edgeGroup.renderOrder = 11;
+
+      const fullLineMat = new THREE.LineBasicMaterial({
+        color: axisColor,
+        transparent: true,
+        opacity: 0.4,
+        depthTest: false,
+        depthWrite: false
+      });
+      const fullFillMat = new THREE.MeshBasicMaterial({
+        color: axisColor,
+        transparent: true,
+        opacity: 0.4,
+        side: THREE.DoubleSide,
+        depthTest: false,
+        depthWrite: false
+      });
+
+      const grooveLineMat = new THREE.LineBasicMaterial({
+        color: 0xA9BED6,
+        transparent: true,
+        opacity: 0.04,
+        depthTest: false,
+        depthWrite: false
+      });
+      const grooveFillMat = new THREE.MeshBasicMaterial({
+        color: 0x020817,
+        transparent: true,
+        opacity: 0.4,
+        side: THREE.DoubleSide,
+        depthTest: false,
+        depthWrite: false
+      });
+
+      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+      function addEndShape(pEnd, sEnd){
+        if (!pEnd) return;
+
+        // sEnd 代表此端在「窗簾軸」上的方向：負端 / 正端
+        const sign = (sEnd >= 0 ? 1 : -1);
+
+        const yF = pEnd.front.y;
+        const yB = pEnd.back.y;
+        const yTop = Math.max(yF, yB);
+        const yBot = Math.min(yF, yB);
+
+        const yMin = yBot + 0.01;
+        const yMax = yTop - 0.01;
+        const tLocal = Math.max(0.0001, yMax - yMin);
+
+        // 垂直位置：比照 2D（從上緣往下 1/2.4 的位置）
+        const yNotch = clamp(yTop - (tLocal / 2.4), yMin, yMax);
+
+        const y1 = clamp(yNotch - h, yMin, yMax);
+        const y2 = clamp(yNotch + h, yMin, yMax);
+
+        const x0 = pEnd.front.x;
+        const z0 = pEnd.front.z;
+
+        if (rimType === "full"){
+          // 全框：外凸三角形尖（顏色符合軸向：垂直黃、水平綠）
+          let tri;
+          if (mode === "x"){
+            const xApex = x0 + sign * tipHeight * sR;
+            tri = [
+              [x0,    y1,     z0],
+              [xApex, yNotch, z0],
+              [x0,    y2,     z0]
+            ];
+          } else {
+            const zApex = z0 + sign * tipHeight * sR;
+            tri = [
+              [x0,    y1,     z0],
+              [x0,    yNotch, zApex],
+              [x0,    y2,     z0]
+            ];
+          }
+
+          // fill
+          const g = new THREE.BufferGeometry();
+          g.setAttribute('position', new THREE.Float32BufferAttribute(tri.flat(), 3));
+          g.setIndex([0, 1, 2]);
+          const mFill = new THREE.Mesh(g, fullFillMat);
+          mFill.renderOrder = edgeGroup.renderOrder;
+          edgeGroup.add(mFill);
+
+        } else {
+          // 車溝框：方形內凹槽（背景深藍）
+          let quad;
+          if (mode === "x"){
+            const xIn = x0 - sign * grooveDepth * sR; // 往中心
+            quad = [
+              [x0,  y1, z0],
+              [x0,  y2, z0],
+              [xIn, y2, z0],
+              [xIn, y1, z0]
+            ];
+          } else {
+            const zIn = z0 - sign * grooveDepth * sR; // 往中心
+            quad = [
+              [x0, y1, z0],
+              [x0, y2, z0],
+              [x0, y2, zIn],
+              [x0, y1, zIn]
+            ];
+          }
+
+          // fill
+          const g = new THREE.BufferGeometry();
+          g.setAttribute('position', new THREE.Float32BufferAttribute(quad.flat(), 3));
+          g.setIndex([0, 1, 2, 0, 2, 3]);
+          const mFill = new THREE.Mesh(g, grooveFillMat);
+          mFill.renderOrder = edgeGroup.renderOrder;
+          edgeGroup.add(mFill);
+
+          // outline
+          const pts = [
+            new THREE.Vector3(quad[0][0], quad[0][1], quad[0][2]),
+            new THREE.Vector3(quad[1][0], quad[1][1], quad[1][2]),
+            new THREE.Vector3(quad[2][0], quad[2][1], quad[2][2]),
+            new THREE.Vector3(quad[3][0], quad[3][1], quad[3][2]),
+            new THREE.Vector3(quad[0][0], quad[0][1], quad[0][2])
+          ];
+          const geo = new THREE.BufferGeometry().setFromPoints(pts);
+          const line = new THREE.Line(geo, grooveLineMat);
+          line.renderOrder = edgeGroup.renderOrder;
+          edgeGroup.add(line);
+        }
+      }
+
+      addEndShape(pMinEnd, sMinReal);
+      addEndShape(pMaxEnd, sMaxReal);
+
+      scene.add(edgeGroup);
+      edgeStyles.push(edgeGroup);
+    }
     return slice;
   }
 
@@ -1543,6 +1794,7 @@ function update3D(res){
   }
   // 存起來方便之後清理
   _L3D.slice = slices;
+  _L3D.edgeStyle = edgeStyles.length ? edgeStyles : null;
 }
   // 繪圖小工具
   function circle(svg,cx,cy,r,fill,stroke,sw, dash){
