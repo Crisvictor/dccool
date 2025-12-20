@@ -1873,7 +1873,7 @@ function update3D(res){
     res.SM   = SM;
     res.SM_pct = (SM - 1) * 100;
     const thickDanger =
-    (res.lensType === "minus") && (res.maxBlankThick > 12);    const thickText   = res.maxBlankThick.toFixed(2) + " mm";
+    (res.lensType === "minus") && (res.maxBlankThick > 10);    const thickText   = res.maxBlankThick.toFixed(2) + " mm";
     const vDec = res.vDecY || 0;
     const vDecText = (vDec > 0 ? "+" : (vDec < 0 ? "−" : "")) + Math.abs(vDec).toFixed(1) + " mm";
     // 顯示度數（+/-）
