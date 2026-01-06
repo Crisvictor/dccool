@@ -282,6 +282,7 @@
       align-items: center;
       justify-content: center;
       position: relative;
+      z-index: 90;
   }
   .articles-wrapper {
       background: rgba(0, 0, 0, 0.1);
@@ -293,13 +294,14 @@
       max-height: 70vh;
       overflow-y: auto;
       backdrop-filter: blur(6px);
+      z-index: 1;
   }
   .menu-wrapper {
       position: absolute;
       right: 20px;
       top: 50%;
       transform: translateY(-50%);
-      z-index: 30;
+      z-index: 90;
   }
   .menu-button {
       padding: 6px 12px;
@@ -311,9 +313,8 @@
       cursor: pointer;
       box-shadow: 0 4px 6px rgba(0,0,0,0.4);
       transition: background-color 0.3s, transform 0.2s;
-      z-index: 19;   
+      z-index: 99;   
   }
-
   .menu-button:hover {
       background-color: rgba(107, 191, 145, .3);  
       transform: translateY(-1px);
