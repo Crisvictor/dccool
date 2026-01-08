@@ -46,8 +46,8 @@
     color:#cbd5e1;
   }
   .card>.bd{padding:8px 16px}
-  .row{display:grid;grid-template-columns:1fr 160px;align-items:center;gap:8px;margin:8px 0}
-  .row label{color:var(--muted);font-size:12px}
+  .row{display:grid;grid-template-columns:1fr 160px;align-items:center;gap:8px;margin:8px 0;position:relative}
+  .row label{color:var(--muted);font-size:13px}
   input,select{
     width:100%;max-width:100%;box-sizing:border-box;
     padding:8px 10px;
@@ -70,14 +70,14 @@
     color:var(--muted);
     line-height:1.4;
   }
-  .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:4px;}
+  .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;margin-bottom:4px;}
   .kpi{
     border:1px solid var(--border);
     border-radius:8px;
     background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
-    padding:5px
+    padding:4px
   }
-  .kpi .t{font-size:11px;color:var(--muted)}
+  .kpi .t{font-size:12px;color:var(--muted)}
   .kpi .v{font-weight:700;margin-top:2px;color:#e2e8f0}
   .tag-warn{
     display:inline-block;
@@ -115,6 +115,63 @@
   }
   .note{font-size:12px;color:var(--muted)}
   .danger{color:var(--ng);font-weight:700}
+  .is-invalid{
+    border-color: rgba(248, 113, 113, .75) !important;
+    box-shadow: 0 0 0 2px rgba(248, 113, 113, .22) !important;
+  }
+  .input-toast{
+    position:absolute;
+    right:8px;
+    top:-10px;
+    transform: translateY(-100%);
+    padding:4px 10px;
+    border-radius:10px;
+    font-size:12px;
+    color:#e2e8f0;
+    background:#0b1628;
+    border:1px solid #334155;
+    box-shadow:0 10px 25px rgba(0,0,0,.35);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .15s, transform .15s;
+    white-space:nowrap;
+    z-index:10;
+  }
+  .input-toast.show{
+    opacity:1;
+    transform: translateY(-115%);
+  }
+  .tip-trigger{
+    cursor: help;
+    text-decoration: underline dotted rgba(148,163,184,.7);
+    text-underline-offset: 3px;
+  }
+  .tip-pop{
+    position: fixed;
+    max-width: 340px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #0b1628;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    font-size: 12px;
+    line-height: 1.45;
+    box-shadow: 0 18px 45px rgba(0,0,0,.45);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity .12s, transform .12s;
+    pointer-events: none;
+  }
+  .tip-pop.show{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .tip-pop .tip-hint{
+    margin-top: 6px;
+    color: #94a3b8;
+    font-size: 11px;
+  }
   @media (max-width:980px){.g-3{grid-template-columns:1fr}}
   hr{border:0;border-top:1px dashed var(--border);margin:10px 0}
 </style>
@@ -130,8 +187,8 @@
         <div class="bd">
           <div class="row"><label>鏡片類型</label><select id="lensType"><option value="minus">近視</option><option value="plus">遠視</option></select></div>
           <div class="row"><label>球鏡 S (±)</label><input id="D" type="number" step="0.25" value="-6" min="-20" max="15"></div>
-          <div class="row"><label>散光 C</label><input id="Cyl" type="number" step="0.25" value="0" min="-10" max="0"></div>
-          <div class="row"><label>軸度 A</label><input id="Axis" type="number" step="1" value="0" min="0" max="180"></div>
+          <div class="row"><label>散光 C</label><input id="Cyl" type="number" step="0.25" value="0" min="-8" max="0"></div>
+          <div class="row"><label>軸度 A</label><input id="Axis" type="number" step="1" value="180" min="1" max="180"></div>
           <div class="row"><label>折射率 n</label>
             <select id="n">
               <option value="1.50">1.50</option>
@@ -146,8 +203,7 @@
           <div class="row" data-for="minus"><label>指定中心厚 (mm)</label><input id="centerT" type="number" step="0.1" value="1.2" min="1.0" max="5.0"></div>
           <div class="row" data-for="plus" style="display:none"><label>設定邊緣厚 (mm)</label><input id="edgeT" type="number" step="0.1" value="2.0" min="0.2" max="3.0"></div>
           <div class="row"><label>鏡坯片徑 (mm)</label><input id="blankDia" type="number" step="1" value="65" min="50" max="80"></div>
-          <div class="note" id="fieldHelp">提示：點擊欄位標題可以查看說明。</div>
-        </div>
+</div>
       </div>
 
       <div class="card">
@@ -177,7 +233,6 @@
           <div class="row"><label>中樑距 DBL (mm)</label><input id="DBL" type="number" step="0.5" value="18" min="10" max="40"></div>
           <div class="row"><label>瞳距 PD (mm)</label><input id="PD" type="number" step="0.5" value="62" min="40" max="80"></div>
           <div class="row"><label>瞳高 PH (mm)</label><input id="pupilH" type="number" step="0.5" value=""></div>
-          <div class="note">若留空則預設為 B/1.7，視為瞳高約於框2/3高。</div>
           <div class="row"><label>預留加工 (mm)</label><input id="allowance" type="number" step="0.5" value="2" min="0" max="4"></div>
           <div class="row"><label id="grooveLabel">框溝寬 (mm)</label><input id="grooveDepth" type="number" step="0.1" value="1.0" min="0.5" max="2"></div>
           <div class="row"><label>最小剩餘厚度需求 (mm)</label><input id="minTip" type="number" step="0.1" value="0" min="0" max="2"></div>
@@ -202,7 +257,7 @@
             <div class="kpi-subtitle">裁型 & 鏡坯評估</div>
             <div class="kpis">
               <div class="kpi">
-                <div class="t">框心距 (A+DBL)</div>
+                <div class="t">框心距</div>
                 <div id="k_framePD" class="v"></div>
               </div>
               <div class="kpi">
@@ -313,6 +368,156 @@
     "ED","A","B","DBL","PD","allowance","grooveDepth","minTip","rimType","pupilH"
   ];
   ids.forEach(id=>$(id).addEventListener('input', update));
+
+  bindRangeGuard("D");
+  bindRangeGuard("Cyl");
+  bindRangeGuard("Axis");
+
+  // ===== 提示框, click = pin ~8s =====
+  const TIP_MAP = {
+    // [訂製鏡片] labels
+    "lensType": "鏡片類型：近視 / 遠視切換會影響球鏡正負號與厚度基準<br>（近視以中心厚為基準；遠視以邊緣厚為基準）",
+    "D": "球鏡 S (±)：-20.00 ~ +15.00 DS<br>正 / 負（近 / 遠視）由鏡片類型決定",
+    "Cyl": "散光 C：輸入負散（0 ~ -10.00D），<br>決定後表散光量（環曲面後散形式）",
+    "Axis": "軸度 A：輸入1–180° （0與180等價）<br>散光量 ≧ 0.25D 時必須輸入",
+    "n": "折射率 n：常用 1.50 / 1.56 / 1.61 / 1.67 / 1.74<br>折射率越高通常可降低厚度，但可能影響阿貝數與邊緣反射",
+    "BC": "前表面彎弧（1.00D ≈ 100 彎）<br>近視可設 0~8D，≧ -5.00DS 建議前彎 0~1D；遠視可設 0~15D<br>本系統遠視鏡片為後散形式，故限制前彎 ≥ DS。",
+    "centerT": "近視鏡坯中心厚度（mm）<br>範圍 1.0 ~ 5.0mm；綜合度數 -1.00D 內建議 2~3mm，<br>低於 -6.00D 建議 1~1.5mm",
+    "edgeT": "遠視鏡坯邊緣厚度（mm）<br>範圍 0.2 ~ 3.0mm；基底不可過薄，避免裝框風險",
+    "blankDia": "鏡坯片徑（mm）：50 ~ 80mm",
+
+    // [框參數] labels
+    "ED": "鏡片內徑最長距離（有效直徑）",
+    "A":  "鏡片水平方向最長距離（鏡寬）",
+    "B":  "鏡片垂直方向最長距離（鏡高）",
+    "DBL":"左右兩鏡片間距長度（中樑距）",
+    "PD": "左右瞳孔間距（瞳距）",
+    "pupilH": "本瞳位高度為鏡片最底部起算至瞳位距離<br>若欄留空則預設為 B/1.7，視為瞳高約於框 2/3 高",
+    "allowance": "鏡坯尺寸訂製時多計算之安全值<br>避免製作時過於保留坯緣，<br>而留下鍍層邊緣的薄膜干涉（Thin-Film Interference）",
+    "grooveLabel": "設定製作時所需的車溝 / 溝尖寬幅<br>供於模擬評估是否有製作 / 鏡片安裝風險",
+    "minTip": "鏡片邊緣因車溝 / 溝尖設計而殘留的最小剩餘厚度需求安全值<br>供於模擬評估是否有製作 / 鏡片安裝風險",
+    "rimType": "切換框種設計，會有不同的鏡片邊緣設計與厚度計算方式",
+
+    // KPI titles
+    "k_framePD": "框心距：鏡寬 A + 中樑距 DBL",
+    "k_dec": "鏡片光學中心之水平偏心量",
+    "k_cutDia": "近視：鏡坯邊緣厚度；遠視：鏡坯中心厚度",
+    "k_reqR": "鏡片光學中心之垂直偏心量<br>正值為相對於裁型鏡片幾何中心向上偏心 <br> 反之、負值為向下偏心",
+    "k_minBlank": "MBS = (A + DBL) − PD + ED + 2mm（預留加工量）",
+    "k_blankOK": "判斷是否偏心過大 / 鏡坯尺寸是否足夠製作",
+    "k_delta": "鏡片中心到最薄邊緣之厚度差值",
+    "k_center": "鏡片光學中心厚度",
+    "k_halfSafety": "判斷鏡片裁型最薄邊緣是否低於設定的最小剩餘厚度需求",
+    "k_result": "判斷鏡片裁型厚度是否過薄之安全性提示",
+    "k_SM": "形狀因素放大率由鏡片本身的幾何結構決定<br>即使度數相同，不同的設計也會影響鏡片影像放大倍率<br>關鍵參數：光心厚度、折射率，以及前表面屈光力（前彎）",
+    "k_SMpct": "鏡片影像放大倍率百分比<br>正值為放大 / 負值為縮小"
+  };
+
+  const _tipEl = document.createElement("div");
+  _tipEl.className = "tip-pop";
+  _tipEl.style.display = "none";
+  document.body.appendChild(_tipEl);
+
+  let _tipPinned = false;
+  let _tipTimer = null;
+  let _tipTarget = null;
+
+  function _positionTip(target){
+    if (!target) return;
+    const r = target.getBoundingClientRect();
+    const pad = 10;
+    const maxW = Math.min(340, window.innerWidth - pad * 2);
+    _tipEl.style.maxWidth = maxW + "px";
+
+    const tw = _tipEl.offsetWidth;
+    const th = _tipEl.offsetHeight;
+
+    let left = r.left;
+    let top  = r.top - th - 8;
+
+    if (left + tw + pad > window.innerWidth) left = window.innerWidth - tw - pad;
+    if (left < pad) left = pad;
+
+    if (top < pad) top = r.bottom + 8;
+    if (top + th + pad > window.innerHeight) top = window.innerHeight - th - pad;
+
+    _tipEl.style.left = left + "px";
+    _tipEl.style.top  = top + "px";
+  }
+
+  function _showTip(target, html, pinned){
+    clearTimeout(_tipTimer);
+    _tipPinned = !!pinned;
+    _tipTarget = target;
+
+    _tipEl.innerHTML = html + (_tipPinned ? '<div class="tip-hint"></div>' : "");
+    _tipEl.style.display = "block";
+    requestAnimationFrame(()=>_tipEl.classList.add("show"));
+    _positionTip(target);
+
+    if (_tipPinned){
+      _tipTimer = setTimeout(()=>_hideTip(true), 8000);
+    }
+  }
+
+  function _hideTip(force){
+    if (_tipPinned && !force) return;
+    _tipPinned = false;
+    _tipTarget = null;
+    _tipEl.classList.remove("show");
+    setTimeout(()=>{
+      if (!_tipPinned) _tipEl.style.display = "none";
+    }, 120);
+  }
+
+  function _getTriggerById(id){
+    const el = $(id);
+    if (!el) return null;
+
+    // KPI：用 .t 當觸發器
+    if (id.startsWith("k_")){
+      const kpi = el.closest(".kpi");
+      return kpi ? kpi.querySelector(".t") : null;
+    }
+
+    // grooveLabel 本身就是 label
+    if (id === "grooveLabel") return el;
+
+    // 一般欄位：取該 row 的 label
+    const row = el.closest(".row");
+    return row ? row.querySelector("label") : null;
+  }
+
+  function bindTooltips(){
+    for (const [id, html] of Object.entries(TIP_MAP)){
+      const trg = _getTriggerById(id);
+      if (!trg) continue;
+
+      trg.classList.add("tip-trigger");
+      if (!trg.hasAttribute("tabindex")) trg.tabIndex = 0;
+
+      trg.addEventListener("mouseenter", ()=>_showTip(trg, html, false));
+      trg.addEventListener("mouseleave", ()=>_hideTip(false));
+      trg.addEventListener("focus",      ()=>_showTip(trg, html, false));
+      trg.addEventListener("blur",       ()=>_hideTip(false));
+
+      // 點擊：固定顯示 8 秒
+      trg.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        _showTip(trg, html, true);
+      });
+    }
+
+    // 點其他地方：立即關閉
+    document.addEventListener("mousedown", (e)=>{
+      const isOnTrigger = e.target?.closest?.(".tip-trigger");
+      if (isOnTrigger) return;
+      _hideTip(true);
+    }, true);
+
+    window.addEventListener("scroll", ()=>{ if (_tipTarget) _positionTip(_tipTarget); }, true);
+    window.addEventListener("resize", ()=>{ if (_tipTarget) _positionTip(_tipTarget); });
+  }
   $("lensType").addEventListener('change', ()=>{
     const t = $("lensType").value;
   document.querySelector('[data-for="minus"]').style.display = (t==='minus')?'' : 'none';
@@ -335,15 +540,108 @@
   });
   updateGrooveLabel($("rimType").value);
   toggleRimUI();
+  bindTooltips();
   function clamp(v,min,max){ v=parseFloat(v); if(isNaN(v)) return min; return Math.min(Math.max(v,min),max); }
+  // ===== Input range guard (prevents extreme values from affecting 2D/3D) =====
+  function _getMinMax(el){
+    const lo = parseFloat(el?.min);
+    const hi = parseFloat(el?.max);
+    return {
+      lo: isFinite(lo) ? lo : -Infinity,
+      hi: isFinite(hi) ? hi :  Infinity
+    };
+  }
+  function _ensureLastValid(el){
+    if (!el) return;
+    if (el.dataset.lastValid != null) return;
+    const mm = _getMinMax(el);
+    const v  = parseFloat(el.value);
+    let init;
+    if (isFinite(v) && v >= mm.lo && v <= mm.hi){
+      init = v;
+    } else if (isFinite(v)){
+      init = clamp(v, mm.lo, mm.hi);
+    } else {
+      init = isFinite(mm.lo) ? mm.lo : 0;
+    }
+    el.dataset.lastValid = String(init);
+    el.value = String(init);
+  }
+  function readBoundedNumber(id){
+    const el = $(id);
+    if (!el) return 0;
+    _ensureLastValid(el);
+    const mm = _getMinMax(el);
+    const v  = parseFloat(el.value);
+    if (!isFinite(v) || v < mm.lo || v > mm.hi){
+      el.classList.add("is-invalid");
+      return parseFloat(el.dataset.lastValid);
+    }
+    el.classList.remove("is-invalid");
+    el.dataset.lastValid = String(v);
+    return v;
+  }
+  function showLimitToast(el, msg){
+    const row = el?.closest?.(".row");
+    if (!row) return;
+    let toast = row.querySelector(".input-toast");
+    if (!toast){
+      toast = document.createElement("div");
+      toast.className = "input-toast";
+      row.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(()=>toast.classList.remove("show"), 1200);
+  }
+  function bindRangeGuard(id){
+    const el = $(id);
+    if (!el) return;
+    _ensureLastValid(el);
+
+    const enforce = ()=>{
+      _ensureLastValid(el);
+      const mm = _getMinMax(el);
+      let v = parseFloat(el.value);
+
+      // Out-of-range or non-number: clamp back, warn, and update visuals
+      if (!isFinite(v) || v < mm.lo || v > mm.hi){
+        showLimitToast(el, "超過輸入限制");
+        v = isFinite(v) ? clamp(v, mm.lo, mm.hi) : parseFloat(el.dataset.lastValid);
+        el.value = String(v);
+      }
+
+      // Convention fixes (optional but consistent with your UI copy)
+      if (id === "D"){
+        const t = $("lensType")?.value;
+        const mag = Math.abs(parseFloat(el.value) || 0);
+        el.value = String(t === "minus" ? -mag : mag);
+      }
+      if (id === "Cyl"){
+        const vv = parseFloat(el.value);
+        if (isFinite(vv)) el.value = String(Math.min(0, vv));
+      }
+
+      const vv = parseFloat(el.value);
+      if (isFinite(vv)) el.dataset.lastValid = String(vv);
+      el.classList.remove("is-invalid");
+      update(); // re-render 2D/3D using the corrected (in-range) value
+    };
+
+    el.addEventListener("blur", enforce);
+    el.addEventListener("change", enforce);
+  }
+
   function calc(){
     const lensType = $("lensType").value; // minus/plus
-    const D  = parseFloat($("D").value);
-    const CylRaw = parseFloat($("Cyl").value);
+    let D  = readBoundedNumber("D");
+    const CylRaw = readBoundedNumber("Cyl");
     const Cyl = isNaN(CylRaw) ? 0 : Math.min(0, CylRaw);
-    const axisRaw = parseFloat($("Axis").value);
-    let Axis = isNaN(axisRaw) ? 0 : axisRaw;
-    Axis = ((Axis % 180) + 180) % 180;
+    D = (lensType === "minus") ? -Math.abs(D || 0) : Math.abs(D || 0);
+    const AxisRaw = readBoundedNumber("Axis");
+    let Axis = Math.round(readBoundedNumber("Axis"));
+    Axis = (Axis === 180) ? 0 : Axis;
     const n  = parseFloat($("n").value);
     const centerT = clamp($("centerT").value,1.0,3.0);
     const edgeT   = clamp($("edgeT").value,0.2,3.0);
@@ -1777,19 +2075,17 @@ function update3D(res){
     }
     return slice;
   }
-
   const slices = [];
-  if (cutRReal > 0) {
-    // 水平：沿 x 方向，從 -cutR 到 +cutR
-    const sMinX  = -cutRReal;
-    const sMaxX  =  cutRReal;
-    const sliceX = buildCurtain(sMinX, sMaxX, "x");
+  if (cutRReal > 0) { 
+    const halfAReal = (Number(res.A) || 0) / 2;
+    const halfBReal = (Number(res.B) || 0) / 2;
+    const spanXReal = (halfAReal > 0) ? Math.min(cutRReal, halfAReal) : cutRReal;
+    const spanZReal = (halfBReal > 0) ? Math.min(cutRReal, halfBReal) : cutRReal;
+    // 水平：沿 x 方向，水平（綠）＝A/2
+    const sliceX = buildCurtain(-spanXReal, +spanXReal, "x");
     if (sliceX) slices.push(sliceX);
-
-    // 垂直：沿 z 方向，從 -cutR 到 +cutR
-    const sMinZ  = -cutRReal;
-    const sMaxZ  =  cutRReal;
-    const sliceZ = buildCurtain(sMinZ, sMaxZ, "z");
+    // 垂直：沿 z 方向，垂直（黃）＝B/2
+    const sliceZ = buildCurtain(-spanZReal, +spanZReal, "z");
     if (sliceZ) slices.push(sliceZ);
   }
   // 存起來方便之後清理
@@ -1839,33 +2135,6 @@ function update3D(res){
     if (sw != null) el.setAttribute("stroke-width", sw);
     svg.appendChild(el);
   }
-  const FIELD_HELP = {
-    D:   "球鏡 S (±)：-20.00~ +15.00 DS。正/負(近/遠視)請由鏡片類型切換",
-    Cyl: "散光 C：輸入負散，決定後表散光量（環曲面後散形式）。",
-    Axis:"軸度 A：0–180°，以水平為180°或0°皆可運算",
-    BC:  "前表面彎弧（1.00D≈100彎）。近視可設置0~8D，≧-5.00DS建議前彎0~1D；而遠視可設置0~15D，此系統遠視鏡片會設計成後散形式所以限制前彎≧DS",
-    centerT: "近視鏡坯中心厚度（mm）。最小1~最大5.0mm，綜合度數-1.00D內建議2~3mm、高於-6.00D建議1~1.5mm",
-    edgeT:   "遠視鏡坯邊緣厚度（mm）。最小0.3~最大3.0mm，調控基底厚度不可過薄、易在鏡框裝合上有問題",
-    blankDia: "鏡坯直徑設定50~80 (mm)"
-  };
-  function bindFieldHelp(){
-    const helpEl = $("fieldHelp");
-    if (!helpEl) return;
-
-    Object.keys(FIELD_HELP).forEach(id => {
-      const input = $(id);
-      if (!input) return;
-      const row = input.closest(".row");
-      if (!row) return;
-      const label = row.querySelector("label");
-      if (!label) return;
-
-      label.style.cursor = "help";
-      label.addEventListener("click", () => {
-        helpEl.textContent = FIELD_HELP[id];
-      });
-    });
-  }
   function update(){
     const res = calc();
     applyVerticalDec(res);
@@ -1873,7 +2142,7 @@ function update3D(res){
     res.SM   = SM;
     res.SM_pct = (SM - 1) * 100;
     const thickDanger =
-    (res.lensType === "minus") && (res.maxBlankThick > 10);    const thickText   = res.maxBlankThick.toFixed(2) + " mm";
+    (res.lensType === "minus") && (res.maxBlankThick > 12);    const thickText   = res.maxBlankThick.toFixed(2) + " mm";
     const vDec = res.vDecY || 0;
     const vDecText = (vDec > 0 ? "+" : (vDec < 0 ? "−" : "")) + Math.abs(vDec).toFixed(1) + " mm";
     // 顯示度數（+/-）
@@ -1989,7 +2258,7 @@ function update3D(res){
     if (plusRow)  plusRow.style.display  = (t === 'plus')  ? '' : 'none';
     if (bcRow)    bcRow.style.display    = '';
   })();
-  syncRimDefaults();bindFieldHelp();update();init3D();
+  syncRimDefaults();update();init3D();
 })();
 </script>
 </body>
