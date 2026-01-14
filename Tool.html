@@ -70,7 +70,7 @@
     }
 
     /*系統工具容器框架 時間管理工具樣式 */
-    #timeTool,#morseTool,#binaryTool{
+    #timeTool,#morseTool,#binaryTool,#moneyTool{
       width:45%; max-height:70vh; background:rgba(0,0,0,.7);
       margin:0 auto; padding:15px 20px; color:#fff;
       border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.6);
@@ -78,12 +78,12 @@
       position:relative; display:flex; flex-direction:column;
       transform:none; margin-top:0;
     }
-    #timeTool::before,#morseTool::before,#binaryTool::before{content:"";display:block;height:0;}
-    #timeTool>h2,#morseTool>h2,#binaryTool>h2{
+    #timeTool::before,#morseTool::before,#binaryTool::before,#moneyTool::before{content:"";display:block;height:0;}
+    #timeTool>h2,#morseTool>h2,#binaryTool>h2,#moneyTool>h2{
       margin:0 0 6px 0; font-size:13px; text-align:center;
       text-shadow:0 1px 3px rgba(0,0,0,.7); line-height:1.2;
     }
-    #tool1Container, #tool2Container,#tool3Container{padding-top: 10px;} 
+    #tool1Container, #tool2Container,#tool3Container,#tool10Container{padding-top: 10px;} 
     .copy-tooltip {
       position: absolute;
       transform: translateX(-50%);
@@ -219,7 +219,7 @@
 
     /* 摩斯密碼工具樣式 */
     #morsePanels{display:flex;flex-direction:column;gap:14px;}
-    #swapBtn,#swapBinBtn{align-self:center;padding:4px 26px;background:#216858;color:#fff;border:none;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
+    #swapBtn,#swapBinBtn,#swapMoneyBtn{align-self:center;padding:4px 26px;background:#216858;color:#fff;border:none;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
     .panel{background:rgba(41,207,168,.3);padding:12px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.5);}
     .panel label{display:block;font-size:12px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.6);}
     .panel textarea{
@@ -342,11 +342,11 @@
       opacity: .9;
     }
     /* 二進制轉換工具樣式 */
-    #binaryTool textarea{width:95%;height:50px;resize:vertical;padding:8px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.4);border-radius:4px;color:#fff;font-family:monospace;font-size:14px;line-height:1.4;}
-    #binaryTool textarea::placeholder{color:rgba(255,255,255,.45);}
-    #binaryPanels{display:flex;flex-direction:column;gap:14px;}
-    #binaryActions{display:flex;gap:10px;justify-content:space-between;margin-top:12px;}
-    #binaryActions button{flex:1;padding:8px 0;background:#013836;border:none;color:#fff;font-weight:bold;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
+    #binaryTool textarea,#moneyTool textarea{width:95%;height:50px;resize:vertical;padding:8px;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.4);border-radius:4px;color:#fff;font-family:monospace;font-size:14px;line-height:1.4;}
+    #binaryTool textarea::placeholder,#moneyTool textarea::placeholder{color:rgba(255,255,255,.45);}
+    #binaryPanels,#moneyPanels{display:flex;flex-direction:column;gap:14px;}
+    #binaryActions,#moneyActions{display:flex;gap:10px;justify-content:space-between;margin-top:12px;}
+    #binaryActions button,#moneyActions button{flex:1;padding:8px 0;background:#013836;border:none;color:#fff;font-weight:bold;border-radius:8px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5);}
 
     /* 匯率轉換工具樣式 */
     #exchangeTool {
@@ -1156,7 +1156,8 @@
     #calculateBtn,
     #resetBtn,
     #swapBtn,
-    #swapBinBtn{
+    #swapBinBtn,
+    #swapMoneyBtn{
       position: relative;
       transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
       box-shadow: 0 3px 0 rgba(0,0,0,.35), 0 6px 12px rgba(0,0,0,.45);
@@ -1165,6 +1166,7 @@
     #morseActions button:hover,
     #exchangeActions button:hover,
     #binaryActions button:hover,
+    #moneyActions button:hover,
     #generateCodeBtn:hover,
     #downloadPngBtn:hover,
     #downloadJpgBtn:hover,
@@ -1177,7 +1179,8 @@
     #resetBtn:hover,
     #unitActions button:hover,
     #swapBtn:hover,
-    #swapBinBtn:hover{
+    #swapBinBtn:hover,
+    #swapMoneyBtn:hover{
       transform: translateY(-2px);
       box-shadow: 0 5px 0 rgba(0,0,0,.4), 0 10px 18px rgba(0,0,0,.55);
       filter: brightness(1.08);
@@ -1187,6 +1190,7 @@
     #morseActions button:active,
     #exchangeActions button:active,
     #binaryActions button:active,
+    #moneyActions button:active,
     #generateCodeBtn:active,
     #downloadPngBtn:active,
     #downloadJpgBtn:active,
@@ -1199,7 +1203,8 @@
     #unitActions button:active,
     #resetBtn:active,
     #swapBtn:active,
-    #swapBinBtn:active{
+    #swapBinBtn:active,
+    #swapMoneyBtn:active{
       transform: translateY(1px);
       box-shadow: inset 0 2px 4px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.4);
       filter: brightness(.95);
@@ -1220,7 +1225,7 @@
       #toricPanel .unit-row input,#crossPanel .unit-row input{ flex: 0 0 auto; width: auto; }
       #kA, #kA2, #mA, #pA{ flex: 0 0 26px !important;  width: 26px !important;  min-width: 26px !important;  max-width: 26px !important; }
       #kD1, #kD2{ flex: 0 0 40px !important;  width: 40px !important;  min-width: 40px !important;  max-width: 40px !important; }
-      #timeTool,#morseTool,#binaryTool,#codeTool,#exchangeTool,#unitTool{ width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto; }
+      #timeTool,#morseTool,#binaryTool,#moneyTool,#codeTool,#exchangeTool,#unitTool{ width:84vw;max-height:85vh;padding:16px 18px;transform:none;margin:10px auto; }
       #arcTool.prism-tool{ width:84vw; max-height:85vh; padding:16px 18px; margin:10px auto; }
       #tool9Container .row .sign-toggle{ margin-left: 6px; }
       #arcTool .arc-side-img,#arcTool .arc-side-img2{ display: none; }
@@ -1244,7 +1249,7 @@
     /* 極小螢幕（<=480px）*/
     @media (max-width:480px){
       #toolSelector button{font-size:10px;padding:7px 10px;}
-      #timeTool,#morseTool{padding:14px 16px;}
+      #timeTool,#morseTool,#moneyTool{padding:14px 16px;}
       .mode-btn{font-size:12px;}
       .mode-btn.active{font-size:14px;}
       .duration-group input{width:50px;}
@@ -1267,6 +1272,7 @@
       <button id="tool9Btn">弧度計</button>
       <button id="tool5Btn">QR／條碼</button>
       <button id="tool4Btn">匯率轉換</button>
+      <button id="tool10Btn">收據大寫</button>
       <button id="tool2Btn">摩斯電碼</button>
       <button id="tool3Btn">轉二進制</button>
     </div>
@@ -1373,6 +1379,29 @@
         <button id="copyDecBtn"   data-copy-target="decimalInput">複製十進制</button>
         <button id="copyBinBtn"   data-copy-target="binaryInput">複製二進制</button>
         <button id="clearBinBtn">清除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 收據中文大寫 -->
+  <div id="tool10Container" class="tool-container">
+    <div id="moneyTool">
+      <h2>收據中文大寫轉換器</h2>
+      <div id="moneyPanels">
+        <div class="panel">
+          <label for="moneyArabicInput">阿拉伯數字輸入</label>
+          <textarea id="moneyArabicInput" placeholder="例如：1508 或 1,508"></textarea>
+        </div>
+        <button id="swapMoneyBtn" title="交換左右內容">⇅ 交換</button>
+        <div class="panel">
+          <label for="moneyChineseInput">中文大寫（收據用）</label>
+          <textarea id="moneyChineseInput" placeholder="例如：壹仟伍佰零捌"></textarea>
+        </div>
+      </div>
+      <div id="moneyActions">
+        <button id="copyMoneyArabicBtn" data-copy-target="moneyArabicInput">複製阿拉伯</button>
+        <button id="copyMoneyChineseBtn" data-copy-target="moneyChineseInput">複製大寫</button>
+        <button id="clearMoneyBtn">清除</button>
       </div>
     </div>
   </div>
@@ -2560,6 +2589,233 @@ syncAudioUI();
       updateBinary();
       playScoreSound();
     });
+
+
+
+    // 收據中文大寫轉換邏輯
+    const moneyArabicInput = document.getElementById('moneyArabicInput');
+    const moneyChineseInput = document.getElementById('moneyChineseInput');
+    const clearMoneyBtn = document.getElementById('clearMoneyBtn');
+    const swapMoneyBtn  = document.getElementById('swapMoneyBtn');
+    let lockMoney = false;
+
+    const moneyDigitMap = ['零','壹','貳','參','肆','伍','陸','柒','捌','玖'];
+    const moneySmallUnits = ['仟','佰','拾',''];
+    const moneyBigUnits = ['','萬','億','兆','京','垓','秭','穰'];
+
+    const fwToAsciiDigits = (s) => String(s ?? '').replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFF10 + 48));
+    const cleanMoneyArabic = (s) => {
+      s = fwToAsciiDigits(s);
+      s = String(s ?? '').trim()
+        .replace(/[,，\s_]/g,'')
+        .replace(/[−–—]/g,'-');
+      // 僅保留數字、負號、小數點
+      s = s.replace(/[^\d\.\-]/g,'');
+      // 只保留最前面的負號
+      s = s.replace(/(?!^)-/g,'');
+      // 只保留第一個小數點
+      const firstDot = s.indexOf('.');
+      if (firstDot !== -1) s = s.slice(0, firstDot + 1) + s.slice(firstDot + 1).replace(/\./g,'');
+      return s;
+    };
+
+    function group4ToChinese(p4){
+      p4 = String(p4 ?? '').padStart(4,'0').slice(-4);
+      let out = '';
+      let zero = false;
+      const ds = p4.split('').map(ch => Number(ch));
+      for (let i = 0; i < 4; i++){
+        const d = ds[i];
+        const unit = moneySmallUnits[i];
+        if (!Number.isFinite(d)) continue;
+        if (d === 0){
+          if (out !== '' && !zero && ds.slice(i+1).some(x => x !== 0)){
+            out += '零';
+            zero = true;
+          }
+        } else {
+          out += moneyDigitMap[d] + unit;
+          zero = false;
+        }
+      }
+      return out;
+    }
+
+    function intToChineseUpper(intStr){
+      intStr = String(intStr ?? '').replace(/^0+(?=\d)/,'');
+      if (intStr === '') return '零';
+      if (!/^\d+$/.test(intStr)) return '';
+      const groups = [];
+      for (let i = intStr.length; i > 0; i -= 4){
+        groups.unshift(intStr.substring(Math.max(0, i - 4), i));
+      }
+      let out = '';
+      let zeroFlag = false;
+
+      for (let gi = 0; gi < groups.length; gi++){
+        const g = groups[gi].padStart(4,'0');
+        const gNum = parseInt(g, 10);
+        if (!gNum){
+          zeroFlag = true;
+          continue;
+        }
+        if (out !== ''){
+          // 跨組補零：前一組為 0 或本組有前置 0（如 0001）
+          if (zeroFlag || gNum < 1000){
+            if (!out.endsWith('零')) out += '零';
+          }
+        }
+        const gCn = group4ToChinese(g);
+        const unit = moneyBigUnits[groups.length - 1 - gi] ?? '';
+        out += gCn + unit;
+        zeroFlag = false;
+      }
+      out = out.replace(/零+/g,'零').replace(/零$/,'');
+      return out || '零';
+    }
+
+    function arabicToChineseUpper(raw){
+      let s = cleanMoneyArabic(raw);
+      if (s === '' || s === '-' || s === '.') return '';
+      let neg = false;
+      if (s.startsWith('-')){ neg = true; s = s.slice(1); }
+      const parts = s.split('.');
+      const intPart = parts[0] || '0';
+      const fracPart = parts[1];
+      let out = intToChineseUpper(intPart);
+      if (fracPart != null && fracPart !== ''){
+        out += '點' + fracPart.split('').map(ch => moneyDigitMap[Number(ch)] ?? '').join('');
+      }
+      if (neg && out !== '') out = '負' + out;
+      return out;
+    }
+
+    const cnDigit = new Map(Object.entries({
+      '零':0,'〇':0,'○':0,'Ｏ':0,
+      '一':1,'壹':1,
+      '二':2,'貳':2,'贰':2,'兩':2,'两':2,
+      '三':3,'參':3,'叁':3,
+      '四':4,'肆':4,
+      '五':5,'伍':5,
+      '六':6,'陸':6,'陆':6,
+      '七':7,'柒':7,
+      '八':8,'捌':8,
+      '九':9,'玖':9
+    }).map(([k,v]) => [k, BigInt(v)]));
+    const smallUnit = new Map([
+      ['十',10n],['拾',10n],
+      ['百',100n],['佰',100n],
+      ['千',1000n],['仟',1000n],
+    ]);
+    const bigUnit = new Map([
+      ['萬',10000n],['万',10000n],
+      ['億',100000000n],['亿',100000000n],
+      ['兆',1000000000000n],
+      ['京',10000000000000000n],
+    ]);
+
+    function chineseUpperToArabic(raw){
+      let s = fwToAsciiDigits(String(raw ?? '').trim());
+      if (s === '') return '';
+      // 若使用者直接貼阿拉伯數字，也接受
+      if (/^-?\d+(?:\.\d+)?$/.test(cleanMoneyArabic(s))) return cleanMoneyArabic(s).replace(/^(\-?)0+(\d)/,'$1$2');
+
+      let neg = false;
+      if (s.startsWith('負') || s.startsWith('-')){ neg = true; s = s.slice(1); }
+      // 去掉常見字尾/單位
+      s = s.replace(/[元圓圆塊块整正\s,，]/g,'');
+      // 小數處理
+      let fracStr = '';
+      const dotIdx = s.search(/[點点\.]/);
+      if (dotIdx !== -1){
+        fracStr = s.slice(dotIdx + 1);
+        s = s.slice(0, dotIdx);
+      }
+
+      let total = 0n;
+      let section = 0n;
+      let number = 0n;
+
+      for (const ch of s){
+        if (cnDigit.has(ch)){
+          number = cnDigit.get(ch);
+          continue;
+        }
+        if (smallUnit.has(ch)){
+          const u = smallUnit.get(ch);
+          const n = (number === 0n) ? 1n : number;
+          section += n * u;
+          number = 0n;
+          continue;
+        }
+        if (bigUnit.has(ch)){
+          const u = bigUnit.get(ch);
+          section += number;
+          total += section * u;
+          section = 0n;
+          number = 0n;
+          continue;
+        }
+        // 忽略不認得的字元
+      }
+      total += section + number;
+
+      // 小數（僅做逐位數字）
+      let fracOut = '';
+      if (fracStr){
+        fracOut = fracStr.split('').map(ch => {
+          if (cnDigit.has(ch)) return String(cnDigit.get(ch));
+          const d = ch.match(/[0-9]/) ? ch : '';
+          return d;
+        }).join('');
+        fracOut = fracOut.replace(/[^0-9]/g,'');
+      }
+
+      let out = total.toString();
+      if (fracOut) out += '.' + fracOut;
+      if (neg && out !== '0') out = '-' + out;
+      return out;
+    }
+
+    function safePlayCut(){
+      try{ if (window.cutSound) { cutSound.currentTime = 0; cutSound.play(); } }catch(e){}
+    }
+    function safePlayScore(){
+      try{ if (typeof playScoreSound === 'function') playScoreSound(); }catch(e){}
+    }
+
+    function updateMoneyFromArabic(){
+      if (lockMoney) return;
+      lockMoney = true;
+      moneyChineseInput.value = arabicToChineseUpper(moneyArabicInput.value);
+      lockMoney = false;
+    }
+    function updateMoneyFromChinese(){
+      if (lockMoney) return;
+      lockMoney = true;
+      moneyArabicInput.value = chineseUpperToArabic(moneyChineseInput.value);
+      lockMoney = false;
+    }
+
+    if (moneyArabicInput && moneyChineseInput){
+      moneyArabicInput.addEventListener('input', updateMoneyFromArabic);
+      moneyChineseInput.addEventListener('input', updateMoneyFromChinese);
+
+      clearMoneyBtn?.addEventListener('click', () => {
+        moneyArabicInput.value = '';
+        moneyChineseInput.value = '';
+        safePlayCut();
+      });
+
+      swapMoneyBtn?.addEventListener('click', () => {
+        const left = moneyArabicInput.value;
+        const right = moneyChineseInput.value;
+        moneyArabicInput.value = chineseUpperToArabic(right);
+        moneyChineseInput.value = arabicToChineseUpper(left);
+        safePlayScore();
+      });
+    }
+
 
 // ===== 匯率轉換邏輯 =====
 document.addEventListener('DOMContentLoaded', () => {
@@ -4578,5 +4834,3 @@ drawPrPlot(plotR, 0, 0);
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.min.js" defer></script>
 </html>
-
-
