@@ -902,7 +902,33 @@ function shuffleAnimation(items) {
     }
         //火焰動畫
 let flameAnimationActive = false;
+function initAnswerBookSingleDraw(items) {
+    cardContainer.innerHTML = '';
+    descriptionBox.innerHTML = '';
+    descriptionBox.style.display = 'none';
+    const picked = items[Math.floor(Math.random() * items.length)];
+    const card = document.createElement('div');
+    card.className = 'card';
 
+    const content = generateCardContent(picked);
+
+    card.innerHTML = `
+        <div class="inner">
+            <div class="back"></div>
+            <div class="front">${content}</div>
+        </div>
+    `;
+    cardContainer.style.display = 'flex';
+    cardContainer.style.justifyContent = 'center';
+    cardContainer.style.alignItems = 'center';
+    card.addEventListener('click', () => {
+        card.classList.toggle('flipped');
+        flipSound.currentTime = 0;
+        flipSound.play();
+    });
+
+    cardContainer.appendChild(card);
+}
 function showFlameAnimation() {
     const flameOverlay = document.getElementById('flame-overlay');
     const flameGif = document.getElementById('flame-gif');
@@ -970,6 +996,10 @@ shuffleBtn.addEventListener('click', () => {
     if (items.includes("K♠️")) {
         initPokerFishingGame(items);
         return;
+    }
+    if (items.length >= 250) {
+    initAnswerBookSingleDraw(items);
+    return;
     }
     requestAnimationFrame(() => {
         shuffleAnimation(items);
