@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>大倉酷眼鏡音樂播放器</title>
+  <link rel="icon" href="img/player.png" type="image/x-icon">
+  <link rel="shortcut icon" href="img/player.png" type="image/x-icon">
+  <meta name="description" content="大倉酷眼鏡音樂播放器，支援多歌單、分類、搜尋與 YouTube 播放。" />
+  <style>
+    :root {
+      --bg: #07080d;
+      --bg-2: #0b0c14;
+      --panel: #10111b;
+      --panel-2: #151726;
+      --card: #111320;
+      --card-hover: rgba(144, 112, 255, 0.12);
+      --line: rgba(255,255,255,0.08);
+      --line-2: rgba(255,255,255,0.14);
+      --text: #f4f3ff;
+      --muted: #a8a7bc;
+      --bule:rgb(135, 166, 231);
+      --purple: #8c6cff;
+      --purple-2: #6f49ff;
+      --purple-3: #b59dff;
+      --purple-4: #c3b5f7;
+      --green: #59d38f;
+      --danger: #ff7a8c;
+      --shadow: 0 20px 46px rgba(0, 0, 0, 0.38);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(141,108,255,.14), transparent 18%),
+        radial-gradient(circle at left 20%, rgba(111,73,255,.09), transparent 22%),
+        linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1060px, calc(100% - 20px));
+      margin: 10px auto;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01));
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(6px);
+    }
+
+    .sidebar {
+      padding: 14px;
+      position: sticky;
+      top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--purple), #cdbfff);
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 12px 26px rgba(111,73,255,.32);
+      flex-shrink: 0;
+    }
+
+    .brand h1 {
+      font-size: 18px;
+      margin: 0 0 4px;
+      line-height: 1.2;
+    }
+
+    .sub, .help, .mini-note, .empty, .muted, .meta, .counter {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .section-title {
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #cfc8ef;
+      margin: 0;
+    }
+
+    .playlist-list,
+    .category-list,
+    .mode-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .playlist-list { grid-template-columns: 1fr; }
+    .category-list { grid-template-columns: repeat(2, 1fr); }
+    .mode-list { grid-template-columns: repeat(2, 1fr); }
+
+    .btn,
+    .playlist-btn,
+    .chip,
+    .icon-btn,
+    .track,
+    .stat-card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: var(--radius-sm);
+      transition: .18s ease;
+    }
+
+    .btn,
+    .playlist-btn,
+    .chip,
+    .icon-btn {
+      cursor: pointer;
+    }
+
+    .btn:hover,
+    .playlist-btn:hover,
+    .chip:hover,
+    .icon-btn:hover,
+    .track:hover {
+      background: var(--card-hover);
+      border-color: rgba(141,108,255,.34);
+    }
+
+    .chip,
+    .btn,
+    .playlist-btn {
+      padding: 12px 14px;
+    }
+
+    .chip.active,
+    .btn.primary,
+    .playlist-btn.active,
+    .toggle.active {
+      background: linear-gradient(135deg, var(--purple), var(--purple-2));
+      border-color: transparent;
+      box-shadow: 0 10px 24px rgba(111,73,255,.26);
+    }
+
+    .playlist-btn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      background: var(--panel-2);
+    }
+
+    .playlist-name {
+      display: block;
+      font-weight: 600;
+    }
+
+    .badge {
+      font-size: 12px;
+      color: #ddd4ff;
+      background: rgba(141,108,255,.12);
+      border: 1px solid rgba(141,108,255,.25);
+      border-radius: 999px;
+      padding: 6px 10px;
+      white-space: nowrap;
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #0f111a;
+      color: var(--text);
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: rgba(141,108,255,.45);
+      box-shadow: 0 0 0 3px rgba(141,108,255,.14);
+    }
+
+    .search-box::before {
+      content: "⌕";
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .main {
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .top-grid {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 12px;
+    }
+
+    .cover-card,
+    .player-card,
+    .list-card,
+    .settings-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.022), rgba(255,255,255,0.01));
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+    }
+
+    .cover-card {
+      padding: 16px;
+      min-height: 220px;
+      position: relative;
+      background:
+        linear-gradient(165deg, rgba(141,108,255,.24), rgba(255,255,255,.03)),
+        radial-gradient(circle at top left, rgba(255,255,255,.10), transparent 38%),
+        #10111a;
+    }
+
+    .cover-card::after {
+      content: "";
+      position: absolute;
+      right: -26px;
+      bottom: -46px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(141,108,255,.18);
+      filter: blur(18px);
+    }
+
+    .cover-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      display: grid;
+      place-items: center;
+      font-size: 32px;
+      margin-bottom: 18px;
+    }
+
+    .cover-title {
+      font-size: 20px;
+      line-height: 1.2;
+      margin: 8px 0 10px;
+      font-weight: 700;
+      max-width: 92%;
+    }
+
+    .info-stack {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .stat-card {
+      padding: 12px;
+      background: rgba(255,255,255,.03);
+    }
+
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .range-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 72px;
+      white-space: nowrap;
+    }
+
+    .range-row input[type="range"] {
+      flex: 0.4;
+      min-width: 0;
+    }
+
+    .stat-card b {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .player-card {
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .player-frame {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.10);
+      background: #04091381;
+      border: 1px solid var(--line);
+      height: 188px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+
+    #youtubeShell {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    #youtubePlayer {
+      position: absolute;
+      top: 52%;
+      left: 50%;
+      width: 108%;
+      height: 108%;
+      transform: translate(-50%, -50%);
+    }
+
+    #audioPlayer {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #2435916b;
+    }
+
+    .audio-mode-shell {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at center, rgba(141,108,255,.16), transparent 28%),
+        linear-gradient(180deg, #0c0d15 0%, #090a10 100%);
+      padding: 18px;
+    }
+
+    .audio-mode-box {
+      width: min(430px, 100%);
+      padding: 22px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      text-align: center;
+    }
+
+    .audio-mode-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    .control-bar,
+    .sub-control-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .btn {
+      min-width: 58px;
+      width: 58px;
+      height: 40px;
+      padding: 0;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .icon-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--panel-2);
+    }
+
+    .toggle {
+      padding: 10px 12px;
+      border-radius: 14px;
+      color: #ddd4ff;
+      border: 1px solid var(--line);
+      background: #121422;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .range-wrap input[type="range"] {
+      accent-color: var(--purple-4);
+      width: min(200px, 100%);
+    }
+
+    .progress-wrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    #seekBar {
+      width: 100%;
+      accent-color: var(--bule);
+    }
+
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .list-card,
+    .settings-card {
+      padding: 16px;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .track-list {
+      max-height: 620px;
+      overflow: auto;
+      display: grid;
+      gap: 10px;
+      padding-right: 6px;
+    }
+
+    .track-list::-webkit-scrollbar { width: 10px; }
+    .track-list::-webkit-scrollbar-thumb {
+      background: rgba(141,108,255,.24);
+      border-radius: 999px;
+    }
+
+    .track {
+      display: grid;
+      grid-template-columns: 54px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 12px;
+      background: #10121b;
+      cursor: pointer;
+    }
+
+    .track.active {
+      background: rgba(141,108,255,.14);
+      border-color: rgba(141,108,255,.48);
+    }
+
+    .track-thumb {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(141,108,255,.34), rgba(255,255,255,.08));
+      border: 1px solid rgba(255,255,255,.05);
+      font-size: 22px;
+    }
+
+    .track-title {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.45;
+      margin-bottom: 4px;
+    }
+
+    .track-sub {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .settings-card {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .setting-box {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,.02);
+      display: grid;
+      gap: 10px;
+    }
+
+    .setting-box label {
+      font-size: 13px;
+      color: #d7d1f6;
+    }
+
+    .setting-box select,
+    .setting-box textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--line-2);
+      background: #0f1119;
+      color: var(--text);
+      padding: 12px;
+      outline: none;
+    }
+
+    .setting-box textarea {
+      min-height: 124px;
+      resize: vertical;
+      line-height: 1.5;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    #volumeRange,
+    #seekBar {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 20px;
+      margin: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 999px;
+    }
+
+    #volumeRange::-webkit-slider-runnable-track,
+    #seekBar::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 999px;
+      background: transparent;
+      border: none;
+    }
+
+    #volumeRange::-moz-range-track,
+    #seekBar::-moz-range-track {
+      height: 8px;
+      border-radius: 999px;
+      background: transparent;
+      border: none;
+    }
+
+    #volumeRange::-webkit-slider-thumb,
+    #seekBar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      margin-top: -3px;
+      border-radius: 50%;
+      border: 0;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    #volumeRange::-moz-range-thumb,
+    #seekBar::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 0;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    #volumeRange::-webkit-slider-thumb {
+      background: #bca7ff;
+      box-shadow:
+        0 0 0 2px rgba(140,108,255,.18),
+        0 0 10px rgba(140,108,255,.45);
+    }
+
+    #volumeRange::-moz-range-thumb {
+      background: #bca7ff;
+      box-shadow:
+        0 0 0 2px rgba(140,108,255,.18),
+        0 0 10px rgba(140,108,255,.45);
+    }
+
+    #seekBar::-webkit-slider-thumb {
+      background: #a9c6ff;
+      box-shadow:
+        0 0 0 2px rgba(143,180,255,.16),
+        0 0 10px rgba(143,180,255,.38);
+    }
+
+    #seekBar::-moz-range-thumb {
+      background: #a9c6ff;
+      box-shadow:
+        0 0 0 2px rgba(143,180,255,.16),
+        0 0 10px rgba(143,180,255,.38);
+    }
+
+    #volumeRange:hover::-webkit-slider-thumb,
+    #seekBar:hover::-webkit-slider-thumb {
+      transform: scale(1.08);
+    }
+
+    #volumeRange:hover::-moz-range-thumb,
+    #seekBar:hover::-moz-range-thumb {
+      transform: scale(1.08);
+    }
+
+    .warning {
+      color: #ffd5db;
+      background: rgba(255,122,140,.10);
+      border: 1px solid rgba(255,122,140,.22);
+      border-radius: 14px;
+      padding: 12px 13px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .ok {
+      color: #cef1dc;
+      background: rgba(89,211,143,.10);
+      border: 1px solid rgba(89,211,143,.24);
+      border-radius: 14px;
+      padding: 12px 13px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .footer-help {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 1180px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+      }
+      .top-grid,
+      .bottom-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .app {
+        width: min(100%, calc(100% - 16px));
+        margin: 8px auto 18px;
+      }
+      .sidebar,
+      .main {
+        padding: 14px;
+      }
+      .category-list,
+      .mode-list {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .track {
+        grid-template-columns: 48px 1fr;
+      }
+      .track .badge {
+        grid-column: 2;
+        justify-self: start;
+      }
+      .stat-row {
+        grid-template-columns: 1fr;
+      }
+      .cover-title {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="panel sidebar">
+      <div class="brand">
+        <div class="brand-logo">♫</div>
+        <div>
+          <h1>公播音樂系統</h1>
+          <p class="sub">大倉酷眼鏡 音樂播放器</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <p class="section-title">歌單</p>
+        <div class="playlist-list" id="playlistList"></div>
+      </div>
+
+      <div class="section">
+        <p class="section-title">分類</p>
+        <div class="category-list" id="categoryList"></div>
+      </div>
+
+      <div class="section">
+        <p class="section-title">搜尋歌曲</p>
+        <div class="search-box">
+          <input id="searchInput" type="text" placeholder="搜尋歌名、類別、備註..." />
+        </div>
+      </div>
+    </aside>
+
+    <main class="panel main">
+      <section class="top-grid">
+        <div class="cover-card">
+          <div class="cover-icon">♪</div>
+          <p class="meta" id="coverPlaylist">歌單：-</p>
+          <h2 class="cover-title" id="coverTitle">尚未選擇歌曲</h2>
+          <p class="meta" id="coverMeta">類別 / 備註</p>
+
+          <div class="stat-row">
+            <div class="stat-card">
+              <b id="statTracks">0</b>
+              <span class="muted">目前清單歌曲</span>
+            </div>
+            <div class="stat-card">
+              <b id="statCategory">所有</b>
+              <span class="muted">目前分類</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-card">
+          <div class="player-frame">
+            <div id="youtubeShell" class="player-layer">
+              <div id="youtubePlayer"></div>
+            </div>
+          </div>
+
+          <div class="control-bar">
+            <button class="btn" id="prevBtn" aria-label="上一首" title="上一首">⏮︎</button>
+            <button class="btn primary" id="playPauseBtn" aria-label="播放" title="播放">▶︎</button>
+            <button class="btn" id="nextBtn" aria-label="下一首" title="下一首">⏭︎</button>
+            <button class="toggle" id="shuffleBtn">隨機：關</button>
+            <button class="toggle" id="repeatBtn">循環：列表</button>
+          </div>
+
+          <div class="sub-control-bar">
+            <div class="range-row">
+              <input id="volumeRange" type="range" min="0" max="100" value="55" />
+              <div class="range-label">
+                <span class="muted">音量</span>
+                <span class="muted" id="volumeText">55%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-wrap">
+            <input id="seekBar" type="range" min="0" max="100" value="0" />
+            <div class="progress-meta">
+              <span id="currentTimeText">00:00</span>
+              <span id="durationText">00:00</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bottom-grid">
+        <section class="list-card">
+          <div class="card-head">
+            <div>
+              <p class="section-title">歌曲列表</p>
+              <p class="counter" id="trackCounter">0 首</p>
+            </div>
+            <div class="badge" id="resultBadge">已套用：所有</div>
+          </div>
+          <div class="track-list" id="trackList"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const MUSIC_DATA = {
+      playlists: [
+        {
+          id: "store-day",
+          name: "流行節奏",
+          description: "清爽、節奏穩定、適合白天接待時段",
+          tracks: [
+            {
+              id: "tw-001",
+              title: "大倉酷 Cypher",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "0cV7yiKmjTs",
+              mp3: "music/chinese/song-01.mp3",
+              note: "Popular rap, brand store background music"
+            },
+            {
+              id: "kr-001",
+              title: "Break the Noise",
+              category: "日韓",
+              sourceType: "youtube",
+              videoId: "S-loXAUE6jc",
+              mp3: "music/korean/song-01.mp3",
+              note: "K-pop, dance-pop "
+            },
+            {
+              id: "kr-002",
+              title: "Burn Up the Night",
+              category: "日韓",
+              sourceType: "youtube",
+              videoId: "UuNOrb1j3xQ",
+              mp3: "music/korean/song-02.mp3",
+              note: "K-pop, dance-pop"
+            },
+            {
+              id: "kr-003",
+              title: "Love Myself",
+              category: "日韓",
+              sourceType: "youtube",
+              videoId: "TuhwifM4dO8",
+              mp3: "music/korean/song-03.mp3",
+              note: "K-pop, dance-pop"
+            },
+            {
+              id: "kr-004",
+              title: "COPY & PASTE",
+              category: "日韓",
+              sourceType: "youtube",
+              videoId: "h-ISrJ2pW6Q",
+              mp3: "music/korean/song-04.mp3",
+              note: "K-pop, dance-pop"
+            },
+            {
+              id: "kr-005",
+              title: "Midnight Signal",
+              category: "日韓",
+              sourceType: "youtube",
+              videoId: "nCTbZxxIma4",
+              mp3: "music/korean/song-05.mp3",
+              note: "K-pop, pulsing beat, soft verses, catchy electro-pop chorus"
+            },
+            {
+              id: "kr-006",
+              title: "Signal to You",
+              category: "日韓",
+              sourceType: "youtube",
+              videoId: "ceV3PvComwg",
+              mp3: "music/korean/song-06.mp3",
+              note: "K-pop, pulsing beat, soft verses, catchy electro-pop chorus"
+            },
+            {
+              id: "kr-007",
+              title: "Soda Love",
+              category: "日韓",
+              sourceType: "youtube",
+              videoId: "67mHSk_pPhM",
+              mp3: "music/korean/song-07.mp3",
+              note: "K-pop,  bright electro dance-pop,"
+            },
+            {
+              id: "en-002",
+              title: "Every Color Every Day",
+              category: "西洋",
+              sourceType: "youtube",
+              videoId: "FRYgMczWn3k",
+              mp3: "music/english/every-color-every-day.mp3",
+              note: "funk, Bouncy electro-pop, soft"
+            }, 
+            {
+              id: "kr-008",
+              title: "Sugar Pop",
+              category: "日韓",
+              sourceType: "youtube",
+              videoId: "bVg07PRXiQA",
+              mp3: "music/korean/song-08.mp3",
+              note: "K-pop, danceable beat, playful and flirty mood"
+            },
+            {
+              id: "bgm-001",
+              title: "輕柔 BGM 示例 01",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "jfKfPfyJRdk",
+              mp3: "music/bgm/bgm-01.mp3",
+              note: "低干擾背景音樂"
+            }
+          ]
+        },
+        {
+          id: "store-night",
+          name: "柔和氛圍",
+          description: "偏輕鬆、較柔和、抒情、適合晚間門市",
+          tracks: [
+            {
+              id: "tw-002",
+              title: "下雨的街口",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "3mRai78CFoU",
+              mp3: "music/chinese/song-02.mp3",
+              note: "Popular love songs / R&B ballads"
+            },
+            {
+              id: "jp-002",
+              title: "ネオンの風",
+              category: "日韓",
+              sourceType: "youtube",
+              videoId: "b-ZZoBLKVhw",
+              mp3: "music/japanese/song-02.mp3",
+              note: "Japanese City Pop,  Lyrical music"
+            },
+            {
+              id: "jp-003",
+              title: "まだ言わない",
+              category: "日韓",
+              sourceType: "youtube",
+              videoId: "jR34oAkeQ2c",
+              mp3: "music/japanese/song-03.mp3",
+              note: "Japanese City Pop, J-pop Ballad, Soft R&B,  Lyrical music"
+            },
+            {
+              id: "en-002",
+              title: "Still Yours in the Rain",
+              category: "西洋",
+              sourceType: "youtube",
+              videoId: "hllZOcjmOLw",
+              mp3: "music/english/song-02.mp3",
+              note: "emotional pop rock,  bittersweet unrequited love,  electric guitar"
+            },
+            {
+              id: "en-001",
+              title: "Maybe It Was the Evening",
+              category: "西洋",
+              sourceType: "youtube",
+              videoId: "274Et8vCvGE",
+              mp3: "music/english/maybe-it-was-the-evening.mp3",
+              note: "Male vocal, city pop,  warm nostalgic urban night vibe"
+            },
+            {
+              id: "en-003",
+              title: "See lt you way",
+              category: "西洋",
+              sourceType: "youtube",
+              videoId: "4nQn906qe8M",
+              mp3: "music/english/See-lt-you-way.mp3",
+              note: "funk, Bouncy electro-pop, soft"
+            }, 
+            {
+              id: "bgm-002",
+              title: "柔和 BGM 示例 02",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "5qap5aO4i9A",
+              mp3: "music/bgm/bgm-02.mp3",
+              note: "較適合長時間循環"
+            },
+            {
+              id: "close-001",
+              title: "閉店播放示例 01",
+              category: "閉店",
+              sourceType: "youtube",
+              videoId: "M7lc1UVf-VE",
+              mp3: "music/closing/close-01.mp3",
+              note: "門市閉店時使用"
+            }
+          ]
+        }
+      ]
+    };
+
+    const CATEGORIES = ["所有", "中文", "日韓", "西洋", "BGM","閉店"];
+
+    const state = {
+      sourceMode: "youtube",
+      playlistId: localStorage.getItem("music_playlist_id") || MUSIC_DATA.playlists[0].id,
+      category: localStorage.getItem("music_category") || "所有",
+      search: "",
+      trackIndex: -1,
+      shuffle: localStorage.getItem("music_shuffle") === "true",
+      repeatMode: localStorage.getItem("music_repeat") || "list", // list | one | off
+      volume: Number(localStorage.getItem("music_volume") || 55),
+      filteredTracks: [],
+      isPlaying: false,
+      ytReady: false,
+      pendingAutoplay: false,
+      seekDragging: false
+    };
+
+    const els = {
+      playlistList: document.getElementById("playlistList"),
+      categoryList: document.getElementById("categoryList"),
+      searchInput: document.getElementById("searchInput"),
+      coverPlaylist: document.getElementById("coverPlaylist"),
+      coverTitle: document.getElementById("coverTitle"),
+      coverMeta: document.getElementById("coverMeta"),
+      statTracks: document.getElementById("statTracks"),
+      statCategory: document.getElementById("statCategory"),
+      trackCounter: document.getElementById("trackCounter"),
+      resultBadge: document.getElementById("resultBadge"),
+      trackList: document.getElementById("trackList"),
+      prevBtn: document.getElementById("prevBtn"),
+      playPauseBtn: document.getElementById("playPauseBtn"),
+      nextBtn: document.getElementById("nextBtn"),
+      shuffleBtn: document.getElementById("shuffleBtn"),
+      repeatBtn: document.getElementById("repeatBtn"),
+      volumeRange: document.getElementById("volumeRange"),
+      volumeText: document.getElementById("volumeText"),
+      seekBar: document.getElementById("seekBar"),
+      currentTimeText: document.getElementById("currentTimeText"),
+      durationText: document.getElementById("durationText"),
+      youtubeShell: document.getElementById("youtubeShell"),
+      youtubePlayer: document.getElementById("youtubePlayer")
+    };
+
+    let ytPlayer = null;
+    let progressTimer = null;
+
+    function getCurrentPlaylist() {
+      return MUSIC_DATA.playlists.find(p => p.id === state.playlistId) || MUSIC_DATA.playlists[0];
+    }
+
+    function getEffectiveTrackSource(track) {
+      if (track.videoId) return "youtube";
+      return null;
+    }
+
+    function saveState() {
+      localStorage.setItem("music_source_mode", state.sourceMode);
+      localStorage.setItem("music_playlist_id", state.playlistId);
+      localStorage.setItem("music_category", state.category);
+      localStorage.setItem("music_shuffle", String(state.shuffle));
+      localStorage.setItem("music_repeat", state.repeatMode);
+      localStorage.setItem("music_volume", String(state.volume));
+    }
+
+    function formatTime(sec) {
+      if (!Number.isFinite(sec) || sec < 0) return "00:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+
+    function getFilteredTracks() {
+      const playlist = getCurrentPlaylist();
+      const kw = state.search.trim().toLowerCase();
+
+      return playlist.tracks.filter(track => {
+        const trackCategory = track.category;
+
+        let categoryOk = false;
+
+        if (state.category === "所有") {
+          categoryOk = ["中文", "日韓", "西洋", "BGM"].includes(trackCategory);
+        } else {
+          categoryOk = trackCategory === state.category;
+        }
+
+        const keywordTarget = `${track.title} ${track.category} ${track.note || ""}`.toLowerCase();
+        const searchOk = !kw || keywordTarget.includes(kw);
+
+        return categoryOk && searchOk;
+      });
+    }
+
+    function renderPlaylists() {
+      els.playlistList.innerHTML = "";
+      MUSIC_DATA.playlists.forEach(playlist => {
+        const btn = document.createElement("button");
+        btn.className = `playlist-btn ${playlist.id === state.playlistId ? "active" : ""}`;
+        btn.innerHTML = `
+          <div>
+            <span class="playlist-name">${playlist.name}</span>
+            <span class="mini-note">${playlist.description || ""}</span>
+          </div>
+          <span class="badge">${playlist.tracks.length} 首</span>
+        `;
+        btn.onclick = () => {
+          state.playlistId = playlist.id;
+          state.trackIndex = -1;
+          saveState();
+          renderPlaylists();
+          refreshTrackList(true);
+        };
+        els.playlistList.appendChild(btn);
+      });
+    }
+
+    function renderCategories() {
+      els.categoryList.innerHTML = "";
+      CATEGORIES.forEach(category => {
+        const btn = document.createElement("button");
+        btn.className = `chip ${state.category === category ? "active" : ""}`;
+        btn.textContent = category;
+        btn.onclick = () => {
+          state.category = category;
+          state.trackIndex = -1;
+          saveState();
+          renderCategories();
+          refreshTrackList(true);
+        };
+        els.categoryList.appendChild(btn);
+      });
+    }
+
+    function refreshTrackList(resetPlayer = false) {
+      state.filteredTracks = getFilteredTracks();
+      els.trackList.innerHTML = "";
+
+      const playlist = getCurrentPlaylist();
+      els.trackCounter.textContent = `${state.filteredTracks.length} 首`;
+      els.resultBadge.textContent = `已套用：${playlist.name} / ${state.category}${state.search ? ` / 搜尋「${state.search}」` : ""}`;
+      els.statTracks.textContent = String(state.filteredTracks.length);
+      els.statCategory.textContent = state.category;
+
+      if (!state.filteredTracks.length) {
+        els.trackList.innerHTML = `<p class="empty">目前沒有符合條件的歌曲。</p>`;
+        if (resetPlayer) {
+          state.trackIndex = -1;
+          stopAllPlayback();
+          updateCover(null);
+          setProgress(0, 0);
+        }
+        return;
+      }
+
+      state.filteredTracks.forEach((track, index) => {
+        const actualSource = getEffectiveTrackSource(track);
+        const item = document.createElement("button");
+        item.className = `track ${index === state.trackIndex ? "active" : ""}`;
+        item.innerHTML = `
+          <div class="track-thumb">♫</div>
+          <div>
+            <div class="track-title">${track.title}</div>
+            <div class="track-sub">${track.category}${track.note ? ` · ${track.note}` : ""}</div>
+          </div>
+          <span class="badge">${track.category}</span>
+        `;
+        item.onclick = () => playTrack(index);
+        els.trackList.appendChild(item);
+      });
+
+      if (resetPlayer) {
+        updateCover(state.filteredTracks[0], false);
+      } else {
+        highlightActiveTrack();
+      }
+    }
+
+    function highlightActiveTrack() {
+      [...els.trackList.querySelectorAll('.track')].forEach((trackEl, idx) => {
+        trackEl.classList.toggle('active', idx === state.trackIndex);
+      });
+    }
+
+    function updateCover(track, keepPlayStatus = true) {
+      const playlist = getCurrentPlaylist();
+      els.coverPlaylist.textContent = `歌單：${playlist.name}`;
+
+      if (!track) {
+        els.coverTitle.textContent = "尚未選擇歌曲";
+        els.coverMeta.textContent = "類別 / 備註";
+        if (!keepPlayStatus) {
+          state.isPlaying = false;
+          updatePlayPauseButton();
+        }
+        return;
+      }
+
+      const actualSource = getEffectiveTrackSource(track);
+      els.coverTitle.textContent = track.title;
+      els.coverMeta.textContent = `${track.category}${track.note ? ` / ${track.note}` : ""}`;
+
+      if (!keepPlayStatus) {
+        state.isPlaying = false;
+        updatePlayPauseButton();
+      }
+    }
+
+    function updatePlayPauseButton() {
+      els.playPauseBtn.textContent = state.isPlaying ? "⏸︎" : "▶︎";
+      els.playPauseBtn.setAttribute("aria-label", state.isPlaying ? "暫停" : "播放");
+      els.playPauseBtn.setAttribute("title", state.isPlaying ? "暫停" : "播放");
+    }
+
+    function updateRepeatButton() {
+      const map = {
+        list: "循環：列表",
+        one: "循環：單曲",
+        off: "循環：關"
+      };
+      els.repeatBtn.textContent = map[state.repeatMode];
+      els.repeatBtn.classList.toggle('active', state.repeatMode !== 'off');
+    }
+
+    function updateShuffleButton() {
+      els.shuffleBtn.textContent = `隨機：${state.shuffle ? "開" : "關"}`;
+      els.shuffleBtn.classList.toggle('active', state.shuffle);
+    }
+
+    function setProgress(current, duration) {
+      const max = duration > 0 ? duration : 0;
+      els.seekBar.max = max;
+      const currentValue = Math.min(current, max || 0);
+
+      if (!state.seekDragging) {
+        els.seekBar.value = currentValue;
+      }
+
+      updateRangeFill(
+        els.seekBar,
+        state.seekDragging ? Number(els.seekBar.value) : currentValue,
+        max || 100,
+        "#8fb4ff",
+        "rgba(143,180,255,.22)"
+      );
+
+      els.currentTimeText.textContent = formatTime(current);
+      els.durationText.textContent = formatTime(duration);
+    }
+
+    function updateRangeFill(el, value, max, fillColor, glowColor, emptyColor = "#03050b") {
+      const safeMax = Number(max) > 0 ? Number(max) : 100;
+      const safeValue = Math.max(0, Math.min(Number(value), safeMax));
+      const percent = (safeValue / safeMax) * 100;
+
+      el.style.background = `
+        linear-gradient(to bottom, rgba(255,255,255,.08), rgba(255,255,255,0) 55%),
+        linear-gradient(to right,
+          ${fillColor} 0%,
+          ${fillColor} ${percent}%,
+          ${emptyColor} ${percent}%,
+          ${emptyColor} 100%)
+      `;
+      el.style.borderRadius = "999px";
+      el.style.boxShadow = `
+        inset 0 0 0 1px rgba(255,255,255,.025),
+        inset 0 0 12px rgba(0,0,0,.52),
+        0 0 10px ${percent > 0 ? glowColor : "transparent"}
+      `;
+    }
+
+    function syncPlayerMode() {}
+
+    function stopAllPlayback() {
+      if (ytPlayer && state.ytReady) ytPlayer.pauseVideo();
+      state.isPlaying = false;
+      updatePlayPauseButton();
+    }
+
+    function playTrack(index, forceReload = false) {
+      const track = state.filteredTracks[index];
+      if (!track) return;
+
+      state.trackIndex = index;
+      highlightActiveTrack();
+      updateCover(track, true);
+
+      const actualSource = getEffectiveTrackSource(track);
+      if (!actualSource) {
+        alert(`歌曲「${track.title}」沒有可播放來源。`);
+        state.isPlaying = false;
+        updatePlayPauseButton();
+        return;
+      }
+
+      syncPlayerMode();
+      playYouTubeTrack(track, forceReload);
+
+      saveState();
+    }
+
+    function playYouTubeTrack(track, forceReload = false) {
+      if (!track.videoId) {
+        alert(`歌曲「${track.title}」缺少 YouTube videoId。`);
+        return;
+      }
+      if (!state.ytReady || !ytPlayer) {
+        state.pendingAutoplay = true;
+        updateCover(track, false);
+        return;
+      }
+
+      const currentVideoData = ytPlayer.getVideoData ? ytPlayer.getVideoData() : null;
+      const currentVideoId = currentVideoData && currentVideoData.video_id ? currentVideoData.video_id : "";
+
+      if (forceReload || currentVideoId !== track.videoId) {
+        ytPlayer.loadVideoById(track.videoId);
+      } else {
+        ytPlayer.playVideo();
+      }
+
+      state.isPlaying = true;
+      updatePlayPauseButton();
+    }
+
+    function getNextIndex() {
+      const total = state.filteredTracks.length;
+      if (!total) return -1;
+      if (state.repeatMode === "one") return state.trackIndex;
+
+      if (state.shuffle) {
+        if (total === 1) return 0;
+        let next = state.trackIndex;
+        while (next === state.trackIndex) {
+          next = Math.floor(Math.random() * total);
+        }
+        return next;
+      }
+
+      const next = state.trackIndex + 1;
+      if (next < total) return next;
+
+      if (state.repeatMode === "list") return 0;
+      return -1;
+    }
+
+    function getPrevIndex() {
+      const total = state.filteredTracks.length;
+      if (!total) return -1;
+      if (state.shuffle) return Math.floor(Math.random() * total);
+      const prev = state.trackIndex - 1;
+      if (prev >= 0) return prev;
+      if (state.repeatMode === "list") return total - 1;
+      return -1;
+    }
+
+    function playNext() {
+      const nextIndex = getNextIndex();
+      if (nextIndex === -1) {
+        state.isPlaying = false;
+        updatePlayPauseButton();
+        return;
+      }
+      playTrack(nextIndex, true);
+    }
+
+    function playPrev() {
+      const prevIndex = getPrevIndex();
+      if (prevIndex === -1) return;
+      playTrack(prevIndex, true);
+    }
+
+    function togglePlayPause() {
+      if (state.trackIndex === -1) {
+        if (state.filteredTracks.length) playTrack(0, true);
+        return;
+      }
+
+      const track = state.filteredTracks[state.trackIndex];
+      if (!track) return;
+      const actualSource = getEffectiveTrackSource(track);
+
+      if (actualSource === "youtube") {
+        if (!ytPlayer || !state.ytReady) return;
+        const playerState = ytPlayer.getPlayerState();
+        if (playerState === YT.PlayerState.PLAYING) {
+          ytPlayer.pauseVideo();
+          state.isPlaying = false;
+        } else {
+          ytPlayer.playVideo();
+          state.isPlaying = true;
+        }
+      }
+      updatePlayPauseButton();
+    }
+
+    function setupEvents() {
+      els.searchInput.addEventListener("input", e => {
+        state.search = e.target.value;
+        state.trackIndex = -1;
+        refreshTrackList(true);
+      });
+
+      els.prevBtn.addEventListener("click", playPrev);
+      els.playPauseBtn.addEventListener("click", togglePlayPause);
+      els.nextBtn.addEventListener("click", playNext);
+
+      els.shuffleBtn.addEventListener("click", () => {
+        state.shuffle = !state.shuffle;
+        updateShuffleButton();
+        saveState();
+      });
+
+      els.repeatBtn.addEventListener("click", () => {
+        state.repeatMode = state.repeatMode === "list" ? "one" : state.repeatMode === "one" ? "off" : "list";
+        updateRepeatButton();
+        saveState();
+      });
+
+      els.volumeRange.addEventListener("input", e => {
+        state.volume = Number(e.target.value);
+        els.volumeText.textContent = `${state.volume}%`;
+        updateRangeFill(els.volumeRange, state.volume, 100, "rgba(140,108,255,.78)", "rgba(140,108,255,.22)");
+        if (ytPlayer && state.ytReady) ytPlayer.setVolume(state.volume);
+        saveState();
+      });
+
+      els.seekBar.addEventListener("input", () => {
+        state.seekDragging = true;
+        els.currentTimeText.textContent = formatTime(Number(els.seekBar.value));
+        updateRangeFill(
+          els.seekBar,
+          Number(els.seekBar.value),
+          Number(els.seekBar.max) || 100,
+          "rgba(143,180,255,.78)",
+          "rgba(143,180,255,.18)"
+        );
+      });
+
+      els.seekBar.addEventListener("change", () => {
+        const target = Number(els.seekBar.value);
+        const track = state.filteredTracks[state.trackIndex];
+        if (!track) return;
+        const actualSource = getEffectiveTrackSource(track);
+        if (actualSource === "youtube" && ytPlayer && state.ytReady) {
+          ytPlayer.seekTo(target, true);
+        }
+        state.seekDragging = false;
+      });
+    }
+
+    function startProgressTimer() {
+      clearInterval(progressTimer);
+      progressTimer = setInterval(() => {
+        if (state.trackIndex === -1) return;
+        const track = state.filteredTracks[state.trackIndex];
+        if (!track) return;
+        const actualSource = getEffectiveTrackSource(track);
+
+        if (actualSource === "youtube" && ytPlayer && state.ytReady) {
+          const cur = ytPlayer.getCurrentTime ? ytPlayer.getCurrentTime() : 0;
+          const dur = ytPlayer.getDuration ? ytPlayer.getDuration() : 0;
+          setProgress(cur, dur);
+        }
+      }, 500);
+    }
+
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player("youtubePlayer", {
+        videoId: "",
+        playerVars: {
+          autoplay: 0,
+          controls: 1,
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1
+        },
+        events: {
+          onReady: () => {
+            state.ytReady = true;
+            ytPlayer.setVolume(state.volume);
+
+            if (state.pendingAutoplay && state.trackIndex >= 0 && state.filteredTracks[state.trackIndex]) {
+              const pendingTrack = state.filteredTracks[state.trackIndex];
+              state.pendingAutoplay = false;
+              playYouTubeTrack(pendingTrack, true);
+            }
+          },
+          onStateChange: event => {
+            if (event.data === YT.PlayerState.PLAYING) {
+              state.isPlaying = true;
+              updatePlayPauseButton();
+            }
+            if (event.data === YT.PlayerState.PAUSED) {
+              state.isPlaying = false;
+              updatePlayPauseButton();
+            }
+            if (event.data === YT.PlayerState.ENDED) {
+              if (state.repeatMode === "one" && state.trackIndex >= 0) {
+                playTrack(state.trackIndex, true);
+                return;
+              }
+              playNext();
+            }
+          }
+        }
+      });
+    }
+
+    window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+
+    function injectYouTubeApi() {
+      const script = document.createElement("script");
+      script.src = "https://www.youtube.com/iframe_api";
+      document.body.appendChild(script);
+    }
+
+    function init() {
+      renderPlaylists();
+      renderCategories();
+      els.searchInput.value = state.search;
+      els.volumeRange.value = state.volume;
+      els.volumeText.textContent = `${state.volume}%`;
+      updateShuffleButton();
+      updateRepeatButton();
+      syncPlayerMode();
+      refreshTrackList(true);
+      setupEvents();
+      startProgressTimer();
+      injectYouTubeApi();
+      updateRangeFill(els.volumeRange, state.volume, 100, "rgba(140,108,255,.78)", "rgba(140,108,255,.22)");
+      updateRangeFill(els.seekBar, 0, 100, "rgba(143,180,255,.78)", "rgba(143,180,255,.18)");
+    }
+
+    init();
+  </script>
+</body>
+</html>
