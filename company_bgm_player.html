@@ -355,6 +355,14 @@
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
     }
 
+    .player-blocker {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: transparent;
+      cursor: default;
+    }
+
     #youtubeShell {
       position: absolute;
       inset: 0;
@@ -798,6 +806,7 @@
             <div id="youtubeShell" class="player-layer">
               <div id="youtubePlayer"></div>
             </div>
+            <div class="player-blocker" aria-hidden="true"></div>
           </div>
 
           <div class="control-bar">
@@ -1289,20 +1298,13 @@
       const safeValue = Math.max(0, Math.min(Number(value), safeMax));
       const percent = (safeValue / safeMax) * 100;
 
-      el.style.background = `
-        linear-gradient(to bottom, rgba(255,255,255,.08), rgba(255,255,255,0) 55%),
-        linear-gradient(to right,
-          ${fillColor} 0%,
-          ${fillColor} ${percent}%,
-          ${emptyColor} ${percent}%,
-          ${emptyColor} 100%)
-      `;
+      el.style.background = `linear-gradient(to right,
+        ${fillColor} 0%,
+        ${fillColor} ${percent}%,
+        ${emptyColor} ${percent}%,
+        ${emptyColor} 100%)`;
       el.style.borderRadius = "999px";
-      el.style.boxShadow = `
-        inset 0 0 0 1px rgba(255,255,255,.025),
-        inset 0 0 12px rgba(0,0,0,.52),
-        0 0 10px ${percent > 0 ? glowColor : "transparent"}
-      `;
+      el.style.boxShadow = `inset 0 0 0 1px rgba(255,255,255,.03), inset 0 0 10px rgba(0,0,0,.55), 0 0 10px ${percent > 0 ? glowColor : "transparent"}`;
     }
 
     function syncPlayerMode() {}
@@ -1456,7 +1458,7 @@
       els.volumeRange.addEventListener("input", e => {
         state.volume = Number(e.target.value);
         els.volumeText.textContent = `${state.volume}%`;
-        updateRangeFill(els.volumeRange, state.volume, 100, "rgba(140,108,255,.78)", "rgba(140,108,255,.22)");
+        updateRangeFill(els.volumeRange, state.volume, 100, "#8c6cff", "rgba(140,108,255,.30)");
         if (ytPlayer && state.ytReady) ytPlayer.setVolume(state.volume);
         saveState();
       });
@@ -1468,8 +1470,8 @@
           els.seekBar,
           Number(els.seekBar.value),
           Number(els.seekBar.max) || 100,
-          "rgba(143,180,255,.78)",
-          "rgba(143,180,255,.18)"
+          "#8fb4ff",
+          "rgba(143,180,255,.22)"
         );
       });
 
@@ -1515,12 +1517,6 @@
           onReady: () => {
             state.ytReady = true;
             ytPlayer.setVolume(state.volume);
-
-            if (state.pendingAutoplay && state.trackIndex >= 0 && state.filteredTracks[state.trackIndex]) {
-              const pendingTrack = state.filteredTracks[state.trackIndex];
-              state.pendingAutoplay = false;
-              playYouTubeTrack(pendingTrack, true);
-            }
           },
           onStateChange: event => {
             if (event.data === YT.PlayerState.PLAYING) {
@@ -1564,8 +1560,8 @@
       setupEvents();
       startProgressTimer();
       injectYouTubeApi();
-      updateRangeFill(els.volumeRange, state.volume, 100, "rgba(140,108,255,.78)", "rgba(140,108,255,.22)");
-      updateRangeFill(els.seekBar, 0, 100, "rgba(143,180,255,.78)", "rgba(143,180,255,.18)");
+      updateRangeFill(els.volumeRange, state.volume, 100, "#8c6cff", "rgba(140,108,255,.30)");
+      updateRangeFill(els.seekBar, 0, 100, "#8fb4ff", "rgba(143,180,255,.22)");
     }
 
     init();
