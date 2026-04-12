@@ -354,6 +354,13 @@
       height: 188px;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
     }
+    .player-blocker {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: transparent;
+      cursor: default;
+    }
 
     #youtubeShell {
       position: absolute;
@@ -820,6 +827,7 @@
             <div id="youtubeShell" class="player-layer">
               <div id="youtubePlayer"></div>
             </div>
+            <div class="player-blocker" aria-hidden="true"></div>
           </div>
 
           <div class="control-bar">
@@ -888,11 +896,128 @@
               note: "Popular rap, brand store background music"
             },
             {
+              id: "tw-011",
+              title: "百變造型",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "_mJX4GBFsS0",
+              mp3: "music/chinese/song-01.mp3",
+              note: "Mandarin Pop Rap, Trendy HipHop"
+            },
+            {
+              id: "tw-003",
+              title: "只留下清楚",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "GkOE-n76CkY",
+              mp3: "music/chinese/song-03.mp3",
+              note: "Urban Pop, upbeat rhythms, with light jazz drum beats, clean bass lines, modern synth vibe"
+            },
+            {
+              id: "tw-018",
+              title: "目光的裁縫",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "teY-yjSHZao",
+              mp3: "music/chinese/song-18.mp3",
+              note: "Urban Pop style, with a touch of light jazz or modern synthesizer sound; City Pop, Modern Pop"
+            },
+            {
+              id: "tw-012",
+              title: "霓虹底下",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "fNraAIHggbE",
+              mp3: "music/chinese/song-12.mp3",
+              note: "Modern pop music, with a neon-lit feel and a sense of loneliness"
+            },
+            {
+              id: "tw-013",
+              title: "輪廓 CONTOUR",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "jr0A5Lx1B6s",
+              mp3: "music/chinese/song-13.mp3",
+              note: "Dark K-pop, nightclub anthem, heavy bass"
+            },
+            {
+              id: "tw-002",
+              title: "午後微醺",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "AkfTNQdxMnQ",
+              mp3: "music/chinese/song-02.mp3",
+              note: "mellow cafe jazz, warm afternoon atmosphere"
+            },
+            {
+              id: "tw-004",
+              title: "披風",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "LblZ-lqdU34",
+              mp3: "music/chinese/song-04.mp3",
+              note: "Pop Rock, electric guitar driven, emotional"
+            },
+            {
+              id: "tw-010",
+              title: "目光的層次",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "Tys27iCz9jg",
+              mp3: "music/chinese/song-10.mp3",
+              note: "Neo-Soul mixed with Acoustic Hip-Hop, warm acoustic guitar, soft punchy drums"
+            },
+            {
+              id: "tw-015",
+              title: "耀眼那一刻",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "ljJ1LpPXxhI",
+              mp3: "music/chinese/song-15.mp3",
+              note: "Mandarin Pop, K-pop Lite, Chill Pop"
+            },
+            {
+              id: "tw-016",
+              title: "夏天戴上墨鏡",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "mdrBlTz8RFQ",
+              mp3: "music/chinese/song-16.mp3",
+              note: "Pop music, guitar, snare drum"
+            },
+            {
+              id: "tw-008",
+              title: "乘風破浪",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "FTHbE2vbndU",
+              mp3: "music/chinese/song-08.mp3",
+              note: "Blending pop hip-hop and rock energy, Electric guitar, snare drum"
+            },
+            {
+              id: "tw-020",
+              title: "目光的專屬",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "v27ZCzPSr80",
+              mp3: "music/chinese/song-20.mp3",
+              note: "Modern Hip Hop, Trendy Pop Rap, Minimalist Beat"
+            },
+            {
+              id: "tw-025",
+              title: "今天要見你",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "FZj9dyiw2sA",
+              mp3: "music/chinese/song-25.mp3",
+              note: "K-pop, Korean R&B, Soft Trap"
+            },
+            {
               id: "kr-001",
               title: "Break the Noise",
               category: "日韓",
               sourceType: "youtube",
-              videoId: "S-loXAUE6jc",
+              videoId: "nkr9RkynUX4",
               mp3: "music/korean/song-01.mp3",
               note: "K-pop, dance-pop "
             },
@@ -901,7 +1026,7 @@
               title: "Burn Up the Night",
               category: "日韓",
               sourceType: "youtube",
-              videoId: "UuNOrb1j3xQ",
+              videoId: "3PtrMhFE808",
               mp3: "music/korean/song-02.mp3",
               note: "K-pop, dance-pop"
             },
@@ -919,7 +1044,7 @@
               title: "COPY & PASTE",
               category: "日韓",
               sourceType: "youtube",
-              videoId: "h-ISrJ2pW6Q",
+              videoId: "nw-8StWfUWc",
               mp3: "music/korean/song-04.mp3",
               note: "K-pop, dance-pop"
             },
@@ -948,10 +1073,28 @@
               sourceType: "youtube",
               videoId: "67mHSk_pPhM",
               mp3: "music/korean/song-07.mp3",
-              note: "K-pop,  bright electro dance-pop,"
+              note: "K-pop,  bright electro dance-pop"
             },
             {
-              id: "en-002",
+              id: "tw-017",
+              title: "視界重生",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "s2tOteYP4BA",
+              mp3: "music/japanese/song-17.mp3",
+              note: "Mandarin Pop Rap, Trendy HipHop"
+            },
+            {
+              id: "tw-015",
+              title: "耀眼那一刻",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "ljJ1LpPXxhI",
+              mp3: "music/chinese/song-15.mp3",
+              note: "Mandarin Pop, K-pop Lite, Chill Pop"
+            },
+            {
+              id: "en-005",
               title: "Every Color Every Day",
               category: "西洋",
               sourceType: "youtube",
@@ -959,6 +1102,24 @@
               mp3: "music/english/every-color-every-day.mp3",
               note: "funk, Bouncy electro-pop, soft"
             }, 
+            {
+              id: "en-004",
+              title: "Crystal Glasses",
+              category: "西洋",
+              sourceType: "youtube",
+              videoId: "HhVBSgHc-Uc",
+              mp3: "music/english/crystal-glasses.mp3",
+              note: "Rap, Shiny modern pop beat with bright side-chained synths,  smooth round bass"
+            }, 
+            {
+              id: "tw-003",
+              title: "留白午後",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "FjdO195ITBI",
+              mp3: "music/chinese/song-03.mp3",
+              note: "Longer light jazz song,  bossa nova,  acoustic cafe vibe"
+            },
             {
               id: "kr-008",
               title: "Sugar Pop",
@@ -969,13 +1130,40 @@
               note: "K-pop, danceable beat, playful and flirty mood"
             },
             {
+              id: "tw-022",
+              title: "青春不設限",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "wbQqhcZvIbw",
+              mp3: "music/japanese/song-22.mp3",
+              note: "Mandarin Pop Rap, Trendy HipHop"
+            },
+            {
               id: "bgm-001",
-              title: "輕柔 BGM 示例 01",
+              title: "城市倒影-BGM",
               category: "BGM",
               sourceType: "youtube",
-              videoId: "jfKfPfyJRdk",
+              videoId: "RC4_tP0IsKg",
               mp3: "music/bgm/bgm-01.mp3",
-              note: "低干擾背景音樂"
+              note: "Modern pop instrumental with bright synth plucks"
+            },
+            {
+              id: "bgm-011",
+              title: "街景漫遊-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "xBS98XgsBFg",
+              mp3: "music/bgm/bgm-011.mp3",
+              note: "Modern pop instrumental with bright synth plucks"
+            },
+            {
+              id: "bgm-003",
+              title: "大倉酷 Cypher-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "H05nv-DlHPU",
+              mp3: "music/bgm/bgm-03.mp3",
+              note: "Urban Pop, Hip Hop Background Music (yes,now you can FreeStyle)"
             }
           ]
         },
@@ -985,6 +1173,24 @@
           description: "偏輕鬆、較柔和、抒情、適合晚間門市",
           tracks: [
             {
+              id: "tw-009",
+              title: "慢慢亮起的街",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "SZPyGRc3uX4",
+              mp3: "music/chinese/song-09.mp3",
+              note: "City Pop, Retro Pop, Chill Funk"
+            },
+            {
+              id: "tw-026",
+              title: "把光穿在身上",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "Yg-sSoNxLeQ",
+              mp3: "music/chinese/song-26.mp3",
+              note: "Poetic soft pop, urban acoustic ballad, light piano and acoustic guitar"
+            },
+            {
               id: "tw-002",
               title: "下雨的街口",
               category: "中文",
@@ -992,6 +1198,60 @@
               videoId: "3mRai78CFoU",
               mp3: "music/chinese/song-02.mp3",
               note: "Popular love songs / R&B ballads"
+            },
+           {
+              id: "tw-007",
+              title: "斷了琴絃",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "Efqk6_5eJqY",
+              mp3: "music/chinese/song-07.mp3",
+              note: "Pop love songs, R&B, piano-dominated, with strings as the base."
+            },
+            {
+              id: "tw-006",
+              title: "別再照舊",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "1Q6zsT9ZNGg",
+              mp3: "music/chinese/song-06.mp3",
+              note: "Lo-fi rap, emotional trap beat, cinematic urban night vibe"
+            },
+            {
+              id: "tw-014",
+              title: "隔著一場天氣想你",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "l-UNTnm5RpQ",
+              mp3: "music/chinese/song-14.mp3",
+              note: "Mandarin pop, nighttime urban feel, piano and electric guitar"
+            },
+            {
+              id: "kr-008",
+              title: "혼자 남은 밤",
+              category: "日韓",
+              sourceType: "youtube",
+              videoId: "sL0hGT0nB5s",
+              mp3: "music/korean/song-08.mp3",
+              note: "Korean male vocals popular ballads, quiet, late at night, lonely"
+            },
+            {
+              id: "tw-019",
+              title: "你還好嗎",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "tnEYh-ZsRTg",
+              mp3: "music/chinese/song-19.mp3",
+              note: "pop ballad,soft piano and strings, comforting and heartfelt"
+            },
+            {
+              id: "jp-004",
+              title: "言えないまま",
+              category: "日韓",
+              sourceType: "youtube",
+              videoId: "VEoOO1vHJL0",
+              mp3: "music/japanese/song-04.mp3",
+              note: "Japanese City Pop / J-pop Ballad / Soft R&B"
             },
             {
               id: "jp-002",
@@ -1010,6 +1270,24 @@
               videoId: "jR34oAkeQ2c",
               mp3: "music/japanese/song-03.mp3",
               note: "Japanese City Pop, J-pop Ballad, Soft R&B,  Lyrical music"
+            },
+            {
+              id: "tw-021",
+              title: "把夜色折成信",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "w5Id0xRt9go",
+              mp3: "music/chinese/song-21.mp3",
+              note: "Urban folk pop, piano and acoustic guitar"
+            },
+            {
+              id: "tw-023",
+              title: "行人號誌",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "wuliyJnEtg0",
+              mp3: "music/chinese/song-23.mp3",
+              note: "Urban pop, piano and acoustic guitar"
             },
             {
               id: "en-002",
@@ -1039,22 +1317,175 @@
               note: "funk, Bouncy electro-pop, soft"
             }, 
             {
+              id: "en-006",
+              title: "Mirror Space",
+              category: "西洋",
+              sourceType: "youtube",
+              videoId: "-z9LQTxHQQg",
+              mp3: "music/english/Mirror-Space.mp3",
+              note: "Rap, Shiny modern pop beat with bright side-chained synths,  smooth round bass"
+            }, 
+            {
+              id: "tw-024",
+              title: "慢慢更好",
+              category: "中文",
+              sourceType: "youtube",
+              videoId: "zRBvr4FNTLs",
+              mp3: "music/chinese/song-24.mp3",
+              note: "Korean-Chinese fusion song, pop music"
+            },
+            {
               id: "bgm-002",
-              title: "柔和 BGM 示例 02",
+              title: "倫敦漫步-BGM",
               category: "BGM",
               sourceType: "youtube",
-              videoId: "5qap5aO4i9A",
+              videoId: "P9E6OO7TVlE",
               mp3: "music/bgm/bgm-02.mp3",
-              note: "較適合長時間循環"
+              note: "A coffee shop with a relaxed and comfortable atmosphere and piano music"
+            },
+            {
+              id: "bgm-010",
+              title: "愜意午後-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "gj1tJRT4UXU",
+              mp3: "music/bgm/bgm-010.mp3",
+              note: "A coffee shop with a relaxed and comfortable atmosphere and piano music"
+            },
+            {
+              id: "bgm-009",
+              title: "層架上的光彩-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "I1Z4pPb6qe8",
+              mp3: "music/bgm/bgm-09.mp3",
+              note: "Bright commercial pop groove with light rap cadence"
+            },
+            {
+              id: "bgm-009",
+              title: "玻璃櫃中的時尚-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "Z5FDINiQQAE",
+              mp3: "music/bgm/bgm-09.mp3",
+              note: "Modern pop instrumental with bright synth plucks, smooth side-chained bass"
+            },
+            {
+              id: "bgm-017",
+              title: "櫥櫃窗邊的霓虹-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "Dwr7YnMma7E",
+              mp3: "music/bgm/bgm-017.mp3",
+              note: "Bright commercial pop groove with light rap cadence"
+            },
+            {
+              id: "bgm-005",
+              title: "公園小水漥-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "QqHL4IJb1Iw",
+              mp3: "music/bgm/bgm-05.mp3",
+              note: "Airy piano trio with brushes and warm upright bass"
+            },
+            {
+              id: "bgm-006",
+              title: "抹茶拿鐵-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "iI4AXdI8S1M",
+              mp3: "music/bgm/bgm-06.mp3",
+              note: "Airy piano trio with brushes and warm upright bass"
+            },
+            {
+              id: "bgm-008",
+              title: "粉紅色的天空-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "tWHLlDjGMcs",
+              mp3: "music/bgm/bgm-08.mp3",
+              note: "Bouncy mid-tempo pop with light rap inflection, bright synth plucks over a silky bassline and crisp, tight drums"
+            },
+            {
+              id: "bgm-007",
+              title: "捕捉美好-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "3Qxd8SAZptY",
+              mp3: "music/bgm/bgm-07.mp3",
+              note: "Modern pop groove with light rap influence; crisp drum loop"
+            },
+            {
+              id: "bgm-014",
+              title: "捕捉美好-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "xhmHjpenkE8",
+              mp3: "music/bgm/bgm-14.mp3",
+              note: "Modern pop groove with light rap influence; crisp drum loop"
+            },
+            {
+              id: "bgm-004",
+              title: "日出的微風-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "-5dvYV5ihBQ",
+              mp3: "music/bgm/bgm-04.mp3",
+              note: "Bouncy mid-tempo pop with light rap inflection"
+            },
+            {
+              id: "bgm-013",
+              title: "慵懶下午茶-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "Uubf3rZR-54",
+              mp3: "music/bgm/bgm-13.mp3",
+              note: "Laid-back light jazz trio with brushed drums,  warm upright bass"
+            },
+            {
+              id: "bgm-012",
+              title: "慵懶茶點-BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "stds3PeA1hE",
+              mp3: "music/bgm/bgm-12.mp3",
+              note: "Laid-back light jazz trio with brushed drums,  warm upright bass"
+            },
+            {
+              id: "bgm-015",
+              title: "繁忙燈火 -BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "vV2dAfY2YBo",
+              mp3: "music/bgm/bgm-015.mp3",
+              note: "Instrumental city pop, warm and nostalgic, smooth groove, 1980s"
+            },
+            {
+              id: "bgm-015",
+              title: "繁忙燈火 -BGM",
+              category: "BGM",
+              sourceType: "youtube",
+              videoId: "vV2dAfY2YBo",
+              mp3: "music/bgm/bgm-015.mp3",
+              note: "Instrumental city pop, warm and nostalgic, smooth groove, 1980s"
             },
             {
               id: "close-001",
-              title: "閉店播放示例 01",
+              title: "晚安，謝謝今天的蒞臨",
               category: "閉店",
               sourceType: "youtube",
-              videoId: "M7lc1UVf-VE",
+              videoId: "2-ynqw4VBlo",
               mp3: "music/closing/close-01.mp3",
-              note: "門市閉店時使用"
+              note: "Warm closing song,  gentle pop ballad,  soft goodnight atmosphere"
+            },
+            {
+              id: "close-002",
+              title: "晚安再會",
+              category: "閉店",
+              sourceType: "youtube",
+              videoId: "seICfwBP1ck",
+              mp3: "music/closing/close-02.mp3",
+              note: "Warm closing song, Gentle Urban Pop, Lo-fi, Light Jazz, Slow City Pop "
             }
           ]
         }
@@ -1069,7 +1500,7 @@
       category: localStorage.getItem("music_category") || "所有",
       search: "",
       trackIndex: -1,
-      shuffle: localStorage.getItem("music_shuffle") === "true",
+      shuffle: localStorage.getItem("music_shuffle") === null ? true : localStorage.getItem("music_shuffle") === "true",
       repeatMode: localStorage.getItem("music_repeat") || "list", // list | one | off
       volume: Number(localStorage.getItem("music_volume") || 55),
       filteredTracks: [],
