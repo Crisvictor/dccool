@@ -1499,7 +1499,9 @@
       isPlaying: false,
       ytReady: false,
       pendingAutoplay: false,
-      seekDragging: false
+      seekDragging: false,
+      playStats: JSON.parse(localStorage.getItem("music_play_stats") || "{}"),
+      recentQueue: JSON.parse(localStorage.getItem("music_recent_queue") || "[]")
     };
 
     const els = {
@@ -1547,6 +1549,60 @@
       localStorage.setItem("music_shuffle", String(state.shuffle));
       localStorage.setItem("music_repeat", state.repeatMode);
       localStorage.setItem("music_volume", String(state.volume));
+      localStorage.setItem("music_play_stats", JSON.stringify(state.playStats));
+      localStorage.setItem("music_recent_queue", JSON.stringify(state.recentQueue));
+    }
+
+    function syncPlaybackMemoryWithCurrentList() {
+      const validIds = new Set(state.filteredTracks.map(track => track.id));
+      state.recentQueue = state.recentQueue.filter(id => validIds.has(id)).slice(-5);
+    }
+
+    function markTrackPlayed(track) {
+      if (!track || !track.id) return;
+      state.playStats[track.id] = (state.playStats[track.id] || 0) + 1;
+      state.recentQueue = state.recentQueue.filter(id => id !== track.id);
+      state.recentQueue.push(track.id);
+      if (state.recentQueue.length > 5) {
+        state.recentQueue = state.recentQueue.slice(-5);
+      }
+      saveState();
+    }
+
+    function getWeightedRandomIndex(excludeIndex = -1) {
+      const candidates = state.filteredTracks
+        .map((track, index) => ({ track, index }))
+        .filter(item => item.index !== excludeIndex);
+
+      if (!candidates.length) return excludeIndex >= 0 ? excludeIndex : -1;
+      if (candidates.length === 1) return candidates[0].index;
+
+      const weighted = candidates.map(item => {
+        const playCount = state.playStats[item.track.id] || 0;
+        let weight = 1 / (playCount + 1);
+
+        const recentPos = state.recentQueue.lastIndexOf(item.track.id);
+        if (recentPos !== -1) {
+          const distanceFromLatest = state.recentQueue.length - 1 - recentPos;
+          const recentPenalty = [0.08, 0.18, 0.35, 0.55, 0.75][distanceFromLatest] ?? 0.85;
+          weight *= recentPenalty;
+        }
+
+        return {
+          index: item.index,
+          weight: Math.max(weight, 0.0001)
+        };
+      });
+
+      const totalWeight = weighted.reduce((sum, item) => sum + item.weight, 0);
+      let randomValue = Math.random() * totalWeight;
+
+      for (const item of weighted) {
+        randomValue -= item.weight;
+        if (randomValue <= 0) return item.index;
+      }
+
+      return weighted[weighted.length - 1].index;
     }
 
     function formatTime(sec) {
@@ -1620,6 +1676,7 @@
 
     function refreshTrackList(resetPlayer = false) {
       state.filteredTracks = getFilteredTracks();
+      syncPlaybackMemoryWithCurrentList();
       els.trackList.innerHTML = "";
 
       const playlist = getCurrentPlaylist();
@@ -1760,6 +1817,7 @@
       const track = state.filteredTracks[index];
       if (!track) return;
 
+      const previousTrackIndex = state.trackIndex;
       state.trackIndex = index;
       highlightActiveTrack();
       updateCover(track, true);
@@ -1770,6 +1828,10 @@
         state.isPlaying = false;
         updatePlayPauseButton();
         return;
+      }
+
+      if (previousTrackIndex !== index || forceReload) {
+        markTrackPlayed(track);
       }
 
       syncPlayerMode();
@@ -1809,11 +1871,7 @@
 
       if (state.shuffle) {
         if (total === 1) return 0;
-        let next = state.trackIndex;
-        while (next === state.trackIndex) {
-          next = Math.floor(Math.random() * total);
-        }
-        return next;
+        return getWeightedRandomIndex(state.trackIndex);
       }
 
       const next = state.trackIndex + 1;
@@ -1826,7 +1884,10 @@
     function getPrevIndex() {
       const total = state.filteredTracks.length;
       if (!total) return -1;
-      if (state.shuffle) return Math.floor(Math.random() * total);
+      if (state.shuffle) {
+        if (total === 1) return 0;
+        return getWeightedRandomIndex(state.trackIndex);
+      }
       const prev = state.trackIndex - 1;
       if (prev >= 0) return prev;
       if (state.repeatMode === "list") return total - 1;
