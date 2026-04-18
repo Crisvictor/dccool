@@ -1791,7 +1791,7 @@
       els.durationText.textContent = formatTime(duration);
     }
 
-    function updateRangeFill(el, value, max, fillColor, glowColor, emptyColor = "#03050b") {
+    function updateRangeFill(el, value, max, fillColor, glowColor, emptyColor = "#110c1a95") {
       const safeMax = Number(max) > 0 ? Number(max) : 100;
       const safeValue = Math.max(0, Math.min(Number(value), safeMax));
       const percent = (safeValue / safeMax) * 100;
