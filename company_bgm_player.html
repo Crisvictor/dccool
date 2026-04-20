@@ -274,6 +274,7 @@
       filter: blur(18px);
     }
 
+
     .cover-icon {
       width: 60px;
       height: 60px;
@@ -284,6 +285,176 @@
       place-items: center;
       font-size: 32px;
       margin-bottom: 18px;
+      position: relative;
+      isolation: isolate;
+      overflow: visible;
+    }
+
+    #playPauseBtn {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.16);
+      background:
+        linear-gradient(180deg, rgba(167,140,255,.24), rgba(111,73,255,.16)),
+        linear-gradient(135deg, var(--purple), var(--purple-2));
+      box-shadow:
+        0 10px 24px rgba(111,73,255,.22),
+        inset 0 1px 0 rgba(255,255,255,.18),
+        inset 0 -1px 0 rgba(0,0,0,.18);
+    }
+
+    /* cover-icon 保留旋轉雙光源 */
+    .cover-icon::before {
+      content: "";
+      position: absolute;
+      inset: -3px;
+      border-radius: inherit;
+      padding: 2px;
+      background: conic-gradient(
+        from 0deg,
+        rgba(0,0,0,0) 0deg 18deg,
+        rgba(160, 210, 255, 1) 26deg 40deg,
+        rgba(118, 91, 255, 1) 40deg 58deg,
+        rgba(0,0,0,0) 58deg 198deg,
+        rgba(160, 210, 255, 1) 206deg 220deg,
+        rgba(118, 91, 255, 1) 220deg 238deg,
+        rgba(0,0,0,0) 238deg 360deg
+      );
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite: exclude;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 2;
+      transform: rotate(0deg);
+      transform-origin: center;
+      filter:
+        drop-shadow(0 0 4px rgba(118, 91, 255, .9))
+        drop-shadow(0 0 10px rgba(160, 210, 255, .55));
+    }
+
+    .cover-icon::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: inherit;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.03),
+        0 0 12px rgba(118, 91, 255, .18),
+        0 0 22px rgba(160, 210, 255, .12);
+    }
+
+    body.music-playing .cover-icon::before {
+      opacity: 1;
+      animation: dualFlowSpin 1.9s linear infinite;
+    }
+
+    body.music-playing .cover-icon::after {
+      opacity: 1;
+    }
+
+    body.music-playing .cover-icon {
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.04),
+        0 0 10px rgba(118, 91, 255, .16),
+        0 0 18px rgba(160, 210, 255, .10);
+    }
+
+    /* 播放鍵改成較適合長方形的「巡航掃光」 */
+    #playPauseBtn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1.5px;
+      background:
+        linear-gradient(90deg,
+          rgba(255,255,255,.10) 0%,
+          rgba(170, 210, 255, .58) 18%,
+          rgba(128, 96, 255, .82) 50%,
+          rgba(170, 210, 255, .58) 82%,
+          rgba(255,255,255,.10) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite: exclude;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 2;
+      box-shadow:
+        0 0 10px rgba(118, 91, 255, .22),
+        0 0 16px rgba(160, 210, 255, .14);
+    }
+
+    #playPauseBtn::after {
+      content: "";
+      position: absolute;
+      top: -30%;
+      left: -70%;
+      width: 52%;
+      height: 160%;
+      background: linear-gradient(
+        115deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,.08) 28%,
+        rgba(190,220,255,.55) 48%,
+        rgba(135,105,255,.32) 56%,
+        rgba(255,255,255,.06) 72%,
+        rgba(255,255,255,0) 100%
+      );
+      transform: skewX(-22deg) translateX(0);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+      filter: blur(.2px);
+    }
+
+    body.music-playing #playPauseBtn::before {
+      opacity: 1;
+      animation: playBtnBorderPulse 1.8s ease-in-out infinite;
+    }
+
+    body.music-playing #playPauseBtn::after {
+      opacity: 1;
+      animation: playBtnSweep 1.9s linear infinite;
+    }
+
+    body.music-playing #playPauseBtn {
+      box-shadow:
+        0 10px 24px rgba(111,73,255,.32),
+        0 0 12px rgba(118, 91, 255, .20),
+        0 0 18px rgba(160, 210, 255, .12),
+        inset 0 1px 0 rgba(255,255,255,.22),
+        inset 0 -1px 0 rgba(0,0,0,.14);
+    }
+
+    @keyframes dualFlowSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes playBtnSweep {
+      0%   { transform: skewX(-22deg) translateX(0); }
+      100% { transform: skewX(-22deg) translateX(260%); }
+    }
+
+    @keyframes playBtnBorderPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 8px rgba(118, 91, 255, .18),
+          0 0 14px rgba(160, 210, 255, .08);
+      }
+      50% {
+        box-shadow:
+          0 0 12px rgba(118, 91, 255, .28),
+          0 0 18px rgba(160, 210, 255, .14);
+      }
     }
 
     .cover-title {
@@ -729,6 +900,13 @@
       opacity: .9;
     }
 
+
+    @property --flow-angle {
+      syntax: "<angle>";
+      inherits: false;
+      initial-value: 0deg;
+    }
+
     .hidden { display: none !important; }
 
     @media (max-width: 1180px) {
@@ -805,7 +983,7 @@
     <main class="panel main">
       <section class="top-grid">
         <div class="cover-card">
-          <div class="cover-icon">♪</div>
+          <div class="cover-icon" id="coverIcon">♪</div>
           <p class="meta" id="coverPlaylist">歌單：-</p>
           <h2 class="cover-title" id="coverTitle">尚未選擇歌曲</h2>
           <p class="meta" id="coverMeta">類別 / 備註</p>
@@ -1506,6 +1684,7 @@
 
     const els = {
       playlistList: document.getElementById("playlistList"),
+      coverIcon: document.getElementById("coverIcon"),
       categoryList: document.getElementById("categoryList"),
       searchInput: document.getElementById("searchInput"),
       coverPlaylist: document.getElementById("coverPlaylist"),
@@ -1749,10 +1928,19 @@
       }
     }
 
+    function updatePlayingVisualState() {
+      document.body.classList.toggle("music-playing", state.isPlaying);
+    }
+
+    function syncPlayingVisual() {
+      document.body.classList.toggle("music-playing", state.isPlaying);
+    }
+
     function updatePlayPauseButton() {
       els.playPauseBtn.textContent = state.isPlaying ? "⏸︎" : "▶︎";
       els.playPauseBtn.setAttribute("aria-label", state.isPlaying ? "暫停" : "播放");
       els.playPauseBtn.setAttribute("title", state.isPlaying ? "暫停" : "播放");
+      updatePlayingVisualState();
     }
 
     function updateRepeatButton() {
@@ -1954,6 +2142,8 @@
       els.repeatBtn.addEventListener("click", () => {
         state.repeatMode = state.repeatMode === "list" ? "one" : state.repeatMode === "one" ? "off" : "list";
         updateRepeatButton();
+      updatePlayingVisualState();
+      syncPlayingVisual();
         saveState();
       });
 
@@ -2064,6 +2254,7 @@
       injectYouTubeApi();
       updateRangeFill(els.volumeRange, state.volume, 100, "#8c6cff", "rgba(140,108,255,.30)");
       updateRangeFill(els.seekBar, 0, 100, "#8fb4ff", "rgba(143,180,255,.22)");
+      updatePlayPauseButton();
     }
 
     init();
