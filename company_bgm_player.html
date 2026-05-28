@@ -130,7 +130,8 @@
     }
 
     .playlist-list { grid-template-columns: 1fr; }
-    .category-list { grid-template-columns: repeat(2, 1fr); }
+    .category-list,
+    .block-list { display: grid; grid-template-columns: repeat(2, 1fr);gap: 10px; }
     .mode-list { grid-template-columns: repeat(2, 1fr); }
 
     .btn,
@@ -175,6 +176,29 @@
       background: linear-gradient(135deg, var(--purple), var(--purple-2));
       border-color: transparent;
       box-shadow: 0 10px 24px rgba(111,73,255,.26);
+    }
+    .chip.block-chip {
+      height: 58px;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      line-height: 1;
+      text-align: center;
+      padding: 0 12px;
+    }
+    .chip.block-chip.active {
+      height: 58px;
+      min-height: 58px;
+      padding: 0 8px;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .block-chip.active {
+      background: linear-gradient(135deg, rgba(255,122,140,.92), rgba(150,55,82,.92));
+      border-color: transparent;
+      box-shadow: 0 10px 24px rgba(255,122,140,.16);
     }
 
     .playlist-btn {
@@ -932,6 +956,7 @@
         padding: 14px;
       }
       .category-list,
+      .block-list,
       .mode-list {
         grid-template-columns: repeat(3, 1fr);
       }
@@ -970,6 +995,12 @@
       <div class="section">
         <p class="section-title">分類</p>
         <div class="category-list" id="categoryList"></div>
+      </div>
+
+      <div class="section">
+        <p class="section-title">屏蔽分類</p>
+        <div class="block-list" id="blockCategoryList"></div>
+        <p class="mini-note">取消該分類出現於目前歌單</p>
       </div>
 
       <div class="section">
@@ -2273,12 +2304,35 @@
       ]
     };
 
-    const CATEGORIES = ["所有", "中文", "日韓", "西洋", "BGM","閉店"];
+    const ALL_PLAYLIST_ID = "all-playlists";
+    const CLOSING_CATEGORY = "閉店";
+    const SHARED_CLOSING_PLAYLIST_NAME = "閉店共用";
+    const DEFAULT_PLAY_CATEGORIES = ["中文", "日韓", "西洋", "BGM"];
+    const CATEGORIES = ["所有", "中文", "日韓", "西洋", "BGM", CLOSING_CATEGORY];
+    const BLOCKABLE_CATEGORIES = ["中文", "日韓", "西洋", "BGM"];
+
+    function readStoredBlockedCategories() {
+      try {
+        const stored = JSON.parse(localStorage.getItem("music_blocked_categories_by_playlist") || "{}");
+        if (!stored || typeof stored !== "object" || Array.isArray(stored)) return {};
+        return Object.fromEntries(
+          Object.entries(stored).map(([playlistId, categories]) => [
+            playlistId,
+            Array.isArray(categories)
+              ? categories.filter(category => BLOCKABLE_CATEGORIES.includes(category))
+              : []
+          ])
+        );
+      } catch (error) {
+        return {};
+      }
+    }
 
     const state = {
       sourceMode: "youtube",
-      playlistId: localStorage.getItem("music_playlist_id") || MUSIC_DATA.playlists[0].id,
+      playlistId: localStorage.getItem("music_playlist_id") || ALL_PLAYLIST_ID,
       category: localStorage.getItem("music_category") || "所有",
+      blockedCategoriesByPlaylist: readStoredBlockedCategories(),
       search: "",
       trackIndex: -1,
       shuffle: localStorage.getItem("music_shuffle") === null ? true : localStorage.getItem("music_shuffle") === "true",
@@ -2297,6 +2351,7 @@
       playlistList: document.getElementById("playlistList"),
       coverIcon: document.getElementById("coverIcon"),
       categoryList: document.getElementById("categoryList"),
+      blockCategoryList: document.getElementById("blockCategoryList"),
       searchInput: document.getElementById("searchInput"),
       coverPlaylist: document.getElementById("coverPlaylist"),
       coverTitle: document.getElementById("coverTitle"),
@@ -2323,8 +2378,70 @@
     let ytPlayer = null;
     let progressTimer = null;
 
+    function getAllTracksWithPlaylistMeta() {
+      return MUSIC_DATA.playlists.flatMap(playlist =>
+        playlist.tracks.map(track => ({
+          ...track,
+          playlistId: playlist.id,
+          playlistName: playlist.name
+        }))
+      );
+    }
+
+    function getSharedClosingTracks() {
+      const seen = new Set();
+
+      return getAllTracksWithPlaylistMeta()
+        .filter(track => track.category === CLOSING_CATEGORY)
+        .filter(track => {
+          const key = track.videoId || track.mp3 || track.id || track.title;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .map(track => ({
+          ...track,
+          playlistId: "shared-closing",
+          playlistName: SHARED_CLOSING_PLAYLIST_NAME
+        }));
+    }
+
+    function getPlaylistTracksForCurrentCategory() {
+      if (state.category === CLOSING_CATEGORY) {
+        return getSharedClosingTracks();
+      }
+
+      return getCurrentPlaylist().tracks;
+    }
+
+    function getPlaylistOptions() {
+      const allTracks = getAllTracksWithPlaylistMeta();
+      return [
+        {
+          id: ALL_PLAYLIST_ID,
+          name: "全部播放",
+          description: "合併所有歌單",
+          tracks: allTracks,
+          badgeCount: allTracks.filter(track => DEFAULT_PLAY_CATEGORIES.includes(track.category)).length
+        },
+        ...MUSIC_DATA.playlists.map(playlist => ({
+          ...playlist,
+          badgeCount: playlist.tracks.length
+        }))
+      ];
+    }
+
     function getCurrentPlaylist() {
-      return MUSIC_DATA.playlists.find(p => p.id === state.playlistId) || MUSIC_DATA.playlists[0];
+      const playlist = getPlaylistOptions().find(p => p.id === state.playlistId);
+      return playlist || getPlaylistOptions()[0];
+    }
+
+    function getTrackMemoryKey(track) {
+      return `${track.playlistId || state.playlistId}::${track.id}`;
+    }
+
+    function getBlockedCategories() {
+      return state.blockedCategoriesByPlaylist[state.playlistId] || [];
     }
 
     function getEffectiveTrackSource(track) {
@@ -2336,6 +2453,7 @@
       localStorage.setItem("music_source_mode", state.sourceMode);
       localStorage.setItem("music_playlist_id", state.playlistId);
       localStorage.setItem("music_category", state.category);
+      localStorage.setItem("music_blocked_categories_by_playlist", JSON.stringify(state.blockedCategoriesByPlaylist));
       localStorage.setItem("music_shuffle", String(state.shuffle));
       localStorage.setItem("music_repeat", state.repeatMode);
       localStorage.setItem("music_volume", String(state.volume));
@@ -2344,15 +2462,16 @@
     }
 
     function syncPlaybackMemoryWithCurrentList() {
-      const validIds = new Set(state.filteredTracks.map(track => track.id));
+      const validIds = new Set(state.filteredTracks.map(track => getTrackMemoryKey(track)));
       state.recentQueue = state.recentQueue.filter(id => validIds.has(id)).slice(-5);
     }
 
     function markTrackPlayed(track) {
       if (!track || !track.id) return;
-      state.playStats[track.id] = (state.playStats[track.id] || 0) + 1;
-      state.recentQueue = state.recentQueue.filter(id => id !== track.id);
-      state.recentQueue.push(track.id);
+      const memoryKey = getTrackMemoryKey(track);
+      state.playStats[memoryKey] = (state.playStats[memoryKey] || 0) + 1;
+      state.recentQueue = state.recentQueue.filter(id => id !== memoryKey);
+      state.recentQueue.push(memoryKey);
       if (state.recentQueue.length > 5) {
         state.recentQueue = state.recentQueue.slice(-5);
       }
@@ -2368,10 +2487,11 @@
       if (candidates.length === 1) return candidates[0].index;
 
       const weighted = candidates.map(item => {
-        const playCount = state.playStats[item.track.id] || 0;
+        const memoryKey = getTrackMemoryKey(item.track);
+        const playCount = state.playStats[memoryKey] || 0;
         let weight = 1 / (playCount + 1);
 
-        const recentPos = state.recentQueue.lastIndexOf(item.track.id);
+        const recentPos = state.recentQueue.lastIndexOf(memoryKey);
         if (recentPos !== -1) {
           const distanceFromLatest = state.recentQueue.length - 1 - recentPos;
           const recentPenalty = [0.08, 0.18, 0.35, 0.55, 0.75][distanceFromLatest] ?? 0.85;
@@ -2403,30 +2523,32 @@
     }
 
     function getFilteredTracks() {
-      const playlist = getCurrentPlaylist();
+      const tracks = getPlaylistTracksForCurrentCategory();
       const kw = state.search.trim().toLowerCase();
+      const blockedCategories = getBlockedCategories();
 
-      return playlist.tracks.filter(track => {
+      return tracks.filter(track => {
         const trackCategory = track.category;
 
         let categoryOk = false;
 
         if (state.category === "所有") {
-          categoryOk = ["中文", "日韓", "西洋", "BGM"].includes(trackCategory);
+          categoryOk = DEFAULT_PLAY_CATEGORIES.includes(trackCategory);
         } else {
           categoryOk = trackCategory === state.category;
         }
 
-        const keywordTarget = `${track.title} ${track.category} ${track.note || ""}`.toLowerCase();
+        const blockedOk = !blockedCategories.includes(trackCategory);
+        const keywordTarget = `${track.title} ${track.category} ${track.note || ""} ${track.playlistName || ""}`.toLowerCase();
         const searchOk = !kw || keywordTarget.includes(kw);
 
-        return categoryOk && searchOk;
+        return categoryOk && blockedOk && searchOk;
       });
     }
 
     function renderPlaylists() {
       els.playlistList.innerHTML = "";
-      MUSIC_DATA.playlists.forEach(playlist => {
+      getPlaylistOptions().forEach(playlist => {
         const btn = document.createElement("button");
         btn.className = `playlist-btn ${playlist.id === state.playlistId ? "active" : ""}`;
         btn.innerHTML = `
@@ -2434,13 +2556,14 @@
             <span class="playlist-name">${playlist.name}</span>
             <span class="mini-note">${playlist.description || ""}</span>
           </div>
-          <span class="badge">${playlist.tracks.length} 首</span>
+          <span class="badge">${playlist.badgeCount ?? playlist.tracks.length} 首</span>
         `;
         btn.onclick = () => {
           state.playlistId = playlist.id;
           state.trackIndex = -1;
           saveState();
           renderPlaylists();
+          renderBlockedCategories();
           refreshTrackList(true);
         };
         els.playlistList.appendChild(btn);
@@ -2464,6 +2587,33 @@
       });
     }
 
+    function renderBlockedCategories() {
+      els.blockCategoryList.innerHTML = "";
+      const blockedCategories = getBlockedCategories();
+
+      BLOCKABLE_CATEGORIES.forEach(category => {
+        const btn = document.createElement("button");
+        const isBlocked = blockedCategories.includes(category);
+        btn.className = `chip block-chip ${isBlocked ? "active" : ""}`;
+        btn.textContent = isBlocked ? `屏蔽 ${category}` : category;
+        btn.onclick = () => {
+          const currentBlocked = new Set(getBlockedCategories());
+          if (currentBlocked.has(category)) {
+            currentBlocked.delete(category);
+          } else {
+            currentBlocked.add(category);
+          }
+
+          state.blockedCategoriesByPlaylist[state.playlistId] = [...currentBlocked];
+          state.trackIndex = -1;
+          saveState();
+          renderBlockedCategories();
+          refreshTrackList(true);
+        };
+        els.blockCategoryList.appendChild(btn);
+      });
+    }
+
     function refreshTrackList(resetPlayer = false) {
       state.filteredTracks = getFilteredTracks();
       syncPlaybackMemoryWithCurrentList();
@@ -2471,9 +2621,11 @@
 
       const playlist = getCurrentPlaylist();
       els.trackCounter.textContent = `${state.filteredTracks.length} 首`;
-      els.resultBadge.textContent = `已套用：${playlist.name} / ${state.category}${state.search ? ` / 搜尋「${state.search}」` : ""}`;
+      const blockedCategories = getBlockedCategories();
+      const blockedText = blockedCategories.length ? ` / 屏蔽：${blockedCategories.join("、")}` : "";
+      els.resultBadge.textContent = `已套用：${playlist.name} / ${state.category}${blockedText}${state.search ? ` / 搜尋「${state.search}」` : ""}`;
       els.statTracks.textContent = String(state.filteredTracks.length);
-      els.statCategory.textContent = state.category;
+      els.statCategory.textContent = blockedCategories.length ? `${state.category}｜屏蔽 ${blockedCategories.length}` : state.category;
 
       if (!state.filteredTracks.length) {
         els.trackList.innerHTML = `<p class="empty">目前沒有符合條件的歌曲。</p>`;
@@ -2494,7 +2646,7 @@
           <div class="track-thumb">♫</div>
           <div>
             <div class="track-title">${track.title}</div>
-            <div class="track-sub">${track.category}${track.note ? ` · ${track.note}` : ""}</div>
+            <div class="track-sub">${track.playlistName ? `${track.playlistName} · ` : ""}${track.category}${track.note ? ` · ${track.note}` : ""}</div>
           </div>
           <span class="badge">${track.category}</span>
         `;
@@ -2851,8 +3003,12 @@
     }
 
     function init() {
+      if (!getPlaylistOptions().some(playlist => playlist.id === state.playlistId)) {
+        state.playlistId = ALL_PLAYLIST_ID;
+      }
       renderPlaylists();
       renderCategories();
+      renderBlockedCategories();
       els.searchInput.value = state.search;
       els.volumeRange.value = state.volume;
       els.volumeText.textContent = `${state.volume}%`;
