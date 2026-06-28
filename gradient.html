@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>片坯漸層染色 1:1 教學演示</title>
+<style>
+  :root{
+    --bg:#f4f7f8;
+    --panel:#ffffff;
+    --ink:#173847;
+    --muted:#71818b;
+    --line:#0d4052;
+    --accent:#d40000;
+    --shadow:0 10px 30px rgba(15,55,70,.12);
+    --scale:1;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;background:var(--bg);color:#162b36;}
+  header{padding:20px 28px 12px;background:linear-gradient(180deg,#fff,#f4f7f8);border-bottom:1px solid #dfe8ec;}
+  h1{margin:0 0 6px;font-size:24px;letter-spacing:.03em;color:var(--ink)}
+  .sub{color:var(--muted);font-size:14px;line-height:1.5}
+  main{display:grid;grid-template-columns:330px 1fr;gap:18px;padding:18px;align-items:start}
+  .controls{background:var(--panel);border:1px solid #dde8ec;border-radius:18px;padding:18px;box-shadow:var(--shadow);position:sticky;top:12px}
+  .group{padding:12px 0;border-bottom:1px solid #ecf1f3}.group:last-child{border-bottom:0}
+  label{display:block;font-weight:700;margin:0 0 8px;color:#203843}.hint{font-size:12px;color:var(--muted);line-height:1.45;margin-top:6px}
+  select,input[type=range],input[type=number]{width:100%}
+  select,input[type=number]{height:40px;border:1px solid #cbd8de;border-radius:10px;padding:0 10px;background:white;font-size:15px}
+  input[type=range]{accent-color:#0d6075}
+  .row{display:flex;gap:10px;align-items:center}.row>*{flex:1}.val{flex:0 0 58px;text-align:center;border:1px solid #cbd8de;border-radius:9px;padding:8px;background:#f8fbfc;font-weight:700}
+  .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.chip{border:1px solid #cbd8de;background:#fff;border-radius:999px;padding:8px;text-align:center;cursor:pointer;font-weight:700}.chip.active{background:#0d4052;color:#fff;border-color:#0d4052}
+  .stageWrap{background:var(--panel);border:1px solid #dde8ec;border-radius:18px;padding:18px;box-shadow:var(--shadow);overflow:auto}
+  .toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px;color:var(--muted);font-size:13px;flex-wrap:wrap}
+  .printBtn{border:0;border-radius:10px;background:#0d4052;color:white;padding:10px 14px;font-weight:700;cursor:pointer}
+  .canvas{transform:scale(var(--scale));transform-origin:top left;width:max-content;min-height:760px;padding:12px 22px 22px;background:#fff;border-radius:12px;border:1px dashed #cbd8de;}
+  svg{display:block;overflow:visible}.lensText{font-size:4.6px;fill:#9aa3a7;font-weight:700}.note{font-size:3.6px;fill:#66757e}.mmLabel{font-size:3.8px;fill:#2b5563;font-weight:700}.frameLabel{font-size:3.2px;fill:#66757e}.cross{stroke:var(--accent);stroke-width:1.2;stroke-linecap:round}.circleLine{stroke:var(--line);stroke-width:.45;fill:none}.shapeLine{stroke:#173847;stroke-width:.45;stroke-dasharray:2 1.5;fill:none}.centerLine{stroke:#9fb1b9;stroke-width:.25;stroke-dasharray:1.5 1.2}.ocLine{stroke:#d33;stroke-width:.28;stroke-dasharray:1.2 1.2}.legendBox{fill:#f8fbfc;stroke:#d8e3e8;stroke-width:.25}.watermark{font-size:4px;fill:#b9c2c6;font-weight:700}.ruler{stroke:#222;stroke-width:.25}.rulerText{font-size:3.2px;fill:#333}
+  @media(max-width:900px){main{grid-template-columns:1fr}.controls{position:relative;top:auto}.canvas{transform:none;width:100%;min-width:760px}}
+  @media print{body{background:#fff}header,.controls,.toolbar{display:none}.stageWrap{box-shadow:none;border:0;padding:0}.canvas{border:0;padding:0;transform:none}.pageBreak{break-after:page}}
+</style>
+</head>
+<body>
+<header>
+  <h1>片坯漸層染色設定演示</h1>
+  <div class="sub">用於 60Φ / 65Φ / 70Φ / 75Φ 片坯的 1:1 教學示意。可切換漸層色、染色深度、染色區比例與光學中心移心量。</div>
+</header>
+<main>
+  <aside class="controls">
+    <div class="group">
+      <label for="colorSelect">1. 漸層顏色</label>
+      <select id="colorSelect"></select>
+      <div class="hint">Rouge Pink、Rouge Rose 預設為「下染色、上透明」；其他顏色為「上染色、下透明」。</div>
+    </div>
+    <div class="group">
+      <label for="depthSelect">2. 染色深度</label>
+      <select id="depthSelect">
+        <option value="30">30%</option>
+        <option value="40">40%</option>
+        <option value="50">50%</option>
+        <option value="60">60%</option>
+        <option value="70">70%</option>
+      </select>
+      <div class="hint">腮紅 Rouge Pink / Rouge Rose 預設 30%；其他色系預設 50%。數值越高，鏡片染色呈現越深。</div>
+    </div>
+    <div class="group">
+      <label>3. 使用者設定染色區</label>
+      <div class="row"><input id="zone" type="range" min="1" max="9" step="1" value="4"><div class="val"><span id="zoneVal">4</span>成</div></div>
+      <div class="hint">腮紅 Rouge Pink / Rouge Rose 預設 4 成；其他色系預設 5 成。1成＝染色約佔片坯高度 10%；9成＝約佔 90%。</div>
+    </div>
+    <div class="group">
+      <label>4. 光學中心移心</label>
+      <div class="row"><input id="decenter" type="range" min="0" max="5" step="0.5" value="0"><div class="val"><span id="decenterVal">0</span> mm</div></div>
+      <div class="hint">紅色十字為光學中心。正值示意往右移心；需要反向時可按下方按鈕。</div>
+      <div class="chips" style="margin-top:10px;grid-template-columns:repeat(2,1fr)"><button class="chip active" id="dirR">往右</button><button class="chip" id="dirL">往左</button></div>
+    </div>
+    <div class="group">
+      <label>片徑顯示</label>
+      <div class="chips" id="diaChips"></div>
+      <div class="hint">全選時可比較四種片徑；單選可放大檢視該片坯。</div>
+    </div>
+    <div class="group">
+      <label>畫面校正</label>
+      <div class="row"><input id="scale" type="range" min="0.75" max="1.35" step="0.01" value="1"><div class="val"><span id="scaleVal">100</span>%</div></div>
+      <div class="hint">螢幕 1:1 會受作業系統縮放與螢幕 DPI 影響。列印或投影前可用下方 50 mm 尺校正。</div>
+    </div>
+  </aside>
+  <section class="stageWrap">
+    <div class="toolbar"><span id="summary">目前設定</span><button class="printBtn" onclick="window.print()">列印 / 轉 PDF</button></div>
+    <div class="canvas"><svg id="svg" width="820" height="760" viewBox="0 0 220 205" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  </section>
+</main>
+<script>
+const colors = [
+  {name:'Yellow 黃色', hex:'#ffd51f', dir:'top'},
+  {name:'Pink 粉色', hex:'#ff3e67', dir:'top'},
+  {name:'Purple 紫色', hex:'#4d2060', dir:'top'},
+  {name:'Blue 藍色', hex:'#09549f', dir:'top'},
+  {name:'Green 綠色', hex:'#418164', dir:'top'},
+  {name:'Soft Tea 煙茶', hex:'#8b6d42', dir:'top'},
+  {name:'Brown 棕色', hex:'#8a5c29', dir:'top'},
+  {name:'Grey 灰色' , hex:'#121417', dir:'top'},
+  {name:'Peach 蜜桃', hex:'#c39679', dir:'top'},
+  {name:'Nude 裸膚', hex:'#c8b09d', dir:'top'},
+  {name:'Cool Grey 冷灰', hex:'#695c5a', dir:'top'},
+  {name:'Rose 玫瑰', hex:'#bd8f89', dir:'top'},
+  {name:'pink 粉紅', hex:'#f7a0ba', dir:'top'},
+  {name:'Rouge Pink 腮紅粉', hex:'#f7a0ba', dir:'bottom'},
+  {name:'Rouge Rose 腮紅玫瑰', hex:'#bd8f89', dir:'bottom'}
+];
+const diaList = [60,65,70,75];
+let state = {color: colors[11], zone:4, depth:30, decenter:0, dir:1, show:'all', scale:1};
+const sel = document.getElementById('colorSelect');
+const depthSelect = document.getElementById('depthSelect');
+colors.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name+(c.dir==='bottom'?'（下染色）':'');sel.appendChild(o)}); sel.value=11;
+const chipBox=document.getElementById('diaChips');
+['all',...diaList].forEach(v=>{let b=document.createElement('button');b.className='chip'+(v==='all'?' active':'');b.dataset.v=v;b.textContent=v==='all'?'全部':v+'Φ';b.onclick=()=>{state.show=v;[...chipBox.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');draw()};chipBox.appendChild(b)});
+depthSelect.value = state.depth;
+depthSelect.onchange=e=>{state.depth=+e.target.value;draw()};
+document.getElementById('zone').oninput=e=>{state.zone=+e.target.value;document.getElementById('zoneVal').textContent=state.zone;draw()};
+document.getElementById('decenter').oninput=e=>{state.decenter=+e.target.value;document.getElementById('decenterVal').textContent=state.decenter;draw()};
+document.getElementById('scale').oninput=e=>{state.scale=+e.target.value;document.documentElement.style.setProperty('--scale',state.scale);document.getElementById('scaleVal').textContent=Math.round(state.scale*100);};
+sel.onchange=e=>{
+  state.color=colors[+e.target.value];
+  state.depth=state.color.dir==='bottom'?30:50;
+  state.zone=state.color.dir==='bottom'?4:5;
+  depthSelect.value=state.depth;
+  document.getElementById('zone').value=state.zone;
+  document.getElementById('zoneVal').textContent=state.zone;
+  draw();
+};
+document.getElementById('dirR').onclick=()=>{state.dir=1;dirR.classList.add('active');dirL.classList.remove('active');draw()};
+document.getElementById('dirL').onclick=()=>{state.dir=-1;dirL.classList.add('active');dirR.classList.remove('active');draw()};
+function el(name, attrs={}){const n=document.createElementNS('http://www.w3.org/2000/svg',name);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));return n}
+function addText(g,x,y,t,cls='lensText',anchor='middle'){const n=el('text',{x,y,class:cls,'text-anchor':anchor});n.textContent=t;g.appendChild(n);return n}
+function lensGradient(id, d){
+  const grad=el('linearGradient',{id, x1:'0%', y1:'0%', x2:'0%', y2:'100%'});
+  const z = state.zone/10;
+  const c = state.color.hex;
+  const depth = state.depth/70;
+  const opStrong = Math.min(.92, .26 + .62*depth);
+  const opMid = Math.min(.62, .12 + .38*depth);
+  const opLight = Math.min(.22, .03 + .13*depth);
+  if(d==='top'){
+    grad.appendChild(el('stop',{offset:'0%','stop-color':c,'stop-opacity':opStrong}));
+    grad.appendChild(el('stop',{offset:(z*65)+'%','stop-color':c,'stop-opacity':opMid}));
+    grad.appendChild(el('stop',{offset:(z*100)+'%','stop-color':c,'stop-opacity':opLight}));
+    grad.appendChild(el('stop',{offset:'100%','stop-color':'#ffffff','stop-opacity':'.02'}));
+  }else{
+    grad.appendChild(el('stop',{offset:'0%','stop-color':'#ffffff','stop-opacity':'.02'}));
+    grad.appendChild(el('stop',{offset:(100-z*100)+'%','stop-color':c,'stop-opacity':opLight}));
+    grad.appendChild(el('stop',{offset:(100-z*65)+'%','stop-color':c,'stop-opacity':opMid}));
+    grad.appendChild(el('stop',{offset:'100%','stop-color':c,'stop-opacity':opStrong}));
+  }
+  return grad;
+}
+function drawLens(svg, x,y,d){
+  const g=el('g'); svg.appendChild(g);
+  const defs=svg.querySelector('defs'); const gid='grad'+d; defs.appendChild(lensGradient(gid,state.color.dir));
+  g.appendChild(el('circle',{cx:x,cy:y,r:d/2,fill:`url(#${gid})`,stroke:'none'}));
+  g.appendChild(el('circle',{cx:x,cy:y,r:d/2,class:'circleLine'}));
+  g.appendChild(el('line',{x1:x-d/2,y1:y,x2:x+d/2,y2:y,class:'centerLine'}));
+  g.appendChild(el('line',{x1:x,y1:y-d/2,x2:x,y2:y+d/2,class:'centerLine'}));
+  const ox=x+state.dir*state.decenter, oy=y;
+  g.appendChild(el('line',{x1:ox-2.2,y1:oy,x2:ox+2.2,y2:oy,class:'cross'}));
+  g.appendChild(el('line',{x1:ox,y1:oy-2.2,x2:ox,y2:oy+2.2,class:'cross'}));
+  if(state.decenter>0){g.appendChild(el('line',{x1:x,y1:y+5,x2:ox,y2:y+5,class:'ocLine'})); addText(g,(x+ox)/2,y+9,`${state.decenter} mm`,'note')}
+  addText(g,x-d*.24,y+1,`${d}Φ`,'lensText');
+  addText(g,x,y+d/2+5,`${state.color.name.split(' ')[0]}｜深度 ${state.depth}%｜染色 ${state.zone}成｜OC ${state.dir>0?'R':'L'}${state.decenter}mm`,'note');
+}
+function drawRuler(svg){
+  const x=12,y=196; svg.appendChild(el('line',{x1:x,y1:y,x2:x+50,y2:y,class:'ruler'}));
+  for(let i=0;i<=50;i+=5){svg.appendChild(el('line',{x1:x+i,y1:y,x2:x+i,y2:y-(i%10===0?3:2),class:'ruler'}));}
+  addText(svg,x+25,y-5,'50 mm 校正尺','rulerText');
+}
+function draw(){
+  const svg=document.getElementById('svg'); svg.innerHTML=''; svg.appendChild(el('defs'));
+  addText(svg,110,8,'片坯漸層染色 1:1 設定演示','mmLabel');
+  const selected = state.show==='all' ? diaList : [Number(state.show)];
+  if(state.show==='all'){
+    drawLens(svg,38,43,60); drawLens(svg,112,43,65); drawLens(svg,43,121,70); drawLens(svg,128,121,75);
+  }else{
+    const d=selected[0]; drawLens(svg,88,88,d);
+    addText(svg,154,56,'單片檢視模式','watermark','start');
+  }
+  const box=el('rect',{x:150,y:18,width:58,height:34,rx:2,class:'legendBox'});svg.appendChild(box);
+  addText(svg,153,25,`顏色：${state.color.name}`,'note','start');
+  addText(svg,153,31,`方向：${state.color.dir==='bottom'?'下染色上透明':'上染色下透明'}`,'note','start');
+  addText(svg,153,37,`深度：${state.depth}%`,'note','start');
+  addText(svg,153,43,`染色區：${state.zone}成`,'note','start');
+  addText(svg,153,49,`光心移心：${state.dir>0?'右':'左'} ${state.decenter} mm`,'note','start');
+  drawRuler(svg);
+  document.getElementById('summary').textContent=`目前：${state.color.name}｜${state.color.dir==='bottom'?'下染色':'上染色'}｜深度 ${state.depth}%｜染色 ${state.zone}成｜光學中心 ${state.dir>0?'右':'左'}移 ${state.decenter} mm`;
+}
+draw();
+</script>
+</body>
+</html>
