@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+<link rel="icon" href="img/G1.ico" type="image/x-icon">
+<link rel="shortcut icon" href="img/G1.ico" type="image/x-icon">
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>片坯漸層染色 1:1 教學演示</title>
@@ -28,12 +30,14 @@
   select,input[type=number]{height:40px;border:1px solid #cbd8de;border-radius:10px;padding:0 10px;background:white;font-size:15px}
   input[type=range]{accent-color:#0d6075}
   .row{display:flex;gap:10px;align-items:center}.row>*{flex:1}.val{flex:0 0 58px;text-align:center;border:1px solid #cbd8de;border-radius:9px;padding:8px;background:#f8fbfc;font-weight:700}
+  .toggleRow{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px;border:1px solid #dbe7ec;border-radius:12px;background:#f8fbfc;font-weight:700;color:#203843}
+  .toggleRow input{width:18px;height:18px;accent-color:#0d6075}
   .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.chip{border:1px solid #cbd8de;background:#fff;border-radius:999px;padding:8px;text-align:center;cursor:pointer;font-weight:700}.chip.active{background:#0d4052;color:#fff;border-color:#0d4052}
   .stageWrap{background:var(--panel);border:1px solid #dde8ec;border-radius:18px;padding:18px;box-shadow:var(--shadow);overflow:auto}
   .toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px;color:var(--muted);font-size:13px;flex-wrap:wrap}
   .printBtn{border:0;border-radius:10px;background:#0d4052;color:white;padding:10px 14px;font-weight:700;cursor:pointer}
   .canvas{transform:scale(var(--scale));transform-origin:top left;width:max-content;min-height:760px;padding:12px 22px 22px;background:#fff;border-radius:12px;border:1px dashed #cbd8de;}
-  svg{display:block;overflow:visible}.lensText{font-size:4.6px;fill:#9aa3a7;font-weight:700}.note{font-size:3.6px;fill:#66757e}.mmLabel{font-size:3.8px;fill:#2b5563;font-weight:700}.frameLabel{font-size:3.2px;fill:#66757e}.cross{stroke:var(--accent);stroke-width:1.2;stroke-linecap:round}.circleLine{stroke:var(--line);stroke-width:.45;fill:none}.shapeLine{stroke:#173847;stroke-width:.45;stroke-dasharray:2 1.5;fill:none}.centerLine{stroke:#9fb1b9;stroke-width:.25;stroke-dasharray:1.5 1.2}.ocLine{stroke:#d33;stroke-width:.28;stroke-dasharray:1.2 1.2}.legendBox{fill:#f8fbfc;stroke:#d8e3e8;stroke-width:.25}.watermark{font-size:4px;fill:#b9c2c6;font-weight:700}.ruler{stroke:#222;stroke-width:.25}.rulerText{font-size:3.2px;fill:#333}
+  svg{display:block;overflow:visible}.lensText{font-size:4.6px;fill:#9aa3a7;font-weight:700}.note{font-size:3.6px;fill:#66757e}.mmLabel{font-size:3.8px;fill:#2b5563;font-weight:700}.frameLabel{font-size:3.2px;fill:#66757e}.cross{stroke:var(--accent);stroke-width:1.2;stroke-linecap:round}.multiCross{stroke:#d6cc35;stroke-width:.75;stroke-linecap:round}.multiLine{stroke:#d6cc35;stroke-width:.5;fill:none}.multiText{font-size:3.2px;fill:#9b931f;font-weight:700}.circleLine{stroke:var(--line);stroke-width:.45;fill:none}.shapeLine{stroke:#173847;stroke-width:.45;stroke-dasharray:2 1.5;fill:none}.centerLine{stroke:#9fb1b9;stroke-width:.25;stroke-dasharray:1.5 1.2}.ocLine{stroke:#d33;stroke-width:.28;stroke-dasharray:1.2 1.2}.legendBox{fill:#f8fbfc;stroke:#d8e3e8;stroke-width:.25}.watermark{font-size:4px;fill:#b9c2c6;font-weight:700}.ruler{stroke:#222;stroke-width:.25}.rulerText{font-size:3.2px;fill:#333}
   @media(max-width:900px){main{grid-template-columns:1fr}.controls{position:relative;top:auto}.canvas{transform:none;width:100%;min-width:760px}}
   @media print{body{background:#fff}header,.controls,.toolbar{display:none}.stageWrap{box-shadow:none;border:0;padding:0}.canvas{border:0;padding:0;transform:none}.pageBreak{break-after:page}}
 </style>
@@ -41,7 +45,7 @@
 <body>
 <header>
   <h1>片坯漸層染色設定演示</h1>
-  <div class="sub">用於 60Φ / 65Φ / 70Φ / 75Φ 片坯的 1:1 教學示意。可切換漸層色、染色深度、染色區比例與光學中心移心量。</div>
+  <div class="sub">用於 60Φ / 65Φ / 70Φ / 75Φ 片坯的 1:1 教學示意。可切換漸層色、染色深度、染色區比例、染色多焦與光學中心移心量。<br><b>《 本網站僅供色區參考，關於染色顏色、深度因每台顯示器會有色彩偏差，請以現場色板為主。 》</b></div>
 </header>
 <main>
   <aside class="controls">
@@ -53,11 +57,15 @@
     <div class="group">
       <label for="depthSelect">2. 染色深度</label>
       <select id="depthSelect">
+        <option value="10">10%</option>
+        <option value="20">20%</option>
         <option value="30">30%</option>
         <option value="40">40%</option>
         <option value="50">50%</option>
         <option value="60">60%</option>
         <option value="70">70%</option>
+        <option value="80">80%</option>
+        <option value="90">90%</option>
       </select>
       <div class="hint">腮紅 Rouge Pink / Rouge Rose 預設 30%；其他色系預設 50%。數值越高，鏡片染色呈現越深。</div>
     </div>
@@ -71,6 +79,8 @@
       <div class="row"><input id="decenter" type="range" min="0" max="5" step="0.5" value="0"><div class="val"><span id="decenterVal">0</span> mm</div></div>
       <div class="hint">紅色十字為光學中心。正值示意往右移心；需要反向時可按下方按鈕。</div>
       <div class="chips" style="margin-top:10px;grid-template-columns:repeat(2,1fr)"><button class="chip active" id="dirR">往右</button><button class="chip" id="dirL">往左</button></div>
+      <label class="toggleRow"><input id="multifocalMode" type="checkbox">開啟多焦模式標記</label>
+      <div class="hint">開啟後會以目前光學中心為基準，往上 4mm 顯示配鏡十字，並加上遠區圓形標記，方便推算染色高度。</div>
     </div>
     <div class="group">
       <label>片徑顯示</label>
@@ -107,7 +117,7 @@ const colors = [
   {name:'Rouge Rose 腮紅玫瑰', hex:'#bd8f89', dir:'bottom'}
 ];
 const diaList = [60,65,70,75];
-let state = {color: colors[11], zone:4, depth:30, decenter:0, dir:1, show:'all', scale:1};
+let state = {color: colors[11], zone:4, depth:30, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
 const sel = document.getElementById('colorSelect');
 const depthSelect = document.getElementById('depthSelect');
 colors.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name+(c.dir==='bottom'?'（下染色）':'');sel.appendChild(o)}); sel.value=11;
@@ -117,6 +127,7 @@ depthSelect.value = state.depth;
 depthSelect.onchange=e=>{state.depth=+e.target.value;draw()};
 document.getElementById('zone').oninput=e=>{state.zone=+e.target.value;document.getElementById('zoneVal').textContent=state.zone;draw()};
 document.getElementById('decenter').oninput=e=>{state.decenter=+e.target.value;document.getElementById('decenterVal').textContent=state.decenter;draw()};
+document.getElementById('multifocalMode').onchange=e=>{state.multifocal=e.target.checked;draw()};
 document.getElementById('scale').oninput=e=>{state.scale=+e.target.value;document.documentElement.style.setProperty('--scale',state.scale);document.getElementById('scaleVal').textContent=Math.round(state.scale*100);};
 sel.onchange=e=>{
   state.color=colors[+e.target.value];
@@ -162,9 +173,22 @@ function drawLens(svg, x,y,d){
   const ox=x+state.dir*state.decenter, oy=y;
   g.appendChild(el('line',{x1:ox-2.2,y1:oy,x2:ox+2.2,y2:oy,class:'cross'}));
   g.appendChild(el('line',{x1:ox,y1:oy-2.2,x2:ox,y2:oy+2.2,class:'cross'}));
+  if(state.multifocal) drawMultifocalMark(g, ox, oy);
   if(state.decenter>0){g.appendChild(el('line',{x1:x,y1:y+5,x2:ox,y2:y+5,class:'ocLine'})); addText(g,(x+ox)/2,y+9,`${state.decenter} mm`,'note')}
   addText(g,x-d*.24,y+1,`${d}Φ`,'lensText');
   addText(g,x,y+d/2+5,`${state.color.name.split(' ')[0]}｜深度 ${state.depth}%｜染色 ${state.zone}成｜OC ${state.dir>0?'R':'L'}${state.decenter}mm`,'note');
+}
+function drawMultifocalMark(g, ox, oy){
+  const fx = ox;
+  const fy = oy - 4;
+  const farY = fy - 5;
+  g.appendChild(el('line',{x1:fx-3,y1:fy,x2:fx-1.2,y2:fy,class:'multiCross'}));
+  g.appendChild(el('line',{x1:fx+1.2,y1:fy,x2:fx+3,y2:fy,class:'multiCross'}));
+  g.appendChild(el('line',{x1:fx,y1:fy-2,x2:fx,y2:fy+1,class:'multiCross'}));
+  g.appendChild(el('circle',{cx:fx,cy:farY,r:5,class:'multiLine'}));
+  g.appendChild(el('circle',{cx:fx,cy:fy,r:.7,fill:'#d6cc35',stroke:'none'}));
+  addText(g,fx+6.2,farY+1.2,' ','multiText','start');
+  addText(g,fx+6.2,fy+1.2,' ','multiText','start');
 }
 function drawRuler(svg){
   const x=12,y=196; svg.appendChild(el('line',{x1:x,y1:y,x2:x+50,y2:y,class:'ruler'}));
@@ -181,14 +205,15 @@ function draw(){
     const d=selected[0]; drawLens(svg,88,88,d);
     addText(svg,154,56,'單片檢視模式','watermark','start');
   }
-  const box=el('rect',{x:150,y:18,width:58,height:34,rx:2,class:'legendBox'});svg.appendChild(box);
+  const box=el('rect',{x:150,y:18,width:58,height:40,rx:2,class:'legendBox'});svg.appendChild(box);
   addText(svg,153,25,`顏色：${state.color.name}`,'note','start');
   addText(svg,153,31,`方向：${state.color.dir==='bottom'?'下染色上透明':'上染色下透明'}`,'note','start');
   addText(svg,153,37,`深度：${state.depth}%`,'note','start');
   addText(svg,153,43,`染色區：${state.zone}成`,'note','start');
   addText(svg,153,49,`光心移心：${state.dir>0?'右':'左'} ${state.decenter} mm`,'note','start');
+  addText(svg,153,55,`多焦標記：${state.multifocal?'開啟':'關閉'}`,'note','start');
   drawRuler(svg);
-  document.getElementById('summary').textContent=`目前：${state.color.name}｜${state.color.dir==='bottom'?'下染色':'上染色'}｜深度 ${state.depth}%｜染色 ${state.zone}成｜光學中心 ${state.dir>0?'右':'左'}移 ${state.decenter} mm`;
+  document.getElementById('summary').textContent=`目前：${state.color.name}｜${state.color.dir==='bottom'?'下染色':'上染色'}｜深度 ${state.depth}%｜染色 ${state.zone}成｜光學中心 ${state.dir>0?'右':'左'}移 ${state.decenter} mm｜多焦標記 ${state.multifocal?'開啟':'關閉'}`;
 }
 draw();
 </script>
