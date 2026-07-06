@@ -120,7 +120,7 @@ const diaList = [60,65,70,75];
 let state = {color: colors[13], zone:4, depth:20, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
 const sel = document.getElementById('colorSelect');
 const depthSelect = document.getElementById('depthSelect');
-colors.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name+(c.dir==='bottom'?'（下染色）':'');sel.appendChild(o)}); sel.value=11;
+colors.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name+(c.dir==='bottom'?'（下染色）':'');sel.appendChild(o)}); sel.value=13;
 const chipBox=document.getElementById('diaChips');
 ['all',...diaList].forEach(v=>{let b=document.createElement('button');b.className='chip'+(v==='all'?' active':'');b.dataset.v=v;b.textContent=v==='all'?'全部':v+'Φ';b.onclick=()=>{state.show=v;[...chipBox.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');draw()};chipBox.appendChild(b)});
 depthSelect.value = state.depth;
