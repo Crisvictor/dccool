@@ -100,24 +100,24 @@
 </main>
 <script>
 const colors = [
-  {name:'Yellow 黃色', hex:'#ffd51f', dir:'top'},
-  {name:'Pink 粉色', hex:'#ff3e67', dir:'top'},
-  {name:'Purple 紫色', hex:'#4d2060', dir:'top'},
-  {name:'Blue 藍色', hex:'#09549f', dir:'top'},
-  {name:'Green 綠色', hex:'#418164', dir:'top'},
-  {name:'Soft Tea 煙茶', hex:'#8b6d42', dir:'top'},
-  {name:'Brown 棕色', hex:'#8a5c29', dir:'top'},
-  {name:'Grey 灰色' , hex:'#121417', dir:'top'},
-  {name:'Peach 蜜桃', hex:'#c39679', dir:'top'},
-  {name:'Nude 裸膚', hex:'#c8b09d', dir:'top'},
-  {name:'Cool Grey 冷灰', hex:'#695c5a', dir:'top'},
-  {name:'Rose 玫瑰', hex:'#bd8f89', dir:'top'},
-  {name:'pink 粉紅', hex:'#f7a0ba', dir:'top'},
-  {name:'Rouge Pink 腮紅粉', hex:'#f7a0ba', dir:'bottom'},
-  {name:'Rouge Rose 腮紅玫瑰', hex:'#bd8f89', dir:'bottom'}
+  {name:'Yellow 黃色', hex:'#ffd51f', dir:'top'},// colors[0]
+  {name:'Pink 粉色', hex:'#ff3e67', dir:'top'},// colors[1]
+  {name:'Purple 紫色', hex:'#4d2060', dir:'top'},// colors[2]
+  {name:'Blue 藍色', hex:'#09549f', dir:'top'},// colors[3]
+  {name:'Green 綠色', hex:'#418164', dir:'top'},// colors[4]
+  {name:'Soft Tea 煙茶', hex:'#8b6d42', dir:'top'},// colors[5]
+  {name:'Brown 棕色', hex:'#8a5c29', dir:'top'},// colors[6]
+  {name:'Grey 灰色' , hex:'#121417', dir:'top'},// colors[7]
+  {name:'Peach 蜜桃', hex:'#c39679', dir:'top'},// colors[8]
+  {name:'Nude 裸膚', hex:'#c8b09d', dir:'top'},// colors[9]
+  {name:'Cool Grey 冷灰', hex:'#695c5a', dir:'top'},// colors[10]
+  {name:'Rose 玫瑰', hex:'#bd8f89', dir:'top'},// colors[11]
+  {name:'pink 粉紅', hex:'#f7a0ba', dir:'top'},// colors[12]
+  {name:'Rouge Pink 腮紅粉', hex:'#f7a0ba', dir:'bottom'},// colors[13]
+  {name:'Rouge Rose 腮紅玫瑰', hex:'#bd8f89', dir:'bottom'}// colors[14]
 ];
 const diaList = [60,65,70,75];
-let state = {color: colors[11], zone:4, depth:20, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
+let state = {color: colors[13], zone:4, depth:20, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
 const sel = document.getElementById('colorSelect');
 const depthSelect = document.getElementById('depthSelect');
 colors.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name+(c.dir==='bottom'?'（下染色）':'');sel.appendChild(o)}); sel.value=11;
