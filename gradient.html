@@ -111,10 +111,10 @@ const colors = [
   {name:'Peach 蜜桃', hex:'#c39679', dir:'top'},// colors[8]
   {name:'Nude 裸膚', hex:'#c8b09d', dir:'top'},// colors[9]
   {name:'Cool Grey 冷灰', hex:'#695c5a', dir:'top'},// colors[10]
-  {name:'Rose 玫瑰', hex:'#bd8f89', dir:'top'},// colors[11]
-  {name:'pink 粉紅', hex:'#f7a0ba', dir:'top'},// colors[12]
-  {name:'Rouge Pink 腮紅粉', hex:'#f7a0ba', dir:'bottom'},// colors[13]
-  {name:'Rouge Rose 腮紅玫瑰', hex:'#bd8f89', dir:'bottom'}// colors[14]
+  {name:'Rose 玫瑰', hex:'#83120c', dir:'top'},// colors[11]
+  {name:'pink 粉紅', hex:'#eb1455', dir:'top'},// colors[12]
+  {name:'Rouge Pink 腮紅粉', hex:'#eb1455', dir:'bottom'},// colors[13]
+  {name:'Rouge Rose 腮紅玫瑰', hex:'#83120c', dir:'bottom'}// colors[14]
 ];
 const diaList = [60,65,70,75];
 let state = {color: colors[13], zone:4, depth:20, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
@@ -146,7 +146,23 @@ function lensGradient(id, d){
   const grad=el('linearGradient',{id, x1:'0%', y1:'0%', x2:'0%', y2:'100%'});
   const z = state.zone/10;
   const c = state.color.hex;
-  const depth = state.depth/70;
+  const isRouge = state.color.name.startsWith('Rouge ');
+  let depth = state.depth/70;
+  let rougeBoost = 1;
+
+  if (isRouge) {
+    if (state.depth >= 90) rougeBoost = 2.1;
+    else if (state.depth >= 80) rougeBoost = 1.95;
+    else if (state.depth >= 70) rougeBoost = 1.86;
+    else if (state.depth >= 60) rougeBoost = 1.77;
+    else if (state.depth >= 50) rougeBoost = 1.65;
+    else if (state.depth >= 40) rougeBoost = 1.57;
+    else if (state.depth >= 30) rougeBoost = 1.28;
+    else if (state.depth >= 20) rougeBoost = 0.5;
+    else if (state.depth >= 10) rougeBoost = 0.1;
+  }
+
+  depth *= rougeBoost;
   const opStrong = Math.min(.92, .26 + .62*depth);
   const opMid = Math.min(.62, .12 + .38*depth);
   const opLight = Math.min(.22, .03 + .13*depth);
@@ -213,7 +229,8 @@ function draw(){
   addText(svg,153,49,`光心移心：${state.dir>0?'右':'左'} ${state.decenter} mm`,'note','start');
   addText(svg,153,55,`多焦標記：${state.multifocal?'開啟':'關閉'}`,'note','start');
   drawRuler(svg);
-  document.getElementById('summary').textContent=`目前：${state.color.name}｜${state.color.dir==='bottom'?'下染色':'上染色'}｜深度 ${state.depth}%｜染色 ${state.zone}成｜光學中心 ${state.dir>0?'右':'左'}移 ${state.decenter} mm｜多焦標記 ${state.multifocal?'開啟':'關閉'}`;
+  const boostNote = state.color.name.startsWith('Rouge ') && state.depth >= 30 ? '｜腮紅加深補正 ON' : '';
+  document.getElementById('summary').textContent=`目前：${state.color.name}｜${state.color.dir==='bottom'?'下染色':'上染色'}｜深度 ${state.depth}%${boostNote}｜染色 ${state.zone}成｜光學中心 ${state.dir>0?'右':'左'}移 ${state.decenter} mm｜多焦標記 ${state.multifocal?'開啟':'關閉'}`;
 }
 draw();
 </script>
