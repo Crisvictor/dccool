@@ -71,8 +71,8 @@
     </div>
     <div class="group">
       <label>3. 使用者設定染色區</label>
-      <div class="row"><input id="zone" type="range" min="1" max="9" step="1" value="4"><div class="val"><span id="zoneVal">4</span>成</div></div>
-      <div class="hint">腮紅系列 預設 4 成；其他色系預設 5 成。1成＝染色約佔片坯高度 10%；9成＝約佔 90%。</div>
+      <div class="row"><input id="zone" type="range" min="1" max="9" step="1" value="2"><div class="val"><span id="zoneVal">2</span>成</div></div>
+      <div class="hint">腮紅系列 預設 2 成；其他色系預設 5 成。1成＝染色約佔片坯高度 10%；9成＝約佔 90%。</div>
     </div>
     <div class="group">
       <label>4. 光學中心移心</label>
@@ -117,7 +117,7 @@ const colors = [
   {name:'Rouge Rose 腮紅玫瑰', hex:'#83120c', dir:'bottom'}// colors[14]
 ];
 const diaList = [60,65,70,75];
-let state = {color: colors[13], zone:4, depth:20, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
+let state = {color: colors[13], zone:2, depth:20, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
 const sel = document.getElementById('colorSelect');
 const depthSelect = document.getElementById('depthSelect');
 colors.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name+(c.dir==='bottom'?'（下染色）':'');sel.appendChild(o)}); sel.value=13;
@@ -132,7 +132,7 @@ document.getElementById('scale').oninput=e=>{state.scale=+e.target.value;documen
 sel.onchange=e=>{
   state.color=colors[+e.target.value];
   state.depth=state.color.dir==='bottom'?20:50;
-  state.zone=state.color.dir==='bottom'?4:5;
+  state.zone=state.color.dir==='bottom'?2:5;
   depthSelect.value=state.depth;
   document.getElementById('zone').value=state.zone;
   document.getElementById('zoneVal').textContent=state.zone;
