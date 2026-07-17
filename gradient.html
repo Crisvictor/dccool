@@ -72,7 +72,7 @@
     <div class="group">
       <label>3. 使用者設定染色區</label>
       <div class="row"><input id="zone" type="range" min="1" max="9" step="1" value="2"><div class="val"><span id="zoneVal">2</span>成</div></div>
-      <div class="hint">腮紅系列 預設 2 成；其他色系預設 5 成。1成＝染色約佔片坯高度 10%；9成＝約佔 90%。</div>
+      <div class="hint">腮紅系列預設 2 成；其他色系預設 5 成。</div>
     </div>
     <div class="group">
       <label>4. 光學中心移心</label>
@@ -100,27 +100,26 @@
 </main>
 <script>
 const colors = [
-  {name:'Yellow 黃色', hex:'#ffd51f', dir:'top'},// colors[0]
-  {name:'Pink 粉色', hex:'#ff3e67', dir:'top'},// colors[1]
-  {name:'Purple 紫色', hex:'#4d2060', dir:'top'},// colors[2]
-  {name:'Blue 藍色', hex:'#09549f', dir:'top'},// colors[3]
-  {name:'Green 綠色', hex:'#418164', dir:'top'},// colors[4]
-  {name:'Soft Tea 煙茶', hex:'#8b6d42', dir:'top'},// colors[5]
-  {name:'Brown 棕色', hex:'#8a5c29', dir:'top'},// colors[6]
-  {name:'Grey 灰色' , hex:'#121417', dir:'top'},// colors[7]
-  {name:'Peach 蜜桃', hex:'#c39679', dir:'top'},// colors[8]
-  {name:'Nude 裸膚', hex:'#c8b09d', dir:'top'},// colors[9]
+  {name:'Yellow 黃色', hex:'#d3d714', dir:'top'},// colors[0]
+  {name:'Pink 粉色', hex:'#f1096c', dir:'top'},// colors[1]
+  {name:'Purple 紫色', hex:'#6f2067', dir:'top'},// colors[2]
+  {name:'Blue 藍色', hex:'#107cb2', dir:'top'},// colors[3]
+  {name:'Green 綠色', hex:'#016f43', dir:'top'},// colors[4]
+  {name:'Soft Tea 煙茶', hex:'#77790b', dir:'top'},// colors[5]
+  {name:'Brown 棕色', hex:'#675b09', dir:'top'},// colors[6]
+  {name:'Grey 灰色' , hex:'#395336', dir:'top'},// colors[7]
+  {name:'Peach 蜜桃', hex:'#ca7b21', dir:'top'},// colors[8]
+  {name:'Nude 裸膚', hex:'#817437', dir:'top'},// colors[9]
   {name:'Cool Grey 冷灰', hex:'#695c5a', dir:'top'},// colors[10]
   {name:'Rose 玫瑰', hex:'#83120c', dir:'top'},// colors[11]
-  {name:'pink 粉紅', hex:'#eb1455', dir:'top'},// colors[12]
-  {name:'Rouge Pink 腮紅粉', hex:'#eb1455', dir:'bottom'},// colors[13]
-  {name:'Rouge Rose 腮紅玫瑰', hex:'#83120c', dir:'bottom'}// colors[14]
+  {name:'Rouge Pink 腮紅粉', hex:'#c00248', dir:'bottom'},// colors[12]
+  {name:'Rouge Rose 腮紅玫瑰', hex:'#83120c', dir:'bottom'}// colors[13]
 ];
 const diaList = [60,65,70,75];
-let state = {color: colors[13], zone:2, depth:20, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
+let state = {color: colors[12], zone:2, depth:20, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
 const sel = document.getElementById('colorSelect');
 const depthSelect = document.getElementById('depthSelect');
-colors.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name+(c.dir==='bottom'?'（下染色）':'');sel.appendChild(o)}); sel.value=13;
+colors.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name+(c.dir==='bottom'?'（下染色）':'');sel.appendChild(o)}); sel.value=12;
 const chipBox=document.getElementById('diaChips');
 ['all',...diaList].forEach(v=>{let b=document.createElement('button');b.className='chip'+(v==='all'?' active':'');b.dataset.v=v;b.textContent=v==='all'?'全部':v+'Φ';b.onclick=()=>{state.show=v;[...chipBox.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');draw()};chipBox.appendChild(b)});
 depthSelect.value = state.depth;
@@ -151,14 +150,14 @@ function lensGradient(id, d){
   let rougeBoost = 1;
 
   if (isRouge) {
-    if (state.depth >= 90) rougeBoost = 2.1;
-    else if (state.depth >= 80) rougeBoost = 1.95;
-    else if (state.depth >= 70) rougeBoost = 1.86;
-    else if (state.depth >= 60) rougeBoost = 1.77;
-    else if (state.depth >= 50) rougeBoost = 1.65;
-    else if (state.depth >= 40) rougeBoost = 1.57;
-    else if (state.depth >= 30) rougeBoost = 1.28;
-    else if (state.depth >= 20) rougeBoost = 0.5;
+    if (state.depth >= 90) rougeBoost = 0.99;
+    else if (state.depth >= 80) rougeBoost = 0.85;
+    else if (state.depth >= 70) rougeBoost = 0.75;
+    else if (state.depth >= 60) rougeBoost = 0.69;
+    else if (state.depth >= 50) rougeBoost = 0.60;
+    else if (state.depth >= 40) rougeBoost = 0.55;
+    else if (state.depth >= 30) rougeBoost = 0.45;
+    else if (state.depth >= 20) rougeBoost = 0.15;
     else if (state.depth >= 10) rougeBoost = 0.1;
   }
 
@@ -166,15 +165,53 @@ function lensGradient(id, d){
   const opStrong = Math.min(.92, .26 + .62*depth);
   const opMid = Math.min(.62, .12 + .38*depth);
   const opLight = Math.min(.22, .03 + .13*depth);
+  // 一般色與腮紅共用相同的色區分布與單一連續漸進曲線，僅染色方向相反。
+  // 例如設定 4 成：3 成實色區 + 2 成漸層變化區 + 5 成透明區。
+  const transitionBand = 0.2; // 固定 2 成漸層變化區
+  const bodyBand = Math.max(0, z - 0.1);
+  const clearBand = Math.max(0, 1 - bodyBand - transitionBand);
+
+  const solidBlendWidth = Math.min(8.8, bodyBand * 100 * 0.56);
+  const rampFractions = [0.05, 0.1, 0.18, 0.28, 0.39, 0.59, 0.72, 1.00];
+
   if(d==='top'){
+    // 一般漸層：上方實色、往下漸淡、下方透明。
+    const clearStart = (bodyBand + transitionBand) * 100;
+    const fadeStart = bodyBand * 100;
+    const rampStart = Math.max(0, fadeStart - solidBlendWidth);
+    const rampSpan = Math.max(1, clearStart - rampStart);
+
     grad.appendChild(el('stop',{offset:'0%','stop-color':c,'stop-opacity':opStrong}));
-    grad.appendChild(el('stop',{offset:(z*65)+'%','stop-color':c,'stop-opacity':opMid}));
-    grad.appendChild(el('stop',{offset:(z*100)+'%','stop-color':c,'stop-opacity':opLight}));
-    grad.appendChild(el('stop',{offset:'100%','stop-color':'#ffffff','stop-opacity':'.02'}));
+    grad.appendChild(el('stop',{offset:rampStart+'%','stop-color':c,'stop-opacity':opStrong}));
+
+    rampFractions.forEach(t => {
+      const eased = 1 - Math.pow(1 - t, 1.05);
+      const opacity = Math.max(0, opStrong * (1 - eased * 0.98));
+      const offset = rampStart + rampSpan * t;
+      grad.appendChild(el('stop',{offset:offset+'%','stop-color':c,'stop-opacity':opacity}));
+    });
+
+    grad.appendChild(el('stop',{offset:clearStart+'%','stop-color':c,'stop-opacity':'0'}));
+    grad.appendChild(el('stop',{offset:clearStart+'%','stop-color':'#ffffff','stop-opacity':'0'}));
+    grad.appendChild(el('stop',{offset:'100%','stop-color':'#ffffff','stop-opacity':'0'}));
   }else{
-    grad.appendChild(el('stop',{offset:'0%','stop-color':'#ffffff','stop-opacity':'.02'}));
-    grad.appendChild(el('stop',{offset:(100-z*100)+'%','stop-color':c,'stop-opacity':opLight}));
-    grad.appendChild(el('stop',{offset:(100-z*65)+'%','stop-color':c,'stop-opacity':opMid}));
+    // 腮紅下染色：上方透明、往下漸深、下方實色。
+    const clearEnd = clearBand * 100;
+    const fadeEnd = (clearBand + transitionBand) * 100;
+    const rampEnd = Math.min(100, fadeEnd + solidBlendWidth);
+    const rampSpan = Math.max(1, rampEnd - clearEnd);
+
+    grad.appendChild(el('stop',{offset:'0%','stop-color':'#ffffff','stop-opacity':'0'}));
+    grad.appendChild(el('stop',{offset:clearEnd+'%','stop-color':'#ffffff','stop-opacity':'0'}));
+    grad.appendChild(el('stop',{offset:clearEnd+'%','stop-color':c,'stop-opacity':'0'}));
+
+    rampFractions.forEach(t => {
+      const eased = 1 - Math.pow(1 - t, 1.05);
+      const opacity = Math.min(opStrong, opStrong * eased * 0.98);
+      const offset = clearEnd + rampSpan * t;
+      grad.appendChild(el('stop',{offset:offset+'%','stop-color':c,'stop-opacity':opacity}));
+    });
+
     grad.appendChild(el('stop',{offset:'100%','stop-color':c,'stop-opacity':opStrong}));
   }
   return grad;
