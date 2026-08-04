@@ -256,6 +256,42 @@
       margin-top: 3px !important; /* 上間距 */
     }
 
+    .supervisor { /* 督導標示🔔 */
+      display: inline-flex !important;
+      background-color: #8e0b13 !important;
+      color: #fff !important;
+      font-size: 14px !important;
+      justify-content: center !important;
+      width: 10px !important;
+      height: 20px !important;
+      border-radius: 8px !important;
+      margin-top: 3px !important;
+    }
+
+    .specialist { /* 專員標示🥷 */
+      display: inline-flex !important;
+      background-color: #080c54 !important;
+      color: #fff !important;
+      font-size: 14px !important;
+      justify-content: center !important;
+      width: 10px !important;
+      height: 20px !important;
+      border-radius: 8px !important;
+      margin-top: 3px !important;
+    }
+
+    .reserveCadre { /* 儲備幹部標示✨ */
+      display: inline-flex !important;
+      background-color: #1f893c !important;
+      color: #fff !important;
+      font-size: 14px !important;
+      justify-content: center !important;
+      width: 10px !important;
+      height: 20px !important;
+      border-radius: 8px !important;
+      margin-top: 3px !important;
+    }
+
     .trainee { /* 建教生標示🎓 */
       display: inline-flex !important;
       background-color: #eee8aa !important; /* 灰金菊色 */
@@ -575,7 +611,10 @@
     </select>
     <select id="categorySelect" onchange="searchEmployees()">
         <option value="">選擇類群</option>
+        <option value="supervisor">督導</option>
+        <option value="specialist">專員</option>
         <option value="manager">主管</option>
+        <option value="reserveCadre">儲備幹部</option>
         <option value="opto">驗光人員</option>
         <option value="depot">倉儲</option>
         <option value="trainee">建教生</option>
@@ -589,7 +628,7 @@
     </div>
     <div id="searchCount" class="search-count hidden"></div>
 <footer id="pageFooter" class="hidden">
-    <p>當前版本：v20260803-secure<br>
+    <p>當前版本：v20260803-secure-role3<br>
     問題聯繫：<a href="mailto:xd67332@gmail.com">xd67332@gmail.com</a></p>
    <a href="Deta.html" class="game-button">扣項細則</a>
   <div class="footer-center">
@@ -1104,6 +1143,33 @@ gridEl.addEventListener('touchend', ev => {
                 managerSpan.classList.add('manager', 'tooltip');
                 managerSpan.setAttribute('data-tooltip', '主管');
                 resultItem.appendChild(managerSpan);
+            }
+
+            // 督導符號
+            if (emp.supervisor) {
+                const supervisorSpan = document.createElement('span');
+                supervisorSpan.textContent = `${emp.supervisor}`;
+                supervisorSpan.classList.add('supervisor', 'tooltip');
+                supervisorSpan.setAttribute('data-tooltip', '督導');
+                resultItem.appendChild(supervisorSpan);
+            }
+
+            // 專員符號
+            if (emp.specialist) {
+                const specialistSpan = document.createElement('span');
+                specialistSpan.textContent = `${emp.specialist}`;
+                specialistSpan.classList.add('specialist', 'tooltip');
+                specialistSpan.setAttribute('data-tooltip', '專員');
+                resultItem.appendChild(specialistSpan);
+            }
+
+            // 儲備幹部符號
+            if (emp.reserveCadre) {
+                const reserveCadreSpan = document.createElement('span');
+                reserveCadreSpan.textContent = `${emp.reserveCadre}`;
+                reserveCadreSpan.classList.add('reserveCadre', 'tooltip');
+                reserveCadreSpan.setAttribute('data-tooltip', '儲備幹部');
+                resultItem.appendChild(reserveCadreSpan);
             }
 
             // 驗光人員（同一分類下：👓=驗光師、🕶️=驗光生）
