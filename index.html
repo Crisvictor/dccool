@@ -256,6 +256,18 @@
       margin-top: 3px !important; /* 上間距 */
     }
 
+    .acc { /* 會計標示💰 */
+      display: inline-flex !important;
+      background-color: #220f07 !important;
+      color: #fff !important;
+      font-size: 14px !important;
+      justify-content: center !important;
+      width: 10px !important;
+      height: 20px !important;
+      border-radius: 8px !important;
+      margin-top: 3px !important;
+    }
+
     .supervisor { /* 督導標示🔔 */
       display: inline-flex !important;
       background-color: #8e0b13 !important;
@@ -570,7 +582,7 @@
       <button type="button" id="dataUnlockButton">載入資料</button>
     </div>
     <div id="dataStatus" class="data-status" role="status" aria-live="polite"></div>
-    <p class="security-note">密碼不會儲存在瀏覽器；員工資料只在本頁記憶體中解密，閒置 15 分鐘後自動鎖定。</p>
+    <p class="security-note">員工資料只在本頁記憶體中解密，閒置 15 分鐘後自動鎖定。</p>
   </section>
 
   <!-- 搜索區域 -->
@@ -611,7 +623,7 @@
     </select>
     <select id="categorySelect" onchange="searchEmployees()">
         <option value="">選擇類群</option>
-        <option value="supervisor">督導</option>
+        <option value="acc">會計</option>
         <option value="specialist">專員</option>
         <option value="manager">主管</option>
         <option value="reserveCadre">儲備幹部</option>
@@ -1143,6 +1155,15 @@ gridEl.addEventListener('touchend', ev => {
                 managerSpan.classList.add('manager', 'tooltip');
                 managerSpan.setAttribute('data-tooltip', '主管');
                 resultItem.appendChild(managerSpan);
+            }
+
+            // 會計符號
+            if (emp.acc) {
+                const accSpan = document.createElement('span');
+                accSpan.textContent = `${emp.acc}`;
+                accSpan.classList.add('acc', 'tooltip');
+                accSpan.setAttribute('data-tooltip', '會計');
+                resultItem.appendChild(accSpan);
             }
 
             // 督導符號
