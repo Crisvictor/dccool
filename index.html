@@ -593,7 +593,7 @@
   
   <!-- 搜索區域 -->
   <div id="searchSection" class="hidden">
-    <h1 id="searchTitle">員工查詢</h1>
+    <h1 id="searchTitle">員工<span id="secretSearchTrigger" title="">查</span>詢</h1>
   <div class="search-container">
     <input type="text" id="employeeIdInput" placeholder="輸入工號..." onkeyup="searchEmployees()">
     <input type="text" id="employeeNameInput" placeholder="輸入姓名..." onkeyup="searchEmployees()">
@@ -665,6 +665,9 @@
   let dataCooldownTimer = null;
   let idleTimer = null;
   let appUnlocked = false;
+  let resignedSearchMode = false;
+  let secretTapCount = 0;
+  let secretTapTimer = null;
 
   function base64ToBytes(value) {
     const binary = atob(value);
@@ -823,7 +826,8 @@
       const loadedEmployees = await loadEncryptedEmployees(password);
       employees = Object.freeze(loadedEmployees);
       input.value = '';
-      setDataStatus(`資料載入完成，共 ${employees.length} 位員工。`, 'success');
+      const activeCount = employees.filter(emp => !(emp.inactive === true || emp.employmentStatus === 'resigned')).length;
+      setDataStatus(`資料載入完成，共 ${activeCount} 位在職員工。`, 'success');
 
       setTimeout(() => {
         document.getElementById('dataUnlockSection').classList.add('hidden');
@@ -1148,6 +1152,29 @@ gridEl.addEventListener('touchend', ev => {
       if (event.key === 'Enter') unlockEmployeeData();
     });
 
+    function bindSecretTrigger() {
+      const node = document.getElementById('secretSearchTrigger');
+      if (!node || node.dataset.bound === '1') return;
+      node.dataset.bound = '1';
+      node.addEventListener('click', () => {
+        secretTapCount += 1;
+        clearTimeout(secretTapTimer);
+        secretTapTimer = setTimeout(() => { secretTapCount = 0; }, 1600);
+        if (secretTapCount < 3) return;
+        secretTapCount = 0;
+        resignedSearchMode = !resignedSearchMode;
+        document.getElementById('searchTitle').innerHTML = resignedSearchMode
+          ? '離職員工<span id="secretSearchTrigger">查</span>詢'
+          : '員工<span id="secretSearchTrigger">查</span>詢';
+        bindSecretTrigger();
+        ['employeeIdInput','employeeNameInput'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('branchSelect').value = '';
+        document.getElementById('categorySelect').value = '';
+        searchEmployees();
+      });
+    }
+    bindSecretTrigger();
+
     function searchEmployees() {
       const inputId = document.getElementById('employeeIdInput').value.trim();   // 取得工號輸入值
       const inputName = document.getElementById('employeeNameInput').value.trim(); // 取得姓名輸入值
@@ -1168,13 +1195,17 @@ gridEl.addEventListener('touchend', ev => {
       const matchName = !inputName || emp.name.includes(inputName); // 姓名匹配
       const matchBranch = !selectedBranch || emp.branch === selectedBranch; // 分公司匹配
       const matchCategory = !selectedCategory || emp[selectedCategory]; // 屬性分類匹配
-      return matchId && matchName && matchBranch && matchCategory;
+      const isResigned = emp.inactive === true || emp.employmentStatus === 'resigned';
+      const matchEmploymentMode = resignedSearchMode ? isResigned : !isResigned;
+      return matchId && matchName && matchBranch && matchCategory && matchEmploymentMode;
    });
 
    // 顯示搜尋結果數量
     if (filteredEmployees.length > 0) {
       const suspendedCount = filteredEmployees.filter(emp => emp.suspended).length;
-      searchCountDiv.textContent = `該搜尋結果共 ${filteredEmployees.length} 員，其中停職共 ${suspendedCount} 員`;
+      searchCountDiv.textContent = resignedSearchMode
+        ? `離職員工搜尋結果共 ${filteredEmployees.length} 員`
+        : `該搜尋結果共 ${filteredEmployees.length} 員，其中停職共 ${suspendedCount} 員`;
       searchCountDiv.classList.remove('hidden');
     } else {
       searchCountDiv.classList.add('hidden');
@@ -1190,7 +1221,7 @@ gridEl.addEventListener('touchend', ev => {
             branchSpan.classList.add('branch');
             
             const dateSpan = document.createElement('span');
-            dateSpan.textContent = `In: ${emp.dateOfEntry}`;
+            dateSpan.textContent = resignedSearchMode && emp.resignedAt ? `Out: ${emp.resignedAt}` : `In: ${emp.dateOfEntry}`;
             dateSpan.classList.add('date');
 
             if (isNewHireWithinSixMonths(emp.dateOfEntry)) {
