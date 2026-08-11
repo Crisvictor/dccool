@@ -5,7 +5,7 @@
 <link rel="shortcut icon" href="img/G1.ico" type="image/x-icon">
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>片坯漸層染色 1:1 教學演示</title>
+<title>片坯漸層染色 / 精修薄 1:1 教學演示</title>
 <style>
   :root{
     --bg:#f4f7f8;
@@ -19,80 +19,149 @@
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;background:var(--bg);color:#162b36;}
-  header{padding:20px 28px 12px;background:linear-gradient(180deg,#fff,#f4f7f8);border-bottom:1px solid #dfe8ec;}
-  h1{margin:0 0 6px;font-size:24px;letter-spacing:.03em;color:var(--ink)}
-  .sub{color:var(--muted);font-size:14px;line-height:1.5}
+  header{padding:18px 28px 12px;background:linear-gradient(180deg,#fff,#f4f7f8);border-bottom:1px solid #dfe8ec;}
+  .titleRow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  h1{margin:0;font-size:24px;letter-spacing:.03em;color:var(--ink)}
+  .modeBtn{border:1px solid #0d6075;border-radius:999px;background:#fff;color:#0d6075;padding:7px 14px;font-weight:800;cursor:pointer;transition:.18s}
+  .modeBtn:hover{background:#0d6075;color:#fff}
+  .sub{color:var(--muted);font-size:14px;line-height:1.5;margin-top:6px}
   main{display:grid;grid-template-columns:330px 1fr;gap:18px;padding:18px;align-items:start}
   .controls{background:var(--panel);border:1px solid #dde8ec;border-radius:18px;padding:18px;box-shadow:var(--shadow);position:sticky;top:12px}
   .group{padding:12px 0;border-bottom:1px solid #ecf1f3}.group:last-child{border-bottom:0}
-  label{display:block;font-weight:700;margin:0 0 8px;color:#203843}.hint{font-size:12px;color:var(--muted);line-height:1.45;margin-top:6px}
+  label{display:block;font-weight:700;margin:0 0 8px;color:#203843}.hint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px}
+  .warnHint{font-size:12px;color:#994b00;line-height:1.55;margin-top:8px;background:#fff8e8;border:1px solid #f1d49d;border-radius:10px;padding:9px 10px}
   select,input[type=range],input[type=number]{width:100%}
   select,input[type=number]{height:40px;border:1px solid #cbd8de;border-radius:10px;padding:0 10px;background:white;font-size:15px}
   input[type=range]{accent-color:#0d6075}
-  .row{display:flex;gap:10px;align-items:center}.row>*{flex:1}.val{flex:0 0 58px;text-align:center;border:1px solid #cbd8de;border-radius:9px;padding:8px;background:#f8fbfc;font-weight:700}
-  .toggleRow{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px;border:1px solid #dbe7ec;border-radius:12px;background:#f8fbfc;font-weight:700;color:#203843}
+  .row{display:flex;gap:10px;align-items:center}.row>*{flex:1}.val{flex:0 0 72px;text-align:center;border:1px solid #cbd8de;border-radius:9px;padding:8px 5px;background:#f8fbfc;font-weight:700;white-space:nowrap}
+  .toggleRow{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px;border:1px solid #dbe7ec;border-radius:12px;background:#f8fbfc;font-weight:700;color:#203843;cursor:pointer}
   .toggleRow input{width:18px;height:18px;accent-color:#0d6075}
-  .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.chip{border:1px solid #cbd8de;background:#fff;border-radius:999px;padding:8px;text-align:center;cursor:pointer;font-weight:700}.chip.active{background:#0d4052;color:#fff;border-color:#0d4052}
+  .chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.chip{border:1px solid #cbd8de;background:#fff;border-radius:999px;padding:8px 6px;text-align:center;cursor:pointer;font-weight:700}.chip.active{background:#0d4052;color:#fff;border-color:#0d4052}
   .stageWrap{background:var(--panel);border:1px solid #dde8ec;border-radius:18px;padding:18px;box-shadow:var(--shadow);overflow:auto}
   .toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px;color:var(--muted);font-size:13px;flex-wrap:wrap}
   .printBtn{border:0;border-radius:10px;background:#0d4052;color:white;padding:10px 14px;font-weight:700;cursor:pointer}
   .canvas{transform:scale(var(--scale));transform-origin:top left;width:max-content;min-height:760px;padding:12px 22px 22px;background:#fff;border-radius:12px;border:1px dashed #cbd8de;}
-  svg{display:block;overflow:visible}.lensText{font-size:4.6px;fill:#9aa3a7;font-weight:700}.note{font-size:3.6px;fill:#66757e}.mmLabel{font-size:3.8px;fill:#2b5563;font-weight:700}.frameLabel{font-size:3.2px;fill:#66757e}.cross{stroke:var(--accent);stroke-width:1.2;stroke-linecap:round}.multiCross{stroke:#d6cc35;stroke-width:.75;stroke-linecap:round}.multiLine{stroke:#d6cc35;stroke-width:.5;fill:none}.multiText{font-size:3.2px;fill:#9b931f;font-weight:700}.circleLine{stroke:var(--line);stroke-width:.45;fill:none}.shapeLine{stroke:#173847;stroke-width:.45;stroke-dasharray:2 1.5;fill:none}.centerLine{stroke:#9fb1b9;stroke-width:.25;stroke-dasharray:1.5 1.2}.ocLine{stroke:#d33;stroke-width:.28;stroke-dasharray:1.2 1.2}.legendBox{fill:#f8fbfc;stroke:#d8e3e8;stroke-width:.25}.watermark{font-size:4px;fill:#b9c2c6;font-weight:700}.ruler{stroke:#222;stroke-width:.25}.rulerText{font-size:3.2px;fill:#333}
+  svg{display:block;overflow:visible}
+  .lensText{font-size:4.6px;fill:#9aa3a7;font-weight:700}
+  .note{font-size:3.6px;fill:#66757e}
+  .mmLabel{font-size:3.8px;fill:#2b5563;font-weight:700}
+  .frameLabel{font-size:3.2px;fill:#66757e}
+  .cross{stroke:var(--accent);stroke-width:1.2;stroke-linecap:round}
+  .multiCross{stroke:#d6cc35;stroke-width:.75;stroke-linecap:round}
+  .multiLine{stroke:#d6cc35;stroke-width:.5;fill:none}
+  .circleLine{stroke:var(--line);stroke-width:.45;fill:none}
+  .centerLine{stroke:#9fb1b9;stroke-width:.25;stroke-dasharray:1.5 1.2}
+  .ocLine{stroke:#d33;stroke-width:.28;stroke-dasharray:1.2 1.2}
+  .legendBox{fill:#f8fbfc;stroke:#d8e3e8;stroke-width:.25}
+  .watermark{font-size:4px;fill:#b9c2c6;font-weight:700}
+  .ruler{stroke:#222;stroke-width:.25}
+  .rulerText{font-size:3.2px;fill:#333}
+  .thinPanelTitle{font-size:13px;font-weight:800;color:#294754;margin-bottom:6px}
+  .miniGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.miniGrid label{font-size:12px;margin-bottom:4px}.miniGrid input{height:36px}
+  .thinSelect{height:42px;border:1px solid #cbd8de;border-radius:10px;padding:0 10px;background:#fff;font-size:15px;font-weight:700;color:#203843}
+  .hidden{display:none!important}
   @media(max-width:900px){main{grid-template-columns:1fr}.controls{position:relative;top:auto}.canvas{transform:none;width:100%;min-width:760px}}
   @media print{body{background:#fff}header,.controls,.toolbar{display:none}.stageWrap{box-shadow:none;border:0;padding:0}.canvas{border:0;padding:0;transform:none}.pageBreak{break-after:page}}
 </style>
 </head>
 <body>
 <header>
-  <h1>片坯漸層染色設定演示</h1>
-  <div class="sub">用於 60Φ / 65Φ / 70Φ / 75Φ 片坯的 1:1 教學示意。可切換漸層色、染色深度、染色區比例、染色多焦與光學中心移心量。<br><b>《 本網站僅供色區參考，關於染色顏色、深度因每台顯示器會有色彩偏差，請以現場色板為主。 》</b></div>
+  <div class="titleRow">
+    <h1 id="pageTitle">片坯漸層染色設定演示</h1>
+    <button class="modeBtn" id="modeBtn" type="button">精修薄模式</button>
+  </div>
+  <div class="sub" id="pageSub">用於 60Φ / 65Φ / 70Φ / 75Φ 片坯的 1:1 教學示意。可切換漸層色、染色深度、染色區比例、染色多焦與光學中心移心量。<br><b>《 本網站僅供色區參考，關於染色顏色、深度因每台顯示器會有色彩偏差，請以現場色板為主。 》</b></div>
 </header>
 <main>
   <aside class="controls">
-    <div class="group">
-      <label for="colorSelect">1. 漸層顏色</label>
-      <select id="colorSelect"></select>
-      <div class="hint">腮紅系列 預設為「下染色、上透明」；其他顏色為「上染色、下透明」。</div>
+    <div id="dyeControls">
+      <div class="group">
+        <label for="colorSelect">1. 漸層顏色</label>
+        <select id="colorSelect"></select>
+        <div class="hint">腮紅系列 預設為「下染色、上透明」；其他顏色為「上染色、下透明」。</div>
+      </div>
+      <div class="group">
+        <label for="depthSelect">2. 染色深度</label>
+        <select id="depthSelect">
+          <option value="10">10%</option><option value="20">20%</option><option value="30">30%</option><option value="40">40%</option><option value="50">50%</option><option value="60">60%</option><option value="70">70%</option><option value="80">80%</option><option value="90">90%</option>
+        </select>
+        <div class="hint">腮紅系列 預設 20%；其他色系預設 50%。數值越高，鏡片染色呈現越深。</div>
+      </div>
+      <div class="group">
+        <label>3. 使用者設定染色區</label>
+        <div class="row"><input id="zone" type="range" min="1" max="9" step="1" value="2"><div class="val"><span id="zoneVal">2</span>成</div></div>
+        <div class="hint">腮紅系列預設 2 成；其他色系預設 5 成。</div>
+      </div>
+      <div class="group">
+        <label>4. 光學中心移心</label>
+        <div class="row"><input id="decenter" type="range" min="0" max="5" step="0.5" value="0"><div class="val"><span id="decenterVal">0</span> mm</div></div>
+        <div class="hint">紅色十字為光學中心。正值示意往右移心；需要反向時可按下方按鈕。</div>
+        <div class="chips" style="margin-top:10px;grid-template-columns:repeat(2,1fr)"><button class="chip active" id="dirR" type="button">往右</button><button class="chip" id="dirL" type="button">往左</button></div>
+        <label class="toggleRow"><input id="multifocalMode" type="checkbox">開啟多焦模式標記</label>
+        <div class="hint">開啟後會以目前光學中心為基準，往上 4mm 顯示配鏡十字，並加上遠區圓形標記，方便推算染色高度。</div>
+      </div>
+      <div class="group">
+        <label>片徑顯示</label>
+        <div class="chips" id="diaChips"></div>
+        <div class="hint">全選時可比較四種片徑；單選可放大檢視該片坯。</div>
+      </div>
     </div>
-    <div class="group">
-      <label for="depthSelect">2. 染色深度</label>
-      <select id="depthSelect">
-        <option value="10">10%</option>
-        <option value="20">20%</option>
-        <option value="30">30%</option>
-        <option value="40">40%</option>
-        <option value="50">50%</option>
-        <option value="60">60%</option>
-        <option value="70">70%</option>
-        <option value="80">80%</option>
-        <option value="90">90%</option>
-      </select>
-      <div class="hint">腮紅系列 預設 20%；其他色系預設 50%。數值越高，鏡片染色呈現越深。</div>
+
+    <div id="thinControls" class="hidden">
+      <div class="group">
+        <label for="thinDiaSelect">1. 片徑選擇</label>
+        <select id="thinDiaSelect" class="thinSelect"></select>
+        <div class="hint">可選 50Φ～70Φ（每 1 mm）及 75Φ。片坯外圈以實際 mm 比例顯示，建議先用下方 50 mm 校正尺確認螢幕比例。</div>
+      </div>
+      <div class="group">
+        <label>2. 有效光學內徑</label>
+        <div class="row"><input id="opticalDia" type="range" min="38" max="65" step="1" value="45"><div class="val"><span id="opticalDiaVal">45</span> Φ</div></div>
+        <div class="hint">將鏡框眼位比對光學中心，比對裁型後留下適當的精修區外徑。</div>
+        <div class="hint" id="opticalDiaHint">可設定範圍：38Φ～65Φ。</div>
+        <div class="warnHint">警示：片坯圓心為光學中心。有效光學內徑越小，外圍精修薄區越大；近視邊緣更薄，遠視中心更薄。但精修薄區-鏡片表面曲率改變、已非原處方光度，該區像差與模糊區也會同步增加。</div>
+      </div>
+      <div class="group">
+        <div class="thinPanelTitle">鏡框參數比對</div>
+        <label class="toggleRow"><input id="showFrameOutline" type="checkbox">開啟鏡框參數比對功能</label>
+        <div id="frameInputWrap" class="hidden" style="margin-top:10px">
+          <div style="margin-bottom:10px">
+            <label>眼別</label>
+            <div class="chips" style="grid-template-columns:repeat(2,1fr)">
+              <button class="chip active" id="eyeR" type="button">右眼</button>
+              <button class="chip" id="eyeL" type="button">左眼</button>
+            </div>
+          </div>
+          <div style="margin-bottom:10px">
+            <label>框型預設</label>
+            <div class="chips" style="grid-template-columns:repeat(3,1fr)" id="shapePresetChips">
+              <button class="chip" id="presetRound" type="button">圓/橢圓形</button>
+              <button class="chip" id="presetSquare" type="button">方/長方形</button>
+              <button class="chip active" id="presetNasal" type="button">鼻側斜面</button>
+            </div>
+            <div class="hint">先選預設框型，再依需要微調 A / B / ED。</div>
+          </div>
+          <div class="hint" id="presetSizeInfo" style="margin:8px 0 10px;padding:8px 10px;border:1px solid #e2eaee;border-radius:10px;background:#f8fbfc;font-weight:700;color:#36515e">預設尺寸：A 54 / B 38 / ED 60</div>
+          <div class="miniGrid">
+            <div><label for="frameA">A 寬</label><input id="frameA" type="number" min="30" max="70" step="1" value="54"></div>
+            <div><label for="frameB">B 高</label><input id="frameB" type="number" min="20" max="60" step="1" value="38"></div>
+            <div><label for="frameED">ED 斜邊/最大內徑</label><input id="frameED" type="number" min="38" max="80" step="0.5" value="60"></div>
+            <div><label for="frameDBL">DBL 中樑距</label><input id="frameDBL" type="number" min="8" max="30" step="1" value="18"></div>
+            <div><label for="framePD">PD 瞳距</label><input id="framePD" type="number" min="50" max="76" step="1" value="64"></div>
+            <div><label for="framePH">瞳高</label><input id="framePH" type="number" min="5" max="36" step="0.5" value="22"></div>
+          </div>
+          <div class="hint">A / B / ED 可手動微調；DBL / PD / 瞳高用於框型相對光學中心的位置估算。<br>瞳高以鏡框最下緣往上量至瞳孔中心。<br>精修薄不建議給予配戴瞳高過高。</div>
+        </div>
+        <div class="hint" id="frameHint">預設關閉。開啟後才顯示左右眼、框型預設、A / B / ED 與 DBL / PD / 瞳高位置參數。</div>
+      </div>
     </div>
-    <div class="group">
-      <label>3. 使用者設定染色區</label>
-      <div class="row"><input id="zone" type="range" min="1" max="9" step="1" value="2"><div class="val"><span id="zoneVal">2</span>成</div></div>
-      <div class="hint">腮紅系列預設 2 成；其他色系預設 5 成。</div>
-    </div>
-    <div class="group">
-      <label>4. 光學中心移心</label>
-      <div class="row"><input id="decenter" type="range" min="0" max="5" step="0.5" value="0"><div class="val"><span id="decenterVal">0</span> mm</div></div>
-      <div class="hint">紅色十字為光學中心。正值示意往右移心；需要反向時可按下方按鈕。</div>
-      <div class="chips" style="margin-top:10px;grid-template-columns:repeat(2,1fr)"><button class="chip active" id="dirR">往右</button><button class="chip" id="dirL">往左</button></div>
-      <label class="toggleRow"><input id="multifocalMode" type="checkbox">開啟多焦模式標記</label>
-      <div class="hint">開啟後會以目前光學中心為基準，往上 4mm 顯示配鏡十字，並加上遠區圓形標記，方便推算染色高度。</div>
-    </div>
-    <div class="group">
-      <label>片徑顯示</label>
-      <div class="chips" id="diaChips"></div>
-      <div class="hint">全選時可比較四種片徑；單選可放大檢視該片坯。</div>
-    </div>
+
     <div class="group">
       <label>畫面校正</label>
       <div class="row"><input id="scale" type="range" min="0.75" max="1.35" step="0.01" value="1"><div class="val"><span id="scaleVal">100</span>%</div></div>
       <div class="hint">螢幕 1:1 會受作業系統縮放與螢幕 DPI 影響。列印或投影前可用下方 50 mm 尺校正。</div>
     </div>
   </aside>
+
   <section class="stageWrap">
     <div class="toolbar"><span id="summary">目前設定</span><button class="printBtn" onclick="window.print()">列印 / 轉 PDF</button></div>
     <div class="canvas"><svg id="svg" width="820" height="760" viewBox="0 0 220 205" xmlns="http://www.w3.org/2000/svg"></svg></div>
@@ -100,34 +169,44 @@
 </main>
 <script>
 const colors = [
-  {name:'Yellow 黃色', hex:'#d3d714', dir:'top'},// colors[0]
-  {name:'Pink 粉色', hex:'#f1096c', dir:'top'},// colors[1]
-  {name:'Purple 紫色', hex:'#6f2067', dir:'top'},// colors[2]
-  {name:'Blue 藍色', hex:'#107cb2', dir:'top'},// colors[3]
-  {name:'Green 綠色', hex:'#016f43', dir:'top'},// colors[4]
-  {name:'Soft Tea 煙茶', hex:'#77790b', dir:'top'},// colors[5]
-  {name:'Brown 棕色', hex:'#675b09', dir:'top'},// colors[6]
-  {name:'Grey 灰色' , hex:'#395336', dir:'top'},// colors[7]
-  {name:'Peach 蜜桃', hex:'#ca7b21', dir:'top'},// colors[8]
-  {name:'Nude 裸膚', hex:'#817437', dir:'top'},// colors[9]
-  {name:'Cool Grey 冷灰', hex:'#695c5a', dir:'top'},// colors[10]
-  {name:'Rose 玫瑰', hex:'#83120c', dir:'top'},// colors[11]
-  {name:'Rouge Pink 腮紅粉', hex:'#c00248', dir:'bottom'},// colors[12]
-  {name:'Rouge Rose 腮紅玫瑰', hex:'#83120c', dir:'bottom'}// colors[13]
+  {name:'Yellow 黃色', hex:'#d3d714', dir:'top'},
+  {name:'Pink 粉色', hex:'#f1096c', dir:'top'},
+  {name:'Purple 紫色', hex:'#6f2067', dir:'top'},
+  {name:'Blue 藍色', hex:'#107cb2', dir:'top'},
+  {name:'Green 綠色', hex:'#016f43', dir:'top'},
+  {name:'Soft Tea 煙茶', hex:'#77790b', dir:'top'},
+  {name:'Brown 棕色', hex:'#675b09', dir:'top'},
+  {name:'Grey 灰色', hex:'#395336', dir:'top'},
+  {name:'Peach 蜜桃', hex:'#ca7b21', dir:'top'},
+  {name:'Nude 裸膚', hex:'#817437', dir:'top'},
+  {name:'Cool Grey 冷灰', hex:'#695c5a', dir:'top'},
+  {name:'Rose 玫瑰', hex:'#83120c', dir:'top'},
+  {name:'Rouge Pink 腮紅粉', hex:'#c00248', dir:'bottom'},
+  {name:'Rouge Rose 腮紅玫瑰', hex:'#83120c', dir:'bottom'}
 ];
 const diaList = [60,65,70,75];
+const thinDiaList = [...Array.from({length:21},(_,i)=>50+i),75];
+let appMode = 'dye';
 let state = {color: colors[12], zone:2, depth:20, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
+let thinState = {dia:70, opticalDia:45, frameA:54, frameB:38, ed:61, dbl:18, pd:64, ph:22, showFrame:false, rxType:'minus', eye:'R', shapePreset:'nasal'};
+
 const sel = document.getElementById('colorSelect');
 const depthSelect = document.getElementById('depthSelect');
-colors.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name+(c.dir==='bottom'?'（下染色）':'');sel.appendChild(o)}); sel.value=12;
+colors.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.name+(c.dir==='bottom'?'（下染色）':'');sel.appendChild(o)});
+sel.value=12;
 const chipBox=document.getElementById('diaChips');
-['all',...diaList].forEach(v=>{let b=document.createElement('button');b.className='chip'+(v==='all'?' active':'');b.dataset.v=v;b.textContent=v==='all'?'全部':v+'Φ';b.onclick=()=>{state.show=v;[...chipBox.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');draw()};chipBox.appendChild(b)});
+['all',...diaList].forEach(v=>{const b=document.createElement('button');b.className='chip'+(v==='all'?' active':'');b.dataset.v=v;b.type='button';b.textContent=v==='all'?'全部':v+'Φ';b.onclick=()=>{state.show=v;[...chipBox.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');draw()};chipBox.appendChild(b)});
+const thinDiaSelect=document.getElementById('thinDiaSelect');
+thinDiaList.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v+'Φ';thinDiaSelect.appendChild(o)});
+thinDiaSelect.value=thinState.dia;
+thinDiaSelect.onchange=e=>{thinState.dia=+e.target.value;syncThinLimits();draw()};
+
 depthSelect.value = state.depth;
 depthSelect.onchange=e=>{state.depth=+e.target.value;draw()};
 document.getElementById('zone').oninput=e=>{state.zone=+e.target.value;document.getElementById('zoneVal').textContent=state.zone;draw()};
 document.getElementById('decenter').oninput=e=>{state.decenter=+e.target.value;document.getElementById('decenterVal').textContent=state.decenter;draw()};
 document.getElementById('multifocalMode').onchange=e=>{state.multifocal=e.target.checked;draw()};
-document.getElementById('scale').oninput=e=>{state.scale=+e.target.value;document.documentElement.style.setProperty('--scale',state.scale);document.getElementById('scaleVal').textContent=Math.round(state.scale*100);};
+document.getElementById('scale').oninput=e=>{state.scale=+e.target.value;document.documentElement.style.setProperty('--scale',state.scale);document.getElementById('scaleVal').textContent=Math.round(state.scale*100)};
 sel.onchange=e=>{
   state.color=colors[+e.target.value];
   state.depth=state.color.dir==='bottom'?20:50;
@@ -139,8 +218,45 @@ sel.onchange=e=>{
 };
 document.getElementById('dirR').onclick=()=>{state.dir=1;dirR.classList.add('active');dirL.classList.remove('active');draw()};
 document.getElementById('dirL').onclick=()=>{state.dir=-1;dirL.classList.add('active');dirR.classList.remove('active');draw()};
+
+document.getElementById('opticalDia').oninput=e=>{thinState.opticalDia=+e.target.value;document.getElementById('opticalDiaVal').textContent=thinState.opticalDia;draw()};
+document.getElementById('showFrameOutline').onchange=e=>{
+  thinState.showFrame=e.target.checked;
+  document.getElementById('frameInputWrap').classList.toggle('hidden',!thinState.showFrame);
+  document.getElementById('frameHint').textContent = thinState.showFrame ? '' : '預設關閉。開啟後才顯示左右眼、框型預設、A / B / ED 與 DBL / PD / 瞳高位置參數。';
+  draw();
+};
+document.getElementById('frameA').oninput=e=>{thinState.frameA=clamp(+e.target.value||54,30,Math.min(70,thinState.dia-2)); syncFrameEDLimits(); draw()};
+document.getElementById('frameB').oninput=e=>{thinState.frameB=clamp(+e.target.value||38,20,Math.min(60,thinState.dia-2)); syncFrameEDLimits(); draw()};
+document.getElementById('frameED').oninput=e=>{syncFrameEDLimits(+e.target.value||thinState.ed); draw()};
+document.getElementById('frameDBL').oninput=e=>{thinState.dbl=clamp(+e.target.value||18,8,30);draw()};
+document.getElementById('framePD').oninput=e=>{thinState.pd=clamp(+e.target.value||64,50,76);draw()};
+document.getElementById('framePH').oninput=e=>{thinState.ph=clamp(+e.target.value||19,5,Math.max(5,thinState.frameB-2));draw()};
+const eyeRBtn=document.getElementById('eyeR');
+const eyeLBtn=document.getElementById('eyeL');
+eyeRBtn.onclick=()=>{thinState.eye='R';syncEyeButtons();draw()};
+eyeLBtn.onclick=()=>{thinState.eye='L';syncEyeButtons();draw()};
+document.getElementById('presetRound').onclick=()=>setShapePreset('round');
+document.getElementById('presetSquare').onclick=()=>setShapePreset('square');
+document.getElementById('presetNasal').onclick=()=>setShapePreset('nasal');
+
+document.getElementById('modeBtn').onclick=()=>{
+  appMode = appMode==='dye' ? 'thin' : 'dye';
+  document.getElementById('dyeControls').classList.toggle('hidden',appMode!=='dye');
+  document.getElementById('thinControls').classList.toggle('hidden',appMode!=='thin');
+  document.getElementById('pageTitle').textContent = appMode==='thin' ? '片坯精修薄演示' : '片坯漸層染色設定演示';
+  document.getElementById('modeBtn').textContent = appMode==='thin' ? '漸層染色模式' : '精修薄模式';
+  document.getElementById('pageSub').innerHTML = appMode==='thin'
+    ? '以 1:1 片坯與有效光學內徑模擬精修薄區範圍；<b>光學中心固定鎖定於片坯圓心</b>。網狀格用來示意精修薄區像差：<b>有效光學內徑越小，外圍模糊 / 像差區越大。</b><br>本版本未納入散光等度數計算。散光度數會影響有效光學內徑的橢圓離心率（E值）；散光度數越高，長短軸差異通常越明顯，而散光軸向則會影響橢圓長短軸的方向。<br><b>《 本模式為區域與相對厚度教學示意，非實際處方光度、像差量或車房厚度計算。 》</b>'
+    : '用於 60Φ / 65Φ / 70Φ / 75Φ 片坯的 1:1 教學示意。可切換漸層色、染色深度、染色區比例、染色多焦與光學中心移心量。<br><b>《 本網站僅供色區參考，關於染色顏色、深度因每台顯示器會有色彩偏差，請以現場色板為主。 》</b>';
+  syncThinLimits();
+  draw();
+};
+
+function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
 function el(name, attrs={}){const n=document.createElementNS('http://www.w3.org/2000/svg',name);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));return n}
 function addText(g,x,y,t,cls='lensText',anchor='middle'){const n=el('text',{x,y,class:cls,'text-anchor':anchor});n.textContent=t;g.appendChild(n);return n}
+
 function lensGradient(id, d){
   const grad=el('linearGradient',{id, x1:'0%', y1:'0%', x2:'0%', y2:'100%'});
   const z = state.zone/10;
@@ -148,7 +264,6 @@ function lensGradient(id, d){
   const isRouge = state.color.name.startsWith('Rouge ');
   let depth = state.depth/70;
   let rougeBoost = 1;
-
   if (isRouge) {
     if (state.depth >= 90) rougeBoost = 0.99;
     else if (state.depth >= 80) rougeBoost = 0.85;
@@ -160,65 +275,53 @@ function lensGradient(id, d){
     else if (state.depth >= 20) rougeBoost = 0.15;
     else if (state.depth >= 10) rougeBoost = 0.1;
   }
-
   depth *= rougeBoost;
   const opStrong = Math.min(.92, .26 + .62*depth);
-  const opMid = Math.min(.62, .12 + .38*depth);
-  const opLight = Math.min(.22, .03 + .13*depth);
-  // 一般色與腮紅共用相同的色區分布與單一連續漸進曲線，僅染色方向相反。
-  // 例如設定 4 成：3 成實色區 + 2 成漸層變化區 + 5 成透明區。
-  const transitionBand = 0.2; // 固定 2 成漸層變化區
+  const transitionBand = 0.2;
   const bodyBand = Math.max(0, z - 0.1);
   const clearBand = Math.max(0, 1 - bodyBand - transitionBand);
-
   const solidBlendWidth = Math.min(8.8, bodyBand * 100 * 0.56);
   const rampFractions = [0.05, 0.1, 0.18, 0.28, 0.39, 0.59, 0.72, 1.00];
 
   if(d==='top'){
-    // 一般漸層：上方實色、往下漸淡、下方透明。
     const clearStart = (bodyBand + transitionBand) * 100;
     const fadeStart = bodyBand * 100;
     const rampStart = Math.max(0, fadeStart - solidBlendWidth);
     const rampSpan = Math.max(1, clearStart - rampStart);
-
     grad.appendChild(el('stop',{offset:'0%','stop-color':c,'stop-opacity':opStrong}));
     grad.appendChild(el('stop',{offset:rampStart+'%','stop-color':c,'stop-opacity':opStrong}));
-
     rampFractions.forEach(t => {
       const eased = 1 - Math.pow(1 - t, 1.05);
       const opacity = Math.max(0, opStrong * (1 - eased * 0.98));
       const offset = rampStart + rampSpan * t;
       grad.appendChild(el('stop',{offset:offset+'%','stop-color':c,'stop-opacity':opacity}));
     });
-
     grad.appendChild(el('stop',{offset:clearStart+'%','stop-color':c,'stop-opacity':'0'}));
     grad.appendChild(el('stop',{offset:clearStart+'%','stop-color':'#ffffff','stop-opacity':'0'}));
     grad.appendChild(el('stop',{offset:'100%','stop-color':'#ffffff','stop-opacity':'0'}));
   }else{
-    // 腮紅下染色：上方透明、往下漸深、下方實色。
     const clearEnd = clearBand * 100;
     const fadeEnd = (clearBand + transitionBand) * 100;
     const rampEnd = Math.min(100, fadeEnd + solidBlendWidth);
     const rampSpan = Math.max(1, rampEnd - clearEnd);
-
     grad.appendChild(el('stop',{offset:'0%','stop-color':'#ffffff','stop-opacity':'0'}));
     grad.appendChild(el('stop',{offset:clearEnd+'%','stop-color':'#ffffff','stop-opacity':'0'}));
     grad.appendChild(el('stop',{offset:clearEnd+'%','stop-color':c,'stop-opacity':'0'}));
-
     rampFractions.forEach(t => {
       const eased = 1 - Math.pow(1 - t, 1.05);
       const opacity = Math.min(opStrong, opStrong * eased * 0.98);
       const offset = clearEnd + rampSpan * t;
       grad.appendChild(el('stop',{offset:offset+'%','stop-color':c,'stop-opacity':opacity}));
     });
-
     grad.appendChild(el('stop',{offset:'100%','stop-color':c,'stop-opacity':opStrong}));
   }
   return grad;
 }
 function drawLens(svg, x,y,d){
   const g=el('g'); svg.appendChild(g);
-  const defs=svg.querySelector('defs'); const gid='grad'+d; defs.appendChild(lensGradient(gid,state.color.dir));
+  const defs=svg.querySelector('defs');
+  const gid='grad'+d;
+  defs.appendChild(lensGradient(gid,state.color.dir));
   g.appendChild(el('circle',{cx:x,cy:y,r:d/2,fill:`url(#${gid})`,stroke:'none'}));
   g.appendChild(el('circle',{cx:x,cy:y,r:d/2,class:'circleLine'}));
   g.appendChild(el('line',{x1:x-d/2,y1:y,x2:x+d/2,y2:y,class:'centerLine'}));
@@ -232,33 +335,422 @@ function drawLens(svg, x,y,d){
   addText(g,x,y+d/2+5,`${state.color.name.split(' ')[0]}｜深度 ${state.depth}%｜染色 ${state.zone}成｜OC ${state.dir>0?'R':'L'}${state.decenter}mm`,'note');
 }
 function drawMultifocalMark(g, ox, oy){
-  const fx = ox;
-  const fy = oy - 4;
-  const farY = fy - 5;
+  const fx = ox, fy = oy - 4, farY = fy - 5;
   g.appendChild(el('line',{x1:fx-3,y1:fy,x2:fx-1.2,y2:fy,class:'multiCross'}));
   g.appendChild(el('line',{x1:fx+1.2,y1:fy,x2:fx+3,y2:fy,class:'multiCross'}));
   g.appendChild(el('line',{x1:fx,y1:fy-2,x2:fx,y2:fy+1,class:'multiCross'}));
   g.appendChild(el('circle',{cx:fx,cy:farY,r:5,class:'multiLine'}));
   g.appendChild(el('circle',{cx:fx,cy:fy,r:.7,fill:'#d6cc35',stroke:'none'}));
-  addText(g,fx+6.2,farY+1.2,' ','multiText','start');
-  addText(g,fx+6.2,fy+1.2,' ','multiText','start');
 }
 function drawRuler(svg){
-  const x=12,y=196; svg.appendChild(el('line',{x1:x,y1:y,x2:x+50,y2:y,class:'ruler'}));
+  const x=12,y=200;
+  svg.appendChild(el('line',{x1:x,y1:y,x2:x+50,y2:y,class:'ruler'}));
   for(let i=0;i<=50;i+=5){svg.appendChild(el('line',{x1:x+i,y1:y,x2:x+i,y2:y-(i%10===0?3:2),class:'ruler'}));}
   addText(svg,x+25,y-5,'50 mm 校正尺','rulerText');
 }
-function draw(){
-  const svg=document.getElementById('svg'); svg.innerHTML=''; svg.appendChild(el('defs'));
+
+function syncEyeButtons(){
+  const r=document.getElementById('eyeR'), l=document.getElementById('eyeL');
+  if(r) r.classList.toggle('active',thinState.eye==='R');
+  if(l) l.classList.toggle('active',thinState.eye==='L');
+}
+function shapePresetName(key){
+  return ({round:'圓形',square:'方形',nasal:'鼻側斜面'})[key] || '鼻側斜面';
+}
+function shapePresetParams(key){
+  return ({
+    round:{frameA:48,frameB:48,ed:48,framePH:25},
+    square:{frameA:53,frameB:38,ed:58,framePH:22},
+    nasal:{frameA:53,frameB:38,ed:58,framePH:22}
+  })[key] || {frameA:53,frameB:38,ed:58};
+}
+function presetCornerProfile(preset, eye){
+  if(preset==='round') return {lt:0.2, rt:0.2, lb:0.2, rb:0.2, n:2.2};
+  if(preset==='square') return {lt:0.8, rt:0.8, lb:0.8, rb:0.8, n:6.0};
+  if(preset==='hex') return eye==='R' ? {lt:1.6, rt:0.9, lb:3.8, rb:2.8, n:4.0} : {lt:0.9, rt:1.6, lb:2.8, rb:3.8, n:4.0};
+  if(preset==='cat') return eye==='R' ? {lt:1.0, rt:1.35, lb:2.2, rb:7.2, n:4.7} : {lt:1.35, rt:1.0, lb:7.2, rb:2.2, n:4.7};
+  return eye==='R' ? {lt:1.55, rt:0.35, lb:8.8, rb:0.35, n:4.8} : {lt:0.35, rt:1.55, lb:0.35, rb:8.8, n:4.8};
+}
+function syncFrameEDLimits(forceVal=null){
+  const input=document.getElementById('frameED');
+  const roundLock = thinState.shapePreset==='round';
+  const edMin=Math.max(thinState.frameA,thinState.frameB);
+  const edMax=Math.hypot(thinState.frameA,thinState.frameB);
+  const next=forceVal==null ? thinState.ed : forceVal;
+  thinState.ed=roundLock ? edMin : clamp(next,edMin,edMax);
+  if(input){
+    input.min=edMin.toFixed(1);
+    input.max=edMax.toFixed(1);
+    input.value=Number(thinState.ed).toFixed(1).replace(/\.0$/,'');
+    input.disabled=roundLock;
+    input.style.opacity=roundLock ? '.55' : '1';
+    input.title=roundLock ? '圓形預設下，ED 會鎖定為圓形直徑。' : '';
+  }
+}
+function syncShapePresetButtons(){
+  const map={round:'presetRound',square:'presetSquare',nasal:'presetNasal'};
+  Object.entries(map).forEach(([key,id])=>{
+    const btn=document.getElementById(id);
+    if(btn) btn.classList.toggle('active',thinState.shapePreset===key);
+  });
+  const info=document.getElementById('presetSizeInfo');
+  if(info) info.textContent=`預設尺寸：A ${thinState.frameA} / B ${thinState.frameB} / ED ${Number(thinState.ed).toFixed(1).replace(/\.0$/,'')}`;
+}
+function applyShapePreset(key){
+  if(key==='hex' || key==='cat') key='nasal';
+  const p=shapePresetParams(key);
+  thinState.shapePreset=key;
+  thinState.frameA=p.frameA;
+  thinState.frameB=p.frameB;
+  thinState.ed=p.ed;
+  syncThinLimits();
+  draw();
+}
+function setShapePreset(key){
+  applyShapePreset(key);
+}
+function syncThinLimits(){
+  const slider=document.getElementById('opticalDia');
+  const min=38, max=thinState.dia-5;
+  slider.min=min; slider.max=max;
+  thinState.opticalDia=clamp(thinState.opticalDia,min,max);
+  slider.value=thinState.opticalDia;
+  document.getElementById('opticalDiaVal').textContent=thinState.opticalDia;
+  document.getElementById('opticalDiaHint').textContent=`可設定範圍：${min}Φ～${max}Φ。`;
+  document.getElementById('thinDiaSelect').value=thinState.dia;
+  thinState.frameA=clamp(thinState.frameA,30,Math.min(70,thinState.dia-2));
+  thinState.frameB=clamp(thinState.frameB,20,Math.min(60,thinState.dia-2));
+  thinState.ph=clamp(thinState.ph,5,Math.max(5,thinState.frameB-2));
+  syncFrameEDLimits();
+  const a=document.getElementById('frameA'), b=document.getElementById('frameB'), ed=document.getElementById('frameED'), dbl=document.getElementById('frameDBL'), pd=document.getElementById('framePD'), ph=document.getElementById('framePH');
+  if(a) a.value=Number(thinState.frameA).toFixed(0);
+  if(b) b.value=Number(thinState.frameB).toFixed(0);
+  if(ed) ed.value=Number(thinState.ed).toFixed(1).replace(/\.0$/,'');
+  if(dbl) dbl.value=thinState.dbl;
+  if(pd) pd.value=thinState.pd;
+  if(ph){ph.max=Math.max(5,thinState.frameB-2); ph.value=Number(thinState.ph).toFixed(1).replace(/\.0$/,'');}
+  syncEyeButtons();
+  syncShapePresetButtons();
+}
+
+function frameDecentration(){
+  const base=(thinState.frameA + thinState.dbl - thinState.pd) / 2;
+  return base * (thinState.eye==='R' ? 1 : -1);
+}
+function frameVerticalDecentration(){
+  // 瞳高定義：由框型最下緣往上量到瞳孔中心。
+  // 光學中心固定在片坯圓心，因此框型中心需依瞳高上下移動。
+  return thinState.ph - thinState.frameB/2;
+}
+function superellipsePoint(a,b,n,t){
+  const c=Math.cos(t), ss=Math.sin(t);
+  return {
+    x:a*Math.sign(c||1)*Math.pow(Math.abs(c),2/n),
+    y:b*Math.sign(ss||1)*Math.pow(Math.abs(ss),2/n)
+  };
+}
+function superellipseED(a,b,n){
+  let maxR=0;
+  for(let i=0;i<=720;i++){
+    const p=superellipsePoint(a,b,n,i/720*Math.PI*2);
+    maxR=Math.max(maxR,Math.hypot(p.x,p.y));
+  }
+  return maxR*2;
+}
+function frameExponentFromED(){
+  const a=thinState.frameA/2, b=thinState.frameB/2;
+  const target=clamp(thinState.ed,Math.max(thinState.frameA,thinState.frameB),Math.hypot(thinState.frameA,thinState.frameB));
+  let lo=2, hi=14;
+  for(let k=0;k<28;k++){
+    const mid=(lo+hi)/2;
+    if(superellipseED(a,b,mid)<target) lo=mid; else hi=mid;
+  }
+  return (lo+hi)/2;
+}
+function getFrameOutlinePoints(cx,cy){
+  const shift=frameDecentration();
+  const vShift=frameVerticalDecentration();
+  const a=thinState.frameA/2, b=thinState.frameB/2;
+  const prof=presetCornerProfile(thinState.shapePreset, thinState.eye);
+  const n=prof.n || frameExponentFromED();
+  const nasalSign = thinState.eye==='R' ? -1 : 1;
+  const temporalSign = -nasalSign;
+  const pts=[];
+
+
+
+
+  function cornerInsetValue(nx,ny){
+    const left=Math.max(0,-nx), right=Math.max(0,nx);
+    const top=Math.max(0,-ny), bottom=Math.max(0,ny);
+    const fxL=Math.pow(clamp((left-0.35)/0.65,0,1),1.4);
+    const fxR=Math.pow(clamp((right-0.35)/0.65,0,1),1.4);
+    const fyT=Math.pow(clamp((top-0.12)/0.88,0,1),1.25);
+    const fyB=Math.pow(clamp((bottom-0.08)/0.92,0,1),1.25);
+    return {
+      lt: prof.lt*fxL*fyT,
+      rt: prof.rt*fxR*fyT,
+      lb: prof.lb*fxL*fyB,
+      rb: prof.rb*fxR*fyB,
+    };
+  }
+
+  for(let i=0;i<=300;i++){
+    const t=i/300*Math.PI*2;
+    const p=superellipsePoint(a,b,n,t);
+    let x=p.x, y=p.y;
+    let nx=x/(a||1), ny=y/(b||1);
+
+    if(y<0) y *= 0.965 + 0.035*Math.abs(ny);
+
+    const inset=cornerInsetValue(nx,ny);
+    if(x<0 && y<0) x += inset.lt;
+    if(x>0 && y<0) x -= inset.rt;
+    if(x<0 && y>0) x += inset.lb;
+    if(x>0 && y>0) x -= inset.rb;
+
+    if(thinState.shapePreset==='nasal'){
+      const nx2=x/(a||1), ny2=y/(b||1);
+      const nasalUpper=Math.max(0,nasalSign*nx2) * Math.max(0,-ny2+0.06);
+      const nasalLower=Math.max(0,nasalSign*nx2) * Math.max(0,ny2+0.02);
+      x -= nasalSign*(1.25*Math.pow(nasalUpper,1.04) + 2.65*Math.pow(nasalLower,1.14));
+      y += 0.28*Math.pow(nasalLower,1.02);
+    }
+    if(thinState.shapePreset==='round'){
+      const nasalMid=Math.max(0,nasalSign*(x/(a||1))) * Math.pow(clamp((0.8-Math.abs(y/(b||1)))/0.8,0,1),1.1);
+      x -= nasalSign*0.3*nasalMid;
+    }
+    if(thinState.shapePreset==='square'){
+      const nasalLower=Math.max(0,nasalSign*(x/(a||1))) * Math.max(0,y/(b||1));
+      x -= nasalSign*0.55*Math.pow(nasalLower,1.12);
+    }
+
+    pts.push({x:cx+shift+x,y:cy+vShift+y});
+  }
+  return pts;
+}
+function frameMaxDistanceFromOC(){
+  if(!thinState.showFrame) return null;
+  const pts=getFrameOutlinePoints(0,0);
+  let max=0;
+  for(const p of pts) max=Math.max(max,Math.hypot(p.x,p.y));
+  return max;
+}
+function makeGridPattern(defs){
+  const pat=el('pattern',{id:'thinGrid',width:5,height:5,patternUnits:'userSpaceOnUse'});
+  pat.appendChild(el('path',{d:'M 5 0 L 0 0 0 5',fill:'none',stroke:'#9eb2bb','stroke-width':'.22'}));
+  defs.appendChild(pat);
+}
+function makeThinMasksAndFilter(defs,cx,cy,r,or){
+  const mask=el('mask',{id:'outerMask',maskUnits:'userSpaceOnUse',x:cx-r-2,y:cy-r-2,width:2*r+4,height:2*r+4});
+  mask.appendChild(el('circle',{cx,cy,r,fill:'white'}));
+  mask.appendChild(el('circle',{cx,cy,r:or,fill:'black'}));
+  defs.appendChild(mask);
+  const severity=clamp((thinState.dia-thinState.opticalDia)/40,0.1,1);
+  const filter=el('filter',{id:'aberrationFilter',x:'-20%',y:'-20%',width:'140%',height:'140%'});
+  filter.appendChild(el('feTurbulence',{type:'fractalNoise',baseFrequency:String(0.035+severity*0.02),numOctaves:'2',seed:'7',result:'noise'}));
+  filter.appendChild(el('feDisplacementMap',{in:'SourceGraphic',in2:'noise',scale:String(1.5+severity*5.5),xChannelSelector:'R',yChannelSelector:'G'}));
+  defs.appendChild(filter);
+}
+function drawFrameOutline(g,cx,cy){
+  const pts=getFrameOutlinePoints(cx,cy);
+  const path=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(2)+' '+p.y.toFixed(2)).join(' ')+' Z';
+  // 兩層淡線：外層像框圈，內層像鏡片溝槽，視覺上比單一橢圓更接近鏡框。
+  g.appendChild(el('path',{d:path,fill:'none',stroke:'#6f7d84','stroke-opacity':'.22','stroke-width':'.75','stroke-linejoin':'round'}));
+  g.appendChild(el('path',{d:path,fill:'none',stroke:'#ffffff','stroke-opacity':'.72','stroke-width':'.24','stroke-linejoin':'round','stroke-dasharray':'1.2 1'}));
+}
+function drawOpticalCenter(g,x,y){
+  g.appendChild(el('circle',{cx:x,cy:y,r:1.7,fill:'#ffffff','fill-opacity':'.92',stroke:'#0d6075','stroke-width':'.35'}));
+  g.appendChild(el('line',{x1:x-2.7,y1:y,x2:x+2.7,y2:y,stroke:'#0d6075','stroke-width':'.58','stroke-linecap':'round'}));
+  g.appendChild(el('line',{x1:x,y1:y-2.7,x2:x,y2:y+2.7,stroke:'#0d6075','stroke-width':'.58','stroke-linecap':'round'}));
+}
+function drawThinTop(svg){
+  const defs=svg.querySelector('defs');
+  const cx=78,cy=67,r=thinState.dia/2,or=thinState.opticalDia/2;
+  makeGridPattern(defs);
+  makeThinMasksAndFilter(defs,cx,cy,r,or);
+  addText(svg,78,9,'片坯精修薄 1:1｜正面區域示意','mmLabel');
+  const g=el('g'); svg.appendChild(g);
+  g.appendChild(el('circle',{cx,cy,r,fill:'#fdfefe',stroke:'#0d4052','stroke-width':'.65'}));
+  g.appendChild(el('circle',{cx,cy,r,fill:'url(#thinGrid)',opacity:'.82'}));
+  const aberr=el('g',{mask:'url(#outerMask)',filter:'url(#aberrationFilter)',opacity:'.88'});
+  aberr.appendChild(el('circle',{cx,cy,r,fill:'url(#thinGrid)'}));
+  g.appendChild(aberr);
+  g.appendChild(el('circle',{cx,cy,r:or,fill:'#ffffff','fill-opacity':'.11',stroke:'#0d6075','stroke-width':'.75','stroke-dasharray':'2 1.2'}));
+  g.appendChild(el('circle',{cx,cy,r,fill:'#b8d6df','fill-opacity':'.09',mask:'url(#outerMask)'}));
+  if(thinState.showFrame) drawFrameOutline(g,cx,cy);
+  drawOpticalCenter(g,cx,cy);
+  addText(g,cx,cy-r-4,`${thinState.dia}Φ 片坯`,'note');
+  addText(g,cx,cy-or-3,`有效光學內徑 ${thinState.opticalDia}Φ`,'note');
+  addText(g,cx,cy+r+6,`${thinState.showFrame?'淡虛線：框型比對｜':''}藍十字：固定光學中心｜虛線圓：有效光學區`,'note');
+
+  const box=el('rect',{x:132,y:20,width:76,height:54,rx:2,class:'legendBox'});svg.appendChild(box);
+  addText(svg,136,28,'網格判讀','mmLabel','start');
+  addText(svg,136,35,'有效光學區：規則網格 / 原光度區','note','start');
+  addText(svg,136,42,'精修薄區：扭曲網格 / 像差示意','note','start');
+  addText(svg,136,49,`精修薄寬度：約 ${(thinState.dia-thinState.opticalDia)/2} mm / 側`,'note','start');
+  if(thinState.showFrame){
+    const maxD=frameMaxDistanceFromOC();
+    const rec=clamp(Math.round(maxD*2-10),38,thinState.dia-5);
+    addText(svg,136,56,`框型 ${({'round':'圓形','square':'方形','nasal':'鼻側斜面'})[thinState.shapePreset]}｜${thinState.eye==='R'?'右眼':'左眼'}`,'note','start');
+    addText(svg,136,63,`A ${thinState.frameA} / B ${thinState.frameB} / ED ${Number(thinState.ed).toFixed(1)}｜最遠邊 ${maxD.toFixed(1)} mm`,'note','start');
+    addText(svg,136,70,`DBL ${thinState.dbl} / PD ${thinState.pd} / 瞳高 ${thinState.ph}｜建議內徑 ${rec}Φ`,'note','start');
+  }else{
+    addText(svg,136,56,'框型比對：關閉','note','start');
+    addText(svg,136,63,'開啟後可輸入 A / B / ED / DBL / PD / 瞳高','note','start');
+    addText(svg,136,70,'並估算框形相對光學中心位置','note','start');
+  }
+  drawThinSection(svg,20,124,188,56);
+  drawRuler(svg);
+}
+function drawRxToggle(g,x,y){
+  const items=[['minus','近視'],['plus','遠視']];
+  items.forEach((item,i)=>{
+    const mode=item[0], label=item[1], active=thinState.rxType===mode;
+    const bx=x+i*19;
+    g.appendChild(el('rect',{x:bx,y:y,width:17,height:6.6,rx:3.3,fill:active?'#0d6075':'#ffffff',stroke:'#0d6075','stroke-width':'.35','data-rxtype':mode,style:'cursor:pointer'}));
+    g.appendChild(el('text',{x:bx+8.5,y:y+4.5,'text-anchor':'middle',class:'note',fill:active?'#ffffff':'#0d6075','font-weight':'700','pointer-events':'none'})).textContent=label;
+  });
+}
+function drawThinSection(svg,x,y,w,h){
+  const g=el('g'); svg.appendChild(g);
+  addText(g,x,y-7,'鏡片剖面概念圖（相對厚度示意）','mmLabel','start');
+  drawRxToggle(g,x+122,y-12);
+
+  // 剖面圖本體中心對齊上方片坯圓心（cx = 78）
+  const mid=78;
+  const left=mid-thinState.dia/2, right=mid+thinState.dia/2;
+  const optLeft=mid-thinState.opticalDia/2, optRight=mid+thinState.opticalDia/2;
+  const severity=clamp((thinState.dia-thinState.opticalDia)/(thinState.dia-10),0,1);
+  const smooth=t=>t*t*(3-2*t);
+  const topRaw=[], bottomRaw=[], topThin=[], bottomThin=[];
+  const outerBand=Math.max(1,(thinState.dia-thinState.opticalDia)/2);
+
+  let legend1='', legend2='';
+
+  if(thinState.rxType==='minus'){
+    // 平凹概念：內徑越小，外圍越早進入修薄帶，因此邊緣越薄。
+    const flatY=y+14;
+    const centerT=2.0;
+    const edgeT=7.8;
+    const rawPower=1.68;
+    const optRadius=thinState.opticalDia/2;
+    const boundaryNorm=optRadius/(thinState.dia/2);
+    const boundaryRawT=centerT + (edgeT-centerT)*Math.pow(boundaryNorm,rawPower);
+    const thinEdgeT=Math.max(centerT+0.45, boundaryRawT-(1.0+3.4*severity));
+    const thinBoundaryT=Math.max(centerT+0.7, boundaryRawT-(0.2+0.45*severity));
+    for(let i=0;i<=160;i++){
+      const px=left+(right-left)*i/160;
+      const dist=Math.abs(px-mid);
+      const norm=dist/(thinState.dia/2);
+      const distOpt=Math.max(0,dist-optRadius);
+      const outside=clamp(distOpt/outerBand,0,1);
+      const rawT = centerT + (edgeT-centerT)*Math.pow(norm,rawPower);
+      let thinT;
+      if(dist<=optRadius){
+        const zoneNorm=clamp(dist/(optRadius||1),0,1);
+        thinT = rawT - (0.08+0.18*severity)*Math.pow(zoneNorm,1.8);
+      }else{
+        thinT = thinBoundaryT + (thinEdgeT-thinBoundaryT)*smooth(outside);
+      }
+      topRaw.push([px,flatY]);
+      bottomRaw.push([px,flatY+rawT]);
+      topThin.push([px,flatY]);
+      bottomThin.push([px,flatY+thinT]);
+    }
+    legend1='灰虛線：原球面平凹相對厚度';
+    legend2='藍實線：後表面外徑反曲修薄，內徑設越小邊緣越薄';
+  }else{
+    // 平凸概念：中心曲率固定，不隨內徑改變；外徑改為類似凹面反曲的修薄示意。
+    const flatY=y+31;
+    const edgeT=1.8;
+    const rawCenterT=9.0;
+    const optRadius=thinState.opticalDia/2;
+    const coreReduction=0.55 + 2.5*severity;
+    const rawShapePower=1.82;
+    const thinCenterT=Math.max(edgeT+1.1, rawCenterT-coreReduction);
+    const boundaryNorm=optRadius/(thinState.dia/2);
+    const boundaryRawT=edgeT + (rawCenterT-edgeT)*(1-Math.pow(boundaryNorm,rawShapePower));
+    const thinBoundaryT=Math.max(edgeT+0.95, boundaryRawT-coreReduction);
+    const edgeCarrierT=edgeT+0.55;
+    const reverseBumpAmp=0.75 + 0.85*severity; // 外徑反曲感更明顯
+    for(let i=0;i<=160;i++){
+      const px=left+(right-left)*i/160;
+      const dist=Math.abs(px-mid);
+      const norm=dist/(thinState.dia/2);
+      const distOpt=Math.max(0,dist-optRadius);
+      const outside=clamp(distOpt/outerBand,0,1);
+      const rawT = edgeT + (rawCenterT-edgeT)*(1-Math.pow(norm,rawShapePower));
+      let thinT;
+      if(dist<=optRadius){
+        // 有效光學區內維持相同中心曲率，只整體平移變薄。
+        thinT = Math.max(edgeT+0.85, rawT-coreReduction);
+      }else{
+        // 外徑進入反曲帶：先快速變薄，再出現外徑上翹反曲，最後回收至邊緣載體厚度。
+        const t=outside;
+        const base = thinBoundaryT + (edgeCarrierT-thinBoundaryT)*smooth(t);
+        const reflex = reverseBumpAmp*Math.sin(Math.PI*t)*Math.pow(1-t,0.55);
+        // 周邊反曲改為向下凹：在外徑帶中段把前表面往下拉，再回收到邊緣載體厚度。
+        thinT = Math.max(edgeCarrierT, base - reflex);
+      }
+      topRaw.push([px,flatY-rawT]);
+      bottomRaw.push([px,flatY]);
+      topThin.push([px,flatY-thinT]);
+      bottomThin.push([px,flatY]);
+    }
+    legend1='灰虛線：原球面平凸相對厚度';
+    legend2='藍實線：外徑反曲修薄，內徑設越小中心越薄';
+  }
+
+  const path=pts=>pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ');
+  const thinPoly=[...topThin,...bottomThin.slice().reverse()];
+  g.appendChild(el('path',{d:path(thinPoly)+' Z',fill:'#dceff4','fill-opacity':'.58',stroke:'none'}));
+  g.appendChild(el('path',{d:path(topRaw),fill:'none',stroke:'#9aa3a7','stroke-width':'.45','stroke-dasharray':'2 1.2'}));
+  g.appendChild(el('path',{d:path(bottomRaw),fill:'none',stroke:'#9aa3a7','stroke-width':'.45','stroke-dasharray':'2 1.2'}));
+  g.appendChild(el('path',{d:path(topThin),fill:'none',stroke:'#0d6075','stroke-width':'.75'}));
+  g.appendChild(el('path',{d:path(bottomThin),fill:'none',stroke:'#0d6075','stroke-width':'.75'}));
+
+  const markerBottom=y+h-18;
+  g.appendChild(el('line',{x1:mid,y1:y+2,x2:mid,y2:markerBottom,stroke:'#0d6075','stroke-width':'.45'}));
+  [optLeft,optRight].forEach(px=>g.appendChild(el('line',{x1:px,y1:y+3,x2:px,y2:markerBottom,stroke:'#0d6075','stroke-width':'.35','stroke-dasharray':'1.2 1'})));
+
+  // 右上說明欄
+  const infoX=118, infoY=y-2, infoW=90, infoH=23;
+  g.appendChild(el('rect',{x:infoX,y:infoY,width:infoW,height:infoH,rx:2.5,class:'legendBox'}));
+  addText(g,infoX+3,infoY+5.2,legend1,'note','start');
+  addText(g,infoX+3,infoY+10.4,legend2 + (thinState.rxType==='plus'?'':''),'note','start');
+  addText(g,infoX+3,infoY+15.6,'警示：無度數參考，非實際鏡片厚度，','note','start');
+  addText(g,infoX+3,infoY+20.4,'僅近/遠視厚度變化概念教學。','note','start');
+
+  // 區域標籤，往下避開虛線
+  const zoneLabelY=y+h-12.5;
+  addText(g,(left+optLeft)/2,zoneLabelY,'精修薄 / 像差區','note');
+  addText(g,(optLeft+optRight)/2,zoneLabelY,'有效光學區','note');
+  addText(g,(optRight+right)/2,zoneLabelY,'精修薄 / 像差區','note');
+
+  // 尺寸標示彼此靠近一點，並整體下移避免擁擠
+  const dimY1=y+h+1.5, dimY2=y+h+7;
+  g.appendChild(el('line',{x1:left,y1:dimY1,x2:right,y2:dimY1,stroke:'#506874','stroke-width':'.32'}));
+  g.appendChild(el('line',{x1:left,y1:dimY1-1.8,x2:left,y2:dimY1+1.8,stroke:'#506874','stroke-width':'.32'}));
+  g.appendChild(el('line',{x1:right,y1:dimY1-1.8,x2:right,y2:dimY1+1.8,stroke:'#506874','stroke-width':'.32'}));
+  addText(g,mid,dimY1-1.4,`片徑 ${thinState.dia} mm（1:1）`,'note');
+  g.appendChild(el('line',{x1:optLeft,y1:dimY2,x2:optRight,y2:dimY2,stroke:'#0d6075','stroke-width':'.38'}));
+  g.appendChild(el('line',{x1:optLeft,y1:dimY2-1.6,x2:optLeft,y2:dimY2+1.6,stroke:'#0d6075','stroke-width':'.38'}));
+  g.appendChild(el('line',{x1:optRight,y1:dimY2-1.6,x2:optRight,y2:dimY2+1.6,stroke:'#0d6075','stroke-width':'.38'}));
+  addText(g,mid,dimY2+5.2,`有效光學內徑 ${thinState.opticalDia} mm（1:1）`,'note');
+
+  addText(g,mid,y+2,'固定光學中心','note');
+}
+function drawDye(svg){
   addText(svg,110,8,'片坯漸層染色 1:1 設定演示','mmLabel');
   const selected = state.show==='all' ? diaList : [Number(state.show)];
   if(state.show==='all'){
     drawLens(svg,38,43,60); drawLens(svg,112,43,65); drawLens(svg,43,121,70); drawLens(svg,128,121,75);
   }else{
-    const d=selected[0]; drawLens(svg,88,88,d);
-    addText(svg,154,56,'單片檢視模式','watermark','start');
+    const d=selected[0]; drawLens(svg,88,88,d); addText(svg,154,56,'單片檢視模式','watermark','start');
   }
-  const box=el('rect',{x:150,y:18,width:58,height:40,rx:2,class:'legendBox'});svg.appendChild(box);
+  const box=el('rect',{x:150,y:18,width:58,height:40,rx:2,class:'legendBox'});
+  svg.appendChild(box);
   addText(svg,153,25,`顏色：${state.color.name}`,'note','start');
   addText(svg,153,31,`方向：${state.color.dir==='bottom'?'下染色上透明':'上染色下透明'}`,'note','start');
   addText(svg,153,37,`深度：${state.depth}%`,'note','start');
@@ -269,7 +761,27 @@ function draw(){
   const boostNote = state.color.name.startsWith('Rouge ') && state.depth >= 30 ? '｜腮紅加深補正 ON' : '';
   document.getElementById('summary').textContent=`目前：${state.color.name}｜${state.color.dir==='bottom'?'下染色':'上染色'}｜深度 ${state.depth}%${boostNote}｜染色 ${state.zone}成｜光學中心 ${state.dir>0?'右':'左'}移 ${state.decenter} mm｜多焦標記 ${state.multifocal?'開啟':'關閉'}`;
 }
-draw();
+function draw(){
+  const svg=document.getElementById('svg');
+  svg.innerHTML='';
+  svg.appendChild(el('defs'));
+  if(appMode==='thin'){
+    drawThinTop(svg);
+    const maxD=frameMaxDistanceFromOC();
+    const rec=maxD==null?null:clamp(Math.round(maxD*2-10),38,thinState.dia-5);
+    document.getElementById('summary').textContent=`精修薄：${thinState.dia}Φ 片坯｜有效光學內徑 ${thinState.opticalDia}Φ｜光學中心固定圓心｜框型比對 ${thinState.showFrame?'開':'關'}${thinState.showFrame?`｜ED ${Number(thinState.ed).toFixed(1)} mm｜瞳高 ${thinState.ph} mm｜建議內徑約 ${rec}Φ｜${thinState.rxType==='minus'?'近視':'遠視'}剖面`:''}`;
+  }else{
+    drawDye(svg);
+  }
+}
+
+const svgEl=document.getElementById('svg');
+svgEl.addEventListener('click',evt=>{
+  const mode=evt.target.getAttribute('data-rxtype');
+  if(mode){thinState.rxType=mode;draw();}
+});
+
+applyShapePreset(thinState.shapePreset);
 </script>
 </body>
 </html>
