@@ -658,7 +658,7 @@ function drawThinSection(svg,x,y,w,h){
       topThin.push([px,flatY]);
       bottomThin.push([px,flatY+thinT]);
     }
-    legend1='灰虛線：原球面平凹相對厚度';
+    legend1='灰虛線：未精修薄相對厚度';
     legend2='藍實線：後表面外徑反曲修薄，內徑設越小邊緣越薄';
   }else{
     // 平凸概念：中心曲率固定，不隨內徑改變；外徑改為類似凹面反曲的修薄示意。
@@ -673,7 +673,7 @@ function drawThinSection(svg,x,y,w,h){
     const boundaryRawT=edgeT + (rawCenterT-edgeT)*(1-Math.pow(boundaryNorm,rawShapePower));
     const thinBoundaryT=Math.max(edgeT+0.95, boundaryRawT-coreReduction);
     const edgeCarrierT=edgeT+0.55;
-    const reverseBumpAmp=0.75 + 0.85*severity; // 外徑反曲感更明顯
+    const reverseBumpAmp=0.75 + 0.85*severity; 
     for(let i=0;i<=160;i++){
       const px=left+(right-left)*i/160;
       const dist=Math.abs(px-mid);
@@ -698,7 +698,7 @@ function drawThinSection(svg,x,y,w,h){
       topThin.push([px,flatY-thinT]);
       bottomThin.push([px,flatY]);
     }
-    legend1='灰虛線：原球面平凸相對厚度';
+    legend1='灰虛線：未精修薄相對厚度';
     legend2='藍實線：外徑反曲修薄，內徑設越小中心越薄';
   }
 
