@@ -143,9 +143,9 @@
               <button class="chip" id="presetSquare" type="button">方/長方形</button>
               <button class="chip active" id="presetFree" type="button">自由框型</button>
             </div>
-            <div class="hint" id="shapePresetHint">自由框型：先設定 B 高，再直接拖曳圖中左右各 6 個定位點（定位點僅水平移動）。<br>A 寬與 ED 最大內徑會自動計算。<br>※顯示之鏡框形狀僅供參考，請以實體為主</div>
+            <div class="hint" id="shapePresetHint">自由框型：先設定 B 高，再直接拖曳圖中左右各 6 個定位點，定位左右邊緣。 ※定位點：僅水平移動<br>A 寬與 ED 最大內徑會自動計算。<br>※顯示之鏡框形狀僅供參考，請以實體為主</div>
           </div>
-          <div class="hint" id="presetSizeInfo" style="margin:8px 0 10px;padding:8px 10px;border:1px solid #e2eaee;border-radius:10px;background:#f8fbfc;font-weight:700;color:#36515e">自由框型即時檢測：A 53 / B 38 / ED 58.1</div>
+          <div class="hint" id="presetSizeInfo" style="margin:8px 0 10px;padding:8px 10px;border:1px solid #e2eaee;border-radius:10px;background:#f8fbfc;font-weight:700;color:#36515e">框型即時檢測：A 53 / B 38 / ED 58.1</div>
           <div id="freeShapeTools" style="margin:0 0 10px">
             <button class="chip" id="resetFreeShape" type="button" style="width:100%">重設自由框型定位點</button>
           </div>
@@ -287,7 +287,7 @@ freeSvg.addEventListener('pointercancel',endFreeDrag);
   document.getElementById('pageTitle').textContent = appMode==='thin' ? '片坯精修薄演示' : '片坯漸層染色設定演示';
   document.getElementById('modeBtn').textContent = appMode==='thin' ? '漸層染色模式' : '精修薄模式';
   document.getElementById('pageSub').innerHTML = appMode==='thin'
-    ? '以 1:1 片坯與有效光學內徑模擬精修薄區範圍；<b>光學中心固定鎖定於片坯圓心</b>。網狀格用來示意精修薄區像差：<b>有效光學內徑越小，外圍模糊 / 像差區越大。</b><br>本版本未納入散光等度數計算。散光度數會影響有效光學內徑的橢圓離心率（E值）；散光度數越高，長短軸差異通常越明顯，而散光軸向則會影響橢圓長短軸的方向。<br><b>《 本模式為區域與相對厚度教學示意，非實際處方光度、像差量或車房厚度計算。 》</b>'
+    ? '以 1:1 片坯與有效光學內徑模擬精修薄區範圍。網狀格用來示意精修薄區像差：<b>有效光學內徑越小，外圍模糊 / 像差區越大。</b><br>本版本未納入散光等度數計算。散光度數會影響有效光學內徑的橢圓離心率（E值）；散光度數越高，長短軸差異通常越明顯，而散光軸向則會影響橢圓長短軸的方向。<br><b>《 本模式為區域與相對厚度教學示意，非實際處方光度、像差量或車房厚度計算。 》</b>'
     : '用於 60Φ / 65Φ / 70Φ / 75Φ 片坯的 1:1 教學示意。可切換漸層色、染色深度、染色區比例、染色多焦與光學中心移心量。<br><b>《 本網站僅供色區參考，關於染色顏色、深度因每台顯示器會有色彩偏差，請以現場色板為主。 》</b>';
   syncThinLimits();
   draw();
@@ -488,11 +488,11 @@ function syncShapePresetButtons(){
     if(btn) btn.classList.toggle('active',thinState.shapePreset===key);
   });
   const info=document.getElementById('presetSizeInfo');
-  if(info) info.textContent=thinState.shapePreset==='free' ? `自由框型即時檢測：A ${thinState.frameA.toFixed(1)} / B ${thinState.frameB} / ED ${thinState.ed.toFixed(1)}（${thinState.edPair||''}）` : `目前尺寸：A ${thinState.frameA} / B ${thinState.frameB} / ED ${Number(thinState.ed).toFixed(1).replace(/\.0$/,'')}`;
+  if(info) info.textContent=thinState.shapePreset==='free' ? `框型即時檢測：A ${thinState.frameA.toFixed(1)} / B ${thinState.frameB} / ED ${thinState.ed.toFixed(1)}（${thinState.edPair||''}）` : `目前尺寸：A ${thinState.frameA} / B ${thinState.frameB} / ED ${Number(thinState.ed).toFixed(1).replace(/\.0$/,'')}`;
   const help=document.getElementById('shapePresetHint');
   if(help){
     if(thinState.shapePreset==='free'){
-      help.innerHTML='自由框型：先設定 B 高，<br>再直接拖曳圖中左右各 6 個定位點<br>（定位點僅水平移動）。<br>A 寬與 ED 最大內徑會自動計算。<br>※顯示之鏡框形狀僅供參考，請以實體為主';
+      help.innerHTML='自由框型：先設定 B 高，選擇左/右眼將框型比對，<br>拖曳圖中左右各 6 個定位點，定位框型左右邊緣。<br> ※定位點：僅水平移動<br>A 寬與 ED 最大內徑會自動計算。<br>※顯示之鏡框形狀僅供參考，請以實體為主';
     }else if(thinState.shapePreset==='square'){
       help.innerHTML='先選預設框型，再依輸入 A 寬 / B 高 / ED 最大內徑。<br>※顯示之鏡框形狀僅供參考，請以實體為主';
     }else{
@@ -750,8 +750,8 @@ function drawThinTop(svg){
     addText(svg,136,70,`DBL ${thinState.dbl} / PD ${thinState.pd} / 瞳高 ${thinState.ph}｜建議內徑 ${rec}Φ`,'note','start');
   }else{
     addText(svg,136,56,'框型比對：關閉','note','start');
-    addText(svg,136,63,'自由框型：先設 B 高，再拖曳左右各 6 個定位點','note','start');
-    addText(svg,136,70,'A / ED 自動反算；輸入 DBL / PD / 瞳高完成位置估算','note','start');
+    addText(svg,136,63,'開啟後可輸入鏡框尺寸參數','note','start');
+    addText(svg,136,70,'並估算框形建議內徑','note','start');
   }
   drawThinSection(svg,20,124,188,56);
   drawRuler(svg);
@@ -922,7 +922,7 @@ function draw(){
     drawThinTop(svg);
     const maxD=frameMaxDistanceFromOC();
     const rec=maxD==null?null:clamp(Math.round(maxD*2-10),38,thinState.dia-5);
-    document.getElementById('summary').textContent=`精修薄：${thinState.dia}Φ 片坯｜有效光學內徑 ${thinState.opticalDia}Φ｜光學中心固定圓心｜框型比對 ${thinState.showFrame?'開':'關'}${thinState.showFrame?`｜ED ${Number(thinState.ed).toFixed(1)} mm｜瞳高 ${thinState.ph} mm｜建議內徑約 ${rec}Φ｜${thinState.rxType==='minus'?'近視':'遠視'}剖面`:''}`;
+    document.getElementById('summary').textContent=`精修薄：${thinState.dia}Φ 片坯｜有效光學內徑 ${thinState.opticalDia}Φ｜框型比對 ${thinState.showFrame?'開':'關'}${thinState.showFrame?`｜ED ${Number(thinState.ed).toFixed(1)} mm｜瞳高 ${thinState.ph} mm｜建議內徑約 ${rec}Φ｜${thinState.rxType==='minus'?'近視':'遠視'}剖面`:''}`;
   }else{
     drawDye(svg);
   }
