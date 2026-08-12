@@ -59,6 +59,11 @@
   .thinPanelTitle{font-size:13px;font-weight:800;color:#294754;margin-bottom:6px}
   .miniGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.miniGrid label{font-size:12px;margin-bottom:4px}.miniGrid input{height:36px}
   .thinSelect{height:42px;border:1px solid #cbd8de;border-radius:10px;padding:0 10px;background:#fff;font-size:15px;font-weight:700;color:#203843}
+  .freeHandle{fill:#fff;stroke:#0d6075;stroke-width:.55;cursor:ew-resize;pointer-events:all}
+  .freeHandle:hover{fill:#dff4fa;stroke-width:.8}
+  .freeHandleLabel{font-size:2.7px;fill:#0d6075;font-weight:700;pointer-events:none;opacity:.70}
+  .freeGuide{stroke:#8fb5c2;stroke-width:.22;stroke-dasharray:1 1;opacity:.65}
+  .lockedInput{background:#eef3f5!important;color:#697982!important;opacity:.8}
   .hidden{display:none!important}
   @media(max-width:900px){main{grid-template-columns:1fr}.controls{position:relative;top:auto}.canvas{transform:none;width:100%;min-width:760px}}
   @media print{body{background:#fff}header,.controls,.toolbar{display:none}.stageWrap{box-shadow:none;border:0;padding:0}.canvas{border:0;padding:0;transform:none}.pageBreak{break-after:page}}
@@ -136,22 +141,25 @@
             <div class="chips" style="grid-template-columns:repeat(3,1fr)" id="shapePresetChips">
               <button class="chip" id="presetRound" type="button">圓/橢圓形</button>
               <button class="chip" id="presetSquare" type="button">方/長方形</button>
-              <button class="chip active" id="presetNasal" type="button">鼻側斜面</button>
+              <button class="chip active" id="presetFree" type="button">自由框型</button>
             </div>
-            <div class="hint">先選預設框型，再依需要微調 A / B / ED。</div>
+            <div class="hint" id="shapePresetHint">自由框型：先設定 B 高，再直接拖曳圖中左右各 6 個定位點（定位點僅水平移動）。<br>A 寬與 ED 最大內徑會自動計算。<br>※顯示之鏡框形狀僅供參考，請以實體為主</div>
           </div>
-          <div class="hint" id="presetSizeInfo" style="margin:8px 0 10px;padding:8px 10px;border:1px solid #e2eaee;border-radius:10px;background:#f8fbfc;font-weight:700;color:#36515e">預設尺寸：A 54 / B 38 / ED 60</div>
+          <div class="hint" id="presetSizeInfo" style="margin:8px 0 10px;padding:8px 10px;border:1px solid #e2eaee;border-radius:10px;background:#f8fbfc;font-weight:700;color:#36515e">自由框型即時檢測：A 53 / B 38 / ED 58.1</div>
+          <div id="freeShapeTools" style="margin:0 0 10px">
+            <button class="chip" id="resetFreeShape" type="button" style="width:100%">重設自由框型定位點</button>
+          </div>
           <div class="miniGrid">
-            <div><label for="frameA">A 寬</label><input id="frameA" type="number" min="30" max="70" step="1" value="54"></div>
+            <div><label for="frameA">A 寬（自動）</label><input id="frameA" type="number" min="30" max="70" step="1" value="54"></div>
             <div><label for="frameB">B 高</label><input id="frameB" type="number" min="20" max="60" step="1" value="38"></div>
-            <div><label for="frameED">ED 斜邊/最大內徑</label><input id="frameED" type="number" min="38" max="80" step="0.5" value="60"></div>
+            <div><label for="frameED">ED 最大內徑（自動）</label><input id="frameED" type="number" min="38" max="80" step="0.5" value="60"></div>
             <div><label for="frameDBL">DBL 中樑距</label><input id="frameDBL" type="number" min="8" max="30" step="1" value="18"></div>
             <div><label for="framePD">PD 瞳距</label><input id="framePD" type="number" min="50" max="76" step="1" value="64"></div>
             <div><label for="framePH">瞳高</label><input id="framePH" type="number" min="5" max="36" step="0.5" value="22"></div>
           </div>
-          <div class="hint">A / B / ED 可手動微調；DBL / PD / 瞳高用於框型相對光學中心的位置估算。<br>瞳高以鏡框最下緣往上量至瞳孔中心。<br>精修薄不建議給予配戴瞳高過高。</div>
+          <div class="hint">瞳高以鏡框最下緣往上量至瞳孔中心。<br>精修薄不建議給予配戴瞳高過高。</div>
         </div>
-        <div class="hint" id="frameHint">預設關閉。開啟後才顯示左右眼、框型預設、A / B / ED 與 DBL / PD / 瞳高位置參數。</div>
+        <div class="hint" id="frameHint">預設關閉。開啟後才顯示左右眼、框型預設、B 高與 DBL / PD / 瞳高；自由框型的 A / ED 由定位點自動反算。</div>
       </div>
     </div>
 
@@ -188,7 +196,7 @@ const diaList = [60,65,70,75];
 const thinDiaList = [...Array.from({length:21},(_,i)=>50+i),75];
 let appMode = 'dye';
 let state = {color: colors[12], zone:2, depth:20, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
-let thinState = {dia:70, opticalDia:45, frameA:54, frameB:38, ed:61, dbl:18, pd:64, ph:22, showFrame:false, rxType:'minus', eye:'R', shapePreset:'nasal'};
+let thinState = {dia:70, opticalDia:45, frameA:53, frameB:38, ed:58.1, dbl:18, pd:64, ph:22, showFrame:false, rxType:'minus', eye:'R', shapePreset:'free', freeLeft:[-22,-25,-26.5,-26.5,-25,-22], freeRight:[22,25,26.5,26.5,25,22]};
 
 const sel = document.getElementById('colorSelect');
 const depthSelect = document.getElementById('depthSelect');
@@ -223,12 +231,12 @@ document.getElementById('opticalDia').oninput=e=>{thinState.opticalDia=+e.target
 document.getElementById('showFrameOutline').onchange=e=>{
   thinState.showFrame=e.target.checked;
   document.getElementById('frameInputWrap').classList.toggle('hidden',!thinState.showFrame);
-  document.getElementById('frameHint').textContent = thinState.showFrame ? '' : '預設關閉。開啟後才顯示左右眼、框型預設、A / B / ED 與 DBL / PD / 瞳高位置參數。';
+  document.getElementById('frameHint').textContent = thinState.showFrame ? '' : '預設關閉。開啟後才顯示左右眼、框型預設、B 高與 DBL / PD / 瞳高；自由框型的 A / ED 由定位點自動反算。';
   draw();
 };
-document.getElementById('frameA').oninput=e=>{thinState.frameA=clamp(+e.target.value||54,30,Math.min(70,thinState.dia-2)); syncFrameEDLimits(); draw()};
-document.getElementById('frameB').oninput=e=>{thinState.frameB=clamp(+e.target.value||38,20,Math.min(60,thinState.dia-2)); syncFrameEDLimits(); draw()};
-document.getElementById('frameED').oninput=e=>{syncFrameEDLimits(+e.target.value||thinState.ed); draw()};
+document.getElementById('frameA').oninput=e=>{if(thinState.shapePreset==='free') return; thinState.frameA=clamp(+e.target.value||54,30,Math.min(70,thinState.dia-2)); syncFrameEDLimits(); draw()};
+document.getElementById('frameB').oninput=e=>{thinState.frameB=clamp(+e.target.value||38,20,Math.min(60,thinState.dia-2)); if(thinState.shapePreset==='free') updateFreeMetrics(); else syncFrameEDLimits(); syncThinLimits(); draw()};
+document.getElementById('frameED').oninput=e=>{if(thinState.shapePreset==='free') return; syncFrameEDLimits(+e.target.value||thinState.ed); draw()};
 document.getElementById('frameDBL').oninput=e=>{thinState.dbl=clamp(+e.target.value||18,8,30);draw()};
 document.getElementById('framePD').oninput=e=>{thinState.pd=clamp(+e.target.value||64,50,76);draw()};
 document.getElementById('framePH').oninput=e=>{thinState.ph=clamp(+e.target.value||19,5,Math.max(5,thinState.frameB-2));draw()};
@@ -238,9 +246,41 @@ eyeRBtn.onclick=()=>{thinState.eye='R';syncEyeButtons();draw()};
 eyeLBtn.onclick=()=>{thinState.eye='L';syncEyeButtons();draw()};
 document.getElementById('presetRound').onclick=()=>setShapePreset('round');
 document.getElementById('presetSquare').onclick=()=>setShapePreset('square');
-document.getElementById('presetNasal').onclick=()=>setShapePreset('nasal');
+document.getElementById('presetFree').onclick=()=>setShapePreset('free');
+document.getElementById('resetFreeShape').onclick=()=>{resetFreeShape();syncThinLimits();draw()};
 
-document.getElementById('modeBtn').onclick=()=>{
+let freeDrag=null;
+const freeSvg=document.getElementById('svg');
+freeSvg.addEventListener('pointerdown',e=>{
+  const side=e.target.getAttribute&&e.target.getAttribute('data-free-side');
+  if(!side||thinState.shapePreset!=='free'||!thinState.showFrame) return;
+  const index=Number(e.target.getAttribute('data-free-index'));
+  const d=freeDisplayArrays();
+  freeDrag={side,index,startClientX:e.clientX,startX:side==='L'?d.left[index]:d.right[index],pointerId:e.pointerId};
+  freeSvg.setPointerCapture?.(e.pointerId);
+  e.preventDefault();
+});
+freeSvg.addEventListener('pointermove',e=>{
+  if(!freeDrag) return;
+  const rect=freeSvg.getBoundingClientRect();
+  const vb=freeSvg.viewBox.baseVal;
+  const unitsPerPx=vb.width/Math.max(1,rect.width);
+  let x=freeDrag.startX+(e.clientX-freeDrag.startClientX)*unitsPerPx;
+  const maxSide=Math.max(6,thinState.dia/2-1.5);
+  x=freeDrag.side==='L'?clamp(x,-maxSide,-4):clamp(x,4,maxSide);
+  updateFreePointFromDisplay(freeDrag.side,freeDrag.index,x);
+  syncThinLimits();
+  draw();
+});
+function endFreeDrag(e){
+  if(!freeDrag) return;
+  try{freeSvg.releasePointerCapture?.(freeDrag.pointerId)}catch(_){ }
+  freeDrag=null;
+}
+freeSvg.addEventListener('pointerup',endFreeDrag);
+freeSvg.addEventListener('pointercancel',endFreeDrag);
+
+ document.getElementById('modeBtn').onclick=()=>{
   appMode = appMode==='dye' ? 'thin' : 'dye';
   document.getElementById('dyeControls').classList.toggle('hidden',appMode!=='dye');
   document.getElementById('thinControls').classList.toggle('hidden',appMode!=='thin');
@@ -355,54 +395,127 @@ function syncEyeButtons(){
   if(l) l.classList.toggle('active',thinState.eye==='L');
 }
 function shapePresetName(key){
-  return ({round:'圓形',square:'方形',nasal:'鼻側斜面'})[key] || '鼻側斜面';
+  return ({round:'圓形',square:'方形',free:'自由框型'})[key] || '自由框型';
 }
 function shapePresetParams(key){
   return ({
     round:{frameA:48,frameB:48,ed:48,framePH:25},
     square:{frameA:53,frameB:38,ed:58,framePH:22},
-    nasal:{frameA:53,frameB:38,ed:58,framePH:22}
-  })[key] || {frameA:53,frameB:38,ed:58};
+    free:{frameB:38,framePH:22}
+  })[key] || {frameB:38,framePH:22};
 }
-function presetCornerProfile(preset, eye){
-  if(preset==='round') return {lt:0.2, rt:0.2, lb:0.2, rb:0.2, n:2.2};
-  if(preset==='square') return {lt:0.8, rt:0.8, lb:0.8, rb:0.8, n:6.0};
-  if(preset==='hex') return eye==='R' ? {lt:1.6, rt:0.9, lb:3.8, rb:2.8, n:4.0} : {lt:0.9, rt:1.6, lb:2.8, rb:3.8, n:4.0};
-  if(preset==='cat') return eye==='R' ? {lt:1.0, rt:1.35, lb:2.2, rb:7.2, n:4.7} : {lt:1.35, rt:1.0, lb:7.2, rb:2.2, n:4.7};
-  return eye==='R' ? {lt:1.55, rt:0.35, lb:8.8, rb:0.35, n:4.8} : {lt:0.35, rt:1.55, lb:0.35, rb:8.8, n:4.8};
+function resetFreeShape(){
+  thinState.freeLeft=[-22,-25,-26.5,-26.5,-25,-22];
+  thinState.freeRight=[22,25,26.5,26.5,25,22];
+  thinState.frameB=38;
+  updateFreeMetrics();
+}
+function freeYLevels(){
+  // B 高定義為框型最上緣到最下緣的總高度。
+  // 上、下緣中央各有一個隱藏頂點，分別比 L1/R1 高 2 mm、比 L6/R6 低 2 mm。
+  // 因此隱藏頂點間距 = B，而 L1/R1 到 L6/R6 的定位點垂直跨度 = B-4 mm。
+  const sideSpan=Math.max(2,thinState.frameB-4);
+  return Array.from({length:6},(_,i)=>-sideSpan/2+i*sideSpan/5);
+}
+function freeDisplayArrays(){
+  if(thinState.eye==='R') return {left:thinState.freeLeft.slice(), right:thinState.freeRight.slice()};
+  return {
+    left:thinState.freeRight.map(v=>-v),
+    right:thinState.freeLeft.map(v=>-v)
+  };
+}
+function updateFreePointFromDisplay(side,index,displayX){
+  if(thinState.eye==='R'){
+    if(side==='L') thinState.freeLeft[index]=displayX;
+    else thinState.freeRight[index]=displayX;
+  }else{
+    if(side==='L') thinState.freeRight[index]=-displayX;
+    else thinState.freeLeft[index]=-displayX;
+  }
+  updateFreeMetrics();
+}
+function clampFreePointsToBlank(){
+  const maxSide=Math.max(6,thinState.dia/2-1.5);
+  thinState.freeLeft=thinState.freeLeft.map(v=>clamp(v,-maxSide,-4));
+  thinState.freeRight=thinState.freeRight.map(v=>clamp(v,4,maxSide));
+}
+function updateFreeMetrics(){
+  clampFreePointsToBlank();
+  const ys=freeYLevels();
+  const minX=Math.min(...thinState.freeLeft);
+  const maxX=Math.max(...thinState.freeRight);
+  thinState.frameA=Math.max(0,maxX-minX);
+  let maxD=thinState.frameB;
+  let pair='B高';
+  for(let i=0;i<6;i++){
+    for(let j=0;j<6;j++){
+      const d=Math.hypot(thinState.freeRight[j]-thinState.freeLeft[i],ys[j]-ys[i]);
+      if(d>maxD){maxD=d;pair=`L${i+1}↔R${j+1}`;}
+    }
+  }
+  thinState.ed=maxD;
+  thinState.edPair=pair;
 }
 function syncFrameEDLimits(forceVal=null){
   const input=document.getElementById('frameED');
-  const roundLock = thinState.shapePreset==='round';
-  const edMin=Math.max(thinState.frameA,thinState.frameB);
-  const edMax=Math.hypot(thinState.frameA,thinState.frameB);
-  const next=forceVal==null ? thinState.ed : forceVal;
-  thinState.ed=roundLock ? edMin : clamp(next,edMin,edMax);
+  const aInput=document.getElementById('frameA');
+  const freeLock=thinState.shapePreset==='free';
+  const roundLock=thinState.shapePreset==='round';
+  if(freeLock) updateFreeMetrics();
+  else{
+    const edMin=Math.max(thinState.frameA,thinState.frameB);
+    const edMax=Math.hypot(thinState.frameA,thinState.frameB);
+    const next=forceVal==null ? thinState.ed : forceVal;
+    thinState.ed=roundLock ? edMin : clamp(next,edMin,edMax);
+    if(input){input.min=edMin.toFixed(1);input.max=edMax.toFixed(1);}
+  }
   if(input){
-    input.min=edMin.toFixed(1);
-    input.max=edMax.toFixed(1);
     input.value=Number(thinState.ed).toFixed(1).replace(/\.0$/,'');
-    input.disabled=roundLock;
-    input.style.opacity=roundLock ? '.55' : '1';
-    input.title=roundLock ? '圓形預設下，ED 會鎖定為圓形直徑。' : '';
+    input.disabled=freeLock||roundLock;
+    input.classList.toggle('lockedInput',freeLock||roundLock);
+    input.title=freeLock?'自由框型的 ED 由 12 個定位點中最遠的左右點距離自動反算。':(roundLock?'圓/橢圓形的 ED 鎖定為最大直徑。':'');
+  }
+  if(aInput){
+    aInput.disabled=freeLock;
+    aInput.classList.toggle('lockedInput',freeLock);
+    aInput.title=freeLock?'自由框型的 A 寬由左右兩列定位點的最左與最右位置自動反算。':'';
   }
 }
 function syncShapePresetButtons(){
-  const map={round:'presetRound',square:'presetSquare',nasal:'presetNasal'};
+  const map={round:'presetRound',square:'presetSquare',free:'presetFree'};
   Object.entries(map).forEach(([key,id])=>{
     const btn=document.getElementById(id);
     if(btn) btn.classList.toggle('active',thinState.shapePreset===key);
   });
   const info=document.getElementById('presetSizeInfo');
-  if(info) info.textContent=`預設尺寸：A ${thinState.frameA} / B ${thinState.frameB} / ED ${Number(thinState.ed).toFixed(1).replace(/\.0$/,'')}`;
+  if(info) info.textContent=thinState.shapePreset==='free' ? `自由框型即時檢測：A ${thinState.frameA.toFixed(1)} / B ${thinState.frameB} / ED ${thinState.ed.toFixed(1)}（${thinState.edPair||''}）` : `目前尺寸：A ${thinState.frameA} / B ${thinState.frameB} / ED ${Number(thinState.ed).toFixed(1).replace(/\.0$/,'')}`;
+  const help=document.getElementById('shapePresetHint');
+  if(help){
+    if(thinState.shapePreset==='free'){
+      help.innerHTML='自由框型：先設定 B 高，<br>再直接拖曳圖中左右各 6 個定位點<br>（定位點僅水平移動）。<br>A 寬與 ED 最大內徑會自動計算。<br>※顯示之鏡框形狀僅供參考，請以實體為主';
+    }else if(thinState.shapePreset==='square'){
+      help.innerHTML='先選預設框型，再依輸入 A 寬 / B 高 / ED 最大內徑。<br>※顯示之鏡框形狀僅供參考，請以實體為主';
+    }else{
+      help.innerHTML='先選預設框型，再依輸入 A 寬 / B 高。<br>※顯示之鏡框形狀僅供參考，請以實體為主';
+    }
+  }
+  const tools=document.getElementById('freeShapeTools');
+  if(tools) tools.classList.toggle('hidden',thinState.shapePreset!=='free');
 }
 function applyShapePreset(key){
-  if(key==='hex' || key==='cat') key='nasal';
+  if(!['round','square','free'].includes(key)) key='free';
   const p=shapePresetParams(key);
   thinState.shapePreset=key;
-  thinState.frameA=p.frameA;
-  thinState.frameB=p.frameB;
-  thinState.ed=p.ed;
+  if(key==='free'){
+    thinState.frameB=p.frameB;
+    if(!thinState.freeLeft || thinState.freeLeft.length!==6) resetFreeShape();
+    updateFreeMetrics();
+  }else{
+    thinState.frameA=p.frameA;
+    thinState.frameB=p.frameB;
+    thinState.ed=p.ed;
+  }
+  if(p.framePH) thinState.ph=p.framePH;
   syncThinLimits();
   draw();
 }
@@ -418,12 +531,13 @@ function syncThinLimits(){
   document.getElementById('opticalDiaVal').textContent=thinState.opticalDia;
   document.getElementById('opticalDiaHint').textContent=`可設定範圍：${min}Φ～${max}Φ。`;
   document.getElementById('thinDiaSelect').value=thinState.dia;
-  thinState.frameA=clamp(thinState.frameA,30,Math.min(70,thinState.dia-2));
   thinState.frameB=clamp(thinState.frameB,20,Math.min(60,thinState.dia-2));
+  if(thinState.shapePreset==='free') updateFreeMetrics();
+  else thinState.frameA=clamp(thinState.frameA,30,Math.min(70,thinState.dia-2));
   thinState.ph=clamp(thinState.ph,5,Math.max(5,thinState.frameB-2));
   syncFrameEDLimits();
   const a=document.getElementById('frameA'), b=document.getElementById('frameB'), ed=document.getElementById('frameED'), dbl=document.getElementById('frameDBL'), pd=document.getElementById('framePD'), ph=document.getElementById('framePH');
-  if(a) a.value=Number(thinState.frameA).toFixed(0);
+  if(a) a.value=thinState.shapePreset==='free'?Number(thinState.frameA).toFixed(1):Number(thinState.frameA).toFixed(0);
   if(b) b.value=Number(thinState.frameB).toFixed(0);
   if(ed) ed.value=Number(thinState.ed).toFixed(1).replace(/\.0$/,'');
   if(dbl) dbl.value=thinState.dbl;
@@ -467,68 +581,95 @@ function frameExponentFromED(){
   }
   return (lo+hi)/2;
 }
+function sampleCatmullSide(ctrl){
+  const out=[];
+  const cat=(p0,p1,p2,p3,t)=>{
+    const t2=t*t,t3=t2*t;
+    return {
+      x:0.5*((2*p1.x)+(-p0.x+p2.x)*t+(2*p0.x-5*p1.x+4*p2.x-p3.x)*t2+(-p0.x+3*p1.x-3*p2.x+p3.x)*t3),
+      y:0.5*((2*p1.y)+(-p0.y+p2.y)*t+(2*p0.y-5*p1.y+4*p2.y-p3.y)*t2+(-p0.y+3*p1.y-3*p2.y+p3.y)*t3)
+    };
+  };
+  for(let i=0;i<ctrl.length-1;i++){
+    const p0=ctrl[Math.max(0,i-1)],p1=ctrl[i],p2=ctrl[i+1],p3=ctrl[Math.min(ctrl.length-1,i+2)];
+    for(let k=0;k<=10;k++){
+      if(i>0&&k===0) continue;
+      const p=cat(p0,p1,p2,p3,k/10);
+      // 水平值限制在當段兩端之間，避免樣條過衝造成 A / ED 與定位點不一致。
+      p.x=clamp(p.x,Math.min(p1.x,p2.x),Math.max(p1.x,p2.x));
+      out.push(p);
+    }
+  }
+  return out;
+}
+function sampleQuadraticEdge(p0,p1,control,steps=18){
+  const out=[];
+  for(let i=0;i<=steps;i++){
+    const t=i/steps,u=1-t;
+    out.push({x:u*u*p0.x+2*u*t*control.x+t*t*p1.x,y:u*u*p0.y+2*u*t*control.y+t*t*p1.y});
+  }
+  return out;
+}
+// 讓上下緣「真的通過」中央隱藏頂點，而不是只把它當控制點。
+// 兩段二次 Bézier 在 midpoint 處共用水平切線，因此中央弧頂平順且高度精確。
+function sampleEdgeThroughHiddenMidpoint(p0,p1,midpoint,stepsEach=12){
+  const c1={x:(p0.x+midpoint.x)/2,y:midpoint.y};
+  const c2={x:(midpoint.x+p1.x)/2,y:midpoint.y};
+  const first=sampleQuadraticEdge(p0,midpoint,c1,stepsEach);
+  const second=sampleQuadraticEdge(midpoint,p1,c2,stepsEach);
+  return [...first,...second.slice(1)];
+}
+function getFreeLocalControlPoints(){
+  const ys=freeYLevels();
+  const d=freeDisplayArrays();
+  return {
+    left:d.left.map((x,i)=>({x,y:ys[i],side:'L',index:i})),
+    right:d.right.map((x,i)=>({x,y:ys[i],side:'R',index:i}))
+  };
+}
+function getFreeOutlineLocal(){
+  const c=getFreeLocalControlPoints();
+  const arc=2; // 隱藏頂點相對 L1/R1、L6/R6 精確偏移 2 mm
+  const topL=c.left[0],topR=c.right[0],botL=c.left[5],botR=c.right[5];
+
+  // B 高是「最上緣隱藏頂點 ↔ 最下緣隱藏頂點」的實際垂直距離。
+  const topMid={x:(topL.x+topR.x)/2,y:topL.y-arc};
+  const bottomMid={x:(botL.x+botR.x)/2,y:botL.y+arc};
+
+  const top=sampleEdgeThroughHiddenMidpoint(topL,topR,topMid,14);
+  const right=sampleCatmullSide(c.right);
+  const bottom=sampleEdgeThroughHiddenMidpoint(botR,botL,bottomMid,14);
+  const left=sampleCatmullSide(c.left).reverse();
+  return [...top,...right.slice(1),...bottom.slice(1),...left.slice(1)];
+}
 function getFrameOutlinePoints(cx,cy){
   const shift=frameDecentration();
   const vShift=frameVerticalDecentration();
-  const a=thinState.frameA/2, b=thinState.frameB/2;
-  const prof=presetCornerProfile(thinState.shapePreset, thinState.eye);
-  const n=prof.n || frameExponentFromED();
-  const nasalSign = thinState.eye==='R' ? -1 : 1;
-  const temporalSign = -nasalSign;
-  const pts=[];
-
-
-
-
-  function cornerInsetValue(nx,ny){
-    const left=Math.max(0,-nx), right=Math.max(0,nx);
-    const top=Math.max(0,-ny), bottom=Math.max(0,ny);
-    const fxL=Math.pow(clamp((left-0.35)/0.65,0,1),1.4);
-    const fxR=Math.pow(clamp((right-0.35)/0.65,0,1),1.4);
-    const fyT=Math.pow(clamp((top-0.12)/0.88,0,1),1.25);
-    const fyB=Math.pow(clamp((bottom-0.08)/0.92,0,1),1.25);
-    return {
-      lt: prof.lt*fxL*fyT,
-      rt: prof.rt*fxR*fyT,
-      lb: prof.lb*fxL*fyB,
-      rb: prof.rb*fxR*fyB,
-    };
+  if(thinState.shapePreset==='free'){
+    updateFreeMetrics();
+    return getFreeOutlineLocal().map(p=>({x:cx+shift+p.x,y:cy+vShift+p.y}));
   }
 
+  const a=thinState.frameA/2,b=thinState.frameB/2;
+  const n=thinState.shapePreset==='round'?2.2:frameExponentFromED();
+  const nasalSign=thinState.eye==='R'?-1:1;
+  const pts=[];
   for(let i=0;i<=300;i++){
     const t=i/300*Math.PI*2;
     const p=superellipsePoint(a,b,n,t);
-    let x=p.x, y=p.y;
-    let nx=x/(a||1), ny=y/(b||1);
-
-    if(y<0) y *= 0.965 + 0.035*Math.abs(ny);
-
-    const inset=cornerInsetValue(nx,ny);
-    if(x<0 && y<0) x += inset.lt;
-    if(x>0 && y<0) x -= inset.rt;
-    if(x<0 && y>0) x += inset.lb;
-    if(x>0 && y>0) x -= inset.rb;
-
-    if(thinState.shapePreset==='nasal'){
-      const nx2=x/(a||1), ny2=y/(b||1);
-      const nasalUpper=Math.max(0,nasalSign*nx2) * Math.max(0,-ny2+0.06);
-      const nasalLower=Math.max(0,nasalSign*nx2) * Math.max(0,ny2+0.02);
-      x -= nasalSign*(1.25*Math.pow(nasalUpper,1.04) + 2.65*Math.pow(nasalLower,1.14));
-      y += 0.28*Math.pow(nasalLower,1.02);
-    }
+    let x=p.x,y=p.y;
     if(thinState.shapePreset==='round'){
       const nasalMid=Math.max(0,nasalSign*(x/(a||1))) * Math.pow(clamp((0.8-Math.abs(y/(b||1)))/0.8,0,1),1.1);
-      x -= nasalSign*0.3*nasalMid;
-    }
-    if(thinState.shapePreset==='square'){
+      x-=nasalSign*0.3*nasalMid;
+    }else if(thinState.shapePreset==='square'){
       const nasalLower=Math.max(0,nasalSign*(x/(a||1))) * Math.max(0,y/(b||1));
-      x -= nasalSign*0.55*Math.pow(nasalLower,1.12);
+      x-=nasalSign*0.55*Math.pow(nasalLower,1.12);
     }
-
     pts.push({x:cx+shift+x,y:cy+vShift+y});
   }
   return pts;
 }
+
 function frameMaxDistanceFromOC(){
   if(!thinState.showFrame) return null;
   const pts=getFrameOutlinePoints(0,0);
@@ -555,9 +696,21 @@ function makeThinMasksAndFilter(defs,cx,cy,r,or){
 function drawFrameOutline(g,cx,cy){
   const pts=getFrameOutlinePoints(cx,cy);
   const path=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(2)+' '+p.y.toFixed(2)).join(' ')+' Z';
-  // 兩層淡線：外層像框圈，內層像鏡片溝槽，視覺上比單一橢圓更接近鏡框。
-  g.appendChild(el('path',{d:path,fill:'none',stroke:'#6f7d84','stroke-opacity':'.22','stroke-width':'.75','stroke-linejoin':'round'}));
+  g.appendChild(el('path',{d:path,fill:'none',stroke:'#6f7d84','stroke-opacity':thinState.shapePreset==='free'?'.34':'.22','stroke-width':thinState.shapePreset==='free'?'.9':'.75','stroke-linejoin':'round'}));
   g.appendChild(el('path',{d:path,fill:'none',stroke:'#ffffff','stroke-opacity':'.72','stroke-width':'.24','stroke-linejoin':'round','stroke-dasharray':'1.2 1'}));
+
+  if(thinState.shapePreset==='free'){
+    const shift=frameDecentration(),vShift=frameVerticalDecentration();
+    const c=getFreeLocalControlPoints();
+    [...c.left,...c.right].forEach(p=>{
+      const px=cx+shift+p.x,py=cy+vShift+p.y;
+      g.appendChild(el('line',{x1:px-2.2,y1:py,x2:px+2.2,y2:py,class:'freeGuide'}));
+      const h=el('circle',{cx:px,cy:py,r:1.25,class:'freeHandle','data-free-side':p.side,'data-free-index':p.index});
+      const title=el('title');title.textContent=`${p.side}${p.index+1}｜左右拖曳調整`;
+      h.appendChild(title);g.appendChild(h);
+      addText(g,px+(p.side==='L'?-2.0:2.0),py-1.6,`${p.side}${p.index+1}`,'freeHandleLabel',p.side==='L'?'end':'start');
+    });
+  }
 }
 function drawOpticalCenter(g,x,y){
   g.appendChild(el('circle',{cx:x,cy:y,r:1.7,fill:'#ffffff','fill-opacity':'.92',stroke:'#0d6075','stroke-width':'.35'}));
@@ -592,13 +745,13 @@ function drawThinTop(svg){
   if(thinState.showFrame){
     const maxD=frameMaxDistanceFromOC();
     const rec=clamp(Math.round(maxD*2-10),38,thinState.dia-5);
-    addText(svg,136,56,`框型 ${({'round':'圓形','square':'方形','nasal':'鼻側斜面'})[thinState.shapePreset]}｜${thinState.eye==='R'?'右眼':'左眼'}`,'note','start');
-    addText(svg,136,63,`A ${thinState.frameA} / B ${thinState.frameB} / ED ${Number(thinState.ed).toFixed(1)}｜最遠邊 ${maxD.toFixed(1)} mm`,'note','start');
+    addText(svg,136,56,`框型 ${shapePresetName(thinState.shapePreset)}｜${thinState.eye==='R'?'右眼':'左眼'}`,'note','start');
+    addText(svg,136,63,`A ${Number(thinState.frameA).toFixed(1)} / B ${thinState.frameB} / ED ${Number(thinState.ed).toFixed(1)}｜最遠邊 ${maxD.toFixed(1)} mm`,'note','start');
     addText(svg,136,70,`DBL ${thinState.dbl} / PD ${thinState.pd} / 瞳高 ${thinState.ph}｜建議內徑 ${rec}Φ`,'note','start');
   }else{
     addText(svg,136,56,'框型比對：關閉','note','start');
-    addText(svg,136,63,'開啟後可輸入 A / B / ED / DBL / PD / 瞳高','note','start');
-    addText(svg,136,70,'並估算框形相對光學中心位置','note','start');
+    addText(svg,136,63,'自由框型：先設 B 高，再拖曳左右各 6 個定位點','note','start');
+    addText(svg,136,70,'A / ED 自動反算；輸入 DBL / PD / 瞳高完成位置估算','note','start');
   }
   drawThinSection(svg,20,124,188,56);
   drawRuler(svg);
