@@ -24,6 +24,19 @@
   h1{margin:0;font-size:24px;letter-spacing:.03em;color:var(--ink)}
   .modeBtn{border:1px solid #0d6075;border-radius:999px;background:#fff;color:#0d6075;padding:7px 14px;font-weight:800;cursor:pointer;transition:.18s}
   .modeBtn:hover{background:#0d6075;color:#fff}
+  .teachBtn{border:1px solid #78929e;border-radius:999px;background:#f8fbfc;color:#294754;padding:7px 14px;font-weight:800;cursor:pointer;transition:.18s}
+  .teachBtn:hover{background:#eaf3f6;border-color:#0d6075;color:#0d6075}
+  .modalOverlay{position:fixed;inset:0;background:rgba(14,35,44,.42);z-index:1000;display:flex;align-items:center;justify-content:center;padding:22px}
+  .modalCard{width:min(760px,94vw);max-height:88vh;overflow:auto;background:#fff;border:1px solid #d7e3e8;border-radius:18px;box-shadow:0 24px 70px rgba(12,42,54,.28)}
+  .modalHead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 20px 12px;border-bottom:1px solid #e8eef1;position:sticky;top:0;background:#fff;z-index:1}
+  .modalHead h2{margin:0;font-size:20px;color:#173847}
+  .modalClose{width:36px;height:36px;border:1px solid #cbd8de;border-radius:50%;background:#fff;color:#36515e;font-size:22px;line-height:1;cursor:pointer}
+  .modalBody{padding:18px 20px 22px;line-height:1.7;color:#294754;font-size:14px}
+  .modalLead{margin:0 0 14px;padding:10px 12px;background:#f5fafb;border:1px solid #dce9ed;border-radius:10px;color:#48616c}
+  .teachSection{padding:12px 0;border-bottom:1px solid #edf2f4}.teachSection:last-child{border-bottom:0}
+  .teachSection h3{font-size:15px;margin:0 0 6px;color:#173847}.teachSection p{margin:4px 0}
+  .teachTag{display:inline-block;font-size:12px;font-weight:800;color:#0d6075;background:#eaf6f8;border-radius:999px;padding:2px 8px;margin-right:5px}
+  .inlineWarn{font-size:12px;color:#994b00;line-height:1.55;margin-top:8px;background:#fff8e8;border:1px solid #f1d49d;border-radius:10px;padding:9px 10px}
   .sub{color:var(--muted);font-size:14px;line-height:1.5;margin-top:6px}
   main{display:grid;grid-template-columns:330px 1fr;gap:18px;padding:18px;align-items:start}
   .controls{background:var(--panel);border:1px solid #dde8ec;border-radius:18px;padding:18px;box-shadow:var(--shadow);position:sticky;top:12px}
@@ -66,7 +79,7 @@
   .lockedInput{background:#eef3f5!important;color:#697982!important;opacity:.8}
   .hidden{display:none!important}
   @media(max-width:900px){main{grid-template-columns:1fr}.controls{position:relative;top:auto}.canvas{transform:none;width:100%;min-width:760px}}
-  @media print{body{background:#fff}header,.controls,.toolbar{display:none}.stageWrap{box-shadow:none;border:0;padding:0}.canvas{border:0;padding:0;transform:none}.pageBreak{break-after:page}}
+  @media print{body{background:#fff}header,.controls,.toolbar,.modalOverlay{display:none!important}.stageWrap{box-shadow:none;border:0;padding:0}.canvas{border:0;padding:0;transform:none}.pageBreak{break-after:page}}
 </style>
 </head>
 <body>
@@ -74,9 +87,44 @@
   <div class="titleRow">
     <h1 id="pageTitle">片坯漸層染色設定演示</h1>
     <button class="modeBtn" id="modeBtn" type="button">精修薄模式</button>
+    <button class="teachBtn hidden" id="processingGuideBtn" type="button">加工設定說明</button>
   </div>
   <div class="sub" id="pageSub">用於 60Φ / 65Φ / 70Φ / 75Φ 片坯的 1:1 教學示意。可切換漸層色、染色深度、染色區比例、染色多焦與光學中心移心量。<br><b>《 本網站僅供色區參考，關於染色顏色、深度因每台顯示器會有色彩偏差，請以現場色板為主。 》</b></div>
 </header>
+<div class="modalOverlay hidden" id="processingGuideModal" role="dialog" aria-modal="true" aria-labelledby="processingGuideTitle">
+  <div class="modalCard">
+    <div class="modalHead">
+      <h2 id="processingGuideTitle">精修薄｜加工設定說明</h2>
+      <button class="modalClose" id="processingGuideClose" type="button" aria-label="關閉">×</button>
+    </div>
+    <div class="modalBody">
+      <p class="modalLead">此頁為精修薄加工布達與機台設定提醒；實際仍需依鏡片條件、機台狀態與現場 SOP 判斷。</p>
+      <div class="teachSection">
+        <h3>1. 研磨定位</h3>
+        <p><span class="teachTag">建議</span><b>使用光學中心模式研磨（主動模式）</b>。</p>
+        <p>鏡框中心模式（被動模式）可能使吸盤落在有效內徑與精修薄區的平台交界，造成吸附與研磨穩定性下降。</p>
+      </div>
+      <div class="teachSection">
+        <h3>2. 尖邊／V 溝設定</h3>
+        <p><b>精修薄加工勿直接套用「4:6 等比例／自動做／前表弧／後表弧」作為固定自動設定。</b></p>
+        <p>改用指導模式，以<b>尖邊彎度（環槽弧）</b>確認尖邊曲線，再用<b>平移</b>確認 <b>V 溝（溝槽）</b>位置。</p>
+      </div>
+      <div class="teachSection">
+        <h3>3. 有效內徑與吸盤</h3>
+        <p>有效光學內徑約 <b>32Φ 以下</b>即應提高加工警覺；內徑越小，吸盤可用接觸範圍越有限。</p>
+        <p>有效內徑接近或低於 <b>30Φ</b> 時，吸盤黏貼不牢與滑片風險更高；必要時請採多段次製作並確認吸附狀態。</p>
+      </div>
+      <div class="teachSection">
+        <h3>4. 片徑選擇</h3>
+        <p>原始光度較高時，可供片徑可能僅至 <b>70Φ</b>。本系統最大可選 <b>75Φ</b>；若個案直徑不足，由廠商依實際製作條件另行提醒。</p>
+      </div>
+      <div class="teachSection">
+        <h3>5. 後製注意</h3>
+        <p>精修薄完成後，避免人工大倒角或過度拋光，以免改變已設定的邊緣結構與溝槽位置。</p>
+      </div>
+    </div>
+  </div>
+</div>
 <main>
   <aside class="controls">
     <div id="dyeControls">
@@ -117,12 +165,14 @@
         <label for="thinDiaSelect">1. 片徑選擇</label>
         <select id="thinDiaSelect" class="thinSelect"></select>
         <div class="hint">可選 50Φ～70Φ（每 1 mm）及 75Φ。片坯外圈以實際 mm 比例顯示，建議先用下方 50 mm 校正尺確認螢幕比例。</div>
+        <div class="inlineWarn hidden" id="dia75Warn"><b>75Φ 片徑提醒：</b>系統最大可選片徑為 75Φ；部分高光度處方實際可供片徑可能僅至 70Φ。若個別案例直徑不足，依廠商實際製作條件另行提醒。</div>
       </div>
       <div class="group">
         <label>2. 有效光學內徑</label>
-        <div class="row"><input id="opticalDia" type="range" min="38" max="65" step="1" value="45"><div class="val"><span id="opticalDiaVal">45</span> Φ</div></div>
+        <div class="row"><input id="opticalDia" type="range" min="30" max="65" step="1" value="45"><div class="val"><span id="opticalDiaVal">45</span> Φ</div></div>
         <div class="hint">將鏡框眼位比對光學中心，比對裁型後留下適當的精修區外徑。</div>
-        <div class="hint" id="opticalDiaHint">可設定範圍：38Φ～65Φ。</div>
+        <div class="hint" id="opticalDiaHint">可設定範圍：30Φ～65Φ。</div>
+        <div class="inlineWarn hidden" id="smallOpticalWarn"><b>加工提醒：</b>加工時鏡片吸盤可能黏貼不牢固。有效光學內徑越小，越需要確認吸盤接觸區與加工穩定性。</div>
         <div class="warnHint">警示：片坯圓心為光學中心。有效光學內徑越小，外圍精修薄區越大；近視邊緣更薄，遠視中心更薄。但精修薄區-鏡片表面曲率改變、已非原處方光度，該區像差與模糊區也會同步增加。</div>
       </div>
       <div class="group">
@@ -207,7 +257,7 @@ const chipBox=document.getElementById('diaChips');
 const thinDiaSelect=document.getElementById('thinDiaSelect');
 thinDiaList.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v+'Φ';thinDiaSelect.appendChild(o)});
 thinDiaSelect.value=thinState.dia;
-thinDiaSelect.onchange=e=>{thinState.dia=+e.target.value;syncThinLimits();draw()};
+thinDiaSelect.onchange=e=>{thinState.dia=+e.target.value;syncThinLimits();updateThinWarnings();draw()};
 
 depthSelect.value = state.depth;
 depthSelect.onchange=e=>{state.depth=+e.target.value;draw()};
@@ -227,7 +277,7 @@ sel.onchange=e=>{
 document.getElementById('dirR').onclick=()=>{state.dir=1;dirR.classList.add('active');dirL.classList.remove('active');draw()};
 document.getElementById('dirL').onclick=()=>{state.dir=-1;dirL.classList.add('active');dirR.classList.remove('active');draw()};
 
-document.getElementById('opticalDia').oninput=e=>{thinState.opticalDia=+e.target.value;document.getElementById('opticalDiaVal').textContent=thinState.opticalDia;draw()};
+document.getElementById('opticalDia').oninput=e=>{thinState.opticalDia=+e.target.value;document.getElementById('opticalDiaVal').textContent=thinState.opticalDia;updateThinWarnings();draw()};
 document.getElementById('showFrameOutline').onchange=e=>{
   thinState.showFrame=e.target.checked;
   document.getElementById('frameInputWrap').classList.toggle('hidden',!thinState.showFrame);
@@ -248,6 +298,18 @@ document.getElementById('presetRound').onclick=()=>setShapePreset('round');
 document.getElementById('presetSquare').onclick=()=>setShapePreset('square');
 document.getElementById('presetFree').onclick=()=>setShapePreset('free');
 document.getElementById('resetFreeShape').onclick=()=>{resetFreeShape();syncThinLimits();draw()};
+
+const processingGuideBtn=document.getElementById('processingGuideBtn');
+const processingGuideModal=document.getElementById('processingGuideModal');
+const processingGuideClose=document.getElementById('processingGuideClose');
+function setProcessingGuide(open){
+  processingGuideModal.classList.toggle('hidden',!open);
+  document.body.style.overflow=open?'hidden':'';
+}
+processingGuideBtn.onclick=()=>setProcessingGuide(true);
+processingGuideClose.onclick=()=>setProcessingGuide(false);
+processingGuideModal.addEventListener('click',e=>{if(e.target===processingGuideModal)setProcessingGuide(false)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!processingGuideModal.classList.contains('hidden'))setProcessingGuide(false)});
 
 let freeDrag=null;
 const freeSvg=document.getElementById('svg');
@@ -286,6 +348,8 @@ freeSvg.addEventListener('pointercancel',endFreeDrag);
   document.getElementById('thinControls').classList.toggle('hidden',appMode!=='thin');
   document.getElementById('pageTitle').textContent = appMode==='thin' ? '片坯精修薄演示' : '片坯漸層染色設定演示';
   document.getElementById('modeBtn').textContent = appMode==='thin' ? '漸層染色模式' : '精修薄模式';
+  document.getElementById('processingGuideBtn').classList.toggle('hidden',appMode!=='thin');
+  if(appMode!=='thin') setProcessingGuide(false);
   document.getElementById('pageSub').innerHTML = appMode==='thin'
     ? '以 1:1 片坯與有效光學內徑模擬精修薄區範圍。網狀格用來示意精修薄區像差：<b>有效光學內徑越小，外圍模糊 / 像差區越大。</b><br>本版本未納入散光等度數計算。散光度數會影響有效光學內徑的橢圓離心率（E值）；散光度數越高，長短軸差異通常越明顯，而散光軸向則會影響橢圓長短軸的方向。<br><b>《 本模式為區域與相對厚度教學示意，非實際處方光度、像差量或車房厚度計算。 》</b>'
     : '用於 60Φ / 65Φ / 70Φ / 75Φ 片坯的 1:1 教學示意。可切換漸層色、染色深度、染色區比例、染色多焦與光學中心移心量。<br><b>《 本網站僅供色區參考，關於染色顏色、深度因每台顯示器會有色彩偏差，請以現場色板為主。 》</b>';
@@ -522,9 +586,15 @@ function applyShapePreset(key){
 function setShapePreset(key){
   applyShapePreset(key);
 }
+function updateThinWarnings(){
+  const small=document.getElementById('smallOpticalWarn');
+  const dia75=document.getElementById('dia75Warn');
+  if(small) small.classList.toggle('hidden',thinState.opticalDia>32);
+  if(dia75) dia75.classList.toggle('hidden',thinState.dia!==75);
+}
 function syncThinLimits(){
   const slider=document.getElementById('opticalDia');
-  const min=38, max=thinState.dia-5;
+  const min=30, max=thinState.dia-5;
   slider.min=min; slider.max=max;
   thinState.opticalDia=clamp(thinState.opticalDia,min,max);
   slider.value=thinState.opticalDia;
@@ -545,6 +615,7 @@ function syncThinLimits(){
   if(ph){ph.max=Math.max(5,thinState.frameB-2); ph.value=Number(thinState.ph).toFixed(1).replace(/\.0$/,'');}
   syncEyeButtons();
   syncShapePresetButtons();
+  updateThinWarnings();
 }
 
 function frameDecentration(){
@@ -744,7 +815,7 @@ function drawThinTop(svg){
   addText(svg,136,49,`精修薄寬度：約 ${(thinState.dia-thinState.opticalDia)/2} mm / 側`,'note','start');
   if(thinState.showFrame){
     const maxD=frameMaxDistanceFromOC();
-    const rec=clamp(Math.round(maxD*2-10),38,thinState.dia-5);
+    const rec=clamp(Math.round(maxD*2-10),30,thinState.dia-5);
     addText(svg,136,56,`框型 ${shapePresetName(thinState.shapePreset)}｜${thinState.eye==='R'?'右眼':'左眼'}`,'note','start');
     addText(svg,136,63,`A ${Number(thinState.frameA).toFixed(1)} / B ${thinState.frameB} / ED ${Number(thinState.ed).toFixed(1)}｜最遠邊 ${maxD.toFixed(1)} mm`,'note','start');
     addText(svg,136,70,`DBL ${thinState.dbl} / PD ${thinState.pd} / 瞳高 ${thinState.ph}｜建議內徑 ${rec}Φ`,'note','start');
@@ -921,7 +992,7 @@ function draw(){
   if(appMode==='thin'){
     drawThinTop(svg);
     const maxD=frameMaxDistanceFromOC();
-    const rec=maxD==null?null:clamp(Math.round(maxD*2-10),38,thinState.dia-5);
+    const rec=maxD==null?null:clamp(Math.round(maxD*2-10),30,thinState.dia-5);
     document.getElementById('summary').textContent=`精修薄：${thinState.dia}Φ 片坯｜有效光學內徑 ${thinState.opticalDia}Φ｜框型比對 ${thinState.showFrame?'開':'關'}${thinState.showFrame?`｜ED ${Number(thinState.ed).toFixed(1)} mm｜瞳高 ${thinState.ph} mm｜建議內徑約 ${rec}Φ｜${thinState.rxType==='minus'?'近視':'遠視'}剖面`:''}`;
   }else{
     drawDye(svg);
@@ -935,6 +1006,7 @@ svgEl.addEventListener('click',evt=>{
 });
 
 applyShapePreset(thinState.shapePreset);
+updateThinWarnings();
 </script>
 </body>
 </html>
