@@ -292,7 +292,8 @@
         <div class="row"><input id="opticalDia" type="range" min="30" max="65" step="1" value="45"><div class="val"><span id="opticalDiaVal">45</span> Φ</div></div>
         <div class="hint">將鏡框眼位比對光學中心，比對裁型後留下適當的精修區外徑。</div>
         <div class="hint" id="opticalDiaHint">可設定範圍：30Φ～65Φ。</div>
-        <div class="inlineWarn hidden" id="smallOpticalWarn"><b>加工提醒：</b>加工時鏡片吸盤可能黏貼不牢固。有效光學內徑越小，越需要確認吸盤接觸區與加工穩定性。</div>
+        <div class="inlineWarn hidden" id="smallOpticalWarn"><b>加工提醒：</b>加工時鏡片後夾具可能夾不牢固，尤其是被動(框心模式)製作。<br>有效光學內徑越小，越需要確認夾具接觸區與加工穩定性。</div>
+        <div class="inlineWarn hidden" id="biggOpticalWarn"><b>內徑提醒：</b>內徑較大使鏡片厚度減薄較少，可能導致精修薄區裁型後較不明顯</div>
         <div class="warnHint">警示：片坯圓心為光學中心。有效光學內徑越小，外圍精修薄區越大；近視邊緣更薄，遠視中心更薄。但精修薄區-鏡片表面曲率改變、已非原處方光度，該區像差與模糊區也會同步增加。</div>
       </div>
       <div class="group">
@@ -1054,8 +1055,10 @@ function setShapePreset(key){
 }
 function updateThinWarnings(){
   const small=document.getElementById('smallOpticalWarn');
+  const bigg=document.getElementById('biggOpticalWarn');
   const dia75=document.getElementById('dia75Warn');
   if(small) small.classList.toggle('hidden',thinState.opticalDia>32);
+  if(bigg) bigg.classList.toggle('hidden',thinState.dia-thinState.opticalDia>8);
   if(dia75) dia75.classList.toggle('hidden',thinState.dia!==75);
 }
 function syncThinLimits(){
@@ -1224,9 +1227,9 @@ function makeThinMasksAndFilter(defs,cx,cy,r,or){
   mask.appendChild(el('circle',{cx,cy,r,fill:'white'}));
   mask.appendChild(el('circle',{cx,cy,r:or,fill:'black'}));
   defs.appendChild(mask);
-  const severity=clamp((thinState.dia-thinState.opticalDia)/40,0.1,1);
+  const severity=clamp((thinState.dia-thinState.opticalDia)/32,0.1,1);
   const filter=el('filter',{id:'aberrationFilter',x:'-20%',y:'-20%',width:'140%',height:'140%'});
-  filter.appendChild(el('feTurbulence',{type:'fractalNoise',baseFrequency:String(0.035+severity*0.02),numOctaves:'2',seed:'7',result:'noise'}));
+  filter.appendChild(el('feTurbulence',{type:'fractalNoise',baseFrequency:String(0.035+severity*0.055),numOctaves:'1',seed:'13',result:'noise'}));
   filter.appendChild(el('feDisplacementMap',{in:'SourceGraphic',in2:'noise',scale:String(1.5+severity*5.5),xChannelSelector:'R',yChannelSelector:'G'}));
   defs.appendChild(filter);
 }
@@ -1311,85 +1314,116 @@ function drawThinSection(svg,x,y,w,h){
   const mid=78;
   const left=mid-thinState.dia/2, right=mid+thinState.dia/2;
   const optLeft=mid-thinState.opticalDia/2, optRight=mid+thinState.opticalDia/2;
+
+  // 保留原版變化邏輯：有效內徑越小，severity 越高，精修薄效果越明顯。
   const severity=clamp((thinState.dia-thinState.opticalDia)/(thinState.dia-10),0,1);
   const smooth=t=>t*t*(3-2*t);
+  const mix=(a,b,t)=>a+(b-a)*t;
   const topRaw=[], bottomRaw=[], topThin=[], bottomThin=[];
   const outerBand=Math.max(1,(thinState.dia-thinState.opticalDia)/2);
+  const optRadius=thinState.opticalDia/2;
+  const blankRadius=thinState.dia/2;
+
+  // 前表面只做固定的輕微正弧；近/遠視皆不受有效內徑影響。
+  const frontBaseY=y+14.4;
+  const frontAmp=2.0;
+  const frontPower=1.82;
+  const frontY=norm=>frontBaseY-frontAmp*(1-Math.pow(norm,frontPower));
 
   let legend1='', legend2='';
 
   if(thinState.rxType==='minus'){
-    // 平凹概念：內徑越小，外圍越早進入修薄帶，因此邊緣越薄。
-    const flatY=y+14;
+    // 近視：沿用原版 edgeT / rawPower / severity 的變化幅度，
+    // 但修正成「有效光學區同曲率，只有外徑區才反曲」。
     const centerT=2.0;
-    const edgeT=7.8;
-    const rawPower=1.68;
-    const optRadius=thinState.opticalDia/2;
-    const boundaryNorm=optRadius/(thinState.dia/2);
-    const boundaryRawT=centerT + (edgeT-centerT)*Math.pow(boundaryNorm,rawPower);
-    const thinEdgeT=Math.max(centerT+0.45, boundaryRawT-(1.0+3.4*severity));
-    const thinBoundaryT=Math.max(centerT+0.7, boundaryRawT-(0.2+0.45*severity));
-    for(let i=0;i<=160;i++){
-      const px=left+(right-left)*i/160;
+    // 加大近視有效光學區後表面的可視曲率：中心厚度不變，邊界厚度差拉大。
+    const edgeT=9.4;
+    const rawPower=1.52;
+    const boundaryNorm=optRadius/blankRadius;
+    const boundaryRawT=centerT+(edgeT-centerT)*Math.pow(boundaryNorm,rawPower);
+
+    // 原版的動態幅度：內徑越小，外圈越薄。
+    const thinEdgeT=Math.max(centerT+0.45,boundaryRawT-(1.0+3.4*severity));
+    const opticalShift=0.12+0.20*severity;
+    const thinBoundaryT=boundaryRawT-opticalShift;
+    const thinCenterT=centerT-opticalShift;
+
+    // 外徑反曲幅度也跟 severity 連動，維持原版「內徑越小變化越大」的視覺感。
+    const reverseAmp=0.35+0.95*severity;
+
+    for(let i=0;i<=180;i++){
+      const px=left+(right-left)*i/180;
       const dist=Math.abs(px-mid);
-      const norm=dist/(thinState.dia/2);
-      const distOpt=Math.max(0,dist-optRadius);
-      const outside=clamp(distOpt/outerBand,0,1);
-      const rawT = centerT + (edgeT-centerT)*Math.pow(norm,rawPower);
+      const norm=dist/blankRadius;
+      const outside=clamp((dist-optRadius)/outerBand,0,1);
+      const fY=frontY(norm);
+      const rawT=centerT+(edgeT-centerT)*Math.pow(norm,rawPower);
       let thinT;
+
       if(dist<=optRadius){
-        const zoneNorm=clamp(dist/(optRadius||1),0,1);
-        thinT = rawT - (0.08+0.18*severity)*Math.pow(zoneNorm,1.8);
+        // 有效光學區完全使用同一曲率家族：只整體平移，不改變曲率。
+        thinT=rawT-opticalShift;
       }else{
-        thinT = thinBoundaryT + (thinEdgeT-thinBoundaryT)*smooth(outside);
+        // 從有效區邊界才開始反曲：先向下弧，再回收到更薄的外緣。
+        const t=smooth(outside);
+        const base=mix(thinBoundaryT,thinEdgeT,t);
+        const reverse=reverseAmp*Math.sin(Math.PI*t)*Math.pow(1-t,0.30);
+        thinT=Math.max(centerT+0.55,base+reverse);
       }
-      topRaw.push([px,flatY]);
-      bottomRaw.push([px,flatY+rawT]);
-      topThin.push([px,flatY]);
-      bottomThin.push([px,flatY+thinT]);
+
+      topRaw.push([px,fY]);
+      bottomRaw.push([px,fY+rawT]);
+      topThin.push([px,fY]);
+      bottomThin.push([px,fY+thinT]);
     }
     legend1='灰虛線：未精修薄相對厚度';
-    legend2='藍實線：後表面外徑反曲修薄，內徑設越小邊緣越薄';
+    legend2='藍實線：光學區同曲率（曲率加強），外徑才反曲；內徑越小邊緣越薄';
+
   }else{
-    // 平凸概念：中心曲率固定，不隨內徑改變；外徑改為類似凹面反曲的修薄示意。
-    const flatY=y+31;
+    // 遠視：沿用原版 coreReduction / rawShapePower / reverseBumpAmp 的變化方式，
+    // 但把有效區內的後表面改成嚴格一致曲率，外徑才進入反曲。
     const edgeT=1.8;
     const rawCenterT=9.0;
-    const optRadius=thinState.opticalDia/2;
-    const coreReduction=0.55 + 2.5*severity;
     const rawShapePower=1.82;
-    const thinCenterT=Math.max(edgeT+1.1, rawCenterT-coreReduction);
-    const boundaryNorm=optRadius/(thinState.dia/2);
-    const boundaryRawT=edgeT + (rawCenterT-edgeT)*(1-Math.pow(boundaryNorm,rawShapePower));
-    const thinBoundaryT=Math.max(edgeT+0.95, boundaryRawT-coreReduction);
+    const boundaryNorm=optRadius/blankRadius;
+    const boundaryRawT=edgeT+(rawCenterT-edgeT)*(1-Math.pow(boundaryNorm,rawShapePower));
+
+    // 原版遠視的動態中心減薄量，保留下來。
+    const coreReduction=0.55+2.5*severity;
+    const thinCenterT=Math.max(edgeT+1.1,rawCenterT-coreReduction);
+    const thinBoundaryT=Math.max(edgeT+0.95,boundaryRawT-coreReduction);
     const edgeCarrierT=edgeT+0.55;
-    const reverseBumpAmp=0.75 + 0.85*severity; 
-    for(let i=0;i<=160;i++){
-      const px=left+(right-left)*i/160;
+    const reverseBumpAmp=0.75+0.85*severity;
+
+    for(let i=0;i<=180;i++){
+      const px=left+(right-left)*i/180;
       const dist=Math.abs(px-mid);
-      const norm=dist/(thinState.dia/2);
-      const distOpt=Math.max(0,dist-optRadius);
-      const outside=clamp(distOpt/outerBand,0,1);
-      const rawT = edgeT + (rawCenterT-edgeT)*(1-Math.pow(norm,rawShapePower));
+      const norm=dist/blankRadius;
+      const outside=clamp((dist-optRadius)/outerBand,0,1);
+      const fY=frontY(norm);
+      const rawT=edgeT+(rawCenterT-edgeT)*(1-Math.pow(norm,rawShapePower));
       let thinT;
+
       if(dist<=optRadius){
-        // 有效光學區內維持相同中心曲率，只整體平移變薄。
-        thinT = Math.max(edgeT+0.85, rawT-coreReduction);
+        // 有效光學區內以有效半徑重新正規化，確保無論內徑 45 / 53 / 60，
+        // 都是同一條連續弧形，不因 boundaryNorm 改變局部曲率。
+        const u=clamp(dist/(optRadius||1),0,1);
+        thinT=thinBoundaryT+(thinCenterT-thinBoundaryT)*(1-Math.pow(u,rawShapePower));
       }else{
-        // 外徑進入反曲帶：先快速變薄，再出現外徑上翹反曲，最後回收至邊緣載體厚度。
-        const t=outside;
-        const base = thinBoundaryT + (edgeCarrierT-thinBoundaryT)*smooth(t);
-        const reflex = reverseBumpAmp*Math.sin(Math.PI*t)*Math.pow(1-t,0.55);
-        // 周邊反曲改為向下凹：在外徑帶中段把前表面往下拉，再回收到邊緣載體厚度。
-        thinT = Math.max(edgeCarrierT, base - reflex);
+        // 只有外徑區才反曲；沿用原版 severity 變化幅度。
+        const t=smooth(outside);
+        const base=mix(thinBoundaryT,edgeCarrierT,t);
+        const reverse=reverseBumpAmp*Math.sin(Math.PI*t)*Math.pow(1-t,0.55);
+        thinT=Math.max(edgeCarrierT,base-reverse);
       }
-      topRaw.push([px,flatY-rawT]);
-      bottomRaw.push([px,flatY]);
-      topThin.push([px,flatY-thinT]);
-      bottomThin.push([px,flatY]);
+
+      topRaw.push([px,fY]);
+      bottomRaw.push([px,fY+rawT]);
+      topThin.push([px,fY]);
+      bottomThin.push([px,fY+thinT]);
     }
     legend1='灰虛線：未精修薄相對厚度';
-    legend2='藍實線：外徑反曲修薄，內徑設越小中心越薄';
+    legend2='藍實線：光學區一致弧度，外徑才反曲；內徑越小中心越薄';
   }
 
   const path=pts=>pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ');
@@ -1408,11 +1442,11 @@ function drawThinSection(svg,x,y,w,h){
   const infoX=118, infoY=y-2, infoW=90, infoH=23;
   g.appendChild(el('rect',{x:infoX,y:infoY,width:infoW,height:infoH,rx:2.5,class:'legendBox'}));
   addText(g,infoX+3,infoY+5.2,legend1,'note','start');
-  addText(g,infoX+3,infoY+10.4,legend2 + (thinState.rxType==='plus'?'':''),'note','start');
+  addText(g,infoX+3,infoY+10.4,legend2,'note','start');
   addText(g,infoX+3,infoY+15.6,'警示：無度數參考，非實際鏡片厚度，','note','start');
   addText(g,infoX+3,infoY+20.4,'僅近/遠視厚度變化概念教學。','note','start');
 
-  // 區域標籤，往下避開虛線
+  // 區域標籤
   const zoneLabelY=y+h-12.5;
   addText(g,(left+optLeft)/2,zoneLabelY,'精修薄 / 像差區','note');
   addText(g,(optLeft+optRight)/2,zoneLabelY,'有效光學區','note');
