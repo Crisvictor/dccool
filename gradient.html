@@ -140,7 +140,7 @@
         <h3>2. 尖邊／V 溝設定</h3>
         <p><b>精修薄加工勿直接套用「4:6 等比例／自動做／前表弧／後表弧」作為固定自動設定。</b></p>
         <p>改用指導模式，以<b>尖邊彎度（環槽弧）</b>確認尖邊曲線，再用<b>平移</b>確認 <b>V 溝（溝槽）</b>位置。</p>
-        <p><span class="teachTag">建議</span><b>全框模式掃描會有鏡框弧數據，尖邊彎度盡可能接近鏡框弧來調配減少兩者差值(±2) (不是直接按鏡框弧模式)</b>。</p>
+        <p><span class="teachTag">建議</span><b>全框模式掃描會有鏡框弧數據，尖邊彎度盡可能接近鏡框弧來調配減少兩者差值(±2) <br>(請勿未評估鏡片本身彎弧，直接按鏡框弧模式)</b>。</p>
       </div>
       <div class="teachSection">
         <h3>3. 裁型與鏡片吸盤</h3>
@@ -1058,7 +1058,7 @@ function updateThinWarnings(){
   const bigg=document.getElementById('biggOpticalWarn');
   const dia75=document.getElementById('dia75Warn');
   if(small) small.classList.toggle('hidden',thinState.opticalDia>32);
-  if(bigg) bigg.classList.toggle('hidden',thinState.dia-thinState.opticalDia>8);
+  if(bigg) bigg.classList.toggle('hidden',thinState.dia-thinState.opticalDia>10);
   if(dia75) dia75.classList.toggle('hidden',thinState.dia!==75);
 }
 function syncThinLimits(){
