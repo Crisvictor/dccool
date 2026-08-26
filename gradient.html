@@ -66,6 +66,7 @@
   .teachSection h3{font-size:15px;margin:0 0 6px;color:#173847}.teachSection p{margin:4px 0}
   .teachTag{display:inline-block;font-size:12px;font-weight:800;color:#0d6075;background:#eaf6f8;border-radius:999px;padding:2px 8px;margin-right:5px}
   .inlineWarn{font-size:12px;color:#994b00;line-height:1.55;margin-top:8px;background:#fff8e8;border:1px solid #f1d49d;border-radius:10px;padding:9px 10px}
+  .infoHint{font-size:12px;color:#315d70;line-height:1.55;margin-top:8px;background:#eef8fc;border:1px solid #b8dbe8;border-radius:10px;padding:9px 10px}
   .sub{color:var(--muted);font-size:14px;line-height:1.5;margin-top:6px}
   main{display:grid;grid-template-columns:330px 1fr;gap:18px;padding:18px;align-items:start}
   .controls{background:var(--panel);border:1px solid #dde8ec;border-radius:18px;padding:18px;box-shadow:var(--shadow);position:sticky;top:12px}
@@ -91,6 +92,7 @@
   .cross{stroke:var(--accent);stroke-width:1.2;stroke-linecap:round}
   .multiCross{stroke:#d6cc35;stroke-width:.75;stroke-linecap:round}
   .multiLine{stroke:#d6cc35;stroke-width:.5;fill:none}
+  .multiTickText{font-size:2.0px;fill:#d6cc35;font-weight:700}
   .circleLine{stroke:var(--line);stroke-width:.45;fill:none}
   .centerLine{stroke:#9fb1b9;stroke-width:.25;stroke-dasharray:1.5 1.2}
   .ocLine{stroke:#d33;stroke-width:.28;stroke-dasharray:1.2 1.2}
@@ -108,7 +110,8 @@
   .lockedInput{background:#eef3f5!important;color:#697982!important;opacity:.8}
   .hidden{display:none!important}
   @media(max-width:900px){main{grid-template-columns:1fr}.controls{position:relative;top:auto}.canvas{transform:none;width:100%;min-width:760px}}
-  @media print{body{background:#fff}header,.controls,.toolbar,.modalOverlay{display:none!important}.stageWrap{box-shadow:none;border:0;padding:0}.canvas{border:0;padding:0;transform:none}.pageBreak{break-after:page}}
+  @page{size:A4 portrait;margin:6mm 5mm}
+  @media print{html,body{width:auto!important;margin:0!important;padding:0!important;background:#fff}header,.controls,.toolbar,.modalOverlay{display:none!important}main{display:block!important;padding:0!important;margin:0!important}.stageWrap{box-shadow:none!important;border:0!important;padding:0!important;margin:0!important;width:100%!important;overflow:visible!important}.canvas{border:0!important;padding:0!important;margin:0!important;transform:none!important;width:195mm!important;min-width:0!important;min-height:0!important;overflow:visible!important}.canvas svg{width:195mm!important;height:auto!important;max-width:none!important;transform:translateX(-3mm)}.pageBreak{break-after:page}}
 </style>
 </head>
 <body>
@@ -130,6 +133,13 @@
     </div>
     <div class="modalBody">
       <p class="modalLead">此頁為精修薄加工布達與機台設定提醒；實際仍需依鏡片條件、機台狀態與現場 SOP 判斷。</p>
+      <div class="teachSection">
+        <h3>精修薄製作條件</h3>
+        <p><b>折射率：</b>僅限 1.61／1.67／1.74；其中 <b>1.74 僅限 S -15.25D 起</b>。</p>
+        <p><b>建議光度：</b>近視 -6.00D、遠視 +4.00D 起。</p>
+        <p><b>交期：</b>生產約 5 個工作天；急件請先確認交期。</p>
+        <div class="inlineWarn" style="margin-top:8px"><b>1.74 特別注意：</b>1.74 僅限近視 S -15.25D（含）以上才可下單；未達 -15.25D 僅供 1.67。<br><b>1.74 美薄收費：</b>1.74 價格＋超光 2200＋美薄 1000。</div>
+      </div>
       <div class="teachSection">
         <h3>1. 研磨定位</h3>
         <p><span class="teachTag">建議</span><b>使用光學中心模式研磨（主動模式）</b>。</p>
@@ -271,7 +281,7 @@
         <div class="hint">紅色十字為光學中心。正值示意往右移心；需要反向時可按下方按鈕。</div>
         <div class="chips" style="margin-top:10px;grid-template-columns:repeat(2,1fr)"><button class="chip active" id="dirR" type="button">往右</button><button class="chip" id="dirL" type="button">往左</button></div>
         <label class="toggleRow"><input id="multifocalMode" type="checkbox">開啟多焦模式標記</label>
-        <div class="hint">開啟後會以目前光學中心為基準，往上 4mm 顯示配鏡十字，並加上遠區圓形標記，方便推算染色高度。</div>
+        <div class="hint">開啟後以鏡片幾何中心為基準，往上 4 mm 顯示配鏡十字與圓形圈，方便推算染色高度。</div>
       </div>
       <div class="group">
         <label>片徑顯示</label>
@@ -294,10 +304,16 @@
         <div class="hint" id="opticalDiaHint">可設定範圍：30Φ～65Φ。</div>
         <div class="inlineWarn hidden" id="smallOpticalWarn"><b>加工提醒：</b>加工時鏡片後夾具可能夾不牢固，尤其是被動(框心模式)製作。<br>有效光學內徑越小，越需要確認夾具接觸區與加工穩定性。</div>
         <div class="inlineWarn hidden" id="biggOpticalWarn"><b>內徑提醒：</b>內徑較大使鏡片厚度減薄較少，可能導致精修薄區裁型後較不明顯</div>
+        <div class="infoHint hidden" id="progressiveOpticalWarn"><b>多焦內徑提醒：</b><span id="progressiveWarnText"></span><br>請放大有效光學內徑，避免下方光心／近用區受到修薄區影響。</div>
         <div class="warnHint">警示：片坯圓心為光學中心。有效光學內徑越小，外圍精修薄區越大；近視邊緣更薄，遠視中心更薄。但精修薄區-鏡片表面曲率改變、已非原處方光度，該區像差與模糊區也會同步增加。</div>
       </div>
       <div class="group">
-        <div class="thinPanelTitle">鏡框參數比對</div>
+        <label>3. 多焦模式</label>
+        <label class="toggleRow"><input id="thinMultifocalMode" type="checkbox">開啟多焦模式標記</label>
+        <div class="hint">開啟後以鏡片幾何中心為基準，往上 4 mm 顯示配鏡十字與圓形圈。內徑設定須留意累進與近用區位置</div>
+      </div>
+      <div class="group">
+        <div class="thinPanelTitle">4. 鏡框參數比對</div>
         <label class="toggleRow"><input id="showFrameOutline" type="checkbox">開啟鏡框參數比對功能</label>
         <div id="frameInputWrap" class="hidden" style="margin-top:10px">
           <div style="margin-bottom:10px">
@@ -390,7 +406,20 @@ depthSelect.value = state.depth;
 depthSelect.onchange=e=>{state.depth=+e.target.value;draw()};
 document.getElementById('zone').oninput=e=>{state.zone=+e.target.value;document.getElementById('zoneVal').textContent=state.zone;draw()};
 document.getElementById('decenter').oninput=e=>{state.decenter=+e.target.value;document.getElementById('decenterVal').textContent=state.decenter;draw()};
-document.getElementById('multifocalMode').onchange=e=>{state.multifocal=e.target.checked;draw()};
+document.getElementById('multifocalMode').onchange=e=>{
+  state.multifocal=e.target.checked;
+  const thinMulti=document.getElementById('thinMultifocalMode');
+  if(thinMulti) thinMulti.checked=state.multifocal;
+  updateThinWarnings();
+  draw();
+};
+document.getElementById('thinMultifocalMode').onchange=e=>{
+  state.multifocal=e.target.checked;
+  const dyeMulti=document.getElementById('multifocalMode');
+  if(dyeMulti) dyeMulti.checked=state.multifocal;
+  updateThinWarnings();
+  draw();
+};
 document.getElementById('scale').oninput=e=>{state.scale=+e.target.value;document.documentElement.style.setProperty('--scale',state.scale);document.getElementById('scaleVal').textContent=Math.round(state.scale*100)};
 sel.onchange=e=>{
   state.color=colors[+e.target.value];
@@ -826,7 +855,18 @@ freeSvg.addEventListener('pointercancel',endFreeDrag);
 
 function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
 function el(name, attrs={}){const n=document.createElementNS('http://www.w3.org/2000/svg',name);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));return n}
-function addText(g,x,y,t,cls='lensText',anchor='middle'){const n=el('text',{x,y,class:cls,'text-anchor':anchor});n.textContent=t;g.appendChild(n);return n}
+function addText(g,x,y,t,cls='lensText',anchor='middle'){
+  const n=el('text',{x,y,class:cls,'text-anchor':anchor});
+  const lines=String(t).split(/<br\s*\/?\s*>/i);
+  const lineHeight=cls==='note'?4.6:(cls==='mmLabel'?5.2:5);
+  lines.forEach((line,i)=>{
+    const span=el('tspan',{x,dy:i===0?0:lineHeight});
+    span.textContent=line;
+    n.appendChild(span);
+  });
+  g.appendChild(n);
+  return n;
+}
 
 function lensGradient(id, d){
   const grad=el('linearGradient',{id, x1:'0%', y1:'0%', x2:'0%', y2:'100%'});
@@ -900,18 +940,66 @@ function drawLens(svg, x,y,d){
   const ox=x+state.dir*state.decenter, oy=y;
   g.appendChild(el('line',{x1:ox-2.2,y1:oy,x2:ox+2.2,y2:oy,class:'cross'}));
   g.appendChild(el('line',{x1:ox,y1:oy-2.2,x2:ox,y2:oy+2.2,class:'cross'}));
-  if(state.multifocal) drawMultifocalMark(g, ox, oy);
+  if(state.multifocal) drawMultifocalMark(g, x, y);
   if(state.decenter>0){g.appendChild(el('line',{x1:x,y1:y+5,x2:ox,y2:y+5,class:'ocLine'})); addText(g,(x+ox)/2,y+9,`${state.decenter} mm`,'note')}
   addText(g,x-d*.24,y+1,`${d}Φ`,'lensText');
   addText(g,x,y+d/2+5,`${state.color.name.split(' ')[0]}｜深度 ${state.depth}%｜染色 ${state.zone}成｜OC ${state.dir>0?'R':'L'}${state.decenter}mm`,'note');
 }
-function drawMultifocalMark(g, ox, oy){
-  const fx = ox, fy = oy - 4, farY = fy - 5;
+function drawMultifocalMark(g, gx, gy){
+  // ===== 多焦標記位置參數：之後要微調，主要改這一區即可 =====
+  const fittingCrossY = gy - 4;       // 原配鏡十字：幾何中心上方 4 mm
+  const topCircleOffsetY = -5;       // 原上方圓圈相對配鏡十字位置
+  const topCircleRadius = 5;
+
+  const engraveOffsetX = 17;         // 幾何中心左右各 16 mm 的永久標記小圓
+  const engraveRadius = 1;           // 小圓半徑 r=1
+
+  const ovalOffsetX = 3.5;          // 左右長方橢圓中心距幾何中心的水平距離
+  const ovalTopOffsetY = 5;          // 長方橢圓從幾何中心下方 5 mm 開始
+  const ovalWidth = 5;               // 寬 5 mm
+  const ovalHeight = 11;             // 長 11 mm
+  const ovalRadius = 2.5;            // 圓角，2.5 會接近長方橢圓
+
+  const tickValues = [7,9,11,13];    // 刻度：幾何中心下方 7 / 9 / 11 / 13 mm
+  const tickLength = 2.4;            // 刻度線往外延伸長度
+  const tickLabelGap = 1.2;          // 數字與刻度線間距
+
+  // 原本的配鏡十字 + 上方圓圈
+  const fx=gx, fy=fittingCrossY;
+  g.appendChild(el('circle',{cx:fx,cy:fy+topCircleOffsetY,r:topCircleRadius,class:'multiLine'}));
   g.appendChild(el('line',{x1:fx-3,y1:fy,x2:fx-1.2,y2:fy,class:'multiCross'}));
   g.appendChild(el('line',{x1:fx+1.2,y1:fy,x2:fx+3,y2:fy,class:'multiCross'}));
-  g.appendChild(el('line',{x1:fx,y1:fy-2,x2:fx,y2:fy+1,class:'multiCross'}));
-  g.appendChild(el('circle',{cx:fx,cy:farY,r:5,class:'multiLine'}));
+  g.appendChild(el('line',{x1:fx,y1:fy-2,x2:fx,y2:fy+2,class:'multiCross'}));
   g.appendChild(el('circle',{cx:fx,cy:fy,r:.7,fill:'#d6cc35',stroke:'none'}));
+
+  // 1. 幾何中心水平左右各 17 mm：小圓 r=1
+  g.appendChild(el('circle',{cx:gx-engraveOffsetX,cy:gy,r:engraveRadius,class:'multiLine'}));
+  g.appendChild(el('circle',{cx:gx+engraveOffsetX,cy:gy,r:engraveRadius,class:'multiLine'}));
+
+  // 2. 幾何中心下方兩側：11 x 5 mm 長方橢圓
+  const ovalY = gy + ovalTopOffsetY;
+  const leftCx = gx - ovalOffsetX;
+  const rightCx = gx + ovalOffsetX;
+  const leftX = leftCx - ovalWidth/2;
+  const rightX = rightCx - ovalWidth/2;
+
+  g.appendChild(el('rect',{x:leftX,y:ovalY,width:ovalWidth,height:ovalHeight,rx:ovalRadius,ry:ovalRadius,class:'multiLine'}));
+  g.appendChild(el('rect',{x:rightX,y:ovalY,width:ovalWidth,height:ovalHeight,rx:ovalRadius,ry:ovalRadius,class:'multiLine'}));
+
+  // 橢圓外側刻度：距幾何中心下方 7 / 9 / 11 / 13 mm
+  const leftOuterX = leftX;
+  const rightOuterX = rightX + ovalWidth;
+  tickValues.forEach(v=>{
+    const ty = gy + v;
+
+    // 左側橢圓：刻度往左、數字放更外側
+    g.appendChild(el('line',{x1:leftOuterX,y1:ty,x2:leftOuterX-tickLength,y2:ty,class:'multiLine'}));
+    addText(g,leftOuterX-tickLength-tickLabelGap,ty+0.9,String(v),'multiTickText','end');
+
+    // 右側橢圓：刻度往右、數字放更外側
+    g.appendChild(el('line',{x1:rightOuterX,y1:ty,x2:rightOuterX+tickLength,y2:ty,class:'multiLine'}));
+    addText(g,rightOuterX+tickLength+tickLabelGap,ty+0.9,String(v),'multiTickText','start');
+  });
 }
 function drawRuler(svg){
   const x=12,y=200;
@@ -1057,9 +1145,28 @@ function updateThinWarnings(){
   const small=document.getElementById('smallOpticalWarn');
   const bigg=document.getElementById('biggOpticalWarn');
   const dia75=document.getElementById('dia75Warn');
+  const prog=document.getElementById('progressiveOpticalWarn');
+  const progText=document.getElementById('progressiveWarnText');
+
   if(small) small.classList.toggle('hidden',thinState.opticalDia>32);
-  if(bigg) bigg.classList.toggle('hidden',thinState.dia-thinState.opticalDia>10);
+
+  // 單側精修帶小於 5 mm 時，提示精修效果可能不明顯。
+  const thinWidth=(thinState.dia-thinState.opticalDia)/2;
+  if(bigg) bigg.classList.toggle('hidden',thinWidth>=5);
+
   if(dia75) dia75.classList.toggle('hidden',thinState.dia!==75);
+
+  // 不需選擇累進通道；依目前有效光學內徑自動提示多焦最低內徑。
+  let progLabel='', minDia=0;
+  if(thinState.opticalDia<32){ progLabel='累進低於 7'; minDia=32; }
+  else if(thinState.opticalDia<36){ progLabel='累進低於 9'; minDia=36; }
+  else if(thinState.opticalDia<40){ progLabel='累進低於 11'; minDia=40; }
+  else if(thinState.opticalDia<44){ progLabel='累進低於 13'; minDia=44; }
+  const tooSmall=minDia>0;
+  if(prog) prog.classList.toggle('hidden',!(state.multifocal && tooSmall));
+  if(progText && tooSmall){
+    progText.textContent=`${progLabel} 的有效光學內徑不得小於 ${minDia}Φ；目前為 ${thinState.opticalDia}Φ。`;
+  }
 }
 function syncThinLimits(){
   const slider=document.getElementById('opticalDia');
@@ -1273,9 +1380,10 @@ function drawThinTop(svg){
   g.appendChild(el('circle',{cx,cy,r,fill:'#b8d6df','fill-opacity':'.09',mask:'url(#outerMask)'}));
   if(thinState.showFrame) drawFrameOutline(g,cx,cy);
   drawOpticalCenter(g,cx,cy);
+  if(state.multifocal) drawMultifocalMark(g,cx,cy);
   addText(g,cx,cy-r-4,`${thinState.dia}Φ 片坯`,'note');
   addText(g,cx,cy-or-3,`有效光學內徑 ${thinState.opticalDia}Φ`,'note');
-  addText(g,cx,cy+r+6,`${thinState.showFrame?'淡虛線：框型比對｜':''}藍十字：固定光學中心｜虛線圓：有效光學區`,'note');
+  addText(g,cx,cy+r+6,`${thinState.showFrame?'淡虛線：框型比對｜':''}藍十字：固定光學中心｜虛線圓：有效光學區${state.multifocal?'｜配鏡十字：幾何中心上方 4 mm':''}`,'note');
 
   const box=el('rect',{x:132,y:20,width:76,height:54,rx:2,class:'legendBox'});svg.appendChild(box);
   addText(svg,136,28,'網格判讀','mmLabel','start');
@@ -1377,7 +1485,7 @@ function drawThinSection(svg,x,y,w,h){
       bottomThin.push([px,fY+thinT]);
     }
     legend1='灰虛線：未精修薄相對厚度';
-    legend2='藍實線：光學區同曲率（曲率加強），外徑才反曲；內徑越小邊緣越薄';
+    legend2='藍實線：光學區同曲率，外徑反曲修薄；<br>內徑越小邊緣越薄  ';
 
   }else{
     // 遠視：沿用原版 coreReduction / rawShapePower / reverseBumpAmp 的變化方式，
@@ -1423,7 +1531,7 @@ function drawThinSection(svg,x,y,w,h){
       bottomThin.push([px,fY+thinT]);
     }
     legend1='灰虛線：未精修薄相對厚度';
-    legend2='藍實線：光學區一致弧度，外徑才反曲；內徑越小中心越薄';
+    legend2='藍實線：光學區同曲率，外徑反曲修薄；<br>內徑越小中心越薄  ';
   }
 
   const path=pts=>pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ');
@@ -1439,12 +1547,12 @@ function drawThinSection(svg,x,y,w,h){
   [optLeft,optRight].forEach(px=>g.appendChild(el('line',{x1:px,y1:y+3,x2:px,y2:markerBottom,stroke:'#0d6075','stroke-width':'.35','stroke-dasharray':'1.2 1'})));
 
   // 右上說明欄
-  const infoX=118, infoY=y-2, infoW=90, infoH=23;
+  const infoX=118, infoY=y-2, infoW=90, infoH=28;
   g.appendChild(el('rect',{x:infoX,y:infoY,width:infoW,height:infoH,rx:2.5,class:'legendBox'}));
   addText(g,infoX+3,infoY+5.2,legend1,'note','start');
-  addText(g,infoX+3,infoY+10.4,legend2,'note','start');
-  addText(g,infoX+3,infoY+15.6,'警示：無度數參考，非實際鏡片厚度，','note','start');
-  addText(g,infoX+3,infoY+20.4,'僅近/遠視厚度變化概念教學。','note','start');
+  addText(g,infoX+3,infoY+10.0,legend2,'note','start');
+  addText(g,infoX+3,infoY+20.0,'警示：無度數參考，非實際鏡片厚度，','note','start');
+  addText(g,infoX+3,infoY+24.8,'僅近/遠視厚度變化概念教學。','note','start');
 
   // 區域標籤
   const zoneLabelY=y+h-12.5;
@@ -1493,7 +1601,7 @@ function draw(){
     drawThinTop(svg);
     const maxD=frameMaxDistanceFromOC();
     const rec=maxD==null?null:clamp(Math.round(maxD*2-10),30,thinState.dia-5);
-    document.getElementById('summary').textContent=`精修薄：${thinState.dia}Φ 片坯｜有效光學內徑 ${thinState.opticalDia}Φ｜框型比對 ${thinState.showFrame?'開':'關'}${thinState.showFrame?`｜ED ${Number(thinState.ed).toFixed(1)} mm｜瞳高 ${thinState.ph} mm｜建議內徑約 ${rec}Φ｜${thinState.rxType==='minus'?'近視':'遠視'}剖面`:''}`;
+    document.getElementById('summary').textContent=`精修薄：${thinState.dia}Φ 片坯｜有效光學內徑 ${thinState.opticalDia}Φ｜多焦標記 ${state.multifocal?'開':'關'}｜框型比對 ${thinState.showFrame?'開':'關'}${thinState.showFrame?`｜ED ${Number(thinState.ed).toFixed(1)} mm｜瞳高 ${thinState.ph} mm｜建議內徑約 ${rec}Φ｜${thinState.rxType==='minus'?'近視':'遠視'}剖面`:''}`;
   }else{
     drawDye(svg);
   }
