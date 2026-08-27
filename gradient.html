@@ -15,7 +15,8 @@
     --line:#0d4052;
     --accent:#d40000;
     --shadow:0 10px 30px rgba(15,55,70,.12);
-    --scale:1;
+    --scale:.98;
+    --device-scale:1;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;background:var(--bg);color:#162b36;}
@@ -83,7 +84,7 @@
   .stageWrap{background:var(--panel);border:1px solid #dde8ec;border-radius:18px;padding:18px;box-shadow:var(--shadow);overflow:auto}
   .toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px;color:var(--muted);font-size:13px;flex-wrap:wrap}
   .printBtn{border:0;border-radius:10px;background:#0d4052;color:white;padding:10px 14px;font-weight:700;cursor:pointer}
-  .canvas{transform:scale(var(--scale));transform-origin:top left;width:max-content;min-height:760px;padding:12px 22px 22px;background:#fff;border-radius:12px;border:1px dashed #cbd8de;}
+  .canvas{transform:scale(calc(var(--scale) * var(--device-scale)));transform-origin:top left;width:max-content;min-height:760px;padding:12px 22px 22px;background:#fff;border-radius:12px;border:1px dashed #cbd8de;}
   svg{display:block;overflow:visible}
   .lensText{font-size:4.6px;fill:#9aa3a7;font-weight:700}
   .note{font-size:3.6px;fill:#66757e}
@@ -109,7 +110,13 @@
   .freeGuide{stroke:#8fb5c2;stroke-width:.22;stroke-dasharray:1 1;opacity:.65}
   .lockedInput{background:#eef3f5!important;color:#697982!important;opacity:.8}
   .hidden{display:none!important}
-  @media(max-width:900px){main{grid-template-columns:1fr}.controls{position:relative;top:auto}.canvas{transform:none;width:100%;min-width:760px}}
+  @media(max-width:900px){
+    :root{--device-scale:1.67}
+    main{grid-template-columns:1fr}
+    .controls{position:relative;top:auto}
+    .stageWrap{overflow:auto;-webkit-overflow-scrolling:touch}
+    .canvas{width:max-content;min-width:760px;transform-origin:top left}
+  }
   @page{size:A4 portrait;margin:6mm 5mm}
   @media print{html,body{width:auto!important;margin:0!important;padding:0!important;background:#fff}header,.controls,.toolbar,.modalOverlay{display:none!important}main{display:block!important;padding:0!important;margin:0!important}.stageWrap{box-shadow:none!important;border:0!important;padding:0!important;margin:0!important;width:100%!important;overflow:visible!important}.canvas{border:0!important;padding:0!important;margin:0!important;transform:none!important;width:195mm!important;min-width:0!important;min-height:0!important;overflow:visible!important}.canvas svg{width:195mm!important;height:auto!important;max-width:none!important;transform:translateX(-3mm)}.pageBreak{break-after:page}}
 </style>
@@ -281,7 +288,7 @@
         <div class="hint">紅色十字為光學中心。正值示意往右移心；需要反向時可按下方按鈕。</div>
         <div class="chips" style="margin-top:10px;grid-template-columns:repeat(2,1fr)"><button class="chip active" id="dirR" type="button">往右</button><button class="chip" id="dirL" type="button">往左</button></div>
         <label class="toggleRow"><input id="multifocalMode" type="checkbox">開啟多焦模式標記</label>
-        <div class="hint">開啟後以鏡片幾何中心為基準，往上 4 mm 顯示配鏡十字與圓形圈，方便推算染色高度。</div>
+        <div class="hint">開啟後多焦標記會跟隨光學中心移心，往上 4 mm 顯示配鏡十字與圓形圈，方便推算染色高度。</div>
       </div>
       <div class="group">
         <label>片徑顯示</label>
@@ -353,7 +360,7 @@
     <div class="group">
       <label>畫面校正</label>
       <div class="row"><input id="scale" type="range" min="0.75" max="1.35" step="0.01" value="1"><div class="val"><span id="scaleVal">100</span>%</div></div>
-      <div class="hint">螢幕 1:1 會受作業系統縮放與螢幕 DPI 影響。列印或投影前可用下方 50 mm 尺校正。</div>
+      <div class="hint">螢幕 1:1 會受作業系統縮放與螢幕 DPI 影響。100% 已套用一般顯示器 98% 基準；手機另有行動裝置補正。仍請以下方 50 mm 尺校正。</div>
     </div>
   </aside>
 
@@ -383,6 +390,13 @@ const diaList = [60,65,70,75];
 const thinDiaList = [...Array.from({length:21},(_,i)=>50+i),75];
 let appMode = 'dye';
 let state = {color: colors[12], zone:2, depth:20, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
+const DISPLAY_BASE_SCALE = 0.98; // 一般顯示器實測：舊版 98% 視為新的 100%
+function applyDisplayScale(){
+  document.documentElement.style.setProperty('--scale', state.scale * DISPLAY_BASE_SCALE);
+  const v=document.getElementById('scaleVal');
+  if(v) v.textContent=Math.round(state.scale*100);
+}
+
 let thinState = {dia:70, opticalDia:45, frameA:53, frameB:38, ed:58.1, dbl:18, pd:64, ph:22, showFrame:false, rxType:'minus', eye:'R', shapePreset:'free', freeLeft:[-22,-25,-26.5,-26.5,-25,-22], freeRight:[22,25,26.5,26.5,25,22]};
 const KANTE_RANGE_DATA=[{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":0,"度數上限(絕對值)":8.75,"片徑":75,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":9,"度數上限(絕對值)":10,"片徑":70,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":10.25,"度數上限(絕對值)":10.25,"片徑":69,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":10.5,"度數上限(絕對值)":10.5,"片徑":68,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":10.75,"度數上限(絕對值)":10.75,"片徑":66,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":11,"度數上限(絕對值)":11,"片徑":65,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":11.25,"度數上限(絕對值)":11.25,"片徑":64,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":11.5,"度數上限(絕對值)":11.5,"片徑":62,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":11.75,"度數上限(絕對值)":11.75,"片徑":61,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":12,"度數上限(絕對值)":12,"片徑":60,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":0,"度數上限(絕對值)":8.75,"片徑":75,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":9,"度數上限(絕對值)":12,"片徑":70,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":12.25,"度數上限(絕對值)":12.25,"片徑":68,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":12.5,"度數上限(絕對值)":12.5,"片徑":67,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":12.75,"度數上限(絕對值)":12.75,"片徑":66,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":13,"度數上限(絕對值)":13,"片徑":65,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":13.25,"度數上限(絕對值)":40,"片徑":"超出範圍","備註":"建議精修薄型/超光度"},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":0,"度數上限(絕對值)":8.75,"片徑":75,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":9,"度數上限(絕對值)":13,"片徑":70,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":13.25,"度數上限(絕對值)":13.25,"片徑":68,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":13.5,"度數上限(絕對值)":13.5,"片徑":67,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":13.75,"度數上限(絕對值)":13.75,"片徑":66,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":14,"度數上限(絕對值)":14,"片徑":65,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":14.25,"度數上限(絕對值)":14.25,"片徑":65,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":14.5,"度數上限(絕對值)":14.5,"片徑":64,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":14.75,"度數上限(絕對值)":14.75,"片徑":63,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":15,"度數上限(絕對值)":15,"片徑":63,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":15.25,"度數上限(絕對值)":40,"片徑":"超出範圍","備註":"建議精修薄型/超光度"},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":0,"度數上限(絕對值)":15,"片徑":70,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":15.25,"度數上限(絕對值)":15.25,"片徑":68,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":15.5,"度數上限(絕對值)":15.5,"片徑":67,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":15.75,"度數上限(絕對值)":15.75,"片徑":66,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":16,"度數上限(絕對值)":16,"片徑":65,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":16.25,"度數上限(絕對值)":16.25,"片徑":64,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":16.5,"度數上限(絕對值)":16.5,"片徑":63,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":16.75,"度數上限(絕對值)":16.75,"片徑":62,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":17,"度數上限(絕對值)":17,"片徑":61,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":17.25,"度數上限(絕對值)":17.25,"片徑":60,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":17.5,"度數上限(絕對值)":17.5,"片徑":59,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":17.75,"度數上限(絕對值)":17.75,"片徑":58,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":18,"度數上限(絕對值)":18,"片徑":57,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":18.25,"度數上限(絕對值)":18.25,"片徑":56,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":18.5,"度數上限(絕對值)":18.5,"片徑":55,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":18.75,"度數上限(絕對值)":18.75,"片徑":54,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":19,"度數上限(絕對值)":19,"片徑":53,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":19.25,"度數上限(絕對值)":19.25,"片徑":52,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":19.5,"度數上限(絕對值)":19.5,"片徑":51,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":19.75,"度數上限(絕對值)":19.75,"片徑":50,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":20,"度數上限(絕對值)":20,"片徑":50,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":20.25,"度數上限(絕對值)":40,"片徑":"超出範圍","備註":"建議精修薄型/超光度"},{"光度類型":"遠視","折射率":"1.56(無美薄)","片種":"UV400&420","度數下限(絕對值)":0.25,"度數上限(絕對值)":6,"片徑":75,"備註":null},{"光度類型":"遠視","折射率":"1.56(無美薄)","片種":"UV400&420","度數下限(絕對值)":6.25,"度數上限(絕對值)":10,"片徑":70,"備註":null},{"光度類型":"遠視","折射率":"1.56(無美薄)","片種":"變色防藍光(灰)","度數下限(絕對值)":0.25,"度數上限(絕對值)":6,"片徑":75,"備註":null},{"光度類型":"遠視","折射率":"1.56(無美薄)","片種":"變色防藍光(灰)","度數下限(絕對值)":6.25,"度數上限(絕對值)":8,"片徑":70,"備註":null},{"光度類型":"遠視","折射率":"1.61","片種":"UV400&420","度數下限(絕對值)":0.25,"度數上限(絕對值)":6,"片徑":75,"備註":null},{"光度類型":"遠視","折射率":"1.61","片種":"UV400&420","度數下限(絕對值)":6.25,"度數上限(絕對值)":10,"片徑":70,"備註":null},{"光度類型":"遠視","折射率":"1.61","片種":"UV400&420","度數下限(絕對值)":10.25,"度數上限(絕對值)":14,"片徑":65,"備註":null},{"光度類型":"遠視","折射率":"1.61","片種":"UV400&420","度數下限(絕對值)":14.25,"度數上限(絕對值)":30,"片徑":"超出範圍","備註":"必須精修薄型/超光度"},{"光度類型":"遠視","折射率":"1.61","片種":"變色防藍光(灰)","度數下限(絕對值)":0.25,"度數上限(絕對值)":5,"片徑":75,"備註":null},{"光度類型":"遠視","折射率":"1.61","片種":"變色防藍光(灰)","度數下限(絕對值)":5.25,"度數上限(絕對值)":10,"片徑":70,"備註":null},{"光度類型":"遠視","折射率":"1.61","片種":"變色防藍光(灰)","度數下限(絕對值)":10.25,"度數上限(絕對值)":30,"片徑":"超出範圍","備註":"必須精修薄型/超光度"},{"光度類型":"遠視","折射率":"1.67","片種":"UV400&420","度數下限(絕對值)":0.25,"度數上限(絕對值)":6,"片徑":75,"備註":null},{"光度類型":"遠視","折射率":"1.67","片種":"UV400&420","度數下限(絕對值)":6.25,"度數上限(絕對值)":12,"片徑":70,"備註":null},{"光度類型":"遠視","折射率":"1.67","片種":"UV400&420","度數下限(絕對值)":12.25,"度數上限(絕對值)":14,"片徑":65,"備註":null},{"光度類型":"遠視","折射率":"1.67","片種":"UV400&420","度數下限(絕對值)":14.25,"度數上限(絕對值)":30,"片徑":"超出範圍","備註":"必須精修薄型/超光度"},{"光度類型":"遠視","折射率":"1.67","片種":"變色防藍光(灰)","度數下限(絕對值)":0.25,"度數上限(絕對值)":5,"片徑":75,"備註":null},{"光度類型":"遠視","折射率":"1.67","片種":"變色防藍光(灰)","度數下限(絕對值)":5.25,"度數上限(絕對值)":9,"片徑":70,"備註":null},{"光度類型":"遠視","折射率":"1.67","片種":"變色防藍光(灰)","度數下限(絕對值)":9.25,"度數上限(絕對值)":10,"片徑":65,"備註":null},{"光度類型":"遠視","折射率":"1.67","片種":"變色防藍光(灰)","度數下限(絕對值)":10.25,"度數上限(絕對值)":30,"片徑":"超出範圍","備註":"必須精修薄型/超光度"}];
 let kanteState={type:'近視',index:'1.67',lens:'全部片種'};
@@ -420,7 +434,8 @@ document.getElementById('thinMultifocalMode').onchange=e=>{
   updateThinWarnings();
   draw();
 };
-document.getElementById('scale').oninput=e=>{state.scale=+e.target.value;document.documentElement.style.setProperty('--scale',state.scale);document.getElementById('scaleVal').textContent=Math.round(state.scale*100)};
+document.getElementById('scale').oninput=e=>{state.scale=+e.target.value;applyDisplayScale()};
+applyDisplayScale();
 sel.onchange=e=>{
   state.color=colors[+e.target.value];
   state.depth=state.color.dir==='bottom'?20:50;
@@ -940,7 +955,7 @@ function drawLens(svg, x,y,d){
   const ox=x+state.dir*state.decenter, oy=y;
   g.appendChild(el('line',{x1:ox-2.2,y1:oy,x2:ox+2.2,y2:oy,class:'cross'}));
   g.appendChild(el('line',{x1:ox,y1:oy-2.2,x2:ox,y2:oy+2.2,class:'cross'}));
-  if(state.multifocal) drawMultifocalMark(g, x, y);
+  if(state.multifocal) drawMultifocalMark(g, ox, oy);
   if(state.decenter>0){g.appendChild(el('line',{x1:x,y1:y+5,x2:ox,y2:y+5,class:'ocLine'})); addText(g,(x+ox)/2,y+9,`${state.decenter} mm`,'note')}
   addText(g,x-d*.24,y+1,`${d}Φ`,'lensText');
   addText(g,x,y+d/2+5,`${state.color.name.split(' ')[0]}｜深度 ${state.depth}%｜染色 ${state.zone}成｜OC ${state.dir>0?'R':'L'}${state.decenter}mm`,'note');
@@ -951,7 +966,7 @@ function drawMultifocalMark(g, gx, gy){
   const topCircleOffsetY = -5;       // 原上方圓圈相對配鏡十字位置
   const topCircleRadius = 5;
 
-  const engraveOffsetX = 17;         // 幾何中心左右各 16 mm 的永久標記小圓
+  const engraveOffsetX = 18;         // 左右小圓再各向外推 1 mm
   const engraveRadius = 1;           // 小圓半徑 r=1
 
   const ovalOffsetX = 3.5;          // 左右長方橢圓中心距幾何中心的水平距離
@@ -972,9 +987,13 @@ function drawMultifocalMark(g, gx, gy){
   g.appendChild(el('line',{x1:fx,y1:fy-2,x2:fx,y2:fy+2,class:'multiCross'}));
   g.appendChild(el('circle',{cx:fx,cy:fy,r:.7,fill:'#d6cc35',stroke:'none'}));
 
-  // 1. 幾何中心水平左右各 17 mm：小圓 r=1
-  g.appendChild(el('circle',{cx:gx-engraveOffsetX,cy:gy,r:engraveRadius,class:'multiLine'}));
-  g.appendChild(el('circle',{cx:gx+engraveOffsetX,cy:gy,r:engraveRadius,class:'multiLine'}));
+  // 1. 幾何中心水平兩側：小圓外推 1 mm，並在各自外側增加 2 mm 水平線
+  const leftEngraveX=gx-engraveOffsetX;
+  const rightEngraveX=gx+engraveOffsetX;
+  g.appendChild(el('circle',{cx:leftEngraveX,cy:gy,r:engraveRadius,class:'multiLine'}));
+  g.appendChild(el('circle',{cx:rightEngraveX,cy:gy,r:engraveRadius,class:'multiLine'}));
+  g.appendChild(el('line',{x1:leftEngraveX-engraveRadius-4,y1:gy,x2:leftEngraveX-engraveRadius-2,y2:gy,class:'multiLine'}));
+  g.appendChild(el('line',{x1:rightEngraveX+engraveRadius+2,y1:gy,x2:rightEngraveX+engraveRadius+4,y2:gy,class:'multiLine'}));
 
   // 2. 幾何中心下方兩側：11 x 5 mm 長方橢圓
   const ovalY = gy + ovalTopOffsetY;
