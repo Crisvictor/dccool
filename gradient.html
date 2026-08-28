@@ -1411,7 +1411,7 @@ function drawThinTop(svg){
   addText(svg,136,49,`精修薄寬度：約 ${(thinState.dia-thinState.opticalDia)/2} mm / 側`,'note','start');
   if(thinState.showFrame){
     const maxD=frameMaxDistanceFromOC();
-    const rec=clamp(Math.round(maxD*2-10),30,thinState.dia-5);
+    const rec=clamp(Math.round(maxD*0.7*2),30,thinState.dia-5);
     addText(svg,136,56,`框型 ${shapePresetName(thinState.shapePreset)}｜${thinState.eye==='R'?'右眼':'左眼'}`,'note','start');
     addText(svg,136,63,`A ${Number(thinState.frameA).toFixed(1)} / B ${thinState.frameB} / ED ${Number(thinState.ed).toFixed(1)}｜最遠邊 ${maxD.toFixed(1)} mm`,'note','start');
     addText(svg,136,70,`DBL ${thinState.dbl} / PD ${thinState.pd} / 瞳高 ${thinState.ph}｜建議內徑 ${rec}Φ`,'note','start');
@@ -1619,7 +1619,7 @@ function draw(){
   if(appMode==='thin'){
     drawThinTop(svg);
     const maxD=frameMaxDistanceFromOC();
-    const rec=maxD==null?null:clamp(Math.round(maxD*2-10),30,thinState.dia-5);
+    const rec=maxD==null?null:clamp(Math.round(maxD*0.7*2),30,thinState.dia-5);
     document.getElementById('summary').textContent=`精修薄：${thinState.dia}Φ 片坯｜有效光學內徑 ${thinState.opticalDia}Φ｜多焦標記 ${state.multifocal?'開':'關'}｜框型比對 ${thinState.showFrame?'開':'關'}${thinState.showFrame?`｜ED ${Number(thinState.ed).toFixed(1)} mm｜瞳高 ${thinState.ph} mm｜建議內徑約 ${rec}Φ｜${thinState.rxType==='minus'?'近視':'遠視'}剖面`:''}`;
   }else{
     drawDye(svg);
