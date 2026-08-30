@@ -84,7 +84,7 @@
   .stageWrap{background:var(--panel);border:1px solid #dde8ec;border-radius:18px;padding:18px;box-shadow:var(--shadow);overflow:auto}
   .toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px;color:var(--muted);font-size:13px;flex-wrap:wrap}
   .printBtn{border:0;border-radius:10px;background:#0d4052;color:white;padding:10px 14px;font-weight:700;cursor:pointer}
-  .canvas{transform:scale(calc(var(--scale) * var(--device-scale)));transform-origin:top left;width:max-content;min-height:760px;padding:12px 22px 22px;background:#fff;border-radius:12px;border:1px dashed #cbd8de;}
+  .canvas{transform:scale(calc(var(--scale) * var(--device-scale)));transform-origin:top left;width:max-content;min-height:914px;padding:12px 22px 22px;background:#fff;border-radius:12px;border:1px dashed #cbd8de;}
   svg{display:block;overflow:visible}
   .lensText{font-size:4.6px;fill:#9aa3a7;font-weight:700}
   .note{font-size:3.6px;fill:#66757e}
@@ -268,27 +268,27 @@
       <div class="group">
         <label for="colorSelect">1. 漸層顏色</label>
         <select id="colorSelect"></select>
-        <div class="hint">腮紅系列 預設為「下染色、上透明」；其他顏色為「上染色、下透明」。</div>
+        <div class="hint">腮紅系列 預設為「下染色、上透明」；<br>其他顏色為「上染色、下透明」。</div>
       </div>
       <div class="group">
         <label for="depthSelect">2. 染色深度</label>
         <select id="depthSelect">
           <option value="10">10%</option><option value="20">20%</option><option value="30">30%</option><option value="40">40%</option><option value="50">50%</option><option value="60">60%</option><option value="70">70%</option><option value="80">80%</option><option value="90">90%</option>
         </select>
-        <div class="hint">腮紅系列 預設 20%；其他色系預設 50%。數值越高，鏡片染色呈現越深。</div>
+        <div class="hint">腮紅系列 預設 20%；其他色系預設 50%。<br>數值越高，鏡片染色呈現越深。</div>
       </div>
       <div class="group">
         <label>3. 使用者設定染色區</label>
         <div class="row"><input id="zone" type="range" min="1" max="9" step="1" value="2"><div class="val"><span id="zoneVal">2</span>成</div></div>
-        <div class="hint">腮紅系列預設 2 成；其他色系預設 5 成。</div>
+        <div class="hint">腮紅系列預設 2 成(20%)；其他色系預設 5 成(50%)。</div>
       </div>
       <div class="group">
         <label>4. 光學中心移心</label>
         <div class="row"><input id="decenter" type="range" min="0" max="5" step="0.5" value="0"><div class="val"><span id="decenterVal">0</span> mm</div></div>
-        <div class="hint">紅色十字為光學中心。正值示意往右移心；需要反向時可按下方按鈕。</div>
+        <div class="hint">紅色十字為光學中心。正值示意往右移心；<br>需要反向時可按下方按鈕。</div>
         <div class="chips" style="margin-top:10px;grid-template-columns:repeat(2,1fr)"><button class="chip active" id="dirR" type="button">往右</button><button class="chip" id="dirL" type="button">往左</button></div>
         <label class="toggleRow"><input id="multifocalMode" type="checkbox">開啟多焦模式標記</label>
-        <div class="hint">開啟後多焦標記會跟隨光學中心移心，往上 4 mm 顯示配鏡十字與圓形圈，方便推算染色高度。</div>
+        <div class="hint">開啟後顯示多焦配鏡十字與近用區，<br>方便推算染色高度。</div>
       </div>
       <div class="group">
         <label>片徑顯示</label>
@@ -301,13 +301,13 @@
       <div class="group">
         <label for="thinDiaSelect">1. 片徑選擇</label>
         <select id="thinDiaSelect" class="thinSelect"></select>
-        <div class="hint">可選 50Φ～70Φ（每 1 mm）及 75Φ。片坯外圈以實際 mm 比例顯示，建議先用下方 50 mm 校正尺確認螢幕比例。</div>
+        <div class="hint">可選 50Φ～70Φ（每 1 mm）及 75Φ。<br>※建議先用下方 50 mm 校正尺確認螢幕比例。</div>
         <div class="inlineWarn hidden" id="dia75Warn"><b>75Φ 片徑提醒：</b>系統最大可選片徑為 75Φ；部分高光度處方實際可供片徑可能僅至 70Φ。若個別案例直徑不足，依廠商實際製作條件另行提醒。</div>
       </div>
       <div class="group">
         <label>2. 有效光學內徑</label>
         <div class="row"><input id="opticalDia" type="range" min="30" max="65" step="1" value="45"><div class="val"><span id="opticalDiaVal">45</span> Φ</div></div>
-        <div class="hint">將鏡框眼位比對光學中心，比對裁型後留下適當的精修區外徑。</div>
+        <div class="hint">將鏡框眼位比對光學中心，<br>比對裁型後留下適當的精修區外徑。</div>
         <div class="hint" id="opticalDiaHint">可設定範圍：30Φ～65Φ。</div>
         <div class="inlineWarn hidden" id="smallOpticalWarn"><b>加工提醒：</b>加工時鏡片後夾具可能夾不牢固，尤其是被動(框心模式)製作。<br>有效光學內徑越小，越需要確認夾具接觸區與加工穩定性。</div>
         <div class="inlineWarn hidden" id="biggOpticalWarn"><b>內徑提醒：</b>內徑較大使鏡片厚度減薄較少，可能導致精修薄區裁型後較不明顯</div>
@@ -315,12 +315,17 @@
         <div class="warnHint">警示：片坯圓心為光學中心。有效光學內徑越小，外圍精修薄區越大；近視邊緣更薄，遠視中心更薄。但精修薄區-鏡片表面曲率改變、已非原處方光度，該區像差與模糊區也會同步增加。</div>
       </div>
       <div class="group">
-        <label>3. 多焦模式</label>
+        <label>3. 頂點距離與有效視野</label>
+        <div class="row"><input id="vertexDistance" type="range" min="6" max="20" step="0.5" value="12"><div class="val"><span id="vertexDistanceVal">12</span> mm</div></div>
+        <div class="hint">頂點距離以鏡片後表面中央頂點至角膜頂點估算。<br>有效光學視野角度會依目前有效光學內徑同步演算。</div>
+      </div>
+      <div class="group">
+        <label>4. 多焦模式</label>
         <label class="toggleRow"><input id="thinMultifocalMode" type="checkbox">開啟多焦模式標記</label>
         <div class="hint">開啟後以鏡片幾何中心為基準，往上 4 mm 顯示配鏡十字與圓形圈。內徑設定須留意累進與近用區位置</div>
       </div>
       <div class="group">
-        <div class="thinPanelTitle">4. 鏡框參數比對</div>
+        <div class="thinPanelTitle">5. 鏡框參數比對</div>
         <label class="toggleRow"><input id="showFrameOutline" type="checkbox">開啟鏡框參數比對功能</label>
         <div id="frameInputWrap" class="hidden" style="margin-top:10px">
           <div style="margin-bottom:10px">
@@ -360,13 +365,13 @@
     <div class="group">
       <label>畫面校正</label>
       <div class="row"><input id="scale" type="range" min="0.75" max="1.35" step="0.01" value="1"><div class="val"><span id="scaleVal">100</span>%</div></div>
-      <div class="hint">螢幕 1:1 會受作業系統縮放與螢幕 DPI 影響。100% 已套用一般顯示器 98% 基準；手機另有行動裝置補正。仍請以下方 50 mm 尺校正。</div>
+      <div class="hint">螢幕 1:1 會受作業系統縮放與螢幕 DPI 影響。<br>請以下方 50 mm 尺校正。</div>
     </div>
   </aside>
 
   <section class="stageWrap">
     <div class="toolbar"><span id="summary">目前設定</span><button class="printBtn" onclick="window.print()">列印 / 轉 PDF</button></div>
-    <div class="canvas"><svg id="svg" width="820" height="760" viewBox="0 0 220 205" xmlns="http://www.w3.org/2000/svg"></svg></div>
+    <div class="canvas"><svg id="svg" width="820" height="914" viewBox="0 0 220 245" xmlns="http://www.w3.org/2000/svg"></svg></div>
   </section>
 </main>
 <script>
@@ -397,7 +402,7 @@ function applyDisplayScale(){
   if(v) v.textContent=Math.round(state.scale*100);
 }
 
-let thinState = {dia:70, opticalDia:45, frameA:53, frameB:38, ed:58.1, dbl:18, pd:64, ph:22, showFrame:false, rxType:'minus', eye:'R', shapePreset:'free', freeLeft:[-22,-25,-26.5,-26.5,-25,-22], freeRight:[22,25,26.5,26.5,25,22]};
+let thinState = {dia:70, opticalDia:45, vertexDistance:12, frameA:53, frameB:38, ed:58.1, dbl:18, pd:64, ph:22, showFrame:false, rxType:'minus', eye:'R', shapePreset:'free', freeLeft:[-22,-25,-26.5,-26.5,-25,-22], freeRight:[22,25,26.5,26.5,25,22]};
 const KANTE_RANGE_DATA=[{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":0,"度數上限(絕對值)":8.75,"片徑":75,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":9,"度數上限(絕對值)":10,"片徑":70,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":10.25,"度數上限(絕對值)":10.25,"片徑":69,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":10.5,"度數上限(絕對值)":10.5,"片徑":68,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":10.75,"度數上限(絕對值)":10.75,"片徑":66,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":11,"度數上限(絕對值)":11,"片徑":65,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":11.25,"度數上限(絕對值)":11.25,"片徑":64,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":11.5,"度數上限(絕對值)":11.5,"片徑":62,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":11.75,"度數上限(絕對值)":11.75,"片徑":61,"備註":null},{"光度類型":"近視","折射率":"1.56","片種":"全部片種","度數下限(絕對值)":12,"度數上限(絕對值)":12,"片徑":60,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":0,"度數上限(絕對值)":8.75,"片徑":75,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":9,"度數上限(絕對值)":12,"片徑":70,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":12.25,"度數上限(絕對值)":12.25,"片徑":68,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":12.5,"度數上限(絕對值)":12.5,"片徑":67,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":12.75,"度數上限(絕對值)":12.75,"片徑":66,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":13,"度數上限(絕對值)":13,"片徑":65,"備註":null},{"光度類型":"近視","折射率":"1.61","片種":"全部片種","度數下限(絕對值)":13.25,"度數上限(絕對值)":40,"片徑":"超出範圍","備註":"建議精修薄型/超光度"},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":0,"度數上限(絕對值)":8.75,"片徑":75,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":9,"度數上限(絕對值)":13,"片徑":70,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":13.25,"度數上限(絕對值)":13.25,"片徑":68,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":13.5,"度數上限(絕對值)":13.5,"片徑":67,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":13.75,"度數上限(絕對值)":13.75,"片徑":66,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":14,"度數上限(絕對值)":14,"片徑":65,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":14.25,"度數上限(絕對值)":14.25,"片徑":65,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":14.5,"度數上限(絕對值)":14.5,"片徑":64,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":14.75,"度數上限(絕對值)":14.75,"片徑":63,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":15,"度數上限(絕對值)":15,"片徑":63,"備註":null},{"光度類型":"近視","折射率":"1.67","片種":"全部片種","度數下限(絕對值)":15.25,"度數上限(絕對值)":40,"片徑":"超出範圍","備註":"建議精修薄型/超光度"},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":0,"度數上限(絕對值)":15,"片徑":70,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":15.25,"度數上限(絕對值)":15.25,"片徑":68,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":15.5,"度數上限(絕對值)":15.5,"片徑":67,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":15.75,"度數上限(絕對值)":15.75,"片徑":66,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":16,"度數上限(絕對值)":16,"片徑":65,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":16.25,"度數上限(絕對值)":16.25,"片徑":64,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":16.5,"度數上限(絕對值)":16.5,"片徑":63,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":16.75,"度數上限(絕對值)":16.75,"片徑":62,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":17,"度數上限(絕對值)":17,"片徑":61,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":17.25,"度數上限(絕對值)":17.25,"片徑":60,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":17.5,"度數上限(絕對值)":17.5,"片徑":59,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":17.75,"度數上限(絕對值)":17.75,"片徑":58,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":18,"度數上限(絕對值)":18,"片徑":57,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":18.25,"度數上限(絕對值)":18.25,"片徑":56,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":18.5,"度數上限(絕對值)":18.5,"片徑":55,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":18.75,"度數上限(絕對值)":18.75,"片徑":54,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":19,"度數上限(絕對值)":19,"片徑":53,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":19.25,"度數上限(絕對值)":19.25,"片徑":52,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":19.5,"度數上限(絕對值)":19.5,"片徑":51,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":19.75,"度數上限(絕對值)":19.75,"片徑":50,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":20,"度數上限(絕對值)":20,"片徑":50,"備註":null},{"光度類型":"近視","折射率":"1.74","片種":"全部片種","度數下限(絕對值)":20.25,"度數上限(絕對值)":40,"片徑":"超出範圍","備註":"建議精修薄型/超光度"},{"光度類型":"遠視","折射率":"1.56(無美薄)","片種":"UV400&420","度數下限(絕對值)":0.25,"度數上限(絕對值)":6,"片徑":75,"備註":null},{"光度類型":"遠視","折射率":"1.56(無美薄)","片種":"UV400&420","度數下限(絕對值)":6.25,"度數上限(絕對值)":10,"片徑":70,"備註":null},{"光度類型":"遠視","折射率":"1.56(無美薄)","片種":"變色防藍光(灰)","度數下限(絕對值)":0.25,"度數上限(絕對值)":6,"片徑":75,"備註":null},{"光度類型":"遠視","折射率":"1.56(無美薄)","片種":"變色防藍光(灰)","度數下限(絕對值)":6.25,"度數上限(絕對值)":8,"片徑":70,"備註":null},{"光度類型":"遠視","折射率":"1.61","片種":"UV400&420","度數下限(絕對值)":0.25,"度數上限(絕對值)":6,"片徑":75,"備註":null},{"光度類型":"遠視","折射率":"1.61","片種":"UV400&420","度數下限(絕對值)":6.25,"度數上限(絕對值)":10,"片徑":70,"備註":null},{"光度類型":"遠視","折射率":"1.61","片種":"UV400&420","度數下限(絕對值)":10.25,"度數上限(絕對值)":14,"片徑":65,"備註":null},{"光度類型":"遠視","折射率":"1.61","片種":"UV400&420","度數下限(絕對值)":14.25,"度數上限(絕對值)":30,"片徑":"超出範圍","備註":"必須精修薄型/超光度"},{"光度類型":"遠視","折射率":"1.61","片種":"變色防藍光(灰)","度數下限(絕對值)":0.25,"度數上限(絕對值)":5,"片徑":75,"備註":null},{"光度類型":"遠視","折射率":"1.61","片種":"變色防藍光(灰)","度數下限(絕對值)":5.25,"度數上限(絕對值)":10,"片徑":70,"備註":null},{"光度類型":"遠視","折射率":"1.61","片種":"變色防藍光(灰)","度數下限(絕對值)":10.25,"度數上限(絕對值)":30,"片徑":"超出範圍","備註":"必須精修薄型/超光度"},{"光度類型":"遠視","折射率":"1.67","片種":"UV400&420","度數下限(絕對值)":0.25,"度數上限(絕對值)":6,"片徑":75,"備註":null},{"光度類型":"遠視","折射率":"1.67","片種":"UV400&420","度數下限(絕對值)":6.25,"度數上限(絕對值)":12,"片徑":70,"備註":null},{"光度類型":"遠視","折射率":"1.67","片種":"UV400&420","度數下限(絕對值)":12.25,"度數上限(絕對值)":14,"片徑":65,"備註":null},{"光度類型":"遠視","折射率":"1.67","片種":"UV400&420","度數下限(絕對值)":14.25,"度數上限(絕對值)":30,"片徑":"超出範圍","備註":"必須精修薄型/超光度"},{"光度類型":"遠視","折射率":"1.67","片種":"變色防藍光(灰)","度數下限(絕對值)":0.25,"度數上限(絕對值)":5,"片徑":75,"備註":null},{"光度類型":"遠視","折射率":"1.67","片種":"變色防藍光(灰)","度數下限(絕對值)":5.25,"度數上限(絕對值)":9,"片徑":70,"備註":null},{"光度類型":"遠視","折射率":"1.67","片種":"變色防藍光(灰)","度數下限(絕對值)":9.25,"度數上限(絕對值)":10,"片徑":65,"備註":null},{"光度類型":"遠視","折射率":"1.67","片種":"變色防藍光(灰)","度數下限(絕對值)":10.25,"度數上限(絕對值)":30,"片徑":"超出範圍","備註":"必須精修薄型/超光度"}];
 let kanteState={type:'近視',index:'1.67',lens:'全部片種'};
 const WEIXING_RANGE_DATA=[{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.56(球面)","光度下限":-12.75,"光度上限":0.0,"片徑顯示":"70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.56(球面)","光度下限":-13.75,"光度上限":-12.76,"片徑顯示":"65mm","片徑數字":65.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.56(球面)","光度下限":-18.0,"光度上限":-13.76,"片徑顯示":"50~60mm","片徑數字":60.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.56(球面)","光度下限":0.01,"光度上限":7.5,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.61(非球面)","光度下限":-13.75,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.61(非球面)","光度下限":-14.75,"光度上限":-13.76,"片徑顯示":"65mm","片徑數字":65.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.61(非球面)","光度下限":-19.0,"光度上限":-14.76,"片徑顯示":"50~60mm","片徑數字":60.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.61(非球面)","光度下限":0.01,"光度上限":9.0,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.61(球面)","光度下限":-13.75,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.61(球面)","光度下限":-14.75,"光度上限":-13.76,"片徑顯示":"65mm","片徑數字":65.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.61(球面)","光度下限":-19.0,"光度上限":-14.76,"片徑顯示":"50~60mm","片徑數字":60.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.61(球面)","光度下限":0.01,"光度上限":9.0,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.67(非球面)","光度下限":-14.75,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.67(非球面)","光度下限":-15.75,"光度上限":-14.76,"片徑顯示":"65mm","片徑數字":65.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.67(非球面)","光度下限":-20.0,"光度上限":-15.76,"片徑顯示":"50~60mm","片徑數字":60.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.67(非球面)","光度下限":0.01,"光度上限":9.0,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.67(球面)","光度下限":-14.75,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.67(球面)","光度下限":-15.75,"光度上限":-14.76,"片徑顯示":"65mm","片徑數字":65.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.67(球面)","光度下限":-20.0,"光度上限":-15.76,"片徑顯示":"50~60mm","片徑數字":60.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.67(球面)","光度下限":0.01,"光度上限":9.0,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.74(非球面)","光度下限":-6.0,"光度上限":-4.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.74(非球面)","光度下限":-12.0,"光度上限":-6.25,"片徑顯示":"70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"變色防藍光 / WS10","折射率/設計":"1.74(非球面)","光度下限":-15.0,"光度上限":-12.5,"片徑顯示":"70mm","片徑數字":70.0,"備註":"散光0"},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.56(球面)","光度下限":-12.75,"光度上限":0.0,"片徑顯示":"70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.56(球面)","光度下限":-13.75,"光度上限":-12.76,"片徑顯示":"65mm","片徑數字":65.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.56(球面)","光度下限":-18.0,"光度上限":-13.76,"片徑顯示":"50~60mm","片徑數字":60.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.56(球面)","光度下限":0.01,"光度上限":12.0,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.56(非球面)","光度下限":-12.75,"光度上限":0.0,"片徑顯示":"70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.56(非球面)","光度下限":-13.75,"光度上限":-12.76,"片徑顯示":"65mm","片徑數字":65.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.56(非球面)","光度下限":-18.0,"光度上限":-13.76,"片徑顯示":"50~60mm","片徑數字":60.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.56(非球面)","光度下限":0.01,"光度上限":10.0,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.61(球面)","光度下限":-13.75,"光度上限":0.0,"片徑顯示":"70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.61(球面)","光度下限":-14.75,"光度上限":-13.76,"片徑顯示":"65mm","片徑數字":65.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.61(球面)","光度下限":-19.0,"光度上限":-14.76,"片徑顯示":"50~60mm","片徑數字":60.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.61(球面)","光度下限":0.01,"光度上限":10.0,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.61(非球面)","光度下限":-13.75,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.61(非球面)","光度下限":-14.75,"光度上限":-13.76,"片徑顯示":"65mm","片徑數字":65.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.61(非球面)","光度下限":-19.0,"光度上限":-14.76,"片徑顯示":"50~60mm","片徑數字":60.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.61(非球面)","光度下限":0.01,"光度上限":10.0,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.67(球面)","光度下限":-14.75,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.67(球面)","光度下限":-15.75,"光度上限":-14.76,"片徑顯示":"65mm","片徑數字":65.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.67(球面)","光度下限":-20.0,"光度上限":-15.76,"片徑顯示":"50~60mm","片徑數字":60.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.67(球面)","光度下限":0.01,"光度上限":13.0,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.67(非球面)","光度下限":-14.75,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.67(非球面)","光度下限":-15.75,"光度上限":-14.76,"片徑顯示":"65mm","片徑數字":65.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.67(非球面)","光度下限":-20.0,"光度上限":-15.76,"片徑顯示":"50~60mm","片徑數字":60.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.67(非球面)","光度下限":0.01,"光度上限":10.0,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.74(非球面)","光度下限":-6.0,"光度上限":-1.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"單焦點","片種":"防藍光&雙抗","折射率/設計":"1.74(非球面)","光度下限":-15.0,"光度上限":-6.25,"片徑顯示":"70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"偏光樹脂","折射率/設計":"1.50(球面) / (茶/灰/綠)","光度下限":-10.0,"光度上限":0.0,"片徑顯示":"50~75mm","片徑數字":75.0,"備註":""},{"訂片類型":"單焦點","片種":"偏光樹脂","折射率/設計":"1.50(球面) / (茶/灰/綠)","光度下限":0.01,"光度上限":6.75,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"單焦點","片種":"偏光樹脂","折射率/設計":"1.61(球面) / (茶/灰/綠)","光度下限":-12.0,"光度上限":0.0,"片徑顯示":"50~75mm","片徑數字":75.0,"備註":""},{"訂片類型":"單焦點","片種":"偏光樹脂","折射率/設計":"1.61(球面) / (茶/灰/綠)","光度下限":0.01,"光度上限":5.0,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"多焦點","片種":"防藍光&雙抗","折射率/設計":"1.56(非球面)","光度下限":-12.0,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"防藍光&雙抗","折射率/設計":"1.56(非球面)","光度下限":0.01,"光度上限":7.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"防藍光&雙抗","折射率/設計":"1.61(非球面)","光度下限":-12.0,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"防藍光&雙抗","折射率/設計":"1.61(非球面)","光度下限":0.01,"光度上限":9.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"防藍光&雙抗","折射率/設計":"1.67(非球面)","光度下限":-14.0,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"防藍光&雙抗","折射率/設計":"1.67(非球面)","光度下限":0.01,"光度上限":9.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"變色","折射率/設計":"1.56(非球面)","光度下限":-12.0,"光度上限":0.0,"片徑顯示":"70mm","片徑數字":70.0,"備註":""},{"訂片類型":"多焦點","片種":"變色","折射率/設計":"1.56(非球面)","光度下限":0.01,"光度上限":7.5,"片徑顯示":"70mm","片徑數字":70.0,"備註":""},{"訂片類型":"多焦點","片種":"變色","折射率/設計":"1.61(非球面)","光度下限":-12.0,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"變色","折射率/設計":"1.61(非球面)","光度下限":0.01,"光度上限":9.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"變色","折射率/設計":"1.67(非球面)","光度下限":-14.0,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"變色","折射率/設計":"1.67(非球面)","光度下限":0.01,"光度上限":9.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"變色防藍光","折射率/設計":"1.56(非球面)","光度下限":-12.0,"光度上限":0.0,"片徑顯示":"70mm","片徑數字":70.0,"備註":""},{"訂片類型":"多焦點","片種":"變色防藍光","折射率/設計":"1.56(非球面)","光度下限":0.01,"光度上限":7.5,"片徑顯示":"70mm","片徑數字":70.0,"備註":""},{"訂片類型":"多焦點","片種":"變色防藍光","折射率/設計":"1.61(非球面)","光度下限":-12.0,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"變色防藍光","折射率/設計":"1.61(非球面)","光度下限":0.01,"光度上限":9.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"變色防藍光","折射率/設計":"1.67(非球面)","光度下限":-14.0,"光度上限":0.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"變色防藍光","折射率/設計":"1.67(非球面)","光度下限":0.01,"光度上限":9.0,"片徑顯示":"75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"偏光樹脂","折射率/設計":"1.50(球面) / (茶/灰/綠)","光度下限":-10.0,"光度上限":0.0,"片徑顯示":"50~75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"偏光樹脂","折射率/設計":"1.50(球面) / (茶/灰/綠)","光度下限":0.01,"光度上限":6.75,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""},{"訂片類型":"多焦點","片種":"偏光樹脂","折射率/設計":"1.61(球面) / (茶/灰/綠)","光度下限":-12.0,"光度上限":0.0,"片徑顯示":"50~75mm","片徑數字":75.0,"備註":""},{"訂片類型":"多焦點","片種":"偏光樹脂","折射率/設計":"1.61(球面) / (茶/灰/綠)","光度下限":0.01,"光度上限":5.0,"片徑顯示":"遠視70mm","片徑數字":70.0,"備註":""}];
@@ -449,6 +454,11 @@ document.getElementById('dirR').onclick=()=>{state.dir=1;dirR.classList.add('act
 document.getElementById('dirL').onclick=()=>{state.dir=-1;dirL.classList.add('active');dirR.classList.remove('active');draw()};
 
 document.getElementById('opticalDia').oninput=e=>{thinState.opticalDia=+e.target.value;document.getElementById('opticalDiaVal').textContent=thinState.opticalDia;updateThinWarnings();draw()};
+document.getElementById('vertexDistance').oninput=e=>{
+  thinState.vertexDistance=clamp(+e.target.value||12,6,20);
+  document.getElementById('vertexDistanceVal').textContent=Number(thinState.vertexDistance).toFixed(1).replace(/\.0$/,'');
+  draw();
+};
 document.getElementById('showFrameOutline').onchange=e=>{
   thinState.showFrame=e.target.checked;
   document.getElementById('frameInputWrap').classList.toggle('hidden',!thinState.showFrame);
@@ -1021,7 +1031,7 @@ function drawMultifocalMark(g, gx, gy){
   });
 }
 function drawRuler(svg){
-  const x=12,y=200;
+  const x=12,y=239;
   svg.appendChild(el('line',{x1:x,y1:y,x2:x+50,y2:y,class:'ruler'}));
   for(let i=0;i<=50;i+=5){svg.appendChild(el('line',{x1:x+i,y1:y,x2:x+i,y2:y-(i%10===0?3:2),class:'ruler'}));}
   addText(svg,x+25,y-5,'50 mm 校正尺','rulerText');
@@ -1402,7 +1412,7 @@ function drawThinTop(svg){
   if(state.multifocal) drawMultifocalMark(g,cx,cy);
   addText(g,cx,cy-r-4,`${thinState.dia}Φ 片坯`,'note');
   addText(g,cx,cy-or-3,`有效光學內徑 ${thinState.opticalDia}Φ`,'note');
-  addText(g,cx,cy+r+6,`${thinState.showFrame?'淡虛線：框型比對｜':''}藍十字：固定光學中心｜虛線圓：有效光學區${state.multifocal?'｜配鏡十字：幾何中心上方 4 mm':''}`,'note');
+  addText(g,cx,cy-r-11,`${thinState.showFrame?'淡虛線：框型比對｜':''}藍十字：固定光學中心｜虛線圓：有效光學區${state.multifocal?'｜配鏡十字：幾何中心上方 4 mm':''}`,'note');
 
   const box=el('rect',{x:132,y:20,width:76,height:54,rx:2,class:'legendBox'});svg.appendChild(box);
   addText(svg,136,28,'網格判讀','mmLabel','start');
@@ -1420,7 +1430,7 @@ function drawThinTop(svg){
     addText(svg,136,63,'開啟後可輸入鏡框尺寸參數','note','start');
     addText(svg,136,70,'並估算框形建議內徑','note','start');
   }
-  drawThinSection(svg,20,124,188,56);
+  drawThinSection(svg,20,124,188,86);
   drawRuler(svg);
 }
 function drawRxToggle(g,x,y){
@@ -1432,9 +1442,16 @@ function drawRxToggle(g,x,y){
     g.appendChild(el('text',{x:bx+8.5,y:y+4.5,'text-anchor':'middle',class:'note',fill:active?'#ffffff':'#0d6075','font-weight':'700','pointer-events':'none'})).textContent=label;
   });
 }
+const EYE_ROTATION_DEPTH = 13.5; // 角膜頂點至眼球旋轉中心的教學估算距離（mm）
+function effectiveOpticalFieldAngle(){
+  const vd=Math.max(0.1,Number(thinState.vertexDistance)||12);
+  const radius=Math.max(0.1,Number(thinState.opticalDia)/2);
+  // 以眼球旋轉中心觀察有效光學內徑的全角；不納入鏡片度數、稜鏡與斜向像差。
+  return 2*Math.atan(radius/(vd+EYE_ROTATION_DEPTH))*180/Math.PI;
+}
 function drawThinSection(svg,x,y,w,h){
   const g=el('g'); svg.appendChild(g);
-  addText(g,x,y-7,'鏡片剖面概念圖（相對厚度示意）','mmLabel','start');
+  addText(g,x+32,y-4,'鏡片剖面概念圖（相對厚度示意）','mmLabel','start');
   drawRxToggle(g,x+122,y-12);
 
   // 剖面圖本體中心對齊上方片坯圓心（cx = 78）
@@ -1451,8 +1468,16 @@ function drawThinSection(svg,x,y,w,h){
   const optRadius=thinState.opticalDia/2;
   const blankRadius=thinState.dia/2;
 
+  // 剖面圖上方標示區：尺寸 → 區域名稱 → 固定光學中心 → 鏡片。
+  // 之後若要微調整體上下位置，優先調這幾個常數。
+  const outerDimY=y+0.5;          // 片徑尺寸線
+  const innerDimY=y+6.5;          // 有效光學內徑尺寸線
+  const zoneLabelY=y+16.2;        // 精修薄 / 有效光學區標籤
+  const fixedCenterLabelY=y+22.0; // 「固定光學中心」文字
+  const sectionVerticalShift=16.5;// 鏡片剖面本體整體下移量
+
   // 前表面只做固定的輕微正弧；近/遠視皆不受有效內徑影響。
-  const frontBaseY=y+14.4;
+  const frontBaseY=y+14.4+sectionVerticalShift;
   const frontAmp=2.0;
   const frontPower=1.82;
   const frontY=norm=>frontBaseY-frontAmp*(1-Math.pow(norm,frontPower));
@@ -1561,36 +1586,72 @@ function drawThinSection(svg,x,y,w,h){
   g.appendChild(el('path',{d:path(topThin),fill:'none',stroke:'#0d6075','stroke-width':'.75'}));
   g.appendChild(el('path',{d:path(bottomThin),fill:'none',stroke:'#0d6075','stroke-width':'.75'}));
 
-  const markerBottom=y+h-18;
-  g.appendChild(el('line',{x1:mid,y1:y+2,x2:mid,y2:markerBottom,stroke:'#0d6075','stroke-width':'.45'}));
-  [optLeft,optRight].forEach(px=>g.appendChild(el('line',{x1:px,y1:y+3,x2:px,y2:markerBottom,stroke:'#0d6075','stroke-width':'.35','stroke-dasharray':'1.2 1'})));
+  const markerBottom=y+24+sectionVerticalShift;
+  // 固定光學中心與有效光學區邊界導引線，從上方標籤區往鏡片延伸。
+  g.appendChild(el('line',{x1:mid,y1:fixedCenterLabelY+1.8,x2:mid,y2:markerBottom,stroke:'#0d6075','stroke-width':'.45'}));
+  [optLeft,optRight].forEach(px=>g.appendChild(el('line',{x1:px,y1:zoneLabelY+1.8,x2:px,y2:markerBottom,stroke:'#0d6075','stroke-width':'.35','stroke-dasharray':'1.2 1'})));
+
+  // 模擬眼球與有效視野角度：頂點距離為鏡片後表面中央頂點至角膜頂點。
+  const fieldAngle=effectiveOpticalFieldAngle();
+  const centerBackY=bottomThin[Math.floor(bottomThin.length/2)][1];
+  const vd=Number(thinState.vertexDistance)||12;
+  const cornealY=centerBackY+vd;
+  const globeCenterY=cornealY+11.2;
+  const rotationY=cornealY+EYE_ROTATION_DEPTH;
+  const idxL=Math.max(0,Math.min(180,Math.round((optLeft-left)/(right-left)*180)));
+  const idxR=Math.max(0,Math.min(180,Math.round((optRight-left)/(right-left)*180)));
+  const rayLY=bottomThin[idxL][1], rayRY=bottomThin[idxR][1];
+
+  // 鏡片後表面中心至眼球旋轉中心的視軸參考線。
+  g.appendChild(el('line',{x1:mid,y1:centerBackY,x2:mid,y2:rotationY+2.5,stroke:'#9fb1b9','stroke-width':'.28','stroke-dasharray':'1.2 1','stroke-opacity':'.72'}));
+
+  // 有效光學區邊界至眼球旋轉中心的視線。
+  g.appendChild(el('line',{x1:mid,y1:rotationY,x2:optLeft,y2:rayLY,stroke:'#70aebe','stroke-width':'.42','stroke-dasharray':'1.4 1','stroke-opacity':'.82'}));
+  g.appendChild(el('line',{x1:mid,y1:rotationY,x2:optRight,y2:rayRY,stroke:'#70aebe','stroke-width':'.42','stroke-dasharray':'1.4 1','stroke-opacity':'.82'}));
+
+  // 眼球輪廓、角膜、虹膜與旋轉中心。
+  g.appendChild(el('ellipse',{cx:mid,cy:globeCenterY,rx:11.5,ry:9.6,fill:'#eef7fa','fill-opacity':'.72',stroke:'#7da7b6','stroke-width':'.55'}));
+  g.appendChild(el('path',{d:`M ${mid-5.2} ${cornealY+3.0} Q ${mid} ${cornealY-1.6} ${mid+5.2} ${cornealY+3.0}`,fill:'#f8fcfd',stroke:'#7da7b6','stroke-width':'.55'}));
+  g.appendChild(el('ellipse',{cx:mid,cy:cornealY+4.3,rx:4.1,ry:1.6,fill:'#d9edf3','fill-opacity':'.8',stroke:'#6f9eae','stroke-width':'.38'}));
+  g.appendChild(el('ellipse',{cx:mid,cy:cornealY+4.3,rx:1.5,ry:.85,fill:'#36515e','fill-opacity':'.78'}));
+  g.appendChild(el('circle',{cx:mid,cy:rotationY,r:.85,fill:'#0d6075','fill-opacity':'.9'}));
+  addText(g,mid+2.2,rotationY+1.2,'旋轉中心','note','start');
+
+  // 頂點距離標示。
+  const vdX=mid+0.5;
+  g.appendChild(el('line',{x1:vdX,y1:centerBackY,x2:vdX,y2:cornealY,stroke:'#7b8f98','stroke-width':'.34'}));
+  g.appendChild(el('line',{x1:vdX-1.6,y1:centerBackY,x2:vdX+1.6,y2:centerBackY,stroke:'#7b8f98','stroke-width':'.34'}));
+  g.appendChild(el('line',{x1:vdX-1.6,y1:cornealY,x2:vdX+1.6,y2:cornealY,stroke:'#7b8f98','stroke-width':'.34'}));
+  addText(g,vdX+2.1,(centerBackY+cornealY)/2+1.2,`VD ${Number(vd).toFixed(1).replace(/\.0$/,'')} mm`,'note','start');
+  addText(g,mid,globeCenterY+14.3,`有效光學視野 約 ${fieldAngle.toFixed(1)}°`,'note');
 
   // 右上說明欄
-  const infoX=118, infoY=y-2, infoW=90, infoH=28;
+  const infoX=126, infoY=y-2, infoW=80, infoH=42;
   g.appendChild(el('rect',{x:infoX,y:infoY,width:infoW,height:infoH,rx:2.5,class:'legendBox'}));
   addText(g,infoX+3,infoY+5.2,legend1,'note','start');
   addText(g,infoX+3,infoY+10.0,legend2,'note','start');
-  addText(g,infoX+3,infoY+20.0,'警示：無度數參考，非實際鏡片厚度，','note','start');
-  addText(g,infoX+3,infoY+24.8,'僅近/遠視厚度變化概念教學。','note','start');
+  addText(g,infoX+3,infoY+21.0,`幾何有效光學視野：約 ${fieldAngle.toFixed(1)}°`,'note','start');
+  addText(g,infoX+3,infoY+26.0,`有效內徑 ${thinState.opticalDia}Φ｜頂點距離 ${Number(vd).toFixed(1).replace(/\.0$/,'')} mm`,'note','start');
+  addText(g,infoX+3,infoY+32.0,'警示：※幾何視野估算；無度數/稜鏡參考，','note','start');
+  addText(g,infoX+3,infoY+36.8,'非實際鏡片厚度或臨床視野。','note','start');
 
-  // 區域標籤
-  const zoneLabelY=y+h-12.5;
-  addText(g,(left+optLeft)/2,zoneLabelY,'精修薄 / 像差區','note');
-  addText(g,(optLeft+optRight)/2,zoneLabelY,'有效光學區','note');
-  addText(g,(optRight+right)/2,zoneLabelY,'精修薄 / 像差區','note');
+  // 尺寸標示移至剖面圖上方，讓尺寸線直接對應實際片徑 / 有效內徑。
+  g.appendChild(el('line',{x1:left,y1:outerDimY+3,x2:right,y2:outerDimY+3,stroke:'#9fb2bc','stroke-width':'.32'}));
+  g.appendChild(el('line',{x1:left,y1:outerDimY-52.8,x2:left,y2:outerDimY+36.8,stroke:'#9fb2bc','stroke-width':'.32'}));
+  g.appendChild(el('line',{x1:right,y1:outerDimY-52.8,x2:right,y2:outerDimY+36.8,stroke:'#9fb2bc','stroke-width':'.32'}));
+  addText(g,mid,outerDimY+0.6,`片徑 ${thinState.dia} mm（1:1）`,'note');
 
-  // 尺寸標示彼此靠近一點，並整體下移避免擁擠
-  const dimY1=y+h+1.5, dimY2=y+h+7;
-  g.appendChild(el('line',{x1:left,y1:dimY1,x2:right,y2:dimY1,stroke:'#506874','stroke-width':'.32'}));
-  g.appendChild(el('line',{x1:left,y1:dimY1-1.8,x2:left,y2:dimY1+1.8,stroke:'#506874','stroke-width':'.32'}));
-  g.appendChild(el('line',{x1:right,y1:dimY1-1.8,x2:right,y2:dimY1+1.8,stroke:'#506874','stroke-width':'.32'}));
-  addText(g,mid,dimY1-1.4,`片徑 ${thinState.dia} mm（1:1）`,'note');
-  g.appendChild(el('line',{x1:optLeft,y1:dimY2,x2:optRight,y2:dimY2,stroke:'#0d6075','stroke-width':'.38'}));
-  g.appendChild(el('line',{x1:optLeft,y1:dimY2-1.6,x2:optLeft,y2:dimY2+1.6,stroke:'#0d6075','stroke-width':'.38'}));
-  g.appendChild(el('line',{x1:optRight,y1:dimY2-1.6,x2:optRight,y2:dimY2+1.6,stroke:'#0d6075','stroke-width':'.38'}));
-  addText(g,mid,dimY2+5.2,`有效光學內徑 ${thinState.opticalDia} mm（1:1）`,'note');
+  g.appendChild(el('line',{x1:optLeft,y1:innerDimY+3.5,x2:optRight,y2:innerDimY+3.5,stroke:'#0d6075','stroke-width':'.38'}));
+  g.appendChild(el('line',{x1:optLeft,y1:innerDimY+2,x2:optLeft,y2:innerDimY+7,stroke:'#0d6075','stroke-width':'.38'}));
+  g.appendChild(el('line',{x1:optRight,y1:innerDimY+2,x2:optRight,y2:innerDimY+7,stroke:'#0d6075','stroke-width':'.38'}));
+  addText(g,mid,innerDimY+0.8,`有效光學內徑 ${thinState.opticalDia} mm（1:1）`,'note');
 
-  addText(g,mid,y+2,'固定光學中心','note');
+  // 區域標籤：放在光學中心文字 / 導引線上方。
+  addText(g,(left+optLeft)/2,zoneLabelY+0.4,'精修薄 / 像差區','note');
+  addText(g,(optLeft+optRight)/2,zoneLabelY+0.4,'有效光學區','note');
+  addText(g,(optRight+right)/2,zoneLabelY+0.4,'精修薄 / 像差區','note');
+
+  addText(g,mid,fixedCenterLabelY,'光學中心','note');
 }
 function drawDye(svg){
   addText(svg,110,8,'片坯漸層染色 1:1 設定演示','mmLabel');
@@ -1620,7 +1681,7 @@ function draw(){
     drawThinTop(svg);
     const maxD=frameMaxDistanceFromOC();
     const rec=maxD==null?null:clamp(Math.round(maxD*0.7*2),30,thinState.dia-5);
-    document.getElementById('summary').textContent=`精修薄：${thinState.dia}Φ 片坯｜有效光學內徑 ${thinState.opticalDia}Φ｜多焦標記 ${state.multifocal?'開':'關'}｜框型比對 ${thinState.showFrame?'開':'關'}${thinState.showFrame?`｜ED ${Number(thinState.ed).toFixed(1)} mm｜瞳高 ${thinState.ph} mm｜建議內徑約 ${rec}Φ｜${thinState.rxType==='minus'?'近視':'遠視'}剖面`:''}`;
+    document.getElementById('summary').textContent=`精修薄：${thinState.dia}Φ 片坯｜有效光學內徑 ${thinState.opticalDia}Φ｜VD ${Number(thinState.vertexDistance).toFixed(1).replace(/\.0$/,'')} mm｜幾何有效視野約 ${effectiveOpticalFieldAngle().toFixed(1)}°｜多焦標記 ${state.multifocal?'開':'關'}｜框型比對 ${thinState.showFrame?'開':'關'}${thinState.showFrame?`｜ED ${Number(thinState.ed).toFixed(1)} mm｜瞳高 ${thinState.ph} mm｜建議內徑約 ${rec}Φ｜${thinState.rxType==='minus'?'近視':'遠視'}剖面`:''}`;
   }else{
     drawDye(svg);
   }
