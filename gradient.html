@@ -209,7 +209,7 @@
       <button class="modalClose" id="kanteRangeClose" type="button" aria-label="關閉">×</button>
     </div>
     <div class="modalBody">
-      <p class="modalLead">依「康德訂片查詢表」整理。先查詢廠商可做片徑，再輸入鏡框與眼位資料，自動估算單焦／多焦所需片徑、移心量與實際訂片資訊。</p>
+      <p class="modalLead">依「康德訂片查詢表V6」整理。先查詢廠商可做片徑，再輸入鏡框與眼位資料，自動估算單焦／多焦所需片徑、移心量與實際訂片資訊。</p>
 
       <div class="orderSection">
         <h3>一、訂片資料輸入</h3>
@@ -223,7 +223,7 @@
           <div><label for="kantePower">總度 S+C</label><input id="kantePower" type="number" step="0.25" value="-8.00"></div>
           <div><label for="kanteCylinder">散光 C</label><input id="kanteCylinder" type="number" min="-12" max="0" step="0.25" value="0.00" placeholder="例：-2.00"></div>
         </div>
-        <div class="hint" id="kantePowerHint">近視可輸入 -8.00 或 8.00，系統以絕對值查詢。散光請以負柱鏡輸入，最大 -12.00D；C &lt; -6.00D 時建議開啟精修薄。</div>
+        <div class="hint" id="kantePowerHint">近視可輸入 -8.00 或 8.00，系統以絕對值查詢。散光請以負柱鏡輸入，最大 -12.00D；C &lt; -6.00D 時建議精修薄。</div>
         <div class="rangeResult" id="kanteResult">
           <div class="rangeResultTitle">輸入條件後即可查詢</div>
           <div class="rangeResultSub">會同步顯示廠商可做最大片徑，以及是否需精修薄型／超光度。</div>
@@ -657,7 +657,7 @@ function setKanteType(type,reset=true){
   kantePower.min=type==='近視'?-40:0.25;
   kantePower.max=type==='近視'?40:30;
   if(reset) kantePower.value=type==='近視'?'-8.00':'6.00';
-  document.getElementById('kantePowerHint').textContent=(type==='近視'?'近視可輸入 -8.00 或 8.00，系統以絕對值查詢。':'遠視可輸入 +6.25 或 6.25，系統以正值／絕對值查詢。')+' 散光請以負柱鏡輸入，最大 -12.00D；C < -6.00D 時建議開啟精修薄。';
+  document.getElementById('kantePowerHint').textContent=(type==='近視'?'近視可輸入 -8.00 或 8.00，系統以絕對值查詢。':'遠視可輸入 +6.25 或 6.25，系統以正值／絕對值查詢。')+' 散光請以負柱鏡輸入，最大 -12.00D；C < -6.00D 時建議精修薄。';
   renderKanteQuery();
 }
 function refreshKanteLensOptions(reset=false){
@@ -746,7 +746,7 @@ function renderKanteQuery(){
   const dia=hit['片徑'];
   const note=hit['備註']||'';
   const cylinderText=`｜散光 C ${cylinder.toFixed(2)}D`;
-  const cylinderThinWarn=cylinder<-6?'<br><b>散光 C 超過 -6.00D，建議開啟精修薄。</b>':'';
+  const cylinderThinWarn=cylinder<-6?'<br><b>散光 C 超過 -6.00D，建議精修薄。</b>':'';
   if(typeof dia==='number'){
     let compare='';
     if(appMode==='thin'){
