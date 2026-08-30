@@ -31,9 +31,14 @@
   .kanteBtn:hover{background:#dff2e5;border-color:#70ad82;color:#244d34}
   .weixingBtn{border:1px solid #9fc7d9;border-radius:999px;background:#eef8fc;color:#315d70;padding:7px 14px;font-weight:800;cursor:pointer;transition:.18s}
   .weixingBtn:hover{background:#dff1f8;border-color:#71abc2;color:#234b5d}
-  .wxQueryGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  /* 訂片資料輸入：桌機版盡量維持單列。
+     偉星：片種 / 折射率設計 / 聯合光度 / 散光 / ADD
+     康德：折射率 / 片種 / 總度 / 散光 */
+  /* 訂片資料輸入：固定單列比例，不因視窗寬度改成兩行 */
+  .wxQueryGrid{grid-template-columns:minmax(0,1.45fr) minmax(0,1.45fr) minmax(0,1.05fr) minmax(0,.82fr) minmax(0,.82fr);gap:8px}
+  .kanteQueryGrid{grid-template-columns:minmax(0,1.05fr) minmax(0,1.45fr) minmax(0,1fr) minmax(0,.9fr);gap:8px}
   .wxConstraintLine{white-space:pre-line}
-  .rangeModalCard{width:min(940px,96vw)}
+  .rangeModalCard{width:min(1120px,98vw)}
   .rangeTabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 12px}
   .rangeTab{border:1px solid #bfd3c6;background:#fff;color:#36574a;border-radius:12px;padding:9px 10px;font-weight:800;cursor:pointer}
   .rangeTab.active{background:#3f7753;color:#fff;border-color:#3f7753}
@@ -72,8 +77,8 @@
   .orderCalcTable tr.activeCalcRow td{background:#edf8f0}
   .orderCalcWarn{font-size:12px;line-height:1.55;margin-top:10px;border-radius:10px;padding:8px 10px;background:#fff8e8;border:1px solid #f1d49d;color:#845009}
   .orderCalcEmpty{font-size:13px;color:#71818b;padding:4px 0}
-  @media(max-width:720px){.rangeQueryGrid,.wxQueryGrid,.ruleGrid{grid-template-columns:1fr}.orderInputGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.rangeModalCard{width:96vw}}
-  @media(max-width:520px){.orderInputGrid{grid-template-columns:1fr}}
+  @media(max-width:720px){.ruleGrid{grid-template-columns:1fr}.orderInputGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.rangeModalCard{width:98vw}.rangeQueryGrid select,.rangeQueryGrid input{padding:0 6px;font-size:12px}.rangeQueryGrid label{font-size:11px}}
+  @media(max-width:520px){.orderInputGrid{grid-template-columns:1fr}.rangeQueryGrid select,.rangeQueryGrid input{padding:0 4px;font-size:11px}.rangeQueryGrid label{font-size:10px}}
   .modalOverlay{position:fixed;inset:0;background:rgba(14,35,44,.42);z-index:1000;display:flex;align-items:center;justify-content:center;padding:22px}
   .modalCard{width:min(760px,94vw);max-height:88vh;overflow:auto;background:#fff;border:1px solid #d7e3e8;border-radius:18px;box-shadow:0 24px 70px rgba(12,42,54,.28)}
   .modalHead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 20px 12px;border-bottom:1px solid #e8eef1;position:sticky;top:0;background:#fff;z-index:1}
@@ -204,7 +209,7 @@
       <button class="modalClose" id="kanteRangeClose" type="button" aria-label="關閉">×</button>
     </div>
     <div class="modalBody">
-      <p class="modalLead">依「康德訂片查詢表V6」整理。先查詢廠商可做片徑，再輸入鏡框與眼位資料，自動估算單焦／多焦所需片徑、移心量與實際訂片資訊。</p>
+      <p class="modalLead">依「康德訂片查詢表」整理。先查詢廠商可做片徑，再輸入鏡框與眼位資料，自動估算單焦／多焦所需片徑、移心量與實際訂片資訊。</p>
 
       <div class="orderSection">
         <h3>一、訂片資料輸入</h3>
@@ -212,12 +217,13 @@
           <button class="rangeTab active" id="kanteTypeMinus" type="button">近視</button>
           <button class="rangeTab" id="kanteTypePlus" type="button">遠視</button>
         </div>
-        <div class="rangeQueryGrid">
+        <div class="rangeQueryGrid kanteQueryGrid">
           <div><label for="kanteIndex">折射率</label><select id="kanteIndex"></select></div>
           <div><label for="kanteLensType">片種</label><select id="kanteLensType"></select></div>
           <div><label for="kantePower">總度 S+C</label><input id="kantePower" type="number" step="0.25" value="-8.00"></div>
+          <div><label for="kanteCylinder">散光 C</label><input id="kanteCylinder" type="number" min="-12" max="0" step="0.25" value="0.00" placeholder="例：-2.00"></div>
         </div>
-        <div class="hint" id="kantePowerHint">近視可輸入 -8.00 或 8.00，系統以絕對值查詢。</div>
+        <div class="hint" id="kantePowerHint">近視可輸入 -8.00 或 8.00，系統以絕對值查詢。散光請以負柱鏡輸入，最大 -12.00D；C &lt; -6.00D 時建議開啟精修薄。</div>
         <div class="rangeResult" id="kanteResult">
           <div class="rangeResultTitle">輸入條件後即可查詢</div>
           <div class="rangeResultSub">會同步顯示廠商可做最大片徑，以及是否需精修薄型／超光度。</div>
@@ -622,6 +628,7 @@ const kanteTypePlus=document.getElementById('kanteTypePlus');
 const kanteIndex=document.getElementById('kanteIndex');
 const kanteLensType=document.getElementById('kanteLensType');
 const kantePower=document.getElementById('kantePower');
+const kanteCylinder=document.getElementById('kanteCylinder');
 
 function setKanteRange(open){
   kanteRangeModal.classList.toggle('hidden',!open);
@@ -650,7 +657,7 @@ function setKanteType(type,reset=true){
   kantePower.min=type==='近視'?-40:0.25;
   kantePower.max=type==='近視'?40:30;
   if(reset) kantePower.value=type==='近視'?'-8.00':'6.00';
-  document.getElementById('kantePowerHint').textContent=type==='近視'?'近視可輸入 -8.00 或 8.00，系統以絕對值查詢。':'遠視可輸入 +6.25 或 6.25，系統以正值／絕對值查詢。';
+  document.getElementById('kantePowerHint').textContent=(type==='近視'?'近視可輸入 -8.00 或 8.00，系統以絕對值查詢。':'遠視可輸入 +6.25 或 6.25，系統以正值／絕對值查詢。')+' 散光請以負柱鏡輸入，最大 -12.00D；C < -6.00D 時建議開啟精修薄。';
   renderKanteQuery();
 }
 function refreshKanteLensOptions(reset=false){
@@ -705,6 +712,8 @@ function renderKanteOrderCalc(hit){
 function renderKanteQuery(){
   const rows=currentKanteRows();
   const power=Math.abs(Number(kantePower.value));
+  const cylRaw=String(kanteCylinder.value??'').trim();
+  const cylinder=cylRaw===''?0:Number(cylRaw);
   const result=document.getElementById('kanteResult');
   const body=document.getElementById('kanteRangeBody');
   body.innerHTML=rows.map(r=>{
@@ -713,6 +722,12 @@ function renderKanteQuery(){
     return `<tr><td>${fmtKanteRange(r)}</td><td><span class="diaBadge${isLimit?' limit':''}">${isLimit?dia:dia+'Φ'}</span></td><td>${r['備註']||'—'}</td></tr>`;
   }).join('') || '<tr><td colspan="3">此條件於查詢表中沒有範圍資料。</td></tr>';
 
+  if(!Number.isFinite(cylinder) || cylinder>0 || cylinder<-12){
+    result.className='rangeResult danger';
+    result.innerHTML='<div class="rangeResultTitle">散光輸入超出康德製作範圍</div><div class="rangeResultSub">散光 C 請以負柱鏡輸入 0.00 ～ -12.00D，並以 0.25D 為單位。</div>';
+    renderKanteOrderCalc(null);
+    return;
+  }
   if(!Number.isFinite(power)){
     result.className='rangeResult';
     result.innerHTML='<div class="rangeResultTitle">請輸入總度 S+C</div><div class="rangeResultSub">以 0.25D 為單位輸入即可。</div>';
@@ -730,16 +745,18 @@ function renderKanteQuery(){
   }
   const dia=hit['片徑'];
   const note=hit['備註']||'';
+  const cylinderText=`｜散光 C ${cylinder.toFixed(2)}D`;
+  const cylinderThinWarn=cylinder<-6?'<br><b>散光 C 超過 -6.00D，建議開啟精修薄。</b>':'';
   if(typeof dia==='number'){
     let compare='';
     if(appMode==='thin'){
       compare=thinState.dia>dia?`<br><b>主頁目前選擇 ${thinState.dia}Φ，高於此條件可做 ${dia}Φ，請調整片徑。</b>`:`<br>主頁目前 ${thinState.dia}Φ，未高於此條件最大 ${dia}Φ。`;
     }
     result.className='rangeResult success';
-    result.innerHTML=`<div class="rangeResultTitle">可做最大片徑：${dia}Φ</div><div class="rangeResultSub">${kanteState.type}｜${kanteState.index}｜${kanteState.lens}｜總度 ${fmtKantePower(power,kanteState.type)}${note?`<br>${note}`:''}${compare}</div>`;
+    result.innerHTML=`<div class="rangeResultTitle">可做最大片徑：${dia}Φ</div><div class="rangeResultSub">${kanteState.type}｜${kanteState.index}｜${kanteState.lens}｜總度 ${fmtKantePower(power,kanteState.type)}${cylinderText}${note?`<br>${note}`:''}${cylinderThinWarn}${compare}</div>`;
   }else{
     result.className='rangeResult warn';
-    result.innerHTML=`<div class="rangeResultTitle">${dia}</div><div class="rangeResultSub">${kanteState.type}｜${kanteState.index}｜${kanteState.lens}｜總度 ${fmtKantePower(power,kanteState.type)}${note?`<br><b>${note}</b>`:''}</div>`;
+    result.innerHTML=`<div class="rangeResultTitle">${dia}</div><div class="rangeResultSub">${kanteState.type}｜${kanteState.index}｜${kanteState.lens}｜總度 ${fmtKantePower(power,kanteState.type)}${cylinderText}${note?`<br><b>${note}</b>`:''}${cylinderThinWarn}</div>`;
   }
 }
 
@@ -751,6 +768,7 @@ kanteTypePlus.onclick=()=>setKanteType('遠視');
 kanteIndex.onchange=e=>{kanteState.index=e.target.value;refreshKanteLensOptions(true);renderKanteQuery()};
 kanteLensType.onchange=e=>{kanteState.lens=e.target.value;renderKanteQuery()};
 kantePower.oninput=renderKanteQuery;
+kanteCylinder.oninput=renderKanteQuery;
 bindOrderFrameInputs('kante',renderKanteQuery);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!kanteRangeModal.classList.contains('hidden'))setKanteRange(false)});
 
