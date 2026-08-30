@@ -88,9 +88,12 @@
   svg{display:block;overflow:visible}
   .lensText{font-size:4.6px;fill:#9aa3a7;font-weight:700}
   .note{font-size:3.6px;fill:#66757e}
+  .note1{font-size:3.2px;fill:#8e7e7e}
   .mmLabel{font-size:3.8px;fill:#2b5563;font-weight:700}
   .frameLabel{font-size:3.2px;fill:#66757e}
   .cross{stroke:var(--accent);stroke-width:1.2;stroke-linecap:round}
+  .zoneThin{font-size:3.5px;fill:#13705498;font-weight:700;}
+  .zoneOptical{font-size:3.5px;fill:#0d7f8cb6;font-weight:700;}
   .multiCross{stroke:#d6cc35;stroke-width:.75;stroke-linecap:round}
   .multiLine{stroke:#d6cc35;stroke-width:.5;fill:none}
   .multiTickText{font-size:2.0px;fill:#d6cc35;font-weight:700}
@@ -1623,7 +1626,7 @@ function drawThinSection(svg,x,y,w,h){
   g.appendChild(el('line',{x1:vdX-1.6,y1:centerBackY,x2:vdX+1.6,y2:centerBackY,stroke:'#7b8f98','stroke-width':'.34'}));
   g.appendChild(el('line',{x1:vdX-1.6,y1:cornealY,x2:vdX+1.6,y2:cornealY,stroke:'#7b8f98','stroke-width':'.34'}));
   addText(g,vdX+2.1,(centerBackY+cornealY)/2+1.2,`VD ${Number(vd).toFixed(1).replace(/\.0$/,'')} mm`,'note','start');
-  addText(g,mid,globeCenterY+14.3,`有效光學視野 約 ${fieldAngle.toFixed(1)}°`,'note');
+  addText(g,mid,globeCenterY+14.3,`有效光學視野 約 ${fieldAngle.toFixed(1)}°`,'note1');
 
   // 右上說明欄
   const infoX=126, infoY=y-2, infoW=80, infoH=42;
@@ -1639,17 +1642,17 @@ function drawThinSection(svg,x,y,w,h){
   g.appendChild(el('line',{x1:left,y1:outerDimY+3,x2:right,y2:outerDimY+3,stroke:'#9fb2bc','stroke-width':'.32'}));
   g.appendChild(el('line',{x1:left,y1:outerDimY-52.8,x2:left,y2:outerDimY+36.8,stroke:'#9fb2bc','stroke-width':'.32'}));
   g.appendChild(el('line',{x1:right,y1:outerDimY-52.8,x2:right,y2:outerDimY+36.8,stroke:'#9fb2bc','stroke-width':'.32'}));
-  addText(g,mid,outerDimY+0.6,`片徑 ${thinState.dia} mm（1:1）`,'note');
+  addText(g,mid,outerDimY+0.8,`片徑 ${thinState.dia} mm（1:1）`,'note1');
 
   g.appendChild(el('line',{x1:optLeft,y1:innerDimY+3.5,x2:optRight,y2:innerDimY+3.5,stroke:'#0d6075','stroke-width':'.38'}));
   g.appendChild(el('line',{x1:optLeft,y1:innerDimY+2,x2:optLeft,y2:innerDimY+7,stroke:'#0d6075','stroke-width':'.38'}));
   g.appendChild(el('line',{x1:optRight,y1:innerDimY+2,x2:optRight,y2:innerDimY+7,stroke:'#0d6075','stroke-width':'.38'}));
-  addText(g,mid,innerDimY+0.8,`有效光學內徑 ${thinState.opticalDia} mm（1:1）`,'note');
+  addText(g,mid,innerDimY+0.8,`有效光學內徑 ${thinState.opticalDia} mm（1:1）`,'note1');
 
   // 區域標籤：放在光學中心文字 / 導引線上方。
-  addText(g,(left+optLeft)/2,zoneLabelY+0.4,'精修薄 / 像差區','note');
-  addText(g,(optLeft+optRight)/2,zoneLabelY+0.4,'有效光學區','note');
-  addText(g,(optRight+right)/2,zoneLabelY+0.4,'精修薄 / 像差區','note');
+  addText(g,(left+optLeft)/2,zoneLabelY+0.4,'精修薄 / 像差區','zoneThin');
+  addText(g,(optLeft+optRight)/2,zoneLabelY+0.4,'有效光學區','zoneOptical');
+  addText(g,(optRight+right)/2,zoneLabelY+0.4,'精修薄 / 像差區','zoneThin');
 
   addText(g,mid,fixedCenterLabelY,'光學中心','note');
 }
