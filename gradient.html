@@ -55,7 +55,25 @@
   .diaBadge.limit{background:#fff0dd;color:#915809}
   .ruleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
   .ruleCard{border:1px solid #e1e9e4;border-radius:10px;padding:9px 10px;background:#fafcfb;font-size:12px;line-height:1.55}
-  @media(max-width:720px){.rangeQueryGrid,.wxQueryGrid,.ruleGrid{grid-template-columns:1fr}.rangeModalCard{width:96vw}}
+  .orderSection{padding:14px 0;border-bottom:1px solid #edf2f4}
+  .orderSection:last-child{border-bottom:0}
+  .orderSection h3{font-size:15px;margin:0 0 8px;color:#173847}
+  .orderInputGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0 6px}
+  .orderInputGrid label{font-size:12px;margin-bottom:5px}
+  .orderInputGrid input,.orderInputGrid select{height:40px;border:1px solid #cbd8de;border-radius:10px;padding:0 10px;background:#fff;font-size:14px;width:100%}
+  .orderCalcPanel{border:1px solid #cfe0e7;border-radius:14px;background:#f8fbfc;padding:12px 14px;margin-top:8px;overflow:auto}
+  .orderCalcSummary{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;font-size:12px;color:#48616c}
+  .orderCalcBadge{display:inline-block;border-radius:999px;background:#e6f3f7;color:#24576a;padding:3px 9px;font-weight:800}
+  .orderCalcTable{width:100%;border-collapse:collapse;font-size:12px;min-width:690px}
+  .orderCalcTable th{background:#eaf3f6;color:#315665;padding:8px 9px;text-align:left;border-bottom:1px solid #cddde4;white-space:nowrap}
+  .orderCalcTable td{padding:8px 9px;border-bottom:1px solid #e7eef1;vertical-align:middle;white-space:nowrap}
+  .orderCalcTable tr:last-child td{border-bottom:0}
+  .orderCalcTable .actualOrder{font-weight:900;color:#173847}
+  .orderCalcTable tr.activeCalcRow td{background:#edf8f0}
+  .orderCalcWarn{font-size:12px;line-height:1.55;margin-top:10px;border-radius:10px;padding:8px 10px;background:#fff8e8;border:1px solid #f1d49d;color:#845009}
+  .orderCalcEmpty{font-size:13px;color:#71818b;padding:4px 0}
+  @media(max-width:720px){.rangeQueryGrid,.wxQueryGrid,.ruleGrid{grid-template-columns:1fr}.orderInputGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.rangeModalCard{width:96vw}}
+  @media(max-width:520px){.orderInputGrid{grid-template-columns:1fr}}
   .modalOverlay{position:fixed;inset:0;background:rgba(14,35,44,.42);z-index:1000;display:flex;align-items:center;justify-content:center;padding:22px}
   .modalCard{width:min(760px,94vw);max-height:88vh;overflow:auto;background:#fff;border:1px solid #d7e3e8;border-radius:18px;box-shadow:0 24px 70px rgba(12,42,54,.28)}
   .modalHead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 20px 12px;border-bottom:1px solid #e8eef1;position:sticky;top:0;background:#fff;z-index:1}
@@ -182,25 +200,50 @@
 <div class="modalOverlay hidden" id="kanteRangeModal" role="dialog" aria-modal="true" aria-labelledby="kanteRangeTitle">
   <div class="modalCard rangeModalCard">
     <div class="modalHead">
-      <h2 id="kanteRangeTitle">康德｜度數與片徑範圍查詢</h2>
+      <h2 id="kanteRangeTitle">康德｜度數、片徑與移心計算</h2>
       <button class="modalClose" id="kanteRangeClose" type="button" aria-label="關閉">×</button>
     </div>
     <div class="modalBody">
-      <p class="modalLead">依「康德訂片查詢表」整理。以<b>總度 S+C</b>查詢，近視／遠視之單焦、多焦共用此片徑範圍。片徑為廠商可做範圍，實際訂片仍需再比對鏡框所需直徑與加工條件。</p>
-      <div class="rangeTabs">
-        <button class="rangeTab active" id="kanteTypeMinus" type="button">近視</button>
-        <button class="rangeTab" id="kanteTypePlus" type="button">遠視</button>
+      <p class="modalLead">依「康德訂片查詢表」整理。先查詢廠商可做片徑，再輸入鏡框與眼位資料，自動估算單焦／多焦所需片徑、移心量與實際訂片資訊。</p>
+
+      <div class="orderSection">
+        <h3>一、訂片資料輸入</h3>
+        <div class="rangeTabs">
+          <button class="rangeTab active" id="kanteTypeMinus" type="button">近視</button>
+          <button class="rangeTab" id="kanteTypePlus" type="button">遠視</button>
+        </div>
+        <div class="rangeQueryGrid">
+          <div><label for="kanteIndex">折射率</label><select id="kanteIndex"></select></div>
+          <div><label for="kanteLensType">片種</label><select id="kanteLensType"></select></div>
+          <div><label for="kantePower">總度 S+C</label><input id="kantePower" type="number" step="0.25" value="-8.00"></div>
+        </div>
+        <div class="hint" id="kantePowerHint">近視可輸入 -8.00 或 8.00，系統以絕對值查詢。</div>
+        <div class="rangeResult" id="kanteResult">
+          <div class="rangeResultTitle">輸入條件後即可查詢</div>
+          <div class="rangeResultSub">會同步顯示廠商可做最大片徑，以及是否需精修薄型／超光度。</div>
+        </div>
       </div>
-      <div class="rangeQueryGrid">
-        <div><label for="kanteIndex">折射率</label><select id="kanteIndex"></select></div>
-        <div><label for="kanteLensType">片種</label><select id="kanteLensType"></select></div>
-        <div><label for="kantePower">總度 S+C</label><input id="kantePower" type="number" step="0.25" value="-8.00"></div>
+
+      <div class="orderSection">
+        <h3>二、鏡框與眼位資料</h3>
+        <div class="orderInputGrid">
+          <div><label for="kanteFrameED">鏡框斜邊 ED（mm）</label><input id="kanteFrameED" type="number" min="20" max="100" step="0.5" value="54"></div>
+          <div><label for="kanteFrameA">鏡框寬 A（mm）</label><input id="kanteFrameA" type="number" min="20" max="90" step="0.5" value="52"></div>
+          <div><label for="kanteDBL">中樑寬 DBL（mm）</label><input id="kanteDBL" type="number" min="5" max="40" step="0.5" value="18"></div>
+          <div><label for="kantePD">瞳距 PD（mm）</label><input id="kantePD" type="number" min="35" max="85" step="0.5" value="70"></div>
+          <div><label for="kantePH">眼位高（mm）</label><input id="kantePH" type="number" min="0" max="50" step="0.5" value="28"></div>
+          <div><label for="kanteFrameB">鏡框高度 B（mm）</label><input id="kanteFrameB" type="number" min="15" max="70" step="0.5" value="42"></div>
+        </div>
+        <div class="hint">鏡框斜邊請填最大 ED；眼位高為瞳孔中心至鏡框下緣。多焦點依原查詢表以眼位高 −4 mm 後計算。</div>
       </div>
-      <div class="hint" id="kantePowerHint">近視可輸入 -8.00 或 8.00，系統以絕對值查詢。</div>
-      <div class="rangeResult" id="kanteResult">
-        <div class="rangeResultTitle">輸入條件後即可查詢</div>
-        <div class="rangeResultSub">會同步顯示可做最大片徑，以及是否需精修薄型／超光度。</div>
+
+      <div class="orderSection">
+        <h3>三、片徑與移心計算結果</h3>
+        <div class="orderCalcPanel" id="kanteCalcResult">
+          <div class="orderCalcEmpty">完成上方訂片條件與鏡框資料後，自動顯示計算結果。</div>
+        </div>
       </div>
+
       <div class="teachSection">
         <h3>目前條件｜片徑範圍速查</h3>
         <div class="rangeTableWrap">
@@ -218,35 +261,61 @@
           <div class="ruleCard"><b>精修薄</b><br>美薄加工需折射率 1.61 以上才可做。</div>
           <div class="ruleCard"><b>75Φ / 70Φ</b><br>近視 1.56、1.61、1.67 總度 -8.75 內可做 75Φ；1.74 最大直徑為 70Φ。</div>
         </div>
-        <div class="inlineWarn" style="margin-top:10px">※客製化鏡片會因處方及附加工程度不同而有差異；若需精準數據，仍請依康德實際回覆為準。</div>
+        <div class="inlineWarn" style="margin-top:10px">※計算結果依查詢表公式做訂片估算；客製化鏡片仍可能因處方、稜鏡、移心及附加工程度而異，最終以康德實際回覆為準。</div>
       </div>
     </div>
   </div>
 </div>
+
 <div class="modalOverlay hidden" id="weixingRangeModal" role="dialog" aria-modal="true" aria-labelledby="weixingRangeTitle">
   <div class="modalCard rangeModalCard">
     <div class="modalHead">
-      <h2 id="weixingRangeTitle">偉星｜度數與片徑範圍查詢</h2>
+      <h2 id="weixingRangeTitle">偉星｜度數、片徑與移心計算</h2>
       <button class="modalClose" id="weixingRangeClose" type="button" aria-label="關閉">×</button>
     </div>
     <div class="modalBody">
-      <p class="modalLead">依「偉星光學 光度範圍 V10 自動計算」整理，資料日期 <b>2026/07/09</b>。以<b>聯合光度 S+C</b>查詢廠商可做片徑；不同片種、折射率／設計及單焦／多焦的範圍不同，實際加工範圍仍可能依訂單條件略有變化。</p>
-      <div class="rangeTabs">
-        <button class="rangeTab active" id="weixingTypeSingle" type="button">單焦點</button>
-        <button class="rangeTab" id="weixingTypeMulti" type="button">多焦點／內漸進</button>
+      <p class="modalLead">依「偉星光學 光度範圍 V10 自動計算」整理。先選訂片類型／片種／折射率並輸入聯合光度，再以鏡框與眼位資料自動估算安全值、所需片徑、移心與實際訂片資訊。</p>
+
+      <div class="orderSection">
+        <h3>一、訂片資料輸入</h3>
+        <div class="rangeTabs">
+          <button class="rangeTab active" id="weixingTypeSingle" type="button">單焦點</button>
+          <button class="rangeTab" id="weixingTypeMulti" type="button">多焦點／內漸進</button>
+        </div>
+        <div class="rangeQueryGrid wxQueryGrid">
+          <div><label for="weixingLensType">片種</label><select id="weixingLensType"></select></div>
+          <div><label for="weixingIndex">折射率／設計</label><select id="weixingIndex"></select></div>
+          <div><label for="weixingPower">聯合光度 S+C</label><input id="weixingPower" type="number" step="0.25" value="-8.00"></div>
+          <div><label for="weixingCylinder">散光 C（選填）</label><input id="weixingCylinder" type="number" step="0.25" placeholder="例：-2.00"></div>
+          <div id="weixingAddWrap" class="hidden"><label for="weixingAdd">ADD（多焦選填）</label><input id="weixingAdd" type="number" step="0.25" min="0" placeholder="例：2.00"></div>
+        </div>
+        <div class="hint" id="weixingPowerHint">近視請輸入負值、遠視請輸入正值；系統依聯合光度 S+C 直接比對偉星片徑表。</div>
+        <div class="rangeResult" id="weixingResult">
+          <div class="rangeResultTitle">輸入條件後即可查詢</div>
+          <div class="rangeResultSub">會顯示廠商片徑、散光／ADD 限制，以及目前條件的製作提醒。</div>
+        </div>
       </div>
-      <div class="rangeQueryGrid wxQueryGrid">
-        <div><label for="weixingLensType">片種</label><select id="weixingLensType"></select></div>
-        <div><label for="weixingIndex">折射率／設計</label><select id="weixingIndex"></select></div>
-        <div><label for="weixingPower">聯合光度 S+C</label><input id="weixingPower" type="number" step="0.25" value="-8.00"></div>
-        <div><label for="weixingCylinder">散光 C（選填）</label><input id="weixingCylinder" type="number" step="0.25" placeholder="例：-2.00"></div>
-        <div id="weixingAddWrap" class="hidden"><label for="weixingAdd">ADD（多焦選填）</label><input id="weixingAdd" type="number" step="0.25" min="0" placeholder="例：2.00"></div>
+
+      <div class="orderSection">
+        <h3>二、鏡框與眼位資料</h3>
+        <div class="orderInputGrid">
+          <div><label for="weixingFrameED">鏡框斜邊 ED（mm）</label><input id="weixingFrameED" type="number" min="20" max="100" step="0.5" value="54"></div>
+          <div><label for="weixingFrameA">鏡框寬 A（mm）</label><input id="weixingFrameA" type="number" min="20" max="90" step="0.5" value="52"></div>
+          <div><label for="weixingDBL">中樑寬 DBL（mm）</label><input id="weixingDBL" type="number" min="5" max="40" step="0.5" value="19"></div>
+          <div><label for="weixingPD">瞳距 PD（mm）</label><input id="weixingPD" type="number" min="35" max="85" step="0.5" value="60"></div>
+          <div><label for="weixingPH">眼位高（mm）</label><input id="weixingPH" type="number" min="0" max="50" step="0.5" value="28"></div>
+          <div><label for="weixingFrameB">鏡框高度 B（mm）</label><input id="weixingFrameB" type="number" min="15" max="70" step="0.5" value="40"></div>
+        </div>
+        <div class="hint">鏡框斜邊為鏡框／鏡片最大斜邊；多焦點依原表以眼位高 −4 mm 後計算。</div>
       </div>
-      <div class="hint" id="weixingPowerHint">近視請輸入負值、遠視請輸入正值；系統依聯合光度 S+C 直接比對偉星片徑表。</div>
-      <div class="rangeResult" id="weixingResult">
-        <div class="rangeResultTitle">輸入條件後即可查詢</div>
-        <div class="rangeResultSub">會顯示廠商片徑、散光／ADD 限制，以及與主頁目前片徑的差異。</div>
+
+      <div class="orderSection">
+        <h3>三、片徑與移心計算結果</h3>
+        <div class="orderCalcPanel" id="weixingCalcResult">
+          <div class="orderCalcEmpty">完成上方訂片條件與鏡框資料後，自動顯示計算結果。</div>
+        </div>
       </div>
+
       <div class="teachSection">
         <h3>目前條件｜片徑範圍速查</h3>
         <div class="rangeTableWrap">
@@ -265,6 +334,7 @@
     </div>
   </div>
 </div>
+
 <main>
   <aside class="controls">
     <div id="dyeControls">
@@ -495,6 +565,55 @@ processingGuideClose.onclick=()=>setProcessingGuide(false);
 processingGuideModal.addEventListener('click',e=>{if(e.target===processingGuideModal)setProcessingGuide(false)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!processingGuideModal.classList.contains('hidden'))setProcessingGuide(false)});
 
+function readOrderFrame(prefix){
+  const map={
+    ed:document.getElementById(prefix+'FrameED'),
+    a:document.getElementById(prefix+'FrameA'),
+    dbl:document.getElementById(prefix+'DBL'),
+    pd:document.getElementById(prefix+'PD'),
+    ph:document.getElementById(prefix+'PH'),
+    b:document.getElementById(prefix+'FrameB')
+  };
+  const out={};
+  for(const [k,el] of Object.entries(map)){
+    if(!el || el.value.trim()==='') return null;
+    const n=Number(el.value);
+    if(!Number.isFinite(n)) return null;
+    out[k]=n;
+  }
+  return out;
+}
+function orderRawDiameter(frame,isMulti=false){
+  if(!frame) return null;
+  const x=(frame.a+frame.dbl-frame.pd)/2;
+  const eyeY=(isMulti?frame.ph-4:frame.ph)-frame.b/2;
+  return frame.ed+Math.sqrt(x*x+eyeY*eyeY)*2;
+}
+function orderSafetyValue(raw,vendorDia){
+  if(!Number.isFinite(raw)||!Number.isFinite(vendorDia)) return null;
+  if(vendorDia<70) return 2;
+  const next5=Math.ceil((raw+2-1e-9)/5)*5;
+  return Math.min(8,Math.max(2,next5-raw));
+}
+function orderCeil(v,step=1){
+  if(!Number.isFinite(v)) return null;
+  return Math.ceil((v-1e-9)/step)*step;
+}
+function fmtOrderNum(v,d=1){
+  if(!Number.isFinite(v)) return '—';
+  const rounded=Number(v.toFixed(d));
+  return Number.isInteger(rounded)?String(rounded):rounded.toFixed(d);
+}
+function orderCalcRowHtml(name,calc,active=false){
+  return `<tr${active?' class="activeCalcRow"':''}><td><b>${name}</b></td><td>${fmtOrderNum(calc.raw,1)}</td><td>${fmtOrderNum(calc.safety,1)}</td><td>${fmtOrderNum(calc.required,1)}</td><td>${calc.moveText}</td><td class="actualOrder">${calc.actual}</td></tr>`;
+}
+function bindOrderFrameInputs(prefix,renderFn){
+  ['FrameED','FrameA','DBL','PD','PH','FrameB'].forEach(s=>{
+    const el=document.getElementById(prefix+s);
+    if(el) el.addEventListener('input',renderFn);
+  });
+}
+
 const kanteRangeBtn=document.getElementById('kanteRangeBtn');
 const kanteRangeModal=document.getElementById('kanteRangeModal');
 const kanteRangeClose=document.getElementById('kanteRangeClose');
@@ -553,6 +672,36 @@ function fmtKanteRange(row){
 function currentKanteRows(){
   return KANTE_RANGE_DATA.filter(r=>r['光度類型']===kanteState.type&&String(r['折射率'])===String(kanteState.index)&&String(r['片種'])===String(kanteState.lens));
 }
+function renderKanteOrderCalc(hit){
+  const box=document.getElementById('kanteCalcResult');
+  if(!box) return;
+  const vendor=hit&&typeof hit['片徑']==='number'?Number(hit['片徑']):NaN;
+  const frame=readOrderFrame('kante');
+  if(!Number.isFinite(vendor)){
+    box.innerHTML='<div class="orderCalcEmpty">目前訂片條件沒有可直接計算的數字片徑；請先選到有明確廠商片徑的條件。</div>';
+    return;
+  }
+  if(!frame){
+    box.innerHTML='<div class="orderCalcEmpty">請完整輸入鏡框斜邊、A、DBL、PD、眼位高與 B 高。</div>';
+    return;
+  }
+  const make=(isMulti)=>{
+    const raw=orderRawDiameter(frame,isMulti);
+    const safety=orderSafetyValue(raw,vendor);
+    const required=raw+safety;
+    const move=orderCeil(Math.max(0,(required-vendor)/2),1);
+    const actual=move>0?`${fmtOrderNum(vendor,0)}移心${fmtOrderNum(move,0)}`:`${fmtOrderNum(orderCeil(required,1),0)}直徑`;
+    return {raw,safety,required,move,moveText:`${fmtOrderNum(move,0)} mm`,actual};
+  };
+  const single=make(false), multi=make(true);
+  const maxMove=Math.max(single.move,multi.move);
+  const warn=maxMove>12?`<div class="orderCalcWarn"><b>移心限制提醒：</b>目前最大移心 ${fmtOrderNum(maxMove,0)} mm，已超過康德查詢表列示的 12 mm 移中心範圍，請洽廠商確認。</div>`:'';
+  box.innerHTML=
+    `<div class="orderCalcSummary"><span class="orderCalcBadge">廠商可做最大 ${fmtOrderNum(vendor,0)}Φ</span><span>安全值：70/75Φ 補至 5 的倍數且限 2～8 mm；小於 70Φ 固定 +2 mm。</span></div>`+
+    `<table class="orderCalcTable"><thead><tr><th>類型</th><th>原始片徑</th><th>安全值</th><th>加安全值後</th><th>移心量</th><th>實際訂片資訊</th></tr></thead><tbody>${orderCalcRowHtml('單焦點',single)}${orderCalcRowHtml('多焦點',multi)}</tbody></table>`+
+    warn;
+}
+
 function renderKanteQuery(){
   const rows=currentKanteRows();
   const power=Math.abs(Number(kantePower.value));
@@ -567,9 +716,11 @@ function renderKanteQuery(){
   if(!Number.isFinite(power)){
     result.className='rangeResult';
     result.innerHTML='<div class="rangeResultTitle">請輸入總度 S+C</div><div class="rangeResultSub">以 0.25D 為單位輸入即可。</div>';
+    renderKanteOrderCalc(null);
     return;
   }
   const hit=rows.find(r=>power>=Number(r['度數下限(絕對值)'])-1e-9&&power<=Number(r['度數上限(絕對值)'])+1e-9);
+  renderKanteOrderCalc(hit||null);
   if(!hit){
     let extra='此折射率／片種於查詢表中沒有對應片徑，請改用其他折射率或洽康德確認。';
     if(kanteState.type==='近視'&&String(kanteState.index)==='1.56'&&power>=12.25) extra='近視範圍表於 -12.25 起標示「建議 1.61」；請改用較高折射率再查詢。';
@@ -600,6 +751,7 @@ kanteTypePlus.onclick=()=>setKanteType('遠視');
 kanteIndex.onchange=e=>{kanteState.index=e.target.value;refreshKanteLensOptions(true);renderKanteQuery()};
 kanteLensType.onchange=e=>{kanteState.lens=e.target.value;renderKanteQuery()};
 kantePower.oninput=renderKanteQuery;
+bindOrderFrameInputs('kante',renderKanteQuery);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!kanteRangeModal.classList.contains('hidden'))setKanteRange(false)});
 
 const weixingRangeBtn=document.getElementById('weixingRangeBtn');
@@ -759,6 +911,51 @@ function renderWeixingRules(detail){
     }else warn.classList.add('hidden');
   }
 }
+function renderWeixingOrderCalc(hit,detail){
+  const box=document.getElementById('weixingCalcResult');
+  if(!box) return;
+  const vendor=hit?Number(hit['片徑數字']):NaN;
+  const frame=readOrderFrame('weixing');
+  if(!Number.isFinite(vendor)){
+    box.innerHTML='<div class="orderCalcEmpty">目前訂片條件查無可做片徑，暫時無法進行鏡框片徑與移心計算。</div>';
+    return;
+  }
+  if(!frame){
+    box.innerHTML='<div class="orderCalcEmpty">請完整輸入鏡框斜邊、A、DBL、PD、眼位高與 B 高。</div>';
+    return;
+  }
+  const isAspheric=String(weixingState.index).includes('非球面');
+  const make=(isMulti)=>{
+    const raw=orderRawDiameter(frame,isMulti);
+    const safety=orderSafetyValue(raw,vendor);
+    const sum=raw+safety;
+    const required=vendor<70?orderCeil(sum,1):orderCeil(sum,5);
+    const move=isAspheric?null:orderCeil(Math.max(0,(required-vendor)/2),1);
+    let actual,moveText;
+    if(isAspheric){
+      moveText='—（非球面）';
+      actual=required>vendor+1e-9?'請訂球面並改移心':`${fmtOrderNum(vendor,0)}mm`;
+    }else{
+      moveText=`${fmtOrderNum(move,0)} mm`;
+      actual=move>0?`${fmtOrderNum(vendor,0)}移心${fmtOrderNum(move,0)}`:`${fmtOrderNum(vendor,0)}mm`;
+    }
+    return {raw,safety,required,move,moveText,actual};
+  };
+  const single=make(false), multi=make(true);
+  const selected=weixingState.order==='多焦點'?multi:single;
+  const warnings=[];
+  if(!isAspheric && Number.isFinite(selected.move) && selected.move>=5) warnings.push(`本次 ${weixingState.order} 移心 ${fmtOrderNum(selected.move,0)} mm；偉星原表提醒移心超過 5 需連絡小何或珊珊。`);
+  if(isAspheric && selected.required>vendor+1e-9) warnings.push('目前為非球面設計且所需直徑大於廠商片徑；依原自動計算表顯示「請訂球面並改移心」。');
+  const detailSpecial=String(detail?.['稜鏡']||'');
+  if(detailSpecial.includes('片徑固定，不可增減')) warnings.push(`此組合原始限制標示「片徑固定，不可增減」；訂片前請再依偉星實際規範確認。`);
+  const warnHtml=warnings.length?`<div class="orderCalcWarn"><b>本次提醒：</b><br>${warnings.map(escapeWx).join('<br>')}</div>`:'';
+  box.innerHTML=
+    `<div class="orderCalcSummary"><span class="orderCalcBadge">廠商片徑 ${fmtOrderNum(vendor,0)}Φ</span><span class="orderCalcBadge">目前訂片：${escapeWx(weixingState.order)}</span><span>${isAspheric?'非球面：不直接顯示移心量':'球面：依所需直徑與廠商片徑計算移心'}</span></div>`+
+    `<table class="orderCalcTable"><thead><tr><th>類型</th><th>原始片徑</th><th>安全值</th><th>最小所需直徑</th><th>移心量</th><th>實際訂片資訊</th></tr></thead><tbody>${orderCalcRowHtml('單焦點',single,weixingState.order==='單焦點')}${orderCalcRowHtml('多焦點',multi,weixingState.order==='多焦點')}</tbody></table>`+
+    `<div class="orderCalcSummary" style="margin-top:10px;margin-bottom:0"><b>本次下單：</b><span class="orderCalcBadge">${escapeWx(selected.actual)}</span></div>`+
+    warnHtml;
+}
+
 function renderWeixingQuery(){
   const rows=currentWeixingRows().slice().sort((a,b)=>Number(a['光度下限'])-Number(b['光度下限']));
   const power=Number(weixingPower.value);
@@ -774,11 +971,13 @@ function renderWeixingQuery(){
     result.className='rangeResult';
     result.innerHTML='<div class="rangeResultTitle">請輸入聯合光度 S+C</div><div class="rangeResultSub">近視輸入負值、遠視輸入正值。</div>';
     renderWeixingRules(null);
+    renderWeixingOrderCalc(null,null);
     return;
   }
   const hit=rows.find(r=>power>=Number(r['光度下限'])-1e-9&&power<=Number(r['光度上限'])+1e-9);
   const detail=wxCurrentDetail(power);
   renderWeixingRules(detail);
+  renderWeixingOrderCalc(hit||null,detail);
   if(!hit){
     result.className='rangeResult danger';
     result.innerHTML=`<div class="rangeResultTitle">查無偉星一般片徑範圍</div><div class="rangeResultSub">${weixingState.order}｜${escapeWx(weixingState.lens)}｜${escapeWx(weixingState.index)}｜聯合光度 ${fmtWxPower(power)}<br>請改選其他片種／折射率，或依偉星實際回覆確認。</div>`;
@@ -833,6 +1032,7 @@ weixingIndex.onchange=e=>{weixingState.index=e.target.value;renderWeixingQuery()
 weixingPower.oninput=renderWeixingQuery;
 weixingCylinder.oninput=renderWeixingQuery;
 weixingAdd.oninput=renderWeixingQuery;
+bindOrderFrameInputs('weixing',renderWeixingQuery);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!weixingRangeModal.classList.contains('hidden'))setWeixingRange(false)});
 
 let freeDrag=null;
