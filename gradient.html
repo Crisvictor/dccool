@@ -1629,14 +1629,14 @@ function drawThinSection(svg,x,y,w,h){
   addText(g,mid,globeCenterY+14.3,`有效光學視野 約 ${fieldAngle.toFixed(1)}°`,'note1');
 
   // 右上說明欄
-  const infoX=126, infoY=y-2, infoW=80, infoH=42;
+  const infoX=122, infoY=y-2, infoW=85, infoH=42;
   g.appendChild(el('rect',{x:infoX,y:infoY,width:infoW,height:infoH,rx:2.5,class:'legendBox'}));
   addText(g,infoX+3,infoY+5.2,legend1,'note','start');
   addText(g,infoX+3,infoY+10.0,legend2,'note','start');
   addText(g,infoX+3,infoY+21.0,`幾何有效光學視野：約 ${fieldAngle.toFixed(1)}°`,'note','start');
   addText(g,infoX+3,infoY+26.0,`有效內徑 ${thinState.opticalDia}Φ｜頂點距離 ${Number(vd).toFixed(1).replace(/\.0$/,'')} mm`,'note','start');
-  addText(g,infoX+3,infoY+32.0,'警示：※幾何視野估算；無度數/稜鏡參考，','note','start');
-  addText(g,infoX+3,infoY+36.8,'非實際鏡片厚度或臨床視野。','note','start');
+  addText(g,infoX+3,infoY+32.0,'※幾何視野估算供調整教學；無度數/稜鏡參考，','note','start');
+  addText(g,infoX+3,infoY+36.8,'非實際鏡片厚度或臨床視野/視場估算。','note','start');
 
   // 尺寸標示移至剖面圖上方，讓尺寸線直接對應實際片徑 / 有效內徑。
   g.appendChild(el('line',{x1:left,y1:outerDimY+3,x2:right,y2:outerDimY+3,stroke:'#9fb2bc','stroke-width':'.32'}));
