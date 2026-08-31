@@ -19,6 +19,20 @@
     --device-scale:1;
   }
   *{box-sizing:border-box}
+  /* 報告頁面文字不可選取；輸入欄位仍保留正常編輯能力 */
+  body, body *:not(input):not(textarea):not(select):not(option){
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+  }
+  button, svg text{
+    -webkit-user-select:none;
+    user-select:none;
+  }
+  input,textarea,select{
+    -webkit-user-select:auto;
+    user-select:auto;
+  }
   body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;background:var(--bg);color:#162b36;}
   header{padding:18px 28px 12px;background:linear-gradient(180deg,#fff,#f4f7f8);border-bottom:1px solid #dfe8ec;}
   .titleRow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -112,6 +126,7 @@
   .lensText{font-size:4.6px;fill:#9aa3a7;font-weight:700}
   .note{font-size:3.6px;fill:#66757e}
   .note1{font-size:3.2px;fill:#8e7e7e}
+  .note2{font-size:3.2px;fill:#dae4e2}
   .mmLabel{font-size:3.8px;fill:#2b5563;font-weight:700}
   .frameLabel{font-size:3.2px;fill:#66757e}
   .cross{stroke:var(--accent);stroke-width:1.2;stroke-linecap:round}
@@ -1633,7 +1648,7 @@ function drawThinTop(svg){
   if(state.multifocal) drawMultifocalMark(g,cx,cy);
   addText(g,cx,cy-r-4,`${thinState.dia}Φ 片坯`,'note');
   addText(g,cx,cy-or-3,`有效光學內徑 ${thinState.opticalDia}Φ`,'note');
-  addText(g,cx,cy-r-11,`${thinState.showFrame?'淡虛線：框型比對｜':''}藍十字：固定光學中心｜虛線圓：有效光學區${state.multifocal?'｜配鏡十字：幾何中心上方 4 mm':''}`,'note');
+  addText(g,cx,cy-r-15,`${thinState.showFrame?'淡虛線：框型比對｜':''}藍十字：固定光學中心｜虛線圓：有效光學區${state.multifocal?'｜配鏡十字：幾何中心上方 4 mm':''}`,'note');
 
   const box=el('rect',{x:132,y:20,width:76,height:54,rx:2,class:'legendBox'});svg.appendChild(box);
   addText(svg,136,28,'網格判讀','mmLabel','start');
@@ -1655,12 +1670,43 @@ function drawThinTop(svg){
   drawRuler(svg);
 }
 function drawRxToggle(g,x,y){
-  const items=[['minus','近視'],['plus','遠視']];
+  // 剖面近／遠視切換：膠囊式分段按鈕，避免文字被滑鼠選取。
+  const items=[['minus','近視','−'],['plus','遠視','+']];
+  const btnW=21.5, btnH=7.8, gap=1.2, pad=1.15;
+  const totalW=btnW*2+gap+pad*2;
+
+  // 外框底板
+  g.appendChild(el('rect',{
+    x:x-pad,y:y-pad,width:totalW,height:btnH+pad*2,rx:4.8,
+    fill:'#f3f8fa',stroke:'#c7d9df','stroke-width':'.32',
+    style:'pointer-events:none'
+  }));
+
   items.forEach((item,i)=>{
-    const mode=item[0], label=item[1], active=thinState.rxType===mode;
-    const bx=x+i*19;
-    g.appendChild(el('rect',{x:bx,y:y,width:17,height:6.6,rx:3.3,fill:active?'#0d6075':'#ffffff',stroke:'#0d6075','stroke-width':'.35','data-rxtype':mode,style:'cursor:pointer'}));
-    g.appendChild(el('text',{x:bx+8.5,y:y+4.5,'text-anchor':'middle',class:'note',fill:active?'#ffffff':'#0d6075','font-weight':'700','pointer-events':'none'})).textContent=label;
+    const mode=item[0], label=item[1], symbol=item[2], active=thinState.rxType===mode;
+    const bx=x+i*(btnW+gap);
+
+    g.appendChild(el('rect',{
+      x:bx,y:y,width:btnW,height:btnH,rx:3.9,
+      fill:active?'#0d6075':'#ffffff',
+      stroke:active?'#0d6075':'#b8cdd5',
+      'stroke-width':active?'.42':'.30',
+      'data-rxtype':mode,
+      style:'cursor:pointer;user-select:none;-webkit-user-select:none'
+    }));
+
+    // 簡潔的 − / + 處方視覺符號
+    g.appendChild(el('text',{
+      x:bx+5.0,y:y+5.15,'text-anchor':'middle',
+      fill:active?'#ffffff':'#5c7884','font-size':'3.2px','font-weight':'900',
+      'pointer-events':'none',style:'user-select:none;-webkit-user-select:none'
+    })).textContent=symbol;
+
+    g.appendChild(el('text',{
+      x:bx+13.3,y:y+5.15,'text-anchor':'middle',
+      fill:active?'#ffffff':'#294b59','font-size':'3.05px','font-weight':'800',
+      'pointer-events':'none',style:'user-select:none;-webkit-user-select:none'
+    })).textContent=label;
   });
 }
 const EYE_ROTATION_DEPTH = 13.5; // 角膜頂點至眼球旋轉中心的教學估算距離（mm）
@@ -1902,7 +1948,7 @@ function draw(){
     drawThinTop(svg);
     const maxD=frameMaxDistanceFromOC();
     const rec=maxD==null?null:clamp(Math.round(maxD*0.7*2),30,thinState.dia-5);
-    document.getElementById('summary').textContent=`精修薄：${thinState.dia}Φ 片坯｜有效光學內徑 ${thinState.opticalDia}Φ｜VD ${Number(thinState.vertexDistance).toFixed(1).replace(/\.0$/,'')} mm｜幾何有效視野約 ${effectiveOpticalFieldAngle().toFixed(1)}°｜多焦標記 ${state.multifocal?'開':'關'}｜框型比對 ${thinState.showFrame?'開':'關'}${thinState.showFrame?`｜ED ${Number(thinState.ed).toFixed(1)} mm｜瞳高 ${thinState.ph} mm｜建議內徑約 ${rec}Φ｜${thinState.rxType==='minus'?'近視':'遠視'}剖面`:''}`;
+    document.getElementById('summary').textContent=`精修薄：${thinState.dia}Φ 片坯｜有效光學內徑 ${thinState.opticalDia}Φ｜VD ${Number(thinState.vertexDistance).toFixed(1).replace(/\.0$/,'')} mm｜幾何有效視野約 ${effectiveOpticalFieldAngle().toFixed(1)}°｜多焦標記 ${state.multifocal?'開':'關'}｜框型比對 ${thinState.showFrame?'開':'關'}${thinState.showFrame?`｜建議內徑約 ${rec}Φ｜${thinState.rxType==='minus'?'近視':'遠視'}剖面`:''}`;
   }else{
     drawDye(svg);
   }
