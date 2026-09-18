@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0b0f14" />
-<title>手機配鏡定位儀 V0.2</title>
+<title>手機配鏡定位儀 V0.2.1</title>
 <style>
 :root{
   --bg:#0b0f14;--panel:#121820;--panel2:#0d131a;--line:#26303b;--txt:#f2f5f8;--muted:#8f9baa;
@@ -38,27 +38,30 @@ pre{white-space:pre-wrap;word-break:break-word;background:#0b1016;border:1px sol
 <div class="wrap">
   <div class="header">
     <div><h1>手機配鏡定位儀</h1><div class="sub">手機後鏡頭＋Face Landmarker＋50 mm 校正卡｜影像只在本機瀏覽器處理</div></div>
-    <div class="version">V0.2 實測版</div>
+    <div class="version">V0.2.1 相機修正版</div>
   </div>
 
   <div class="panel">
     <div class="stage" id="stage">
-      <video id="video" playsinline muted></video>
+      <video id="video" playsinline muted autoplay></video>
       <canvas id="photoCanvas"></canvas>
       <div class="guide" id="guide">
         <div class="faceGuide"></div><div class="crossV"></div><div class="crossH"></div><div class="cardGuide"></div>
-        <div class="liveBanner" id="liveBanner">正在載入臉部辨識模型…</div>
+        <div class="liveBanner" id="liveBanner">可先開啟相機；AI 會另外載入</div>
       </div>
       <canvas id="loupe" width="248" height="248"></canvas>
     </div>
     <div class="row controls">
-      <button class="primary" id="startBtn">開啟相機</button>
+      <button class="primary" id="startBtn">開啟即時相機</button>
+      <button id="systemCameraBtn">系統相機／選照片</button>
+      <input id="photoInput" type="file" accept="image/*" capture="environment" hidden>
       <button class="good" id="captureBtn" disabled>拍照並分析</button>
       <button id="retakeBtn" disabled>重新拍攝</button>
     </div>
+    <div class="hint" id="cameraHint" style="margin-top:8px">若「即時相機」無法開啟，可直接使用「系統相機／選照片」。GitHub Pages / HTTPS 下即時相機相容性最佳。</div>
     <div class="row" style="justify-content:space-between;margin-top:7px">
       <label class="toggle"><input type="checkbox" id="autoCapture"> 姿勢穩定時自動拍攝</label>
-      <span class="small" id="modelState">模型：載入中</span>
+      <span class="small" id="modelState">模型：背景載入中</span>
     </div>
     <div class="status" id="liveStatus"></div>
   </div>
@@ -135,9 +138,8 @@ pre{white-space:pre-wrap;word-break:break-word;background:#0b1016;border:1px sol
   </div>
 </div>
 
-<script type="module">
-import vision from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/+esm";
-const { FaceLandmarker, FilesetResolver } = vision;
+<script>
+let FaceLandmarker=null, FilesetResolver=null;
 
 const $=id=>document.getElementById(id);
 const video=$('video'), canvas=$('photoCanvas'), ctx=canvas.getContext('2d',{willReadFrequently:true});
@@ -168,32 +170,99 @@ function faceMetrics(lm,w,h){
   return {p,bridge,roll,yawBias,faceFrac,span};
 }
 
+let modelPromise=null;
 async function initModel(){
   if(modelReady)return true;
-  $('modelState').textContent='模型：下載中…'; $('liveBanner').textContent='正在載入臉部辨識模型…';
-  try{
-    const files=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm');
-    const opts={baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',delegate:'GPU'},runningMode:'VIDEO',numFaces:1,minFaceDetectionConfidence:.68,minFacePresenceConfidence:.68,minTrackingConfidence:.68,outputFacialTransformationMatrixes:true};
-    try{faceLandmarker=await FaceLandmarker.createFromOptions(files,opts)}catch(e){opts.baseOptions.delegate='CPU';faceLandmarker=await FaceLandmarker.createFromOptions(files,opts)}
-    modelReady=true;$('modelState').textContent='模型：就緒';$('liveBanner').textContent='請開啟相機';return true;
-  }catch(e){console.error(e);$('modelState').textContent='模型：載入失敗';$('liveBanner').textContent='模型載入失敗，請確認網路連線';return false}
+  if(modelPromise)return modelPromise;
+  modelPromise=(async()=>{
+    $('modelState').textContent='模型：背景下載中…';
+    try{
+      const vision=await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/+esm');
+      FaceLandmarker=vision.FaceLandmarker; FilesetResolver=vision.FilesetResolver;
+      const files=await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm');
+      const opts={baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',delegate:'GPU'},runningMode:'VIDEO',numFaces:1,minFaceDetectionConfidence:.68,minFacePresenceConfidence:.68,minTrackingConfidence:.68,outputFacialTransformationMatrixes:true};
+      try{faceLandmarker=await FaceLandmarker.createFromOptions(files,opts)}catch(e){opts.baseOptions.delegate='CPU';faceLandmarker=await FaceLandmarker.createFromOptions(files,opts)}
+      modelReady=true;$('modelState').textContent='模型：就緒';
+      if(stream&&running)$('liveBanner').textContent='AI 已就緒，請正視鏡頭';
+      if(captured&&!capturedLandmarks) await analyzeCapturedWithAI();
+      return true;
+    }catch(e){console.error('AI model load failed',e);$('modelState').textContent='模型：載入失敗（仍可人工量測）';if(!stream)$('liveBanner').textContent='AI 載入失敗，仍可開相機／使用系統拍照';return false}
+  })();
+  return modelPromise;
 }
 initModel();
 
+function cameraErrorMessage(e){
+  const n=e?.name||'';
+  if(!window.isSecureContext)return '此頁目前不是安全連線。請改用 HTTPS / GitHub Pages，或使用「系統相機／選照片」。';
+  if(!navigator.mediaDevices?.getUserMedia)return '此瀏覽器不提供即時相機 API，請改用「系統相機／選照片」。';
+  if(n==='NotAllowedError'||n==='SecurityError')return '相機權限被拒絕。請到瀏覽器網站設定允許相機，再重新整理；也可改用系統相機。';
+  if(n==='NotFoundError')return '找不到可用相機。請確認裝置相機可正常使用。';
+  if(n==='NotReadableError'||n==='AbortError')return '相機目前被其他 App／分頁占用，請關閉其他相機程式後再試。';
+  if(n==='OverconstrainedError')return '目前相機不支援要求的解析度／鏡頭條件，系統已嘗試降低條件仍失敗。';
+  return `即時相機啟動失敗${n?'（'+n+'）':''}。可改用「系統相機／選照片」。`;
+}
+async function requestCameraWithFallback(){
+  if(!navigator.mediaDevices?.getUserMedia)throw Object.assign(new Error('getUserMedia unavailable'),{name:'UnsupportedError'});
+  const tries=[
+    {video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false},
+    {video:{facingMode:'environment'},audio:false},
+    {video:true,audio:false}
+  ];
+  let last;
+  for(const c of tries){
+    try{return await navigator.mediaDevices.getUserMedia(c)}catch(e){last=e;console.warn('camera constraint failed',c,e);if(e?.name==='NotAllowedError'||e?.name==='SecurityError')break}
+  }
+  throw last||new Error('camera unavailable');
+}
 async function startCamera(){
-  if(!(await initModel()))return;
+  $('liveBanner').textContent='正在請求相機權限…';$('cameraHint').textContent='若瀏覽器跳出權限詢問，請選擇允許。';
   try{
-    if(stream)stream.getTracks().forEach(t=>t.stop());
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:2560},height:{ideal:1920}},audio:false});
-    video.srcObject=stream; await video.play(); running=true;captured=false;lastLandmarks=null;stableFrames=0;autoCaptureLock=false;
-    video.style.display='block';canvas.style.display='none';$('guide').style.display='block';retakeBtn.disabled=true;captureBtn.disabled=true;autoCalBtn.disabled=true;
-    loop();
-  }catch(e){console.error(e);$('liveBanner').textContent='無法開啟相機：請使用 HTTPS 並允許相機權限';$('liveStatus').innerHTML=chip('相機權限／HTTPS 檢查','bad')}
+    if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+    stream=await requestCameraWithFallback();
+    video.srcObject=stream;
+    await new Promise((resolve,reject)=>{
+      const done=()=>{cleanup();resolve()};const fail=()=>{cleanup();reject(new Error('video metadata failed'))};const cleanup=()=>{video.removeEventListener('loadedmetadata',done);video.removeEventListener('error',fail)};
+      if(video.readyState>=1)return resolve();video.addEventListener('loadedmetadata',done,{once:true});video.addEventListener('error',fail,{once:true});
+    });
+    try{await video.play()}catch(e){console.warn('video.play()',e)}
+    running=true;captured=false;lastLandmarks=null;capturedLandmarks=null;stableFrames=0;autoCaptureLock=false;
+    video.style.display='block';canvas.style.display='none';$('guide').style.display='block';retakeBtn.disabled=true;captureBtn.disabled=false;autoCalBtn.disabled=true;
+    $('liveBanner').textContent=modelReady?'相機已開啟，請正視鏡頭':'相機已開啟；AI 正在背景載入';
+    $('liveStatus').innerHTML=chip('相機已啟動','good')+(modelReady?chip('AI 就緒','good'):chip('AI 載入中','warn'));
+    $('cameraHint').textContent='即時相機已啟動。若畫面是前鏡頭，重新按一次「開啟即時相機」通常會再次優先要求後鏡頭。';
+    initModel();loop();
+  }catch(e){
+    console.error(e);const msg=cameraErrorMessage(e);$('liveBanner').textContent='即時相機未開啟';$('liveStatus').innerHTML=chip(msg,'bad');$('cameraHint').textContent=msg;captureBtn.disabled=true;
+  }
+}
+async function analyzeCapturedWithAI(){
+  if(!captured||!photoBacking||!modelReady||!faceLandmarker)return false;
+  try{
+    const ts=performance.now();const r=faceLandmarker.detectForVideo(photoBacking,ts);capturedLandmarks=r.faceLandmarks?.[0]||null;lastLandmarks=capturedLandmarks;
+    if(capturedLandmarks){$('modelState').textContent='模型：就緒（照片已辨識）';drawOverlay();calculate();return true}
+  }catch(e){console.error('still AI analysis failed',e)}
+  return false;
+}
+async function loadPhotoFile(file){
+  if(!file)return;
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+  running=false;lastLandmarks=null;capturedLandmarks=null;
+  const url=URL.createObjectURL(file);
+  try{
+    const img=new Image();img.decoding='async';await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});
+    canvas.width=img.naturalWidth||img.width;canvas.height=img.naturalHeight||img.height;ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    photoBacking=document.createElement('canvas');photoBacking.width=canvas.width;photoBacking.height=canvas.height;photoBacking.getContext('2d').drawImage(canvas,0,0);
+    captured=true;video.style.display='none';canvas.style.display='block';$('guide').style.display='none';retakeBtn.disabled=false;captureBtn.disabled=true;autoCalBtn.disabled=false;autoCaptureLock=false;
+    clearManualMarks(false);imageQuality=analyzeImageQuality();$('liveBanner').textContent='照片已載入';$('cameraHint').textContent='照片已載入；AI 若成功會自動抓瞳孔，否則仍可使用人工標記。';
+    if(modelReady)await analyzeCapturedWithAI();else initModel().then(ok=>ok&&analyzeCapturedWithAI());
+    drawOverlay();calculate();$('tapHint').textContent='正在嘗試辨識 50 mm 校正卡…';setTimeout(()=>{if(!autoDetectCalibration())$('tapHint').textContent='未自動抓到校正卡。可按「人工標記基準」點兩個白圓中心。'},50);
+  }catch(e){console.error(e);$('cameraHint').textContent='照片載入失敗，請重新選擇。'}finally{URL.revokeObjectURL(url);$('photoInput').value=''}
 }
 function livePass(m){return m&&Math.abs(m.roll)<=2.5&&Math.abs(m.yawBias)<=.085&&m.faceFrac>=.28&&m.faceFrac<=.62}
 function renderLiveStatus(){
   if(!stream){$('liveStatus').innerHTML=chip('相機尚未開啟');return}
-  if(!lastLandmarks){captureBtn.disabled=true;$('liveBanner').textContent='請讓完整臉部進入框內';$('liveStatus').innerHTML=chip('尚未偵測到完整人臉','warn');stableFrames=0;return}
+  if(!lastLandmarks){captureBtn.disabled=false;$('liveBanner').textContent=modelReady?'尚未偵測到完整人臉；仍可手動拍攝':'AI 載入中；可先手動拍攝';$('liveStatus').innerHTML=chip(modelReady?'尚未偵測到完整人臉':'AI 尚未就緒','warn');stableFrames=0;return}
   const m=faceMetrics(lastLandmarks,video.videoWidth||1,video.videoHeight||1);if(!m)return;
   captureBtn.disabled=false;
   const rc=Math.abs(m.roll)<=2.5?'good':Math.abs(m.roll)<=4?'warn':'bad';
@@ -212,16 +281,17 @@ async function loop(){
   requestAnimationFrame(loop);
 }
 
-function capturePhoto(){
-  if(!lastLandmarks||!video.videoWidth)return;
+async function capturePhoto(){
+  if(!video.videoWidth)return;
   canvas.width=video.videoWidth;canvas.height=video.videoHeight;ctx.drawImage(video,0,0,canvas.width,canvas.height);
   photoBacking=document.createElement('canvas');photoBacking.width=canvas.width;photoBacking.height=canvas.height;photoBacking.getContext('2d').drawImage(canvas,0,0);
-  capturedLandmarks=structuredClone(lastLandmarks);captured=true;running=false;canvas.style.display='block';video.style.display='none';$('guide').style.display='none';retakeBtn.disabled=false;captureBtn.disabled=true;autoCalBtn.disabled=false;autoCaptureLock=false;
-  clearManualMarks(false);imageQuality=analyzeImageQuality();drawOverlay();calculate();
+  capturedLandmarks=lastLandmarks?structuredClone(lastLandmarks):null;captured=true;running=false;canvas.style.display='block';video.style.display='none';$('guide').style.display='none';retakeBtn.disabled=false;captureBtn.disabled=true;autoCalBtn.disabled=false;autoCaptureLock=false;
+  clearManualMarks(false);imageQuality=analyzeImageQuality();if(!capturedLandmarks&&modelReady)await analyzeCapturedWithAI();drawOverlay();calculate();
   $('tapHint').textContent='正在嘗試辨識 50 mm 校正卡…';setTimeout(()=>{if(!autoDetectCalibration())$('tapHint').textContent='未自動抓到校正卡。可重拍，或按「人工標記基準」點兩個白圓中心。'},30);
 }
 function retake(){
-  captured=false;capturedLandmarks=null;lastLandmarks=null;running=true;photoBacking=null;imageQuality=null;cardMeta=null;clearManualMarks(false);canvas.style.display='none';video.style.display='block';$('guide').style.display='block';retakeBtn.disabled=true;autoCalBtn.disabled=true;stableFrames=0;calculate();loop();
+  captured=false;capturedLandmarks=null;lastLandmarks=null;photoBacking=null;imageQuality=null;cardMeta=null;clearManualMarks(false);canvas.style.display='none';$('guide').style.display='block';retakeBtn.disabled=true;autoCalBtn.disabled=true;stableFrames=0;calculate();
+  if(stream){running=true;video.style.display='block';captureBtn.disabled=false;$('liveBanner').textContent=modelReady?'請正視鏡頭':'相機已開啟；AI 正在背景載入';loop()}else{running=false;video.style.display='block';captureBtn.disabled=true;$('liveBanner').textContent='請開啟即時相機，或使用系統相機／選照片'}
 }
 
 function analyzeImageQuality(){
@@ -292,7 +362,11 @@ document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('clic
 }));
 
 function rotatePoint(p,c,a){const co=Math.cos(a),s=Math.sin(a),x=p.x-c.x,y=p.y-c.y;return{x:c.x+x*co-y*s,y:c.y+x*s+y*co}}
-function currentPoints(){if(!capturedLandmarks)return null;const a=faceMetrics(capturedLandmarks,canvas.width,canvas.height);if(!a)return null;return{rightPupil:marks.rightPupil||a.p.right,leftPupil:marks.leftPupil||a.p.left,bridge:marks.bridge||a.bridge,rightBottom:marks.rightBottom,leftBottom:marks.leftBottom,roll:a.roll,yawBias:a.yawBias,faceFrac:a.faceFrac}}
+function currentPoints(){
+  if(capturedLandmarks){const a=faceMetrics(capturedLandmarks,canvas.width,canvas.height);if(a)return{rightPupil:marks.rightPupil||a.p.right,leftPupil:marks.leftPupil||a.p.left,bridge:marks.bridge||a.bridge,rightBottom:marks.rightBottom,leftBottom:marks.leftBottom,roll:a.roll,yawBias:a.yawBias,faceFrac:a.faceFrac,ai:true}}
+  if(marks.rightPupil&&marks.leftPupil){const r=marks.rightPupil,l=marks.leftPupil,dx=l.x-r.x,dy=l.y-r.y,mid={x:(r.x+l.x)/2,y:(r.y+l.y)/2};return{rightPupil:r,leftPupil:l,bridge:marks.bridge||mid,rightBottom:marks.rightBottom,leftBottom:marks.leftBottom,roll:Math.atan2(dy,dx)*180/Math.PI,yawBias:0,faceFrac:NaN,ai:false}}
+  return null;
+}
 function scaleMmPerPx(){if(marks.calibration.length!==2)return null;const d=Math.hypot(marks.calibration[1].x-marks.calibration[0].x,marks.calibration[1].y-marks.calibration[0].y);const mm=parseFloat($('refSize').value);return d>5?mm/d:null}
 function fmt(v,u='mm'){return Number.isFinite(v)?`${v.toFixed(1)} ${u}`:'--'}
 function qualityClass(level){return level==='good'?'good':level==='warn'?'warn':'bad'}
@@ -302,10 +376,10 @@ function calculate(){
   const R=rotatePoint(p.rightPupil,mid,ang),L=rotatePoint(p.leftPupil,mid,ang),B=rotatePoint(p.bridge,mid,ang),rb=p.rightBottom?rotatePoint(p.rightBottom,mid,ang):null,lb=p.leftBottom?rotatePoint(p.leftBottom,mid,ang):null;
   const totalPx=Math.abs(L.x-R.x),rPx=Math.abs(B.x-R.x),lPx=Math.abs(L.x-B.x),hRPx=rb?Math.max(0,rb.y-R.y):NaN,hLPx=lb?Math.max(0,lb.y-L.y):NaN;
   $('pdTotal').textContent=s?fmt(totalPx*s):`${totalPx.toFixed(0)} px`;$('pdR').textContent=s?fmt(rPx*s):`${rPx.toFixed(0)} px`;$('pdL').textContent=s?fmt(lPx*s):`${lPx.toFixed(0)} px`;
-  $('heightR').textContent=s&&Number.isFinite(hRPx)?fmt(hRPx*s):'--';$('heightL').textContent=s&&Number.isFinite(hLPx)?fmt(hLPx*s):'--';$('scaleOut').textContent=s?`${s.toFixed(4)}`:'未校正';$('scaleSource').textContent=s?'mm / px':'--';$('rollOut').textContent=`${p.roll.toFixed(1)}°`;$('yawOut').textContent=`${(p.yawBias*100).toFixed(1)}%`;$('pdSource').textContent=`瞳孔：${marks.rightPupil||marks.leftPupil?'含人工修正':'AI 虹膜中心'}`;
+  $('heightR').textContent=s&&Number.isFinite(hRPx)?fmt(hRPx*s):'--';$('heightL').textContent=s&&Number.isFinite(hLPx)?fmt(hLPx*s):'--';$('scaleOut').textContent=s?`${s.toFixed(4)}`:'未校正';$('scaleSource').textContent=s?'mm / px':'--';$('rollOut').textContent=`${p.roll.toFixed(1)}°`;$('yawOut').textContent=p.ai?`${(p.yawBias*100).toFixed(1)}%`:'人工模式';$('pdSource').textContent=`瞳孔：${p.ai?(marks.rightPupil||marks.leftPupil?'含人工修正':'AI 虹膜中心'):'人工標記'}`;
   const chips=[];let bad=0,warn=0;
   const rr=Math.abs(p.roll)<=2.5?'good':Math.abs(p.roll)<=4?'warn':'bad';chips.push(chip(Math.abs(p.roll)<=2.5?'頭部水平良好':Math.abs(p.roll)<=4?'頭部稍斜':'頭部傾斜過大',rr));rr==='bad'?bad++:rr==='warn'&&warn++;
-  const yy=Math.abs(p.yawBias)<=.085?'good':Math.abs(p.yawBias)<=.13?'warn':'bad';chips.push(chip(Math.abs(p.yawBias)<=.085?'正面度良好':Math.abs(p.yawBias)<=.13?'可能輕微轉頭':'轉頭偏差較大',yy));yy==='bad'?bad++:yy==='warn'&&warn++;
+  if(p.ai){const yy=Math.abs(p.yawBias)<=.085?'good':Math.abs(p.yawBias)<=.13?'warn':'bad';chips.push(chip(Math.abs(p.yawBias)<=.085?'正面度良好':Math.abs(p.yawBias)<=.13?'可能輕微轉頭':'轉頭偏差較大',yy));yy==='bad'?bad++:yy==='warn'&&warn++;}else{chips.push(chip('AI 未定位：正面偏轉需人工確認','warn'));warn++;}
   if(s)chips.push(chip(cardMeta?.source==='auto'?'校正卡自動定位':'毫米尺度已建立','good'));else{chips.push(chip('尚未建立毫米尺度','warn'));warn++}
   if(cardMeta?.source==='auto'){
     const ca=Math.abs(cardMeta.angle)<=3?'good':Math.abs(cardMeta.angle)<=6?'warn':'bad';chips.push(chip(`卡片水平 ${cardMeta.angle.toFixed(1)}°`,ca));ca==='bad'?bad++:ca==='warn'&&warn++;
@@ -317,11 +391,11 @@ function calculate(){
   }
   $('qualityStatus').innerHTML=chips.join('');
   const gate=$('qualityGate');gate.className='gate '+(bad?'bad':warn?'warn':'good');gate.textContent=bad?'不建議採用本次數值：請依紅色項目重新拍攝。':warn?'本次可供比較，但有黃色注意項目；正式記錄前建議重拍確認。':'影像與姿勢檢查通過；仍請人工確認校正靶點與鏡框下緣。';
-  const rep=['【手機配鏡定位量測 V0.2】',`影像：${canvas.width} × ${canvas.height}px`,`頭部 Roll：${p.roll.toFixed(2)}°`,`正面偏轉指標：${(p.yawBias*100).toFixed(2)}%`];
+  const rep=['【手機配鏡定位量測 V0.2.1】',`影像：${canvas.width} × ${canvas.height}px`,`頭部 Roll：${p.roll.toFixed(2)}°`,p.ai?`正面偏轉指標：${(p.yawBias*100).toFixed(2)}%`:'正面偏轉指標：AI 未定位，需人工確認'];
   if(imageQuality)rep.push(`影像品質：亮度 ${imageQuality.mean.toFixed(0)} / 清晰指標 ${imageQuality.lapVar.toFixed(0)} / 高光 ${(imageQuality.clipPct*100).toFixed(1)}%`);
   if(cardMeta?.source==='auto')rep.push(`校正卡：自動定位；水平 ${cardMeta.angle.toFixed(2)}°；圓形比例 ${cardMeta.aspect.toFixed(2)}`);else if(s)rep.push('校正卡：人工定位');
   if(s){rep.push(`校正尺度：${s.toFixed(5)} mm/px`,`總 PD：${(totalPx*s).toFixed(2)} mm`,`患者右單眼 PD：${(rPx*s).toFixed(2)} mm`,`患者左單眼 PD：${(lPx*s).toFixed(2)} mm`,`患者右瞳高：${Number.isFinite(hRPx)?(hRPx*s).toFixed(2)+' mm':'未標記'}`,`患者左瞳高：${Number.isFinite(hLPx)?(hLPx*s).toFixed(2)+' mm':'未標記'}`)}else rep.push('尚未建立毫米尺度，pixel 結果不可視為實際 mm。');
-  rep.push(`瞳孔來源：右=${marks.rightPupil?'人工':'AI'}、左=${marks.leftPupil?'人工':'AI'}`,`鼻樑中心：${marks.bridge?'人工鏡架中心':'AI 臉部中線估算'}`,'注意：校正卡需與鏡框近似同一平面；本原型尚未完成正式驗配誤差驗證。');
+  rep.push(`瞳孔來源：右=${marks.rightPupil?'人工':p.ai?'AI':'未標記'}、左=${marks.leftPupil?'人工':p.ai?'AI':'未標記'}`,`鼻樑中心：${marks.bridge?'人工鏡架中心':p.ai?'AI 臉部中線估算':'雙瞳中點暫代'}`,'注意：校正卡需與鏡框近似同一平面；本原型尚未完成正式驗配誤差驗證。');
   $('report').textContent=rep.join('\n');$('copyBtn').disabled=false;$('downloadBtn').disabled=false;renderCardStatus();
 }
 function renderCardStatus(){
@@ -330,11 +404,11 @@ function renderCardStatus(){
 }
 function resetOutputs(){['pdTotal','pdR','pdL','heightR','heightL','scaleOut','rollOut','yawOut'].forEach(id=>$(id).textContent='--');$('pdSource').textContent='--';$('scaleSource').textContent='--';$('qualityStatus').innerHTML='';$('qualityGate').className='gate';$('qualityGate').textContent='尚未完成拍攝。';$('report').textContent='尚未完成量測。';$('copyBtn').disabled=true;$('downloadBtn').disabled=true;renderCardStatus()}
 function drawOverlay(){
-  if(!captured||!photoBacking)return;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(photoBacking,0,0);const p=currentPoints();if(!p)return;const sc=Math.max(1,canvas.width/1400);ctx.font=`${20*sc}px -apple-system,sans-serif`;
+  if(!captured||!photoBacking)return;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(photoBacking,0,0);const p=currentPoints();const sc=Math.max(1,canvas.width/1400);ctx.font=`${20*sc}px -apple-system,sans-serif`;
   function dot(pt,color,label){if(!pt)return;ctx.beginPath();ctx.arc(pt.x,pt.y,8*sc,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='#071018';ctx.lineWidth=2*sc;ctx.stroke();ctx.fillStyle=color;ctx.fillText(label,pt.x+11*sc,pt.y-9*sc)}
-  dot(p.rightPupil,'#4b9cff','R');dot(p.leftPupil,'#4ed7dd','L');dot(p.bridge,'#c89cff','CENTER');dot(p.rightBottom,'#39c56b','R LOW');dot(p.leftBottom,'#78e39a','L LOW');
+  if(p){dot(p.rightPupil,'#4b9cff','R');dot(p.leftPupil,'#4ed7dd','L');dot(p.bridge,'#c89cff','CENTER');dot(p.rightBottom,'#39c56b','R LOW');dot(p.leftBottom,'#78e39a','L LOW');}
   if(marks.calibration.length){marks.calibration.forEach((q,i)=>dot(q,'#f2cc60',`CAL${i+1}`));if(marks.calibration.length===2){ctx.beginPath();ctx.moveTo(marks.calibration[0].x,marks.calibration[0].y);ctx.lineTo(marks.calibration[1].x,marks.calibration[1].y);ctx.strokeStyle='#f2cc60';ctx.lineWidth=3*sc;ctx.stroke()}}
-  ctx.beginPath();ctx.moveTo(p.rightPupil.x,p.rightPupil.y);ctx.lineTo(p.leftPupil.x,p.leftPupil.y);ctx.strokeStyle='rgba(75,156,255,.82)';ctx.lineWidth=2*sc;ctx.setLineDash([10*sc,7*sc]);ctx.stroke();ctx.setLineDash([]);
+  if(p){ctx.beginPath();ctx.moveTo(p.rightPupil.x,p.rightPupil.y);ctx.lineTo(p.leftPupil.x,p.leftPupil.y);ctx.strokeStyle='rgba(75,156,255,.82)';ctx.lineWidth=2*sc;ctx.setLineDash([10*sc,7*sc]);ctx.stroke();ctx.setLineDash([]);}
 }
 
 function printCalibrationCard(){
@@ -342,11 +416,13 @@ function printCalibrationCard(){
   w.document.write(`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>50 mm 配鏡定位校正卡</title><style>@page{size:A4;margin:12mm}body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;color:#000;margin:0}h2{font-size:16pt;margin:0 0 4mm}.note{font-size:9pt;line-height:1.55;margin-bottom:8mm}.sheet{display:flex;justify-content:center}.verify{margin-top:12mm;border-top:.3mm solid #000;padding-top:5mm;font-size:9pt}.bar{display:inline-block;border-top:.5mm solid #000;position:relative;margin:7mm 12mm 0 0}.bar:before,.bar:after{content:"";position:absolute;top:-2mm;width:.4mm;height:4mm;background:#000}.bar:before{left:0}.bar:after{right:0}.noPrint{margin-top:8mm;font-size:9pt}@media print{.noPrint{display:none}}</style></head><body><h2>配鏡定位校正卡｜50.00 mm</h2><div class="note">列印設定請選「100%／實際大小」，不要選「符合頁面」。建議霧面 200–250g 白卡紙；不要護貝。列印後先用下方驗證尺確認尺寸。</div><div class="sheet"><svg xmlns="http://www.w3.org/2000/svg" width="92mm" height="58mm" viewBox="0 0 92 58"><rect x="1" y="1" width="90" height="56" rx="4" fill="white" stroke="black" stroke-width="0.35" stroke-dasharray="2 1"/><rect x="3" y="3" width="86" height="52" rx="3" fill="white" stroke="black" stroke-width="0.45"/><path d="M7 12V7h5 M80 7h5v5 M7 46v5h5 M80 51h5v-5" fill="none" stroke="black" stroke-width="1.7"/><line x1="6" y1="23" x2="86" y2="23" stroke="black" stroke-width="0.35"/><line x1="46" y1="5" x2="46" y2="31" stroke="black" stroke-width="0.35"/><rect x="14" y="16" width="14" height="14" fill="black"/><circle cx="21" cy="23" r="3" fill="white"/><rect x="64" y="16" width="14" height="14" fill="black"/><circle cx="71" cy="23" r="3" fill="white"/><line x1="21" y1="12" x2="71" y2="12" stroke="black" stroke-width="0.35"/><line x1="21" y1="10.5" x2="21" y2="13.5" stroke="black" stroke-width="0.35"/><line x1="71" y1="10.5" x2="71" y2="13.5" stroke="black" stroke-width="0.35"/><text x="46" y="10" font-size="4" text-anchor="middle" font-weight="700">50.00 mm</text><text x="46" y="38" font-size="6" text-anchor="middle" font-weight="700">配鏡定位校正卡</text><text x="46" y="43" font-size="3" text-anchor="middle">兩白圓中心距離 50.00 mm</text><text x="46" y="48" font-size="2.8" text-anchor="middle">霧面使用｜請勿護貝｜保持與鏡框平面平行</text>${Array.from({length:17},(_,i)=>`<line x1="${8+i*4.75}" y1="4" x2="${8+i*4.75}" y2="${i%4===0?7:6}" stroke="black" stroke-width="0.3"/><line x1="${8+i*4.75}" y1="54" x2="${8+i*4.75}" y2="${i%4===0?51:52}" stroke="black" stroke-width="0.3"/>`).join('')}</svg></div><div class="verify"><b>列印尺寸驗證尺</b><br><span class="bar" style="width:10mm"></span> 10 mm　<span class="bar" style="width:50mm"></span> 50 mm<br><div style="margin-top:5mm">用實體直尺量測；若不是 10.0 mm / 50.0 mm，請勿使用該張校正卡。</div></div><button class="noPrint" onclick="window.print()">列印</button></body></html>`);w.document.close();setTimeout(()=>w.focus(),150)
 }
 
-startBtn.addEventListener('click',startCamera);captureBtn.addEventListener('click',capturePhoto);retakeBtn.addEventListener('click',retake);autoCalBtn.addEventListener('click',autoDetectCalibration);$('printCardBtn').addEventListener('click',printCalibrationCard);
+startBtn.addEventListener('click',startCamera);$('systemCameraBtn').addEventListener('click',()=>$('photoInput').click());$('photoInput').addEventListener('change',e=>loadPhotoFile(e.target.files?.[0]));captureBtn.addEventListener('click',capturePhoto);retakeBtn.addEventListener('click',retake);autoCalBtn.addEventListener('click',autoDetectCalibration);$('printCardBtn').addEventListener('click',printCalibrationCard);
 $('undoBtn').addEventListener('click',()=>{if(history.length)restoreState(JSON.parse(history.pop()))});$('clearMarksBtn').addEventListener('click',()=>clearManualMarks(true));$('refSize').addEventListener('change',()=>{cardMeta={source:'manual'};calculate()});
 $('copyBtn').addEventListener('click',async()=>{const t=$('report').textContent;try{await navigator.clipboard.writeText(t);$('copyBtn').textContent='已複製';setTimeout(()=>$('copyBtn').textContent='複製量測摘要',1200)}catch{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}});
 $('downloadBtn').addEventListener('click',()=>{drawOverlay();const a=document.createElement('a');a.download=`配鏡定位_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.png`;a.href=canvas.toDataURL('image/png');a.click()});
 resetOutputs();
+if(!window.isSecureContext)$('cameraHint').textContent='目前不是安全連線環境；即時相機可能被瀏覽器封鎖。請使用 HTTPS / GitHub Pages，或直接按「系統相機／選照片」。';
+else if(!navigator.mediaDevices?.getUserMedia)$('cameraHint').textContent='此瀏覽器沒有即時相機 API；請直接使用「系統相機／選照片」。';
 </script>
 </body>
 </html>
