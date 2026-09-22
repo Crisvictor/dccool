@@ -369,12 +369,12 @@
         <select id="depthSelect">
           <option value="10">10%</option><option value="20">20%</option><option value="30">30%</option><option value="40">40%</option><option value="50">50%</option><option value="60">60%</option><option value="70">70%</option><option value="80">80%</option><option value="90">90%</option>
         </select>
-        <div class="hint">腮紅系列 預設 20%；其他色系預設 50%。<br>數值越高，鏡片染色呈現越深。</div>
+        <div class="hint">選擇顏色後會依「漸層展示標籤」自動帶入預設深度。<br>數值越高，鏡片染色呈現越深。</div>
       </div>
       <div class="group">
         <label>3. 染色區占比</label>
         <div class="row"><input id="zone" type="range" min="1" max="9" step="1" value="2"><div class="val"><span id="zoneVal">2</span>成</div></div>
-        <div class="hint">腮紅系列預設 2 成(20%)；其他色系預設 5 成(50%)。</div>
+        <div class="hint">選擇顏色後會依「漸層展示標籤」自動帶入預設染色區占比。</div>
       </div>
       <div class="group">
         <label>4. 光學中心移心</label>
@@ -470,25 +470,25 @@
 </main>
 <script>
 const colors = [
-  {name:'Yellow 黃色', hex:'#d3d714', dir:'top'},
-  {name:'Pink 粉色', hex:'#f1096c', dir:'top'},
-  {name:'Purple 紫色', hex:'#6f2067', dir:'top'},
-  {name:'Blue 藍色', hex:'#107cb2', dir:'top'},
-  {name:'Green 綠色', hex:'#016f43', dir:'top'},
-  {name:'Soft Tea 煙茶', hex:'#77790b', dir:'top'},
-  {name:'Brown 棕色', hex:'#675b09', dir:'top'},
-  {name:'Grey 灰色', hex:'#395336', dir:'top'},
-  {name:'Peach 蜜桃', hex:'#ca7b21', dir:'top'},
-  {name:'Nude 裸膚', hex:'#817437', dir:'top'},
-  {name:'Cool Grey 冷灰', hex:'#695c5a', dir:'top'},
-  {name:'Rose 玫瑰', hex:'#83120c', dir:'top'},
-  {name:'Rouge Pink 腮紅粉', hex:'#c00248', dir:'bottom'},
-  {name:'Rouge Rose 腮紅玫瑰', hex:'#83120c', dir:'bottom'}
+  {name:'Yellow 黃色', hex:'#d3d714', dir:'top', defaultDepth:50, defaultZone:7},
+  {name:'Pink 粉色', hex:'#f1096c', dir:'top', defaultDepth:60, defaultZone:7},
+  {name:'Purple 紫色', hex:'#6f2067', dir:'top', defaultDepth:70, defaultZone:7},
+  {name:'Blue 藍色', hex:'#107cb2', dir:'top', defaultDepth:70, defaultZone:7},
+  {name:'Green 綠色', hex:'#016f43', dir:'top', defaultDepth:70, defaultZone:7},
+  {name:'Soft Tea 煙茶', hex:'#77790b', dir:'top', defaultDepth:70, defaultZone:7},
+  {name:'Brown 棕色', hex:'#675b09', dir:'top', defaultDepth:70, defaultZone:7},
+  {name:'Grey 灰色', hex:'#395336', dir:'top', defaultDepth:70, defaultZone:7},
+  {name:'Peach 蜜桃', hex:'#ca7b21', dir:'top', defaultDepth:50, defaultZone:5},
+  {name:'Nude 裸膚', hex:'#817437', dir:'top', defaultDepth:50, defaultZone:5},
+  {name:'Cool Grey 冷灰', hex:'#695c5a', dir:'top', defaultDepth:50, defaultZone:5},
+  {name:'Rose 玫瑰', hex:'#83120c', dir:'top', defaultDepth:50, defaultZone:7},
+  {name:'Rouge Pink 腮紅粉', hex:'#c00248', dir:'bottom', defaultDepth:20, defaultZone:2},
+  {name:'Rouge Rose 腮紅玫瑰', hex:'#83120c', dir:'bottom', defaultDepth:20, defaultZone:2}
 ];
 const diaList = [60,65,70,75];
 const thinDiaList = [...Array.from({length:21},(_,i)=>50+i),75];
 let appMode = 'dye';
-let state = {color: colors[12], zone:2, depth:20, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
+let state = {color: colors[12], zone:colors[12].defaultZone, depth:colors[12].defaultDepth, decenter:0, dir:1, multifocal:false, show:'all', scale:1};
 const DISPLAY_BASE_SCALE = 0.98; // 一般顯示器實測：舊版 98% 視為新的 100%
 function applyDisplayScale(){
   document.documentElement.style.setProperty('--scale', state.scale * DISPLAY_BASE_SCALE);
@@ -537,8 +537,9 @@ document.getElementById('scale').oninput=e=>{state.scale=+e.target.value;applyDi
 applyDisplayScale();
 sel.onchange=e=>{
   state.color=colors[+e.target.value];
-  state.depth=state.color.dir==='bottom'?20:50;
-  state.zone=state.color.dir==='bottom'?2:5;
+  // 依「漸層展示標籤」帶入各色預設：濃度 = 染色深度，著色% = 染色區占比。
+  state.depth=state.color.defaultDepth ?? (state.color.dir==='bottom'?20:50);
+  state.zone=state.color.defaultZone ?? (state.color.dir==='bottom'?2:5);
   depthSelect.value=state.depth;
   document.getElementById('zone').value=state.zone;
   document.getElementById('zoneVal').textContent=state.zone;
