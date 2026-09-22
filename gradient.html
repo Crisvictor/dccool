@@ -2056,7 +2056,7 @@ function drawThinSection(svg,x,y,w,h){
     const fmt=n=>Number(n).toFixed(2).replace(/\.00$/,'');
     const sign=n=>n>0?'+':'';
     const baseY=thinState.vertexFieldMode?27:22;
-    addText(g,infoX+3,infoY+baseY,'紫虛線：S/C/A＋A/PD/內徑/VD 視場估算','note','start');
+    addText(g,infoX+3,infoY+baseY,'紫虛線：水平視場估算','note','start');
     addText(g,infoX+3,infoY+baseY+5.0,`${thinState.eye==='R'?'右眼':'左眼'}｜水平子午線 ${sign(estInfo.fH)}${fmt(estInfo.fH)}D｜移心 ${fmt(Math.abs(estInfo.shift))} mm`,'note','start');
     addText(g,infoX+3,infoY+baseY+10.0,`有效左右緣 ${fmt(estInfo.leftX)} / ${fmt(estInfo.rightX)} mm｜內徑 ${thinState.opticalDia}Φ`,'note','start');
     addText(g,infoX+3,infoY+baseY+15.0,`稜鏡 左 ${fmt(Math.abs(estInfo.leftPrism))}△｜右 ${fmt(Math.abs(estInfo.rightPrism))}△`,'note','start');
