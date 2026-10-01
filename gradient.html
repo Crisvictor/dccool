@@ -34,7 +34,7 @@
     user-select:auto;
   }
   body{margin:0;font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;background:var(--bg);color:#162b36;}
-  header{padding:18px 28px 12px;background:linear-gradient(180deg,#fff,#f4f7f8);border-bottom:1px solid #dfe8ec;}
+  header{position:relative;padding:18px 86px 12px 28px;background:linear-gradient(180deg,#fff,#f4f7f8);border-bottom:1px solid #dfe8ec;}
   .titleRow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   h1{margin:0;font-size:24px;letter-spacing:.03em;color:var(--ink)}
   .modeBtn{border:1px solid #0d6075;border-radius:999px;background:#fff;color:#0d6075;padding:7px 14px;font-weight:800;cursor:pointer;transition:.18s}
@@ -189,10 +189,250 @@
   }
   @page{size:A4 portrait;margin:6mm 5mm}
   @media print{html,body{width:auto!important;margin:0!important;padding:0!important;background:#fff}header,.controls,.toolbar,.modalOverlay{display:none!important}main{display:block!important;padding:0!important;margin:0!important}.stageWrap{box-shadow:none!important;border:0!important;padding:0!important;margin:0!important;width:100%!important;overflow:visible!important}.canvas{border:0!important;padding:0!important;margin:0!important;transform:none!important;width:195mm!important;min-width:0!important;min-height:0!important;overflow:visible!important}.canvas svg{width:195mm!important;height:auto!important;max-width:none!important;transform:translateX(-3mm)}.pageBreak{break-after:page}}
+
+  /* ===== 外觀切換｜暗模式 ===== */
+  .themeToggle{
+    position:absolute;top:15px;right:24px;z-index:20;
+    width:42px;height:42px;padding:0;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid #bccbd2;border-radius:50%;
+    background:#fff;color:#294754;
+    cursor:pointer;box-shadow:0 4px 14px rgba(15,55,70,.10);
+    transition:background .18s ease,color .18s ease,border-color .18s ease,
+               box-shadow .18s ease,transform .12s ease;
+  }
+  .themeToggle:hover{
+    background:#edf5f8;border-color:#7fa9b9;color:#173847;
+    transform:translateY(-1px);
+  }
+  .themeToggle:active{transform:scale(.94)}
+  .themeToggle:focus-visible{outline:2px solid #71abc2;outline-offset:3px}
+  .themeIcon{width:22px;height:22px;display:block;pointer-events:none}
+  .themeIcon path,.themeIcon circle,.themeIcon line{
+    stroke:currentColor;fill:none;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round;
+  }
+
+  body.darkMode{
+    --bg:#080b10;
+    --panel:#11161e;
+    --ink:#e8edf3;
+    --muted:#98a5b2;
+    --line:#78bdd9;
+    --accent:#ff6f7d;
+    --shadow:0 10px 30px rgba(0,0,0,.34);
+    background:var(--bg);
+    color:#d9e0e7;
+  }
+  body.darkMode header{
+    background:linear-gradient(180deg,#0e131b,#090d13);
+    border-bottom-color:#27313d;
+  }
+  body.darkMode h1{color:#edf2f7}
+  body.darkMode .sub,
+  body.darkMode .toolbar,
+  body.darkMode .hint{color:#97a5b2}
+  body.darkMode .controls,
+  body.darkMode .stageWrap{
+    background:#11161e;border-color:#293440;box-shadow:var(--shadow);
+  }
+  body.darkMode .group{border-bottom-color:#27313b}
+  body.darkMode label{color:#d7dfe6}
+
+  body.darkMode .themeToggle{
+    background:#191523;border-color:#766b9f;color:#f0dc8b;
+    box-shadow:0 4px 18px rgba(0,0,0,.36);
+  }
+  body.darkMode .themeToggle:hover{
+    background:#241d33;border-color:#9988c6;color:#ffe9a2;
+  }
+
+  body.darkMode select,
+  body.darkMode input[type=number],
+  body.darkMode .thinSelect,
+  body.darkMode .rangeQueryGrid select,
+  body.darkMode .rangeQueryGrid input,
+  body.darkMode .orderInputGrid input,
+  body.darkMode .orderInputGrid select{
+    background:#171d26;color:#e2e8ee;border-color:#3a4654;
+  }
+  body.darkMode input[type=range],
+  body.darkMode .toggleRow input{accent-color:#82c9e3}
+  body.darkMode .val{
+    background:#171d26;color:#dde5ec;border-color:#3a4654;
+  }
+  body.darkMode .toggleRow{
+    background:#151b23;color:#dbe3ea;border-color:#35414d;
+  }
+
+  body.darkMode .segSwitch{
+    background:#171d25;border-color:#394653;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.28);
+  }
+  body.darkMode .segSwitchLabel{color:#a4b1bc}
+  body.darkMode .segBtn{color:#aebac5}
+  body.darkMode .segBtn:hover{background:#202833;color:#e3e9ee}
+  body.darkMode .segBtn.active{
+    background:#27323e;color:#92d6ef;
+    box-shadow:0 2px 8px rgba(0,0,0,.28),0 0 0 1px rgba(126,201,228,.18);
+  }
+  body.darkMode .segBtn.vendorKante.active{background:#274a6d;color:#eef7ff}
+  body.darkMode .segBtn.vendorWeixing.active{background:#777325;color:#fffbd5}
+  body.darkMode .segBtn.dirActive.active{background:#2e7894;color:#fff}
+
+  body.darkMode .chip{
+    background:#151b23;color:#cbd5dd;border-color:#3a4653;
+  }
+  body.darkMode .chip:hover{background:#202833}
+  body.darkMode .chip.active{
+    background:#315f78;color:#fff;border-color:#63a8c6;
+  }
+
+  body.darkMode .modeBtn,
+  body.darkMode .teachBtn,
+  body.darkMode .kanteBtn,
+  body.darkMode .weixingBtn{
+    background:#151b23;color:#cfd9e1;border-color:#455360;
+  }
+  body.darkMode .modeBtn:hover,
+  body.darkMode .teachBtn:hover,
+  body.darkMode .kanteBtn:hover,
+  body.darkMode .weixingBtn:hover{
+    background:#24313c;color:#f1f5f8;border-color:#6f8998;
+  }
+  body.darkMode .printBtn{background:#315f78;color:#fff}
+
+  body.darkMode .canvas{
+    background:#0b0f15;border-color:#35414d;
+  }
+
+  /* 染色漸層模式的鏡坯以白色基底模擬透明／白底鏡片。
+     漸層透明區仍會落在白底上，不受暗模式畫布黑底影響。 */
+  .dyeLensBase{fill:#fff}
+  body.darkMode .dyeLensBase{fill:#fff!important}
+  body.darkMode .legendBox{fill:#151b23!important;stroke:#40505e!important}
+  body.darkMode .lensText{fill:#aab4bd!important}
+  body.darkMode .note{fill:#a8b3bd!important}
+  body.darkMode .note1{fill:#c0aeb7!important}
+  body.darkMode .note2{fill:#76828d!important}
+  body.darkMode .mmLabel{fill:#a6d8ea!important}
+  body.darkMode .frameLabel{fill:#aab5bf!important}
+  body.darkMode .watermark{fill:#68747e!important}
+  body.darkMode .ruler{stroke:#b9c3cb!important}
+  body.darkMode .rulerText{fill:#c9d2d9!important}
+  body.darkMode .centerLine{stroke:#667989!important}
+  body.darkMode .ocLine{stroke:#ff7f8b!important}
+  body.darkMode .zoneThin{fill:#72d4ad!important}
+  body.darkMode .zoneOptical{fill:#7bd3e2!important}
+  body.darkMode .freeHandle{fill:#17202a!important;stroke:#83cde8!important}
+  body.darkMode .freeHandle:hover{fill:#22303b!important;stroke:#a4e1f5!important}
+  body.darkMode .freeHandleLabel{fill:#8ed6ef!important}
+  body.darkMode .freeGuide{stroke:#76aabd!important}
+  body.darkMode .multiTickText{fill:var(--multi-color,#e0d75c)!important}
+
+  /* SVG 內原本的深藍／灰／紫線條在暗底上統一提亮 */
+  body.darkMode svg [stroke="#0d4052"]{stroke:#7fc5df!important}
+  body.darkMode svg [stroke="#0d6075"]{stroke:#82cce7!important}
+  body.darkMode svg [stroke="#70aebe"]{stroke:#8ed5e8!important}
+  body.darkMode svg [stroke="#b45a8a"]{stroke:#dda0c6!important}
+  body.darkMode svg [stroke="#6f7d84"]{stroke:#aab6c0!important}
+  body.darkMode svg [stroke="#7b8f98"]{stroke:#aeb9c2!important}
+  body.darkMode svg [stroke="#7da7b6"]{stroke:#92c6d8!important}
+  body.darkMode svg [stroke="#6f9eae"]{stroke:#8fc7da!important}
+  body.darkMode svg [stroke="#9eb2bb"],
+  body.darkMode svg [stroke="#9fb1b9"],
+  body.darkMode svg [stroke="#9fb2bc"]{stroke:#788b99!important}
+  body.darkMode svg [stroke="#d8e3e8"],
+  body.darkMode svg [stroke="#c7d9df"]{stroke:#41515f!important}
+
+  /* SVG 內亮色底塊改成深色半透明底，避免暗模式出現白塊 */
+  body.darkMode svg [fill="#fff"],
+  body.darkMode svg [fill="#ffffff"],
+  body.darkMode svg [fill="#fdfefe"]{fill:#151b23!important}
+  body.darkMode svg [fill="#f8fbfc"],
+  body.darkMode svg [fill="#f8fcfd"],
+  body.darkMode svg [fill="#f3f8fa"],
+  body.darkMode svg [fill="#eef7fa"]{fill:#151c24!important}
+  body.darkMode svg [fill="#d9edf3"],
+  body.darkMode svg [fill="#dceff4"]{fill:#21313c!important}
+
+  body.darkMode .fieldEstimatePanel,
+  body.darkMode .thicknessEstimatePanel{
+    background:#141b24;border-color:#3a4a59;
+  }
+  body.darkMode .fieldEstimateResult{
+    background:#171e27;border-color:#3b4855;color:#d2dbe3;
+  }
+  body.darkMode .fieldEstimateResult.warn,
+  body.darkMode .inlineWarn,
+  body.darkMode .warnHint,
+  body.darkMode .orderCalcWarn{
+    background:#292317;border-color:#6b5a32;color:#e7c982;
+  }
+  body.darkMode .infoHint{
+    background:#15232d;border-color:#34596a;color:#a9d6e7;
+  }
+
+  body.darkMode .modalOverlay{background:rgba(0,0,0,.66)}
+  body.darkMode .modalCard,
+  body.darkMode .modalHead{
+    background:#11161e;border-color:#2d3944;color:#dce4eb;
+  }
+  body.darkMode .modalHead h2,
+  body.darkMode .teachSection h3{color:#e8edf3}
+  body.darkMode .modalClose{
+    background:#171e27;border-color:#3e4c59;color:#dce4eb;
+  }
+  body.darkMode .modalLead,
+  body.darkMode .ruleCard,
+  body.darkMode .orderCalcPanel{
+    background:#151c24;border-color:#303d49;color:#cfd8df;
+  }
+  body.darkMode .teachSection{border-bottom-color:#28333e}
+  body.darkMode .teachTag{background:#183343;color:#91d2ea}
+  body.darkMode .rangeTab{
+    background:#151c24;color:#c8d3db;border-color:#3a4a55;
+  }
+  body.darkMode .rangeTab.active{background:#315f78;color:#fff;border-color:#6ba8c3}
+  body.darkMode .rangeResult{
+    background:#151d24;border-color:#34434e;color:#c9d5dd;
+  }
+  body.darkMode .rangeResult.success{background:#16261d;border-color:#3f6b4d;color:#9fd3aa}
+  body.darkMode .rangeResult.warn{background:#292317;border-color:#6b5a32;color:#e7c982}
+  body.darkMode .rangeResult.danger{background:#2b191a;border-color:#704143;color:#e6a7a8}
+  body.darkMode .rangeTableWrap{border-color:#34414b}
+  body.darkMode .rangeTable th{
+    background:#17232b;color:#b7d6e2;border-bottom-color:#3a4b57;
+  }
+  body.darkMode .rangeTable td{border-bottom-color:#28333b;color:#ccd5dc}
+  body.darkMode .orderCalcTable th{
+    background:#17232b;color:#b8d7e4;border-bottom-color:#3a4a56;
+  }
+  body.darkMode .orderCalcTable td{border-bottom-color:#29343d;color:#cbd5dc}
+  body.darkMode .orderCalcTable tr.activeCalcRow td{background:#17271e}
+  body.darkMode .orderCalcTable .actualOrder{color:#e5edf3}
+
+  @media(max-width:720px){
+    header{padding-right:74px}
+    .themeToggle{right:14px;top:14px;width:40px;height:40px}
+    .themeIcon{width:21px;height:21px}
+  }
+
+  /* 列印固定使用亮色，避免暗模式列印成黑底 */
+  @media print{
+    body.darkMode{background:#fff!important;color:#162b36!important}
+    body.darkMode .stageWrap,
+    body.darkMode .canvas{background:#fff!important}
+    body.darkMode svg text{fill:initial}
+  }
+
 </style>
 </head>
 <body>
 <header>
+  <button class="themeToggle" id="themeToggle" type="button" aria-pressed="false" aria-label="切換至暗模式" title="切換至暗模式">
+    <svg class="themeIcon" id="themeIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
+  </button>
   <div class="titleRow">
     <h1 id="pageTitle">片坯漸層染色設定演示</h1>
     <button class="modeBtn" id="modeBtn" type="button">精修薄模式</button>
@@ -548,6 +788,55 @@
   </section>
 </main>
 <script>
+const themeToggle=document.getElementById('themeToggle');
+const themeIcon=document.getElementById('themeIcon');
+
+function renderThemeIcon(dark){
+  if(!themeIcon) return;
+
+  // 亮模式顯示「月亮」＝點擊後進入暗模式；
+  // 暗模式顯示「太陽」＝點擊後回到亮模式。
+  themeIcon.innerHTML = dark
+    ? `
+      <circle cx="12" cy="12" r="3.7"></circle>
+      <line x1="12" y1="2.2" x2="12" y2="4.1"></line>
+      <line x1="12" y1="19.9" x2="12" y2="21.8"></line>
+      <line x1="2.2" y1="12" x2="4.1" y2="12"></line>
+      <line x1="19.9" y1="12" x2="21.8" y2="12"></line>
+      <line x1="5.05" y1="5.05" x2="6.4" y2="6.4"></line>
+      <line x1="17.6" y1="17.6" x2="18.95" y2="18.95"></line>
+      <line x1="18.95" y1="5.05" x2="17.6" y2="6.4"></line>
+      <line x1="6.4" y1="17.6" x2="5.05" y2="18.95"></line>
+    `
+    : `
+      <path d="M20.1 15.1A8.1 8.1 0 0 1 8.9 3.9A8.4 8.4 0 1 0 20.1 15.1Z"></path>
+    `;
+}
+
+function applyTheme(mode){
+  const dark=mode==='dark';
+  document.body.classList.toggle('darkMode',dark);
+  renderThemeIcon(dark);
+
+  if(themeToggle){
+    themeToggle.setAttribute('aria-pressed',String(dark));
+    themeToggle.setAttribute('aria-label',dark?'切換至亮模式':'切換至暗模式');
+    themeToggle.setAttribute('title',dark?'切換至亮模式':'切換至暗模式');
+  }
+}
+let savedTheme='light';
+try{
+  savedTheme=localStorage.getItem('gradientTheme')==='dark'?'dark':'light';
+}catch(_){}
+applyTheme(savedTheme);
+if(themeToggle){
+  themeToggle.onclick=()=>{
+    const next=document.body.classList.contains('darkMode')?'light':'dark';
+    applyTheme(next);
+    try{localStorage.setItem('gradientTheme',next);}catch(_){}
+  };
+}
+
 const colors = [
   {name:'Yellow 黃色', hex:'#d3d714', dir:'top'},
   {name:'Pink 粉色', hex:'#f1096c', dir:'top'},
@@ -1461,6 +1750,8 @@ function drawLens(svg, x,y,d){
   const defs=svg.querySelector('defs');
   const gid='grad'+d;
   defs.appendChild(lensGradient(gid,state.color.dir));
+  // 染色鏡坯白底：透明漸層區顯示白色，而不是暗模式畫布底色。
+  g.appendChild(el('circle',{cx:x,cy:y,r:d/2,class:'dyeLensBase'}));
   g.appendChild(el('circle',{cx:x,cy:y,r:d/2,fill:`url(#${gid})`,stroke:'none'}));
   g.appendChild(el('circle',{cx:x,cy:y,r:d/2,class:'circleLine'}));
   g.appendChild(el('line',{x1:x-d/2,y1:y,x2:x+d/2,y2:y,class:'centerLine'}));
