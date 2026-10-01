@@ -671,32 +671,61 @@ document.getElementById('dirL').onclick=()=>{state.dir=-1;syncDirectionButtons()
 syncDirectionButtons();
 
 document.getElementById('opticalDia').oninput=e=>{thinState.opticalDia=+e.target.value;document.getElementById('opticalDiaVal').textContent=thinState.opticalDia;updateThinWarnings();draw()};
-const vertexFieldMode=document.getElementById('vertexFieldMode');
-function syncVertexFieldUI(){
-  const wrap=document.getElementById('vertexFieldControls');
-  const advance=document.getElementById('fieldEstimateAdvanceRow');
-  const fieldToggle=document.getElementById('fieldEstimateToggle');
 
-  if(wrap) wrap.classList.toggle('hidden',!thinState.vertexFieldMode);
-  if(advance) advance.classList.toggle('hidden',!thinState.vertexFieldMode);
-
-  // 關閉「頂點距離與有效視野」時，視場估算必須同步關閉。
-  if(!thinState.vertexFieldMode){
-    fieldEstimateState.open=false;
-    if(fieldToggle) fieldToggle.setAttribute('aria-expanded','false');
-    const panel=document.getElementById('fieldEstimatePanel');
-    if(panel) panel.classList.add('hidden');
-  }
+// 視場估算狀態機：三個狀態只以 JS state 為準，事件改變 state 後統一由 draw() 刷新 UI。
+// 條件：頂點距離與有效視野 + 視場估算 + 鏡框參數比對。
+function isFieldEstimateReady(){
+  return !!(thinState.vertexFieldMode && fieldEstimateState.open && thinState.showFrame);
 }
+function syncFieldEstimateUI(){
+  const vertexWrap=document.getElementById('vertexFieldControls');
+  const advance=document.getElementById('fieldEstimateAdvanceRow');
+  const panel=document.getElementById('fieldEstimatePanel');
+  const toggle=document.getElementById('fieldEstimateToggle');
+
+  // 規則：關閉頂點距離時，視場估算也必須直接關閉。
+  if(!thinState.vertexFieldMode) fieldEstimateState.open=false;
+
+  if(vertexWrap) vertexWrap.classList.toggle('hidden',!thinState.vertexFieldMode);
+  if(advance) advance.classList.toggle('hidden',!thinState.vertexFieldMode);
+  if(panel) panel.classList.toggle('hidden',!fieldEstimateState.open);
+  if(toggle) toggle.setAttribute('aria-expanded',String(!!fieldEstimateState.open));
+}
+function syncFrameCompareUI(){
+  const frameWrap=document.getElementById('frameInputWrap');
+  if(frameWrap) frameWrap.classList.toggle('hidden',!thinState.showFrame);
+}
+function syncFrameDefaultsFromDOM(){
+  const num=(id,fallback)=>{
+    const el=document.getElementById(id);
+    const v=el ? Number(el.value) : NaN;
+    return isFinite(v) ? v : fallback;
+  };
+  thinState.frameA=num('frameA',thinState.frameA);
+  thinState.frameB=num('frameB',thinState.frameB);
+  thinState.ed=num('frameED',thinState.ed);
+  thinState.dbl=num('frameDBL',thinState.dbl);
+  thinState.pd=num('framePD',thinState.pd);
+  thinState.ph=num('framePH',thinState.ph);
+
+  // 自由框型本身已有預設定位點，勾選鏡框比對時就立刻反算 A / ED。
+  if(thinState.shapePreset==='free') updateFreeMetrics();
+  syncFrameEDLimits();
+  syncThinLimits();
+}
+function syncThinDependentUI(){
+  syncFieldEstimateUI();
+  syncFrameCompareUI();
+}
+
+const vertexFieldMode=document.getElementById('vertexFieldMode');
 if(vertexFieldMode){
   vertexFieldMode.checked=!!thinState.vertexFieldMode;
   vertexFieldMode.onchange=e=>{
-    thinState.vertexFieldMode=e.target.checked;
-    syncVertexFieldUI();
-    updateFieldEstimatePanel();
+    thinState.vertexFieldMode=!!e.target.checked;
+    if(!thinState.vertexFieldMode) fieldEstimateState.open=false;
     draw();
   };
-  syncVertexFieldUI();
 }
 document.getElementById('vertexDistance').oninput=e=>{
   thinState.vertexDistance=clamp(+e.target.value||12,6,20);
@@ -759,14 +788,10 @@ if(fieldEstimateToggle){
     if(e){e.preventDefault();e.stopPropagation();}
     if(!thinState.vertexFieldMode){
       fieldEstimateState.open=false;
-      fieldEstimateToggle.setAttribute('aria-expanded','false');
-      updateFieldEstimatePanel();
       draw();
       return;
     }
     fieldEstimateState.open=!fieldEstimateState.open;
-    fieldEstimateToggle.setAttribute('aria-expanded',String(fieldEstimateState.open));
-    updateFieldEstimatePanel();
     draw();
   };
   fieldEstimateToggle.setAttribute('aria-expanded','false');
@@ -786,12 +811,19 @@ if(fieldEstimateToggle){
   };
 });
 
-document.getElementById('showFrameOutline').onchange=e=>{
-  thinState.showFrame=e.target.checked;
-  document.getElementById('frameInputWrap').classList.toggle('hidden',!thinState.showFrame);
-  document.getElementById('frameHint').textContent = thinState.showFrame ? '' : '預設關閉。開啟後才顯示左右眼、框型預設、B 高與 DBL / PD / 瞳高；自由框型的 A / ED 由定位點自動反算。';
-  draw();
-};
+const showFrameOutline=document.getElementById('showFrameOutline');
+if(showFrameOutline){
+  showFrameOutline.checked=!!thinState.showFrame;
+  showFrameOutline.onchange=e=>{
+    thinState.showFrame=!!e.target.checked;
+
+    // 已有預設鏡框資料，因此「最後才勾選鏡框比對」時直接同步並重畫，
+    // 不再依賴自由框型/輸入欄位的第二次事件。
+    if(thinState.showFrame) syncFrameDefaultsFromDOM();
+
+    draw();
+  };
+}
 document.getElementById('frameA').oninput=e=>{if(thinState.shapePreset==='free') return; thinState.frameA=clamp(+e.target.value||54,30,Math.min(70,thinState.dia-2)); syncFrameEDLimits(); draw()};
 document.getElementById('frameB').oninput=e=>{thinState.frameB=clamp(+e.target.value||38,20,Math.min(60,thinState.dia-2)); if(thinState.shapePreset==='free') updateFreeMetrics(); else syncFrameEDLimits(); syncThinLimits(); draw()};
 document.getElementById('frameED').oninput=e=>{if(thinState.shapePreset==='free') return; syncFrameEDLimits(+e.target.value||thinState.ed); draw()};
@@ -1984,11 +2016,12 @@ function getPrescriptionFieldEstimate(){
   return {fH,shift,frameLeftX,frameRightX,opticalRadius,leftX,rightX,clippedLeft,clippedRight,leftPrism,rightPrism,leftGeom,rightGeom,leftDev,rightDev,leftAdjusted,rightAdjusted,geomWidth,adjustedWidth,change:adjustedWidth-geomWidth};
 }
 function updateFieldEstimatePanel(){
+  const ready=isFieldEstimateReady();
   const panel=document.getElementById('fieldEstimatePanel');
   const out=document.getElementById('fieldEstimateResult');
   if(panel) panel.classList.toggle('hidden',!fieldEstimateState.open);
   if(!out || !fieldEstimateState.open) return;
-  if(!thinState.showFrame){
+  if(!ready){
     out.className='fieldEstimateResult warn';
     out.innerHTML='請先開啟「鏡框參數比對功能」；完成 A / DBL / PD 與眼位資料後，才會啟用度數視場估算。';
     return;
@@ -2344,7 +2377,7 @@ function drawThinSection(svg,x,y,w,h){
   // 隱藏度數視場估算：開啟功能且完成鏡框參數後，加入處方估算視場虛線。
   // 紫虛線的左 / 右出發點改為剖面圖鏡片後表面的「實際可用視場左右邊界」，
   // 也就是鏡框水平範圍 ∩ 有效光學內徑；因此會跟著 A / DBL / PD / 內徑變化。
-  if(fieldEstimateState.open && thinState.showFrame){
+  if(isFieldEstimateReady()){
     const est=getPrescriptionFieldEstimate();
     if(est && !est.invalid){
       const mmToIdx = mm => Math.max(0,Math.min(180,Math.round((mm+blankRadius)/thinState.dia*180)));
@@ -2383,7 +2416,7 @@ function drawThinSection(svg,x,y,w,h){
   if(thinState.vertexFieldMode) addText(g,mid,globeCenterY+14.3,`有效光學視野 約 ${fieldAngle.toFixed(1)}°`,'note1');
 
   // 右上說明欄
-  const estInfo=(fieldEstimateState.open&&thinState.showFrame)?getPrescriptionFieldEstimate():null;
+  const estInfo=isFieldEstimateReady()?getPrescriptionFieldEstimate():null;
   const thickInfo=getThicknessEstimate();
   const fmt=n=>Number(n).toFixed(2).replace(/\.00$/,'').replace(/(\.\d)0$/,'$1');
   const sign=n=>n>0?'+':'';
@@ -2474,6 +2507,7 @@ function drawDye(svg){
   document.getElementById('summary').textContent=`目前：${state.color.name}｜${state.color.dir==='bottom'?'下染色':'上染色'}｜深度 ${state.depth}%${boostNote}｜染色 ${state.zone}成｜光學中心 ${state.dir>0?'右':'左'}移 ${state.decenter} mm｜多焦標記 ${state.multifocal?`開啟（${state.multiVendor==='kante'?'康德':'偉星'}）`:'關閉'}`;
 }
 function draw(){
+  syncThinDependentUI();
   updateFieldEstimatePanel();
   const svg=document.getElementById('svg');
   svg.innerHTML='';
