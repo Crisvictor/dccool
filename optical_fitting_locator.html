@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0b0f14" />
-<title>手機配鏡定位儀 V0.2.1</title>
+<title>手機配鏡定位儀 V0.3.0</title>
 <style>
 :root{
   --bg:#0b0f14;--panel:#121820;--panel2:#0d131a;--line:#26303b;--txt:#f2f5f8;--muted:#8f9baa;
@@ -19,26 +19,55 @@ button,input,select{font:inherit}.wrap{max-width:980px;margin:auto;padding:12px 
 video,#photoCanvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}#photoCanvas{display:none;touch-action:none}
 .guide{position:absolute;inset:0;pointer-events:none}.faceGuide{position:absolute;left:50%;top:38%;width:59%;height:48%;transform:translate(-50%,-50%);border:2px solid rgba(255,255,255,.28);border-radius:46% 46% 50% 50%}
 .crossV,.crossH{position:absolute;background:rgba(255,255,255,.18)}.crossV{width:1px;height:54%;left:50%;top:11%}.crossH{height:1px;width:54%;left:23%;top:38%}
-.cardGuide{position:absolute;left:50%;top:73%;width:58%;height:12%;transform:translate(-50%,-50%);border:1.5px dashed rgba(242,204,96,.62);border-radius:7px}.cardGuide:after{content:"校正卡靠近鏡框平面";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:11px;color:#f2cc60;white-space:nowrap;text-shadow:0 1px 2px #000}
+.cardGuide{position:absolute;left:50%;top:73%;width:58%;height:12%;transform:translate(-50%,-50%);border:1.5px dashed rgba(242,204,96,.62);border-radius:7px}.cardGuide:after{content:"校正卡平貼鏡架，勿向前伸";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:11px;color:#f2cc60;white-space:nowrap;text-shadow:0 1px 2px #000}
 .liveBanner{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);min-width:65%;max-width:92%;text-align:center;padding:7px 10px;border-radius:999px;background:rgba(0,0,0,.68);font-size:12px;backdrop-filter:blur(4px)}
 #loupe{display:none;position:absolute;right:10px;top:10px;width:124px;height:124px;border-radius:50%;border:3px solid #fff;box-shadow:0 3px 18px rgba(0,0,0,.55);background:#000;pointer-events:none}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.controls{margin-top:10px}.controls button{flex:1;min-width:120px}
 button{appearance:none;border:1px solid var(--line);background:#1a222c;color:var(--txt);padding:10px 12px;border-radius:10px;cursor:pointer}button.primary{background:#1769d3;border-color:#2176e8}button.good{background:#207a40;border-color:#2b9b52}button.warn{background:#604512;border-color:#8d681e}button:disabled{opacity:.42;cursor:not-allowed}
-select,input[type="text"]{background:#0b1016;color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:9px;max-width:100%}.toggle{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);padding:3px 0}.toggle input{accent-color:var(--accent)}
+select,input[type="text"],input[type="number"]{background:#0b1016;color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:9px;max-width:100%}.toggle{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);padding:3px 0}.toggle input{accent-color:var(--accent)}
 .status{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.chip{border:1px solid var(--line);border-radius:999px;padding:5px 8px;font-size:11px;color:#c7d0da;background:#0d131a}.chip.good{border-color:#2b8f4e;color:#77e39a}.chip.warn{border-color:#8a661e;color:#f2c767}.chip.bad{border-color:#9e3d39;color:#ff8d88}.chip.info{border-color:#2a67a3;color:#83bcff}
 .gate{margin-top:9px;padding:10px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-size:13px}.gate.good{border-color:#286941}.gate.warn{border-color:#78601f}.gate.bad{border-color:#873a37}
 .calCard{display:grid;grid-template-columns:1fr;gap:10px}.callout{padding:10px;border-radius:10px;background:#0d131a;border:1px solid var(--line);font-size:12px;color:#b8c1cb;line-height:1.55}.callout b{color:var(--txt)}
 .steps{display:grid;grid-template-columns:1fr;gap:8px}.step{background:#0d131a;border:1px solid var(--line);border-radius:11px;padding:10px}.step.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}.step b{font-size:13px}.small{font-size:12px;color:var(--muted);line-height:1.55}.hint{margin-top:8px;padding:8px 9px;border-radius:9px;background:#0c1117;border:1px dashed #344253;font-size:12px;color:#b5c0cc}
-.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metric{background:#0d131a;border:1px solid var(--line);border-radius:11px;padding:10px}.metric span{font-size:11px;color:var(--muted)}.metric b{display:block;font-size:19px;margin-top:3px}.metric .src{font-size:10px;color:#657383;margin-top:2px}
+.measureGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.measureGrid label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px}.measureGrid label.span2{grid-column:1 / -1}.measureGrid input,.measureGrid select{width:100%;max-width:100%;min-width:0}.measureNote{font-size:12px;line-height:1.6;color:#bdc8d5;margin:8px 0 0}.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metric{background:#0d131a;border:1px solid var(--line);border-radius:11px;padding:10px}.metric span{font-size:11px;color:var(--muted)}.metric b{display:block;font-size:19px;margin-top:3px}.metric .src{font-size:10px;color:#657383;margin-top:2px}
 pre{white-space:pre-wrap;word-break:break-word;background:#0b1016;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:11px;line-height:1.55;margin:9px 0 0}.footerNote{font-size:11px;line-height:1.55;color:#758190}.sep{height:1px;background:var(--line);margin:10px 0}
 @media(min-width:760px){.stage{aspect-ratio:4/3}.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.calCard{grid-template-columns:1.2fr .8fr}}
+
+/* 精準校正卡：平時隱藏，列印時獨占 A4 頁面 */
+#printCalibrationSheet{display:none}
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  html,body{background:#fff!important;color:#000!important;width:auto!important;height:auto!important}
+  body{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .wrap{display:none!important}
+  #printCalibrationSheet{
+    display:block!important;
+    position:static!important;
+    width:190mm!important;
+    margin:0 auto!important;
+    padding:0!important;
+    color:#000!important;
+    background:#fff!important;
+    font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",sans-serif!important;
+  }
+  #printCalibrationSheet .pc-title{font-size:16pt;font-weight:800;margin:0 0 3mm}
+  #printCalibrationSheet .pc-note{font-size:9pt;line-height:1.55;margin:0 0 6mm}
+  #printCalibrationSheet .pc-card-wrap{display:flex;justify-content:center;margin:0}
+  #printCalibrationSheet .pc-verify{margin-top:9mm;border-top:.3mm solid #000;padding-top:5mm;font-size:9pt;line-height:1.55}
+  #printCalibrationSheet .pc-ruler-row{display:flex;align-items:flex-end;gap:10mm;margin-top:5mm}
+  #printCalibrationSheet .pc-ruler-item{display:flex;align-items:center;gap:3mm;white-space:nowrap}
+  #printCalibrationSheet .pc-bar{height:5mm;border-left:.4mm solid #000;border-right:.4mm solid #000;border-top:.45mm solid #000;display:inline-block}
+  #printCalibrationSheet .pc-w10{width:10mm}.pc-w50{width:50mm}
+  #printCalibrationSheet svg{display:block;width:92mm;height:58mm}
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="header">
     <div><h1>手機配鏡定位儀</h1><div class="sub">手機後鏡頭＋Face Landmarker＋50 mm 校正卡｜影像只在本機瀏覽器處理</div></div>
-    <div class="version">V0.2.1 相機修正版</div>
+    <div class="version">V0.3.0 透視誤差防護版</div>
   </div>
 
   <div class="panel">
@@ -70,8 +99,8 @@ pre{white-space:pre-wrap;word-break:break-word;background:#0b1016;border:1px sol
     <h2>50 mm 定位校正卡</h2>
     <div class="calCard">
       <div class="callout">
-        <b>建議拍法：</b>校正卡放在鼻樑下方／鏡框前方，盡量與鏡片平面平行，不要往前伸到手機方向。霧面白卡紙、不護貝，可減少反光。<br>
-        網頁會嘗試找出兩個「黑底白圓」靶點，兩圓心實際距離固定為 <b>50.00 mm</b>。
+        <b>建議拍法：</b>固定校正卡在鏡框平面，勿手持向鏡頭前伸；卡片不要彎曲。相機放在雙眼高度，鏡頭盡量正對雙眼，避免抬頭或俯拍。<br>
+        新版校正卡使用<b>四個黑底白圓</b>（左右相距 50 mm、上下 28 mm），可比兩點卡更可靠地偵測卡片歪斜與透視。<b>卡片低於眼睛或前後深度不同，仍無法只靠四點完全消除誤差。</b>
       </div>
       <div class="row" style="align-content:flex-start">
         <button id="printCardBtn">列印精準校正卡</button>
@@ -86,10 +115,10 @@ pre{white-space:pre-wrap;word-break:break-word;background:#0b1016;border:1px sol
     <div class="steps">
       <div class="step" id="stepCal">
         <b>1. 尺度校正</b>
-        <div class="small">自動辨識失敗時，依序點兩個白圓中心；不是點卡片邊緣。</div>
+        <div class="small">新版四圓卡：依序點左上、右上、左下、右下白圓中心。若仍使用舊版兩圓卡，可用「舊卡兩點」操作，但無法判斷完整透視。</div>
         <div class="row" style="margin-top:7px">
           <select id="refSize"><option value="50" selected>專用校正卡 50.00 mm</option><option value="85.60">信用卡長邊 85.60 mm</option><option value="53.98">信用卡短邊 53.98 mm</option><option value="30">基準線 30.00 mm</option></select>
-          <button data-mode="calibration">人工標記基準</button>
+          <button data-mode="quadCalibration">新版四圓人工校正</button><button data-mode="calibration">舊卡兩點校正</button>
         </div>
       </div>
       <div class="step" id="stepPupil">
@@ -113,9 +142,27 @@ pre{white-space:pre-wrap;word-break:break-word;background:#0b1016;border:1px sol
   </div>
 
   <div class="panel">
+    <h2>幾何修正與注視條件</h2>
+    <div class="measureGrid">
+      <label>本次注視目標
+        <select id="gazeMode"><option value="unknown">未確認（不可解讀為遠用 PD）</option><option value="far">遠處固定目標（建議 6 m 以上）</option><option value="near">注視近距離手機／近物</option></select>
+      </label>
+      <label>鏡頭至瞳孔平面距離（mm）
+        <input id="cameraEyeMm" type="number" value="400" min="250" max="1200" step="1" inputmode="decimal" />
+      </label>
+      <label class="span2">校正卡相對雙瞳前移距離（mm）；向鏡頭前移為正，後移為負
+        <input id="cardForwardMm" type="number" value="0" min="-80" max="80" step="0.5" inputmode="decimal" />
+      </label>
+      <label class="span2" style="flex-direction:row;align-items:flex-start"><input id="depthConfirmed" type="checkbox" style="width:auto;margin-top:3px" />已實際確認前後距離，啟用近似透視比例補償（未勾選時不會偷偷加固定修正值）</label>
+    </div>
+    <div class="measureNote" id="geometryHelp">當校正卡與瞳孔不在同一深度，光用 50 mm 單一比例會出現系統性偏小／偏大。此處依針孔模型做近似補償；鏡片／虹膜不共平面、鏡頭俯仰與畸變仍存在，不能直接作最終驗配依據。</div>
+    <div class="status" id="geometryStatus"></div>
+  </div>
+
+  <div class="panel">
     <h2>量測結果</h2>
     <div class="metrics">
-      <div class="metric"><span>總 PD</span><b id="pdTotal">--</b><div class="src" id="pdSource">--</div></div>
+      <div class="metric"><span id="pdLabel">總 PD（注視未確認）</span><b id="pdTotal">--</b><div class="src" id="pdSource">--</div></div>
       <div class="metric"><span>患者右單眼 PD</span><b id="pdR">--</b><div class="src">鏡架中心→右瞳</div></div>
       <div class="metric"><span>患者左單眼 PD</span><b id="pdL">--</b><div class="src">鏡架中心→左瞳</div></div>
       <div class="metric"><span>尺度</span><b id="scaleOut">--</b><div class="src" id="scaleSource">--</div></div>
@@ -133,10 +180,42 @@ pre{white-space:pre-wrap;word-break:break-word;background:#0b1016;border:1px sol
   <div class="panel">
     <h2>目前用途與限制</h2>
     <div class="footerNote">
-      本頁可用於原型驗證與門市內部比較測試；毫米結果依賴「校正卡與鏡框處於近似同一平面」。單張 2D 影像仍會受到透視、鏡片反光、手機鏡頭畸變與人工下緣定位影響。正式導入前，應以既有瞳距儀／配鏡定位儀做多次重複性與偏差驗證，不應直接把本原型視為醫療或驗配標準設備。
+      本頁可用於原型驗證與門市內部比較測試；毫米結果依賴卡片已知尺度、實測前後深度與正面拍攝。新版四點主要用於<b>判斷卡片歪斜</b>，並不能推知卡片與瞳孔的未知深度差；深度補償只是近似模型。遠近 PD 必須依實際注視目標區分。單張 2D 影像仍會受到透視、鏡片反光、手機鏡頭畸變與人工下緣定位影響。正式導入前，應以既有瞳距儀／配鏡定位儀做多次重複性與偏差驗證，不應直接把本原型視為醫療或驗配標準設備。
     </div>
   </div>
 </div>
+
+
+<section id="printCalibrationSheet" aria-hidden="true">
+  <div class="pc-title">配鏡定位校正卡｜50.00 mm</div>
+  <div class="pc-note">
+    列印請使用 <b>100%／實際大小</b>，不要選「符合頁面」或縮放。建議使用霧面 200–250g 白卡紙，請勿護貝。<br>
+    列印完成後，務必先用實體直尺確認下方 10 mm 與 50 mm 驗證尺，再使用校正卡。
+  </div>
+  <div class="pc-card-wrap">
+    <svg xmlns="http://www.w3.org/2000/svg" width="92mm" height="58mm" viewBox="0 0 92 58" role="img" aria-label="四點幾何校正卡，左右圓心50毫米，上下圓心28毫米">
+      <rect x="1" y="1" width="90" height="56" rx="2" fill="white" stroke="black" stroke-width="0.35" stroke-dasharray="2 1" />
+      <rect x="3" y="3" width="86" height="52" rx="2" fill="none" stroke="black" stroke-width="0.5" />
+      <path d="M6 9V6h3 M83 6h3v3 M6 49v3h3 M83 52h3v-3" fill="none" stroke="black" stroke-width="1.3" />
+      <text x="46" y="7.6" text-anchor="middle" font-size="3.7" font-weight="700">左右圓心距 50.00 mm</text>
+      <line x1="21" y1="9" x2="71" y2="9" stroke="black" stroke-width="0.3" />
+      <text x="46" y="28.2" text-anchor="middle" font-size="4" font-weight="700">配鏡定位校正卡</text>
+      <text x="46" y="33" text-anchor="middle" font-size="2.7">四點透視檢核  ·  上下圓心距 28.00 mm</text>
+      <g fill="black"><rect x="15" y="10" width="12" height="12"/><rect x="65" y="10" width="12" height="12"/><rect x="15" y="38" width="12" height="12"/><rect x="65" y="38" width="12" height="12"/></g>
+      <g fill="white"><circle cx="21" cy="16" r="3.0"/><circle cx="71" cy="16" r="3.0"/><circle cx="21" cy="44" r="3.0"/><circle cx="71" cy="44" r="3.0"/></g>
+      <line x1="21" y1="23.5" x2="21" y2="36.5" stroke="#777" stroke-width=".2" />
+      <line x1="71" y1="23.5" x2="71" y2="36.5" stroke="#777" stroke-width=".2" />
+      <text x="46" y="53.7" text-anchor="middle" font-size="2.4">100% 列印 · 霧面卡紙 · 勿護貝 · 圓心定位</text>
+    </svg>
+  </div>
+  <div class="pc-verify">
+    <b>列印尺寸驗證尺</b>：請用實體直尺量測，若下列線段不是精確的 10.0 mm / 50.0 mm，請勿使用此張校正卡。
+    <div class="pc-ruler-row">
+      <div class="pc-ruler-item"><span class="pc-bar pc-w10"></span><b>10 mm</b></div>
+      <div class="pc-ruler-item"><span class="pc-bar pc-w50"></span><b>50 mm</b></div>
+    </div>
+  </div>
+</section>
 
 <script>
 let FaceLandmarker=null, FilesetResolver=null;
@@ -148,7 +227,7 @@ const startBtn=$('startBtn'), captureBtn=$('captureBtn'), retakeBtn=$('retakeBtn
 let stream=null, faceLandmarker=null, running=false, modelReady=false, captured=false, lastLandmarks=null, capturedLandmarks=null;
 let lastInfer=0, stableFrames=0, autoCaptureLock=false, photoBacking=null, imageQuality=null, cardMeta=null;
 let mode=null, history=[], dragPoint=null;
-const marks={calibration:[],rightPupil:null,leftPupil:null,bridge:null,rightBottom:null,leftBottom:null};
+const marks={quad:[],calibration:[],rightPupil:null,leftPupil:null,bridge:null,rightBottom:null,leftBottom:null};
 
 function chip(t,c=''){return `<span class="chip ${c}">${t}</span>`}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
@@ -183,7 +262,7 @@ async function initModel(){
       const opts={baseOptions:{modelAssetPath:'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',delegate:'GPU'},runningMode:'VIDEO',numFaces:1,minFaceDetectionConfidence:.68,minFacePresenceConfidence:.68,minTrackingConfidence:.68,outputFacialTransformationMatrixes:true};
       try{faceLandmarker=await FaceLandmarker.createFromOptions(files,opts)}catch(e){opts.baseOptions.delegate='CPU';faceLandmarker=await FaceLandmarker.createFromOptions(files,opts)}
       modelReady=true;$('modelState').textContent='模型：就緒';
-      if(stream&&running)$('liveBanner').textContent='AI 已就緒，請正視鏡頭';
+      if(stream&&running)$('liveBanner').textContent='AI 已就緒，頭部朝正面，視線看指定目標';
       if(captured&&!capturedLandmarks) await analyzeCapturedWithAI();
       return true;
     }catch(e){console.error('AI model load failed',e);$('modelState').textContent='模型：載入失敗（仍可人工量測）';if(!stream)$('liveBanner').textContent='AI 載入失敗，仍可開相機／使用系統拍照';return false}
@@ -228,7 +307,7 @@ async function startCamera(){
     try{await video.play()}catch(e){console.warn('video.play()',e)}
     running=true;captured=false;lastLandmarks=null;capturedLandmarks=null;stableFrames=0;autoCaptureLock=false;
     video.style.display='block';canvas.style.display='none';$('guide').style.display='block';retakeBtn.disabled=true;captureBtn.disabled=false;autoCalBtn.disabled=true;
-    $('liveBanner').textContent=modelReady?'相機已開啟，請正視鏡頭':'相機已開啟；AI 正在背景載入';
+    $('liveBanner').textContent=modelReady?'相機已開啟，頭部朝正面，視線看指定注視目標':'相機已開啟；AI 正在背景載入';
     $('liveStatus').innerHTML=chip('相機已啟動','good')+(modelReady?chip('AI 就緒','good'):chip('AI 載入中','warn'));
     $('cameraHint').textContent='即時相機已啟動。若畫面是前鏡頭，重新按一次「開啟即時相機」通常會再次優先要求後鏡頭。';
     initModel();loop();
@@ -256,7 +335,7 @@ async function loadPhotoFile(file){
     captured=true;video.style.display='none';canvas.style.display='block';$('guide').style.display='none';retakeBtn.disabled=false;captureBtn.disabled=true;autoCalBtn.disabled=false;autoCaptureLock=false;
     clearManualMarks(false);imageQuality=analyzeImageQuality();$('liveBanner').textContent='照片已載入';$('cameraHint').textContent='照片已載入；AI 若成功會自動抓瞳孔，否則仍可使用人工標記。';
     if(modelReady)await analyzeCapturedWithAI();else initModel().then(ok=>ok&&analyzeCapturedWithAI());
-    drawOverlay();calculate();$('tapHint').textContent='正在嘗試辨識 50 mm 校正卡…';setTimeout(()=>{if(!autoDetectCalibration())$('tapHint').textContent='未自動抓到校正卡。可按「人工標記基準」點兩個白圓中心。'},50);
+    drawOverlay();calculate();$('tapHint').textContent='正在嘗試辨識 50 mm 校正卡…';setTimeout(()=>{if(!autoDetectCalibration())$('tapHint').textContent='未自動抓到校正卡。可選新版四圓人工校正，舊版仍能用兩點。'},50);
   }catch(e){console.error(e);$('cameraHint').textContent='照片載入失敗，請重新選擇。'}finally{URL.revokeObjectURL(url);$('photoInput').value=''}
 }
 function livePass(m){return m&&Math.abs(m.roll)<=2.5&&Math.abs(m.yawBias)<=.085&&m.faceFrac>=.28&&m.faceFrac<=.62}
@@ -272,7 +351,7 @@ function renderLiveStatus(){
   if(livePass(m)){
     stableFrames++;$('liveBanner').textContent=$('autoCapture').checked?`姿勢穩定 ${Math.min(100,stableFrames*10)}%`:'姿勢良好，可以拍攝';
     if($('autoCapture').checked&&stableFrames>=10&&!autoCaptureLock){autoCaptureLock=true;capturePhoto()}
-  }else{stableFrames=0;$('liveBanner').textContent=Math.abs(m.roll)>2.5?'請將頭部擺正':Math.abs(m.yawBias)>.085?'請正視鏡頭':m.faceFrac<.28?'請稍微靠近':'請稍微退後'}
+  }else{stableFrames=0;$('liveBanner').textContent=Math.abs(m.roll)>2.5?'請將頭部擺正':Math.abs(m.yawBias)>.085?'請面朝鏡頭，保持指定注視方向':m.faceFrac<.28?'請稍微靠近':'請稍微退後'}
 }
 async function loop(){
   if(!running)return;
@@ -287,11 +366,13 @@ async function capturePhoto(){
   photoBacking=document.createElement('canvas');photoBacking.width=canvas.width;photoBacking.height=canvas.height;photoBacking.getContext('2d').drawImage(canvas,0,0);
   capturedLandmarks=lastLandmarks?structuredClone(lastLandmarks):null;captured=true;running=false;canvas.style.display='block';video.style.display='none';$('guide').style.display='none';retakeBtn.disabled=false;captureBtn.disabled=true;autoCalBtn.disabled=false;autoCaptureLock=false;
   clearManualMarks(false);imageQuality=analyzeImageQuality();if(!capturedLandmarks&&modelReady)await analyzeCapturedWithAI();drawOverlay();calculate();
-  $('tapHint').textContent='正在嘗試辨識 50 mm 校正卡…';setTimeout(()=>{if(!autoDetectCalibration())$('tapHint').textContent='未自動抓到校正卡。可重拍，或按「人工標記基準」點兩個白圓中心。'},30);
+  $('tapHint').textContent='正在嘗試辨識 50 mm 校正卡…';setTimeout(()=>{if(!autoDetectCalibration())$('tapHint').textContent='未自動抓到校正卡。可重拍或使用四圓人工校正。'},30);
 }
 function retake(){
+  // Do not accidentally reuse measured depth offset for another subject/capture.
+  $('depthConfirmed').checked=false;$('cardForwardMm').value='0';
   captured=false;capturedLandmarks=null;lastLandmarks=null;photoBacking=null;imageQuality=null;cardMeta=null;clearManualMarks(false);canvas.style.display='none';$('guide').style.display='block';retakeBtn.disabled=true;autoCalBtn.disabled=true;stableFrames=0;calculate();
-  if(stream){running=true;video.style.display='block';captureBtn.disabled=false;$('liveBanner').textContent=modelReady?'請正視鏡頭':'相機已開啟；AI 正在背景載入';loop()}else{running=false;video.style.display='block';captureBtn.disabled=true;$('liveBanner').textContent='請開啟即時相機，或使用系統相機／選照片'}
+  if(stream){running=true;video.style.display='block';captureBtn.disabled=false;$('liveBanner').textContent=modelReady?'請面朝鏡頭，保持指定注視方向':'相機已開啟；AI 正在背景載入';loop()}else{running=false;video.style.display='block';captureBtn.disabled=true;$('liveBanner').textContent='請開啟即時相機，或使用系統相機／選照片'}
 }
 
 function analyzeImageQuality(){
@@ -317,6 +398,42 @@ function refineTarget(data,w,h,x,y,r){
   }
   if(!sw||cnt<8)return null;const cx=sx/sw,cy=sy/sw,bw=maxx-minx+1,bh=maxy-miny+1;return {x:cx,y:cy,bw,bh,aspect:bw/Math.max(1,bh)};
 }
+function cardQuadInfo(q){
+  if(!q||q.length!==4)return null;
+  const [tl,tr,bl,br]=q, dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  const top=dist(tl,tr),bottom=dist(bl,br),left=dist(tl,bl),right=dist(tr,br);
+  if(Math.min(top,bottom,left,right)<5)return null;
+  const slopeTop=Math.atan2(tr.y-tl.y,tr.x-tl.x)*180/Math.PI;
+  const slopeBottom=Math.atan2(br.y-bl.y,br.x-bl.x)*180/Math.PI;
+  const sizeSkew=Math.max(Math.abs(top-bottom)/(0.5*(top+bottom)),Math.abs(left-right)/(0.5*(left+right)));
+  const angleDiff=Math.abs(slopeTop-slopeBottom);
+  // Upper and lower horizontal rows provide a robust average lateral scale.
+  return {top,bottom,left,right,angle:slopeTop,angleDiff,skew:Math.max(sizeSkew,angleDiff*Math.PI/180),ratio:top/bottom,scale:50/(.5*(top+bottom)),verticalRatio:(left+right)/(top+bottom),source:'four'};
+}
+function findQuad(keep,workW){
+  // Candidate ordering TL,TR,BL,BR; score four circles as a 50x28 mm planar grid.
+  let best=null,bestScore=-1e10;
+  for(let i=0;i<keep.length;i++)for(let j=0;j<keep.length;j++){
+    if(i===j)continue;const tl=keep[i],tr=keep[j],dx=tr.x-tl.x,dy=tr.y-tl.y,L=Math.hypot(dx,dy);
+    if(dx<=0||L<workW*.12||L>workW*.78||Math.abs(dy)>L*.22)continue;
+    const pred={x:-dy*.56,y:dx*.56};
+    for(let a=0;a<keep.length;a++){
+      if(a===i||a===j)continue;
+      const bl=keep[a],e1=Math.hypot(bl.x-(tl.x+pred.x),bl.y-(tl.y+pred.y));
+      if(e1>.20*L)continue;
+      for(let b=0;b<keep.length;b++){
+        if(b===i||b===j||b===a)continue;
+        const br=keep[b],e2=Math.hypot(br.x-(tr.x+pred.x),br.y-(tr.y+pred.y));
+        if(e2>.20*L)continue;
+        const q=[tl,tr,bl,br],info=cardQuadInfo(q);
+        if(!info||info.skew>.18||Math.abs(info.verticalRatio-.56)>.10)continue;
+        const score=q.reduce((v,p)=>v+p.score,0) + 100*L/workW - 150*(e1+e2)/L - 220*info.skew;
+        if(score>bestScore){best={q,info,score};bestScore=score}
+      }
+    }
+  }
+  return best;
+}
 function detectCalibrationTargets(){
   if(!photoBacking)return null;
   const workW=Math.min(500,canvas.width),sc=workW/canvas.width,workH=Math.round(canvas.height*sc);const c=document.createElement('canvas');c.width=workW;c.height=workH;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(photoBacking,0,0,workW,workH);const img=x.getImageData(0,0,workW,workH),data=img.data;
@@ -324,6 +441,11 @@ function detectCalibrationTargets(){
   const radii=[6,9,12,15,18,22],cand=[];
   for(let y=yStart;y<workH-24;y+=3)for(let xx=24;xx<workW-24;xx+=3){let best=0,br=0;for(const r of radii){const s=targetScore(data,workW,workH,xx,y,r);if(s>best){best=s;br=r}}if(best>185)cand.push({x:xx,y,r:br,score:best})}
   cand.sort((a,b)=>b.score-a.score);const keep=[];for(const cnd of cand){if(keep.every(k=>Math.hypot(k.x-cnd.x,k.y-cnd.y)>Math.max(k.r,cnd.r)*1.4)){const rr=refineTarget(data,workW,workH,cnd.x,cnd.y,cnd.r);if(rr)keep.push({...cnd,...rr});if(keep.length>=16)break}}
+  const qMatch=findQuad(keep,workW);
+  if(qMatch){
+    const f=1/sc,q=qMatch.q.map(p=>({x:p.x*f,y:p.y*f})),info=cardQuadInfo(q);
+    return {a:q[0],b:q[1],quad:q,angle:info.angle,aspect:1,skew:info.skew,angleDiff:info.angleDiff,score:qMatch.score};
+  }
   let bestPair=null,bestPairScore=-1;
   for(let i=0;i<keep.length;i++)for(let j=i+1;j<keep.length;j++){
     let a=keep[i],b=keep[j];if(a.x>b.x)[a,b]=[b,a];const sep=b.x-a.x;if(sep<workW*.16||sep>workW*.82)continue;const dy=Math.abs(b.y-a.y);if(dy>sep*.24)continue;const sizeRatio=Math.max(a.bw*b.bh,b.bw*b.bh)/Math.max(1,Math.min(a.bw*a.bh,b.bw*b.bh));if(sizeRatio>2.1)continue;
@@ -335,19 +457,35 @@ function detectCalibrationTargets(){
 function autoDetectCalibration(){
   if(!captured)return false;const r=detectCalibrationTargets();
   if(!r){$('cardStatus').innerHTML=chip('未找到兩個校正靶點','warn');return false}
-  snapshotMarks();marks.calibration=[r.a,r.b];$('refSize').value='50';cardMeta={source:'auto',angle:r.angle,aspect:r.aspect,aspect1:r.aspect1,aspect2:r.aspect2};drawOverlay();calculate();
-  $('tapHint').textContent='已自動辨識校正卡。請確認黃色靶點是否落在兩個白圓中心。';return true;
+  snapshotMarks();marks.calibration=[r.a,r.b];marks.quad=r.quad||[];$('refSize').value='50';cardMeta={source:r.quad?'auto4':'auto2',angle:r.angle,aspect:r.aspect,skew:r.skew,aspect1:r.aspect1,aspect2:r.aspect2};drawOverlay();calculate();
+  $('tapHint').textContent=r.quad?'已偵測四個校正白圓，請檢查靶點位置與傾斜警示。':'只偵測到兩圓（舊版）：無法驗證完整透視，建議改印四圓卡。';return true;
 }
 
 function snapshotMarks(){history.push(JSON.stringify({marks,cardMeta}));if(history.length>30)history.shift()}
 function restoreState(s){Object.assign(marks,s.marks);cardMeta=s.cardMeta;drawOverlay();calculate()}
-function clearManualMarks(redraw=true){marks.calibration=[];marks.rightPupil=null;marks.leftPupil=null;marks.bridge=null;marks.rightBottom=null;marks.leftBottom=null;history=[];mode=null;cardMeta=null;if(redraw){drawOverlay();calculate()}}
+function clearManualMarks(redraw=true){marks.quad=[];marks.calibration=[];marks.rightPupil=null;marks.leftPupil=null;marks.bridge=null;marks.rightBottom=null;marks.leftBottom=null;history=[];mode=null;cardMeta=null;if(redraw){drawOverlay();calculate()}}
 
-function canvasPoint(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+function canvasPoint(e){
+  const r=canvas.getBoundingClientRect();
+  // The element may be object-fit:contain inside a 3:4 stage, while the image is 9:16.
+  // Correct the horizontal/vertical letterboxing before converting to image pixels.
+  const scale=Math.min(r.width/canvas.width,r.height/canvas.height);
+  const dw=canvas.width*scale,dh=canvas.height*scale;
+  const padX=(r.width-dw)/2,padY=(r.height-dh)/2;
+  return {x:clamp((e.clientX-r.left-padX)/scale,0,canvas.width-1),y:clamp((e.clientY-r.top-padY)/scale,0,canvas.height-1)};
+}
 function showLoupe(pt){if(!photoBacking)return;loupe.style.display='block';const z=4,sw=loupe.width/z,sh=loupe.height/z;lctx.clearRect(0,0,loupe.width,loupe.height);lctx.imageSmoothingEnabled=false;lctx.drawImage(photoBacking,pt.x-sw/2,pt.y-sh/2,sw,sh,0,0,loupe.width,loupe.height);lctx.strokeStyle='#fff';lctx.lineWidth=2;lctx.beginPath();lctx.moveTo(loupe.width/2-20,loupe.height/2);lctx.lineTo(loupe.width/2+20,loupe.height/2);lctx.moveTo(loupe.width/2,loupe.height/2-20);lctx.lineTo(loupe.width/2,loupe.height/2+20);lctx.stroke()}
 function commitPoint(pt){
   if(!mode)return;if(mode!=='calibration')snapshotMarks();
-  if(mode==='calibration'){marks.calibration.push(pt);cardMeta={source:'manual'};if(marks.calibration.length>=2){marks.calibration=marks.calibration.slice(0,2);mode=null;$('tapHint').textContent='人工基準完成。'}}else{marks[mode]=pt;mode=null;$('tapHint').textContent='標記完成。'}
+  if(mode==='calibration'){
+    marks.quad=[];marks.calibration.push(pt);cardMeta={source:'manual2'};
+    if(marks.calibration.length>=2){marks.calibration=marks.calibration.slice(0,2);mode=null;$('tapHint').textContent='舊卡兩點完成。僅能估算尺度，請留意透視誤差。'}
+  }else if(mode==='quadCalibration'){
+    marks.quad.push(pt);cardMeta={source:'manual4'};
+    const names=['左上','右上','左下','右下'];
+    if(marks.quad.length>=4){marks.quad=marks.quad.slice(0,4);marks.calibration=marks.quad.slice(0,2);mode=null;$('tapHint').textContent='四圓人工校正完成。'}
+    else $('tapHint').textContent=`已點 ${names[marks.quad.length-1]}；下一點請選 ${names[marks.quad.length]}`;
+  }else{marks[mode]=pt;mode=null;$('tapHint').textContent='標記完成。'}
   document.querySelectorAll('.step').forEach(x=>x.classList.remove('active'));drawOverlay();calculate();
 }
 canvas.addEventListener('pointerdown',e=>{if(!captured||!mode)return;canvas.setPointerCapture?.(e.pointerId);dragPoint=canvasPoint(e);showLoupe(dragPoint)});
@@ -357,8 +495,8 @@ canvas.addEventListener('pointercancel',()=>{dragPoint=null;loupe.style.display=
 
 document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{
   if(!captured){$('tapHint').textContent='請先拍照。';return}mode=btn.dataset.mode;document.querySelectorAll('.step').forEach(x=>x.classList.remove('active'));btn.closest('.step')?.classList.add('active');
-  const h={calibration:'依序點兩個白圓中心；可按住拖曳，用放大鏡對準。',rightPupil:'點患者右眼瞳孔中心（照片左側）。',leftPupil:'點患者左眼瞳孔中心（照片右側）。',bridge:'點鏡架鼻樑幾何中心。',rightBottom:'點患者右瞳正下方的鏡片有效最低點。',leftBottom:'點患者左瞳正下方的鏡片有效最低點。'};$('tapHint').textContent=h[mode]||'';
-  if(mode==='calibration'){snapshotMarks();marks.calibration=[];cardMeta={source:'manual'};drawOverlay();calculate()}
+  const h={quadCalibration:'依序點左上、右上、左下、右下白圓中心，可按住拖曳微調。',calibration:'舊版卡依序點兩個白圓中心。',rightPupil:'點患者右眼瞳孔中心（照片左側）。',leftPupil:'點患者左眼瞳孔中心（照片右側）。',bridge:'點鏡架鼻樑幾何中心。',rightBottom:'點患者右瞳正下方的鏡片有效最低點。',leftBottom:'點患者左瞳正下方的鏡片有效最低點。'};$('tapHint').textContent=h[mode]||'';
+  if(mode==='calibration'||mode==='quadCalibration'){snapshotMarks();marks.calibration=[];marks.quad=[];cardMeta={source:mode==='calibration'?'manual2':'manual4'};drawOverlay();calculate()}
 }));
 
 function rotatePoint(p,c,a){const co=Math.cos(a),s=Math.sin(a),x=p.x-c.x,y=p.y-c.y;return{x:c.x+x*co-y*s,y:c.y+x*s+y*co}}
@@ -367,23 +505,50 @@ function currentPoints(){
   if(marks.rightPupil&&marks.leftPupil){const r=marks.rightPupil,l=marks.leftPupil,dx=l.x-r.x,dy=l.y-r.y,mid={x:(r.x+l.x)/2,y:(r.y+l.y)/2};return{rightPupil:r,leftPupil:l,bridge:marks.bridge||mid,rightBottom:marks.rightBottom,leftBottom:marks.leftBottom,roll:Math.atan2(dy,dx)*180/Math.PI,yawBias:0,faceFrac:NaN,ai:false}}
   return null;
 }
-function scaleMmPerPx(){if(marks.calibration.length!==2)return null;const d=Math.hypot(marks.calibration[1].x-marks.calibration[0].x,marks.calibration[1].y-marks.calibration[0].y);const mm=parseFloat($('refSize').value);return d>5?mm/d:null}
+function scaleMmPerPx(){if(marks.quad?.length===4&&parseFloat($('refSize').value)===50){const q=cardQuadInfo(marks.quad);return q?.scale||null}if(marks.calibration.length!==2)return null;const d=Math.hypot(marks.calibration[1].x-marks.calibration[0].x,marks.calibration[1].y-marks.calibration[0].y);const mm=parseFloat($('refSize').value);return d>5?mm/d:null}
 function fmt(v,u='mm'){return Number.isFinite(v)?`${v.toFixed(1)} ${u}`:'--'}
 function qualityClass(level){return level==='good'?'good':level==='warn'?'warn':'bad'}
 function calculate(){
   const p=currentPoints(),s=scaleMmPerPx();if(!p){resetOutputs();return}
-  const mid={x:(p.rightPupil.x+p.leftPupil.x)/2,y:(p.rightPupil.y+p.leftPupil.y)/2},ang=-Math.atan2(p.leftPupil.y-p.rightPupil.y,p.leftPupil.x-p.rightPupil.x);
-  const R=rotatePoint(p.rightPupil,mid,ang),L=rotatePoint(p.leftPupil,mid,ang),B=rotatePoint(p.bridge,mid,ang),rb=p.rightBottom?rotatePoint(p.rightBottom,mid,ang):null,lb=p.leftBottom?rotatePoint(p.leftBottom,mid,ang):null;
+  const D=Number($('cameraEyeMm').value),dz=Number($('cardForwardMm').value);
+  const depthValid=Number.isFinite(D)&&Number.isFinite(dz)&&D>=250&&D<=1200&&Math.abs(dz)<=80&&D-dz>150;
+  const depthOn=$('depthConfirmed').checked&&depthValid;
+  const depthFactor=depthOn?D/(D-dz):1;
+  // Eye points are projected into the card plane around the camera principal point.
+  // Bridge and lens-edge points remain in the card/frame plane. Pinhole approximation only.
+  const projCenter={x:canvas.width/2,y:canvas.height/2};
+  const eyePoint=a=>({x:projCenter.x+(a.x-projCenter.x)*depthFactor,y:projCenter.y+(a.y-projCenter.y)*depthFactor});
+  const pupilR=eyePoint(p.rightPupil),pupilL=eyePoint(p.leftPupil);
+  const rawPupilSpan=Math.hypot(p.leftPupil.x-p.rightPupil.x,p.leftPupil.y-p.rightPupil.y);
+  const mid={x:(pupilR.x+pupilL.x)/2,y:(pupilR.y+pupilL.y)/2},ang=-Math.atan2(pupilL.y-pupilR.y,pupilL.x-pupilR.x);
+  const R=rotatePoint(pupilR,mid,ang),L=rotatePoint(pupilL,mid,ang),B=rotatePoint(p.bridge,mid,ang),rb=p.rightBottom?rotatePoint(p.rightBottom,mid,ang):null,lb=p.leftBottom?rotatePoint(p.leftBottom,mid,ang):null;
+  const quadInfo=cardQuadInfo(marks.quad);
+  $('pdLabel').textContent=$('gazeMode').value==='far'?'總 PD（遠處注視取像）':$('gazeMode').value==='near'?'總 PD（近距離注視取像）':'總 PD（注視距離未確認）';
+  const geoMsg=depthOn?`已依前移 ${dz.toFixed(1)} mm、拍攝距離 ${D.toFixed(0)} mm，套用近似係數 ×${depthFactor.toFixed(4)}`:'未啟用深度補償（顯示原始尺度；不可直接當遠用 PD）';
+  $('geometryStatus').innerHTML=chip(geoMsg,depthOn?'info':'warn');
   const totalPx=Math.abs(L.x-R.x),rPx=Math.abs(B.x-R.x),lPx=Math.abs(L.x-B.x),hRPx=rb?Math.max(0,rb.y-R.y):NaN,hLPx=lb?Math.max(0,lb.y-L.y):NaN;
   $('pdTotal').textContent=s?fmt(totalPx*s):`${totalPx.toFixed(0)} px`;$('pdR').textContent=s?fmt(rPx*s):`${rPx.toFixed(0)} px`;$('pdL').textContent=s?fmt(lPx*s):`${lPx.toFixed(0)} px`;
-  $('heightR').textContent=s&&Number.isFinite(hRPx)?fmt(hRPx*s):'--';$('heightL').textContent=s&&Number.isFinite(hLPx)?fmt(hLPx*s):'--';$('scaleOut').textContent=s?`${s.toFixed(4)}`:'未校正';$('scaleSource').textContent=s?'mm / px':'--';$('rollOut').textContent=`${p.roll.toFixed(1)}°`;$('yawOut').textContent=p.ai?`${(p.yawBias*100).toFixed(1)}%`:'人工模式';$('pdSource').textContent=`瞳孔：${p.ai?(marks.rightPupil||marks.leftPupil?'含人工修正':'AI 虹膜中心'):'人工標記'}`;
+  $('heightR').textContent=s&&Number.isFinite(hRPx)?fmt(hRPx*s):'--';$('heightL').textContent=s&&Number.isFinite(hLPx)?fmt(hLPx*s):'--';$('scaleOut').textContent=s?`${s.toFixed(4)}`:'未校正';$('scaleSource').textContent=s?'mm / px':'--';$('rollOut').textContent=`${p.roll.toFixed(1)}°`;$('yawOut').textContent=p.ai?`${(p.yawBias*100).toFixed(1)}%`:'人工模式';$('pdSource').textContent=`${depthOn?'深度近似補償':'原始平面尺度'}／${p.ai?(marks.rightPupil||marks.leftPupil?'含人工修正':'AI 虹膜中心'):'人工標記'}`;
   const chips=[];let bad=0,warn=0;
   const rr=Math.abs(p.roll)<=2.5?'good':Math.abs(p.roll)<=4?'warn':'bad';chips.push(chip(Math.abs(p.roll)<=2.5?'頭部水平良好':Math.abs(p.roll)<=4?'頭部稍斜':'頭部傾斜過大',rr));rr==='bad'?bad++:rr==='warn'&&warn++;
   if(p.ai){const yy=Math.abs(p.yawBias)<=.085?'good':Math.abs(p.yawBias)<=.13?'warn':'bad';chips.push(chip(Math.abs(p.yawBias)<=.085?'正面度良好':Math.abs(p.yawBias)<=.13?'可能輕微轉頭':'轉頭偏差較大',yy));yy==='bad'?bad++:yy==='warn'&&warn++;}else{chips.push(chip('AI 未定位：正面偏轉需人工確認','warn'));warn++;}
-  if(s)chips.push(chip(cardMeta?.source==='auto'?'校正卡自動定位':'毫米尺度已建立','good'));else{chips.push(chip('尚未建立毫米尺度','warn'));warn++}
-  if(cardMeta?.source==='auto'){
+  if(s)chips.push(chip(cardMeta?.source?.startsWith('auto')?'校正卡自動定位':'毫米尺度已建立','good'));else{chips.push(chip('尚未建立毫米尺度','bad'));bad++}
+  if(!quadInfo){chips.push(chip('只有兩點基準，不能判斷透視','warn'));warn++}
+  else {
+    const ch=quadInfo.skew<=.04?'good':quadInfo.skew<=.08?'warn':'bad';
+    chips.push(chip(`四點透視差 ${(quadInfo.skew*100).toFixed(1)}%`,ch));ch==='bad'?bad++:ch==='warn'&&warn++;
+    const tilted=Math.abs(quadInfo.angle),tilt=tilted<=3?'good':tilted<=6?'warn':'bad';
+    chips.push(chip(`卡片水平角 ${quadInfo.angle.toFixed(1)}°`,tilt));tilt==='bad'?bad++:tilt==='warn'&&warn++;
+    const aspectErr=Math.abs(quadInfo.verticalRatio-.56);
+    const cv=aspectErr<=.03?'good':aspectErr<=.07?'warn':'bad';
+    chips.push(chip(`卡片縱橫比例偏差 ${(aspectErr*100).toFixed(1)}%`,cv));cv==='bad'?bad++:cv==='warn'&&warn++;
+  }
+  if($('gazeMode').value==='unknown'){chips.push(chip('未確認遠／近注視','warn'));warn++}
+  if(!depthOn){chips.push(chip('前後深度未驗證','warn'));warn++}
+  if($('depthConfirmed').checked&&!depthValid){chips.push(chip('深度輸入不合理','bad'));bad++}
+  if(cardMeta?.source==='auto2'||cardMeta?.source==='auto4'){
     const ca=Math.abs(cardMeta.angle)<=3?'good':Math.abs(cardMeta.angle)<=6?'warn':'bad';chips.push(chip(`卡片水平 ${cardMeta.angle.toFixed(1)}°`,ca));ca==='bad'?bad++:ca==='warn'&&warn++;
-    const dev=Math.abs(cardMeta.aspect-1);const cp=dev<=.13?'good':dev<=.24?'warn':'bad';chips.push(chip(`卡片透視 ${(cardMeta.aspect).toFixed(2)}`,cp));cp==='bad'?bad++:cp==='warn'&&warn++;
+    if(cardMeta.source==='auto2'){const dev=Math.abs(cardMeta.aspect-1);const cp=dev<=.13?'good':dev<=.24?'warn':'bad';chips.push(chip(`雙圓外觀比例 ${(cardMeta.aspect).toFixed(2)}`,cp));cp==='bad'?bad++:cp==='warn'&&warn++;}
   }
   if(imageQuality){
     const sh=imageQuality.lapVar>=85?'good':imageQuality.lapVar>=45?'warn':'bad';chips.push(chip(sh==='good'?'清晰度良好':sh==='warn'?'清晰度普通':'影像可能模糊',sh));sh==='bad'?bad++:sh==='warn'&&warn++;
@@ -391,33 +556,49 @@ function calculate(){
   }
   $('qualityStatus').innerHTML=chips.join('');
   const gate=$('qualityGate');gate.className='gate '+(bad?'bad':warn?'warn':'good');gate.textContent=bad?'不建議採用本次數值：請依紅色項目重新拍攝。':warn?'本次可供比較，但有黃色注意項目；正式記錄前建議重拍確認。':'影像與姿勢檢查通過；仍請人工確認校正靶點與鏡框下緣。';
-  const rep=['【手機配鏡定位量測 V0.2.1】',`影像：${canvas.width} × ${canvas.height}px`,`頭部 Roll：${p.roll.toFixed(2)}°`,p.ai?`正面偏轉指標：${(p.yawBias*100).toFixed(2)}%`:'正面偏轉指標：AI 未定位，需人工確認'];
+  const rep=['【手機配鏡定位量測 V0.3.0】',`影像：${canvas.width} × ${canvas.height}px`,`頭部 Roll：${p.roll.toFixed(2)}°`,p.ai?`正面偏轉指標：${(p.yawBias*100).toFixed(2)}%`:'正面偏轉指標：AI 未定位，需人工確認'];
   if(imageQuality)rep.push(`影像品質：亮度 ${imageQuality.mean.toFixed(0)} / 清晰指標 ${imageQuality.lapVar.toFixed(0)} / 高光 ${(imageQuality.clipPct*100).toFixed(1)}%`);
   if(cardMeta?.source==='auto')rep.push(`校正卡：自動定位；水平 ${cardMeta.angle.toFixed(2)}°；圓形比例 ${cardMeta.aspect.toFixed(2)}`);else if(s)rep.push('校正卡：人工定位');
-  if(s){rep.push(`校正尺度：${s.toFixed(5)} mm/px`,`總 PD：${(totalPx*s).toFixed(2)} mm`,`患者右單眼 PD：${(rPx*s).toFixed(2)} mm`,`患者左單眼 PD：${(lPx*s).toFixed(2)} mm`,`患者右瞳高：${Number.isFinite(hRPx)?(hRPx*s).toFixed(2)+' mm':'未標記'}`,`患者左瞳高：${Number.isFinite(hLPx)?(hLPx*s).toFixed(2)+' mm':'未標記'}`)}else rep.push('尚未建立毫米尺度，pixel 結果不可視為實際 mm。');
-  rep.push(`瞳孔來源：右=${marks.rightPupil?'人工':p.ai?'AI':'未標記'}、左=${marks.leftPupil?'人工':p.ai?'AI':'未標記'}`,`鼻樑中心：${marks.bridge?'人工鏡架中心':p.ai?'AI 臉部中線估算':'雙瞳中點暫代'}`,'注意：校正卡需與鏡框近似同一平面；本原型尚未完成正式驗配誤差驗證。');
+  if(s){rep.push(`注視：${$('gazeMode').value==='far'?'遠處固定目標':$('gazeMode').value==='near'?'近物／手機':'尚未確認'}`,`幾何：${geoMsg}`,`原始雙瞳尺度（未深度修正）：${(rawPupilSpan*s).toFixed(2)} mm`,`四點檢核：${quadInfo?'偏差 '+(quadInfo.skew*100).toFixed(2)+'%':'未建立（舊版兩點）'}`,`校正尺度：${s.toFixed(5)} mm/px`,`總 PD：${(totalPx*s).toFixed(2)} mm`,`患者右單眼 PD：${(rPx*s).toFixed(2)} mm`,`患者左單眼 PD：${(lPx*s).toFixed(2)} mm`,`患者右瞳高：${Number.isFinite(hRPx)?(hRPx*s).toFixed(2)+' mm':'未標記'}`,`患者左瞳高：${Number.isFinite(hLPx)?(hLPx*s).toFixed(2)+' mm':'未標記'}`)}else rep.push('尚未建立毫米尺度，pixel 結果不可視為實際 mm。');
+  rep.push(`瞳孔來源：右=${marks.rightPupil?'人工':p.ai?'AI':'未標記'}、左=${marks.leftPupil?'人工':p.ai?'AI':'未標記'}`, `鼻樑中心：${marks.bridge?'人工鏡架中心':p.ai?'AI 臉部中線估算':'雙瞳中點暫代'}`,'注意：單張照片未知深度不可自動解出；前後補償為近似值，並不能代替正式驗配儀測量。');
   $('report').textContent=rep.join('\n');$('copyBtn').disabled=false;$('downloadBtn').disabled=false;renderCardStatus();
 }
 function renderCardStatus(){
-  if(!captured){$('cardStatus').innerHTML='';return}if(marks.calibration.length!==2){$('cardStatus').innerHTML=chip('等待校正卡定位','warn');return}
-  if(cardMeta?.source==='auto'){$('cardStatus').innerHTML=chip('已抓到兩個白圓中心','good')+chip(`水平 ${cardMeta.angle.toFixed(1)}°`,Math.abs(cardMeta.angle)<=3?'good':Math.abs(cardMeta.angle)<=6?'warn':'bad')+chip(`透視比 ${cardMeta.aspect.toFixed(2)}`,Math.abs(cardMeta.aspect-1)<=.13?'good':'warn')}else $('cardStatus').innerHTML=chip('使用人工校正點','info');
+  if(!captured){$('cardStatus').innerHTML='';return}
+  if(marks.calibration.length!==2){$('cardStatus').innerHTML=chip(marks.quad.length?`四圓已標 ${marks.quad.length}/4`:'等待校正卡定位','warn');return}
+  const q=cardQuadInfo(marks.quad);
+  if(q){const c=q.skew<=.04?'good':q.skew<=.08?'warn':'bad';$('cardStatus').innerHTML=chip('已建立四點基準','good')+chip(`四點變形 ${(q.skew*100).toFixed(1)}%`,c)+chip(`卡片水平 ${q.angle.toFixed(1)}°`,Math.abs(q.angle)<=3?'good':'warn')}
+  else $('cardStatus').innerHTML=chip('兩點基準：未檢查透視','warn');
 }
-function resetOutputs(){['pdTotal','pdR','pdL','heightR','heightL','scaleOut','rollOut','yawOut'].forEach(id=>$(id).textContent='--');$('pdSource').textContent='--';$('scaleSource').textContent='--';$('qualityStatus').innerHTML='';$('qualityGate').className='gate';$('qualityGate').textContent='尚未完成拍攝。';$('report').textContent='尚未完成量測。';$('copyBtn').disabled=true;$('downloadBtn').disabled=true;renderCardStatus()}
+function resetOutputs(){$('geometryStatus').innerHTML='';['pdTotal','pdR','pdL','heightR','heightL','scaleOut','rollOut','yawOut'].forEach(id=>$(id).textContent='--');$('pdSource').textContent='--';$('scaleSource').textContent='--';$('qualityStatus').innerHTML='';$('qualityGate').className='gate';$('qualityGate').textContent='尚未完成拍攝。';$('report').textContent='尚未完成量測。';$('copyBtn').disabled=true;$('downloadBtn').disabled=true;renderCardStatus()}
 function drawOverlay(){
   if(!captured||!photoBacking)return;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(photoBacking,0,0);const p=currentPoints();const sc=Math.max(1,canvas.width/1400);ctx.font=`${20*sc}px -apple-system,sans-serif`;
   function dot(pt,color,label){if(!pt)return;ctx.beginPath();ctx.arc(pt.x,pt.y,8*sc,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='#071018';ctx.lineWidth=2*sc;ctx.stroke();ctx.fillStyle=color;ctx.fillText(label,pt.x+11*sc,pt.y-9*sc)}
   if(p){dot(p.rightPupil,'#4b9cff','R');dot(p.leftPupil,'#4ed7dd','L');dot(p.bridge,'#c89cff','CENTER');dot(p.rightBottom,'#39c56b','R LOW');dot(p.leftBottom,'#78e39a','L LOW');}
-  if(marks.calibration.length){marks.calibration.forEach((q,i)=>dot(q,'#f2cc60',`CAL${i+1}`));if(marks.calibration.length===2){ctx.beginPath();ctx.moveTo(marks.calibration[0].x,marks.calibration[0].y);ctx.lineTo(marks.calibration[1].x,marks.calibration[1].y);ctx.strokeStyle='#f2cc60';ctx.lineWidth=3*sc;ctx.stroke()}}
+  if(marks.quad.length){marks.quad.forEach((q,i)=>dot(q,'#f2cc60',['左上','右上','左下','右下'][i]));}if(marks.calibration.length){if(!marks.quad.length)marks.calibration.forEach((q,i)=>dot(q,'#f2cc60',`CAL${i+1}`));if(marks.calibration.length===2){ctx.beginPath();ctx.moveTo(marks.calibration[0].x,marks.calibration[0].y);ctx.lineTo(marks.calibration[1].x,marks.calibration[1].y);ctx.strokeStyle='#f2cc60';ctx.lineWidth=3*sc;ctx.stroke()}}
   if(p){ctx.beginPath();ctx.moveTo(p.rightPupil.x,p.rightPupil.y);ctx.lineTo(p.leftPupil.x,p.leftPupil.y);ctx.strokeStyle='rgba(75,156,255,.82)';ctx.lineWidth=2*sc;ctx.setLineDash([10*sc,7*sc]);ctx.stroke();ctx.setLineDash([]);}
 }
 
 function printCalibrationCard(){
-  const w=window.open('','_blank');if(!w){alert('瀏覽器阻擋新視窗，請允許彈出視窗後再試。');return}
-  w.document.write(`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>50 mm 配鏡定位校正卡</title><style>@page{size:A4;margin:12mm}body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;color:#000;margin:0}h2{font-size:16pt;margin:0 0 4mm}.note{font-size:9pt;line-height:1.55;margin-bottom:8mm}.sheet{display:flex;justify-content:center}.verify{margin-top:12mm;border-top:.3mm solid #000;padding-top:5mm;font-size:9pt}.bar{display:inline-block;border-top:.5mm solid #000;position:relative;margin:7mm 12mm 0 0}.bar:before,.bar:after{content:"";position:absolute;top:-2mm;width:.4mm;height:4mm;background:#000}.bar:before{left:0}.bar:after{right:0}.noPrint{margin-top:8mm;font-size:9pt}@media print{.noPrint{display:none}}</style></head><body><h2>配鏡定位校正卡｜50.00 mm</h2><div class="note">列印設定請選「100%／實際大小」，不要選「符合頁面」。建議霧面 200–250g 白卡紙；不要護貝。列印後先用下方驗證尺確認尺寸。</div><div class="sheet"><svg xmlns="http://www.w3.org/2000/svg" width="92mm" height="58mm" viewBox="0 0 92 58"><rect x="1" y="1" width="90" height="56" rx="4" fill="white" stroke="black" stroke-width="0.35" stroke-dasharray="2 1"/><rect x="3" y="3" width="86" height="52" rx="3" fill="white" stroke="black" stroke-width="0.45"/><path d="M7 12V7h5 M80 7h5v5 M7 46v5h5 M80 51h5v-5" fill="none" stroke="black" stroke-width="1.7"/><line x1="6" y1="23" x2="86" y2="23" stroke="black" stroke-width="0.35"/><line x1="46" y1="5" x2="46" y2="31" stroke="black" stroke-width="0.35"/><rect x="14" y="16" width="14" height="14" fill="black"/><circle cx="21" cy="23" r="3" fill="white"/><rect x="64" y="16" width="14" height="14" fill="black"/><circle cx="71" cy="23" r="3" fill="white"/><line x1="21" y1="12" x2="71" y2="12" stroke="black" stroke-width="0.35"/><line x1="21" y1="10.5" x2="21" y2="13.5" stroke="black" stroke-width="0.35"/><line x1="71" y1="10.5" x2="71" y2="13.5" stroke="black" stroke-width="0.35"/><text x="46" y="10" font-size="4" text-anchor="middle" font-weight="700">50.00 mm</text><text x="46" y="38" font-size="6" text-anchor="middle" font-weight="700">配鏡定位校正卡</text><text x="46" y="43" font-size="3" text-anchor="middle">兩白圓中心距離 50.00 mm</text><text x="46" y="48" font-size="2.8" text-anchor="middle">霧面使用｜請勿護貝｜保持與鏡框平面平行</text>${Array.from({length:17},(_,i)=>`<line x1="${8+i*4.75}" y1="4" x2="${8+i*4.75}" y2="${i%4===0?7:6}" stroke="black" stroke-width="0.3"/><line x1="${8+i*4.75}" y1="54" x2="${8+i*4.75}" y2="${i%4===0?51:52}" stroke="black" stroke-width="0.3"/>`).join('')}</svg></div><div class="verify"><b>列印尺寸驗證尺</b><br><span class="bar" style="width:10mm"></span> 10 mm　<span class="bar" style="width:50mm"></span> 50 mm<br><div style="margin-top:5mm">用實體直尺量測；若不是 10.0 mm / 50.0 mm，請勿使用該張校正卡。</div></div><button class="noPrint" onclick="window.print()">列印</button></body></html>`);w.document.close();setTimeout(()=>w.focus(),150)
+  const btn=$('printCardBtn');
+  if(typeof window.print!=='function'){
+    alert('目前瀏覽器不支援直接列印。請改用 Safari／Chrome 開啟此頁，再使用瀏覽器的「分享 → 列印」。');
+    return;
+  }
+  const old=btn.textContent;
+  btn.textContent='開啟系統列印…';
+  try{
+    // 直接從目前頁面進入列印，避免 iPhone/Safari 阻擋 window.open 新分頁。
+    window.print();
+  }catch(err){
+    alert('無法開啟系統列印。請使用瀏覽器的「分享 → 列印」。');
+  }finally{
+    setTimeout(()=>{btn.textContent=old},300);
+  }
 }
 
 startBtn.addEventListener('click',startCamera);$('systemCameraBtn').addEventListener('click',()=>$('photoInput').click());$('photoInput').addEventListener('change',e=>loadPhotoFile(e.target.files?.[0]));captureBtn.addEventListener('click',capturePhoto);retakeBtn.addEventListener('click',retake);autoCalBtn.addEventListener('click',autoDetectCalibration);$('printCardBtn').addEventListener('click',printCalibrationCard);
-$('undoBtn').addEventListener('click',()=>{if(history.length)restoreState(JSON.parse(history.pop()))});$('clearMarksBtn').addEventListener('click',()=>clearManualMarks(true));$('refSize').addEventListener('change',()=>{cardMeta={source:'manual'};calculate()});
+$('undoBtn').addEventListener('click',()=>{if(history.length)restoreState(JSON.parse(history.pop()))});$('clearMarksBtn').addEventListener('click',()=>clearManualMarks(true));$('refSize').addEventListener('change',()=>{if(Number($('refSize').value)!==50)marks.quad=[];cardMeta={source:'manual2'};calculate()});['cameraEyeMm','cardForwardMm','depthConfirmed','gazeMode'].forEach(id=>$(id).addEventListener('change',calculate));
 $('copyBtn').addEventListener('click',async()=>{const t=$('report').textContent;try{await navigator.clipboard.writeText(t);$('copyBtn').textContent='已複製';setTimeout(()=>$('copyBtn').textContent='複製量測摘要',1200)}catch{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}});
 $('downloadBtn').addEventListener('click',()=>{drawOverlay();const a=document.createElement('a');a.download=`配鏡定位_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.png`;a.href=canvas.toDataURL('image/png');a.click()});
 resetOutputs();
