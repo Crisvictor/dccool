@@ -3154,7 +3154,7 @@ function update3D(res){
     const geo=buildCutLensGeometry(res);
     if(!geo)return;
     const mat=new THREE.MeshPhysicalMaterial({color:res.blankOK?0x38d9dd:0xff6d79,
-      transparent:true,opacity:.50,roughness:.14,metalness:0,side:THREE.DoubleSide,
+      transparent:true,opacity:.20,roughness:.14,metalness:0,side:THREE.DoubleSide,
       depthTest:true,depthWrite:false,transmission:.12,clearcoat:.7,
       polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
     // 排序只決定繪製先後；表面間距 + 深度偏移共同避免真正的 Z-fighting。
