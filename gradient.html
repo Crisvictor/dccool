@@ -210,6 +210,12 @@
   .shape-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
   .shape-toolbar button,.scale-tools button{cursor:pointer;border:1px solid #3b5670;border-radius:9px;background:#12243b;color:#dbeafe;padding:8px 11px;font-size:13px}
   .shape-toolbar button.active{background:#145174;border-color:#38bdf8;color:#fff}
+  .shape-toolbar .shape-export{background:#17344b;border-color:#477b94;color:#b4e9fb}
+  .shape-toolbar .shape-export:hover{background:#1b4c67;border-color:#5ebde9}
+  /* 匯出按鈕預設隱藏，必須完成指定的預設點擊序列才能顯示。 */
+  #exportShapeJSON[hidden]{display:none!important}
+
+
   .scale-tools{margin:10px 0;display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;color:#b9c9dc}
   .scale-tools input{width:78px;flex:none;padding:6px 8px}
   #scaleStatus{font-size:11px;color:#85c8e5}
@@ -462,6 +468,40 @@
     .summary-actions{grid-column:1;grid-row:auto;justify-content:space-between}
     .summary-actions .model-disclosure[open] .note{right:0;max-width:calc(100vw - 44px);min-width:min(330px,calc(100vw - 44px))}
   }
+  /* 左右眼切換：置於自由取型工具列，並在摘要列標示當前眼別 */
+  .eye-switch{display:inline-flex;align-items:center;gap:3px;margin-left:auto;padding:3px;
+    background:#0c1a2d;border:1px solid #37536e;border-radius:10px}
+  .eye-switch-label{padding:0 6px;color:#a9c1d5;font-size:11px;white-space:nowrap}
+  .shape-toolbar .eye-switch button,
+  .work-slot .shape-toolbar .eye-switch button{
+    appearance:none;border:1px solid transparent;border-radius:7px;
+    background:transparent;color:#adc5d9;font-size:12px;font-weight:600;
+    white-space:nowrap;padding:7px 10px;cursor:pointer}
+  .shape-toolbar .eye-switch button:hover,
+  .work-slot .shape-toolbar .eye-switch button:hover{background:#19334b;color:#e0f7ff}
+  .shape-toolbar .eye-switch button.active,
+  .work-slot .shape-toolbar .eye-switch button.active{
+    background:#145174;border-color:#38bdf8;color:#fff;box-shadow:inset 0 1px #ffffff1a}
+  .eye-summary{font-weight:700;color:#8bdfff}
+  @media(max-width:620px){.eye-switch{margin-left:0}}
+
+  /* 內建自由取型：預1、預2、預3，與重設按鈕同行排列 */
+  .shape-preset-buttons{display:inline-flex;gap:4px;align-items:center;flex-wrap:nowrap}
+  .shape-toolbar button.shape-preset,.work-slot .shape-toolbar button.shape-preset{
+    min-width:42px;padding:7px 9px;border:1px solid #426780;border-radius:8px;
+    background:#153047;color:#bcd9e9;font-size:12px;font-weight:650;white-space:nowrap
+  }
+  .shape-toolbar button.shape-preset:hover,.work-slot .shape-toolbar button.shape-preset:hover{
+    background:#1a4760;border-color:#56b9df;color:#e9f8ff
+  }
+  .shape-toolbar button.shape-preset.active,.work-slot .shape-toolbar button.shape-preset.active{
+    background:#145174;border-color:#38bdf8;color:#fff;box-shadow:inset 0 0 0 1px #38bdf844
+  }
+  @media(max-width:520px){
+    .shape-toolbar button.shape-preset,.work-slot .shape-toolbar button.shape-preset{
+      min-width:39px;padding:7px 8px;font-size:11px
+    }
+  }
 </style>
 </head>
 <body>
@@ -479,6 +519,7 @@
     </nav>
     <div class="live-summary" aria-live="polite">
       <div class="summary-basic">
+        <span id="summaryEye" class="eye-summary" aria-label="目前模擬眼別">左眼 OS</span>
         <span id="summaryPower">度數 —</span>
         <span id="summaryThickness">中心厚 —</span>
         <span id="summarySM" hidden>像倍率 —</span>
@@ -547,8 +588,19 @@
         <div class="bd">
           <div class="shape-toolbar" role="group" aria-label="框型操作模式">
             <button type="button" id="modeManual" class="shape-mode active">一般框型</button>
-            <button type="button" id="modeFree" class="shape-mode">自由取型（14 點）</button>
-            <button type="button" id="resetShape" class="shape-reset">重設自由框型</button>
+            <button type="button" id="modeFree" class="shape-mode">自由取型</button>
+            <button type="button" id="resetShape" class="shape-reset">重設</button>
+            <div class="shape-preset-buttons" id="shapePresetButtons" role="group" aria-label="內建自由取型形狀">
+              <button type="button" class="shape-preset" data-shape-preset="預1" aria-pressed="false" title="預1：A 54.62／B 43.61／ED 56.72 mm">預1</button>
+              <button type="button" class="shape-preset" data-shape-preset="預2" aria-pressed="false" title="預2：A 53.07／B 32.66／ED 54.01 mm">預2</button>
+              <button type="button" class="shape-preset" data-shape-preset="預3" aria-pressed="false" title="預3：A 52.50／B 43.48／ED 52.68 mm">預3</button>
+            </div>
+            <button type="button" id="exportShapeJSON" class="shape-export" hidden title="匯出目前眼別的 14 個控制點，可傳給 ChatGPT 製作預設形狀">匯出取型</button>
+            <div class="eye-switch" role="group" aria-label="切換模擬左右眼">
+              <span class="eye-switch-label">眼別</span>
+              <button type="button" id="eyeOD" aria-pressed="false">右眼 OD</button>
+              <button type="button" id="eyeOS" class="active" aria-pressed="true">左眼 OS</button>
+            </div>
           </div>
           <p id="shapeInstruction" class="note">一般框型：依輸入 A／B／ED 產生近似輪廓；可切換自由取型。</p>
           <div class="scale-tools">
@@ -2495,10 +2547,73 @@ function update3D(res){
   // ===== Unified shape geometry: one contour for 1:1, safety, sections and cut 3D =====
   const SHAPE_SVG_NS = 'http://www.w3.org/2000/svg';
   const shapeState = {
-    mode: 'manual', pixelsPerMm: 96/25.4, calibrated: false,
-    free: null, rawBounds: null, rawPoints: null, localPoints: null,
+    mode: 'manual', eye: 'OS', pixelsPerMm: 96/25.4, calibrated: false,
+    free: null, freeByEye: {OS:null,OD:null},
+    rawBounds: null, rawPoints: null, localPoints: null,
     dragging: null
   };
+  // 三組使用者提供的 OS 原始十四點輪廓，單位 mm；右眼按 x 鏡像載入。
+  // 內建在 HTML 中，不需要 JSON 外部檔或瀏覽器儲存空間。
+  const BUILTIN_FREE_PRESETS = Object.freeze({"預1":{"eye":"OS","points":{"L":[{"x":-17.16,"y":-29.35338},{"x":-23.4,"y":-22.64889},{"x":-22.22853,"y":-13.92633},{"x":-18.26282,"y":-4.11344},{"x":-12.17721,"y":4.60912},{"x":-6.0916,"y":10.65942}],"R":[{"x":23.54269,"y":-29.35338},{"x":30.42209,"y":-22.64889},{"x":31.21791,"y":-13.92633},{"x":29.62831,"y":-4.11344},{"x":25.92403,"y":4.60912},{"x":19.04463,"y":10.65942}],"T":[{"x":0,"y":-31.15338}],"B":[{"x":0,"y":12.45942}]},"measurements":{"A":54.618,"B":43.613,"ED":56.724}},"預2":{"eye":"OS","points":{"L":[{"x":-21.89535,"y":-16.2},{"x":-25.97489,"y":-11.63088},{"x":-25.33504,"y":-5.09845},{"x":-23.4829,"y":2.25053},{"x":-20.57239,"y":8.78296},{"x":-16.07433,"y":12.86215}],"R":[{"x":23.1289,"y":-16.2},{"x":27.09447,"y":-11.63088},{"x":27.094,"y":-5.09845},{"x":26,"y":2.25053},{"x":22.8643,"y":8.78296},{"x":15.3851,"y":12.86215}],"T":[{"x":0,"y":-18}],"B":[{"x":0,"y":14.66215}]},"measurements":{"A":53.069,"B":32.662,"ED":54.01}},"預3":{"eye":"OS","points":{"L":[{"x":-15.32367,"y":-27.07409},{"x":-22.20305,"y":-20.39638},{"x":-24.4303,"y":-11.70129},{"x":-22.46765,"y":-1.91932},{"x":-16.91122,"y":6.77577},{"x":-8.97346,"y":12.80135}],"R":[{"x":17.75032,"y":-27.07409},{"x":24.62971,"y":-20.39638},{"x":28.06877,"y":-11.70129},{"x":26.74645,"y":-1.91932},{"x":22.24838,"y":6.77577},{"x":13.78144,"y":12.80135}],"T":[{"x":0,"y":-28.87409}],"B":[{"x":0,"y":14.60135}]},"measurements":{"A":52.499,"B":43.475,"ED":52.678}}});
+  const activePresetByEye = {OS:null,OD:null};
+  function syncPresetUI(){
+    const enabled=shapeState.mode==='free';
+    const host=$('shapePresetButtons');
+    if(host)host.hidden=!enabled;
+    document.querySelectorAll('[data-shape-preset]').forEach(button=>{
+      const active=enabled && button.dataset.shapePreset===activePresetByEye[shapeState.eye];
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',String(active));
+    });
+  }
+  function copyPresetPoints(pts){
+    return Object.fromEntries(['L','R','T','B'].map(k=>[
+      k,pts[k].map(p=>({x:p.x,y:p.y}))
+    ]));
+  }
+  function applyBuiltinPreset(name){
+    const data=BUILTIN_FREE_PRESETS[name];
+    if(!data)return;
+    const osPoints=copyPresetPoints(data.points);
+    const next=shapeState.eye==='OS' ? osPoints : mirrorFreeHandles(osPoints);
+    shapeState.free=next;
+    shapeState.freeByEye[shapeState.eye]=next;
+    shapeState.mode='free';
+    shapeState.dragging=null;
+    activePresetByEye[shapeState.eye]=name;
+    syncShapeUI();
+    update();
+  }
+  // 隱藏匯出工具：必須依序點選 預3 → 預1 → 預2 → 預2 → 預2。
+  // 只監聽預設按鈕點擊；錯誤序列重新開始，若又點到預3則視為新序列起點。
+  const exportUnlockSequence=['預3','預1','預2','預2','預2'];
+  let exportUnlockIndex=0;
+  let exportUnlocked=false;
+  function syncExportVisibility(){
+    const button=$('exportShapeJSON');
+    const visible=exportUnlocked && shapeState.mode==='free';
+    button.hidden=!visible;
+    button.style.display=visible?'':'none';
+  }
+  function observePresetUnlock(name){
+    if(exportUnlocked)return;
+    if(name===exportUnlockSequence[exportUnlockIndex]){
+      exportUnlockIndex++;
+    }else{
+      exportUnlockIndex=name===exportUnlockSequence[0]?1:0;
+    }
+    if(exportUnlockIndex===exportUnlockSequence.length){
+      exportUnlocked=true;
+      syncExportVisibility();
+    }
+  }
+  document.querySelectorAll('[data-shape-preset]').forEach(button=>{
+    button.addEventListener('click',()=>{
+      const name=button.dataset.shapePreset;
+      applyBuiltinPreset(name);
+      observePresetUnlock(name);
+    });
+  });
   function elSVG(tag, attributes, parent){
     const el=document.createElementNS(SHAPE_SVG_NS,tag);
     Object.entries(attributes||{}).forEach(([k,v])=>el.setAttribute(k,String(v)));
@@ -2526,6 +2641,7 @@ function update3D(res){
       T:[{x:0,y:-B*.5}],
       B:[{x:0,y:B*.5}]
     };
+    shapeState.freeByEye[shapeState.eye]=shapeState.free;
   }
   function rawHandles(){
     if(!shapeState.free) resetFreeGeometry();
@@ -2598,6 +2714,8 @@ function update3D(res){
     $('modeManual').classList.toggle('active',shapeState.mode==='manual');
     $('modeFree').classList.toggle('active',shapeState.mode==='free');
     $('resetShape').style.display=shapeState.mode==='free'?'':'none';
+    syncExportVisibility();
+    syncPresetUI();
     $('shapeInstruction').textContent=shapeState.mode==='free'
       ?'自由取型：左右各 6 個藍點調寬、上下橙點調 B 高；L1／R1、L6／R6 與 B 點維持 1.8 mm 端距，其餘點依 B 高比例縮放。'
       :'一般框型：以 A、B、ED 輸入建立圓角輪廓（近似）；切換至自由取型可拖曳形狀。';
@@ -2623,7 +2741,12 @@ function update3D(res){
   function enrichContour(res){
     const geometry=computeOutline();
     res.shapeMode=shapeState.mode;
-    res.hDec=(res.framePD-res.PD)/2; // signed direction retained
+    // 以配戴者對面觀察的正面圖座標：OD 光心往鼻側（圖右），
+    // 因此裁型框心相對光心向圖左；OS 則向圖右。
+    // 沿用舊版 OS 的正向偏心以保持既有計算結果。
+    const inset=(res.framePD-res.PD)/2;
+    res.hDec=(shapeState.eye==='OD'?-1:1)*inset;
+    res.eye=shapeState.eye;
     res.vDecY=res.pupilH-res.B/2;
     res.localContour=geometry.local;
     res.contour=geometry.local.map(p=>({x:p.x+res.hDec,y:p.y+res.vDecY}));
@@ -2753,6 +2876,53 @@ function update3D(res){
     f.T[0].y=newTop;
     f.B[0].y=newBottom;
   }
+  // 左右眼專屬處方與取型形狀：其他共同參數（框心距、折射率等）維持共用。
+  const EYE_FIELDS=['D','Cyl','Axis','BC','centerT','edgeT','pupilH'];
+  const eyeProfiles={OS:null,OD:null};
+  function captureEyeFields(){
+    return Object.fromEntries(EYE_FIELDS.map(id=>[id,$(id).value]));
+  }
+  function mirrorFreeHandles(source){
+    const mirrorArray=arr=>arr.map(p=>({x:-p.x,y:p.y}));
+    return {L:mirrorArray(source.R),R:mirrorArray(source.L),
+      T:mirrorArray(source.T),B:mirrorArray(source.B)};
+  }
+  function syncEyeSwitchUI(){
+    for(const eye of ['OD','OS']){
+      const btn=$('eye'+eye),isActive=shapeState.eye===eye;
+      btn.classList.toggle('active',isActive);
+      btn.setAttribute('aria-pressed',String(isActive));
+    }
+    $('summaryEye').textContent=shapeState.eye==='OD'?'右眼 OD':'左眼 OS';
+  }
+  function setEye(eye){
+    if(eye!== 'OD' && eye!== 'OS')return;
+    if(shapeState.eye===eye)return;
+    const old=shapeState.eye;
+    eyeProfiles[old]=captureEyeFields();
+    if(shapeState.free)shapeState.freeByEye[old]=shapeState.free;
+    // 初次建立對側眼時，鏡像複製已調好的框型；此後兩眼各自存取。
+    if(!shapeState.freeByEye[eye] && shapeState.freeByEye[old]){
+      shapeState.freeByEye[eye]=mirrorFreeHandles(shapeState.freeByEye[old]);
+      activePresetByEye[eye]=activePresetByEye[old];
+    }
+    if(!eyeProfiles[eye])eyeProfiles[eye]={...eyeProfiles[old]};
+    shapeState.eye=eye;
+    shapeState.free=shapeState.freeByEye[eye];
+    for(const [id,value] of Object.entries(eyeProfiles[eye])){
+      $(id).value=value;
+      if($(id).dataset.lastValid!==undefined && value!=='' )$(id).dataset.lastValid=value;
+    }
+    shapeState.dragging=null;
+    syncAutoLensTypeUI(Number($('D').value)||0,Number($('Cyl').value)||0);
+    syncEyeSwitchUI();
+    syncPresetUI();
+    update();
+  }
+  $('eyeOD').addEventListener('click',()=>setEye('OD'));
+  $('eyeOS').addEventListener('click',()=>setEye('OS'));
+  syncEyeSwitchUI();
+
   $('topView').addEventListener('pointerdown',e=>{
     const handle=e.target.closest('[data-group]');
     if(shapeState.mode!=='free'||!handle)return;
@@ -2774,6 +2944,8 @@ function update3D(res){
     if(drag.group==='L')target.x=Math.max(-38,Math.min(-4,rawX));
     else if(drag.group==='R')target.x=Math.min(38,Math.max(4,rawX));
     else resizeFreeHeight(drag.group,rawY);
+    activePresetByEye[shapeState.eye]=null;
+    syncPresetUI();
     update();
   });
   for(const event of ['pointerup','pointercancel','lostpointercapture'])$('topView').addEventListener(event,()=>shapeState.dragging=null);
@@ -2782,7 +2954,40 @@ function update3D(res){
     shapeState.mode='free';syncShapeUI();update();
   });
   $('modeManual').addEventListener('click',()=>{shapeState.mode='manual';syncShapeUI();update();});
-  $('resetShape').addEventListener('click',()=>{resetFreeGeometry();shapeState.mode='free';syncShapeUI();update();});
+  $('resetShape').addEventListener('click',()=>{
+    resetFreeGeometry();
+    activePresetByEye[shapeState.eye]=null;
+    shapeState.mode='free';syncShapeUI();update();
+  });
+  // 將 14 個原始可編輯控制點以毫米座標匯出；不能以畫面截圖或密集輪廓取樣替代。
+  // 供後續嵌入「預1／預2／預3」使用，且不輸出處方或其他個人資料。
+  $('exportShapeJSON').addEventListener('click',()=>{
+    if(shapeState.mode!=='free')return;
+    if(!shapeState.free)resetFreeGeometry();
+    // 更新精確的量測 A/B/ED（毫米），避免匯出使用過期的輸入值。
+    const geometry=computeOutline();
+    const suggested='預1';
+    const entered=window.prompt('請輸入形狀名稱（例如：預1、預2、預3）',suggested);
+    if(entered===null)return;
+    const name=(entered.trim()||suggested).slice(0,50);
+    const pts=shapeState.free;
+    const copy=arr=>arr.map(p=>({x:Number(p.x.toFixed(5)),y:Number(p.y.toFixed(5))}));
+    const data={
+      format:'lens-freeform-preset',version:1,
+      name,eye:shapeState.eye,units:'mm',
+      description:'原始 14 點控制座標，L/R 各 6 個水平調整點，T/B 各 1 個垂直調整點',
+      points:{L:copy(pts.L),R:copy(pts.R),T:copy(pts.T),B:copy(pts.B)},
+      measurements:{A:Number(geometry.metrics.A.toFixed(3)),B:Number(geometry.metrics.B.toFixed(3)),ED:Number(geometry.metrics.ED.toFixed(3))},
+      fixedShoulderGapMm:FREE_B_SHOULDER_GAP_MM
+    };
+    const filenameSafe=name.replace(/[^\p{L}\p{N}_-]+/gu,'_')||'預設';
+    const json=JSON.stringify(data,null,2);
+    const url=URL.createObjectURL(new Blob([json],{type:'application/json;charset=utf-8'}));
+    const a=document.createElement('a');
+    a.href=url;a.download=`鏡片自由取型_${filenameSafe}_${shapeState.eye}.json`;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  });
   $('applyRuler').addEventListener('click',()=>{
     const measured=Number($('measuredRuler').value);
     if(!Number.isFinite(measured)||measured<15||measured>130){$('scaleStatus').textContent='量測值須為 15～130 mm';return;}
@@ -2968,24 +3173,26 @@ function update3D(res){
       const l=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(points),outlineMat.clone());
       l.renderOrder=13;scene.add(l);return l;
     });
-    // 輔助描線只強化側壁的真實峰線／槽底線；不會產生額外厚度。
+    // 加工側壁描線：僅影響顯示，不更動 4:6 位置、尖寬、溝寬或厚度。
+    // 全框：尖端線白色 60%，上／下底線白色 30%。車溝維持原本青色槽底線。
     if(res.rimType==='full'||res.rimType==='groove'){
       const samples=cutRimSamples(res);
-      const profileIndices=res.rimType==='full'?[2]:[2,3];
-      const style=new THREE.LineBasicMaterial({
-        color:res.rimType==='full'?0xc4faff:0x72ddfa,
-        opacity:res.rimType==='full'?.92:.78,transparent:true,
-        depthTest:false,depthWrite:false
-      });
-      for(const idx of profileIndices){
+      const specifications=res.rimType==='full'
+        ? [{index:2,color:0xffffff,opacity:.60},  // V 尖端
+           {index:1,color:0xffffff,opacity:.30},  // 上底線
+           {index:3,color:0xffffff,opacity:.30}]  // 下底線
+        : [{index:2,color:0x72ddfa,opacity:.78},
+           {index:3,color:0x72ddfa,opacity:.78}];
+      for(const {index,color,opacity} of specifications){
         const positions=samples.map(p=>{
-          const profile=cutRimProfile(res,p),v=profile[idx];
+          const v=cutRimProfile(res,p)[index];
           return new THREE.Vector3(p.x+p.nx*v.r,6+v.y,p.z+p.nz*v.r);
         });
-        const path=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(positions),style.clone());
-        path.renderOrder=14;scene.add(path);loops.push(path);
+        const matLine=new THREE.LineBasicMaterial({color,opacity,transparent:true,
+          depthTest:false,depthWrite:false});
+        const path=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(positions),matLine);
+        path.renderOrder=index===2?15:14;scene.add(path);loops.push(path);
       }
-      style.dispose();
     }
     _L3D.cutEdges=loops;
   }
