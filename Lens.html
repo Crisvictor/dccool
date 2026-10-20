@@ -7,7 +7,7 @@
 <link rel="shortcut icon" href="img/optometry.png" type="image/x-icon">
 <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
 <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<title>鏡片厚度模擬器</title>
+<title>鏡片厚度模擬器｜整合工作台</title>
 <style>
   :root{
     --bg:#0b1220;          /* 背景 */
@@ -26,6 +26,9 @@
     background:radial-gradient(1200px 800px at 20% -10%,#0e1728 0%,#0b1220 55%),
                radial-gradient(800px 800px at 90% 10%,#0a1a2f 0%,transparent 60%),
                var(--bg);
+    /* 背景相對視窗固定：長卡片捲動時不延展、也不重複平鋪漸層。 */
+    background-attachment:fixed;
+    background-repeat:no-repeat;
     color:var(--ink);
   }
   .wrap{max-width:1200px;margin:24px auto;padding:0 16px}
@@ -172,21 +175,395 @@
     color: #94a3b8;
     font-size: 11px;
   }
+
+  /* 六區頁籤模式：一頁只顯示一個工作卡片 */
+  .wrap{max-width:1000px}
+  .panel-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0 10px}
+  .panel-tab{appearance:none;display:flex;align-items:center;justify-content:center;gap:9px;padding:12px 8px;
+    border:1px solid #334155;border-radius:12px;background:#101d30;color:#bdcce0;font-size:14px;
+    cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+  .panel-tab:hover{background:#1b304b;border-color:#4381ad}
+  .panel-tab.active{background:#123b58;border-color:#38bdf8;color:#ecfaff;box-shadow:inset 0 0 0 1px #38bdf850}
+  .panel-tab:focus-visible{outline:2px solid #38bdf8;outline-offset:2px}
+  .tab-count{font-size:11px;color:#7a9ab0;letter-spacing:.05em}
+  .panel-tab.active .tab-count{color:#80dbff}
+  .panel-layout{display:block !important}
+  .panel-layout>.switch-panel{display:none}
+  .panel-layout>.switch-panel.active{display:block}
+  .switch-panel>.bd{padding:16px 20px}
+  .switch-panel .canvas{max-width:560px;margin:4px auto}
+  .switch-panel .canvas svg{width:min(100%,500px);height:auto;aspect-ratio:1/1}
+  .switch-panel #threeWrap{height:480px !important;max-width:760px;margin:4px auto}
+  .switch-panel .kpis{gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .switch-panel .kpi{padding:10px 12px}
+  .live-summary{display:flex;flex-wrap:wrap;gap:9px;padding:9px 12px;border:1px solid #23364b;
+    background:#0c192b;border-radius:10px;color:#afc4d9;font-size:12px}
+  .live-summary > span:not(:last-of-type){border-right:1px solid #30445b;padding-right:12px}
+  .tab-help{margin:8px 0 14px}
+  @media(max-width:620px){.panel-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.panel-tab{font-size:12px;padding:10px 5px}
+    .switch-panel>.bd{padding:12px}.switch-panel .row{grid-template-columns:1fr 135px}
+    .switch-panel #threeWrap{height:360px !important}.switch-panel .kpis{gap:6px}}
   @media (max-width:980px){.g-3{grid-template-columns:1fr}}
   hr{border:0;border-top:1px dashed var(--border);margin:10px 0}
+
+  /* 取型畫布使用毫米 viewBox，實際 CSS px 由螢幕校正值指定，不得被響應式樣式拉伸 */
+  .shape-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  .shape-toolbar button,.scale-tools button{cursor:pointer;border:1px solid #3b5670;border-radius:9px;background:#12243b;color:#dbeafe;padding:8px 11px;font-size:13px}
+  .shape-toolbar button.active{background:#145174;border-color:#38bdf8;color:#fff}
+  .shape-toolbar .shape-export{background:#17344b;border-color:#477b94;color:#b4e9fb}
+  .shape-toolbar .shape-export:hover{background:#1b4c67;border-color:#5ebde9}
+  /* 匯出按鈕預設隱藏，必須完成指定的預設點擊序列才能顯示。 */
+  #exportShapeJSON[hidden]{display:none!important}
+
+
+  .scale-tools{margin:10px 0;display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;color:#b9c9dc}
+  .scale-tools input{width:78px;flex:none;padding:6px 8px}
+  #scaleStatus{font-size:11px;color:#85c8e5}
+  .scale-tag{font-weight:650;color:#e2e8f0}
+  .switch-panel .canvas.dimension-canvas{display:block;overflow:auto;aspect-ratio:auto!important;height:auto!important;max-width:100%;justify-content:initial;min-height:0;padding:10px;background:#0c182a;touch-action:pan-x pan-y}
+  .switch-panel .canvas.dimension-canvas svg#topView{width:auto!important;height:auto!important;max-width:none!important;min-width:0!important;aspect-ratio:auto!important;display:block;overflow:visible;touch-action:none;user-select:none}
+  .shape-metrics{border:1px solid #314963;background:#0c1d31;border-radius:9px;color:#d5f1ff;font-size:13px;font-weight:650;padding:9px 12px;margin-top:9px}
+  .free-dot{cursor:ew-resize;stroke:#f0fdff;stroke-width:.4;fill:#15b8de;touch-action:none}
+  .free-dot.vert{cursor:ns-resize;fill:#f9b766;stroke:#fff0cc}
+  .free-dot.active{stroke:#fff;stroke-width:1;fill:#ffffff}
+  .free-dot-label{font-size:2.5px;fill:#c9e9f9;pointer-events:none;text-anchor:middle}
+  .section-header{margin:10px 0 8px;color:#bcd6e7;font-size:13px;font-weight:600}
+  .section-visual{overflow:auto;max-width:100%;border:1px solid #283d55;border-radius:12px;background:#0c192c;padding:8px;display:flex;justify-content:center}
+  .section-visual svg{width:min(100%,680px)!important;height:auto!important;aspect-ratio:auto!important;flex:none}
+  input.auto-locked{background:#283241!important;color:#a9bacb!important;border-color:#4d5a6b!important;opacity:.78;cursor:not-allowed}
+  #freeFieldNotice{margin:0 0 10px}
+
+  /* ===== 2026 UX：整合工作台，保留既有六頁與 1:1 毫米畫布 ===== */
+  :root{--safe:#86efac;--warn:#fbbf24;--bad:#fca5a5;--panel2:#101d30;--hairline:#2a3a50}
+  .wrap{max-width:1510px;margin:18px auto 36px;padding:0 22px}
+  h1{margin:0;font-size:24px;letter-spacing:.014em}
+  .intro-line{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:4px}
+  .intro-line>p{margin:0;color:#9eb1c4;font-size:12.5px}
+  .model-disclosure{position:relative;font-size:12px;color:#a9c3d9}
+  .model-disclosure summary{cursor:pointer;padding:5px 7px;border:1px solid #34475c;border-radius:7px;list-style:none}
+  .model-disclosure summary::-webkit-details-marker{display:none}
+  .model-disclosure[open] .note{position:absolute;z-index:25;right:0;top:36px;background:#112238;border:1px solid #344b64;box-shadow:0 12px 32px #0008;padding:14px;border-radius:10px;min-width:min(480px,90vw);line-height:1.7}
+  /* 工作台主頁加寬至其他單一頁籤約 2 倍；六張詳細功能頁籤均分剩餘寬度 */
+  .panel-tabs{display:grid;grid-template-columns:2fr repeat(6,minmax(0,1fr));gap:6px;margin:14px 0 9px}
+  .panel-tab{padding:11px 5px;font-size:12.5px;gap:6px;border-radius:10px;white-space:nowrap}
+  .workspace-tab{font-weight:700;font-size:14px;letter-spacing:.01em}
+  .live-summary{padding:10px 15px;gap:11px;background:#0e1b2d;font-size:12px}
+  .tab-help{margin:7px 0 13px;font-size:11.5px}
+  .workspace{display:grid;grid-template-columns:minmax(270px,306px) minmax(0,1fr);align-items:start;gap:14px}
+  .workspace[hidden]{display:none!important}
+  .quick-sidebar{overflow:hidden;position:sticky;top:12px;max-height:calc(100vh - 24px);display:flex;flex-direction:column}
+  .quick-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .quick-head-actions{display:flex;align-items:center;gap:5px}
+  #quickToggle{display:none}
+  .quick-sidebar.is-collapsed .quick-inner{display:none}
+  .quick-inner{overflow:auto;padding:4px 12px 14px;scrollbar-width:thin}
+  .quick-group{border-bottom:1px solid var(--hairline);padding:5px 0 8px}
+  .quick-group>summary{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:640;color:#d5e4f4;font-size:13px;padding:8px 4px;list-style:none}
+  .quick-group>summary::-webkit-details-marker{display:none}
+  .quick-group[open] .details-chevron{transform:rotate(180deg)}
+  .details-chevron{transition:transform .18s;color:#83a4bc}
+  .quick-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 8px;padding:4px 0}
+  .quick-field{min-width:0;display:flex;flex-direction:column;gap:4px}
+  .quick-field label{font-size:11.5px;color:#b6c8d9;white-space:nowrap}
+  .quick-field input,.quick-field select{font-size:13px;padding:9px 8px;min-width:0;height:37px;font-variant-numeric:tabular-nums}
+  .quick-field.is-locked input{background:#283241;color:#93a5b7;border-color:#4b5d6a;cursor:not-allowed}
+  .quick-hint{font-size:11px;line-height:1.5;color:#8fa5bb;padding:3px 2px}
+  .small-link{border:1px solid #3e5a73;border-radius:8px;background:#14253b;padding:6px 9px;font-size:11.5px;color:#93d6f3;cursor:pointer;white-space:nowrap}
+  .small-link:hover{background:#174260;border-color:#38bdf8}
+  .workspace-primary{display:grid;gap:11px;min-width:0}
+  .workspace-statusbar{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:2px 2px 0}
+  .workspace-statusbar strong{font-size:15px;color:#e5f5ff}
+  .status-sub{font-size:11.5px;color:#90a9bc;margin-top:2px}
+  .dashboard-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+  .dashboard-kpi{background:linear-gradient(155deg,#152a40,#0e1b2e);border:1px solid #2c435b;border-radius:11px;padding:11px 12px;min-width:0}
+  .dashboard-kpi span{display:block;color:#9fb3c8;font-size:11px;margin-bottom:6px}
+  .dashboard-kpi strong{display:block;color:#e8f7ff;font-weight:680;font-size:17px;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .dashboard-kpi strong.ok{color:var(--safe)}
+  .dashboard-kpi strong.bad{color:var(--bad)}
+  .dashboard-kpi strong.warn{color:var(--warn)}
+  .workspace-views{display:grid;grid-template-columns:minmax(0,1.17fr) minmax(340px,.83fr);gap:10px;align-items:stretch;min-width:0}
+  .work-slot{min-width:0;display:flex}
+  .work-slot>.switch-panel{display:block!important;width:100%;min-width:0}
+  .work-slot>.switch-panel>.bd{padding:11px 12px}
+  .work-slot>.switch-panel>.hd{padding:11px 14px;font-size:13px}
+  .work-slot .dimension-canvas{margin:0!important;padding:8px!important;max-width:100%!important}
+  .work-slot .shape-toolbar{margin-bottom:7px}
+  .work-slot .shape-toolbar button{font-size:12px;padding:7px 9px}
+  .work-slot .scale-tools{gap:5px;margin:9px 0 7px;font-size:11px}
+  .work-slot .scale-tools button{font-size:11px;padding:6px 7px}
+  .work-slot .scale-tools input{font-size:12px;width:68px;padding:5px 6px}
+  .work-slot #shapeInstruction{margin:5px 0 7px}
+  .work-slot #shapeMetrics{font-size:11.5px;line-height:1.5}
+  .work-slot #threeWrap{height:400px!important;max-width:none}
+  .work-slot #panel-4 .note{line-height:1.65}
+  .three-toolbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+  .three-toolbar button{cursor:pointer;background:#12243b;border:1px solid #37536e;border-radius:8px;color:#d3e9ff;font-size:11px;padding:7px 9px}
+  .three-toolbar button:hover{background:#174260;border-color:#38bdf8}
+  .blank-toggle{display:flex;align-items:center;gap:5px;margin-left:auto;color:#b8d5e6;font-size:11.5px;white-space:nowrap}
+  .blank-toggle input{width:15px;height:15px;accent-color:#38bdf8}
+  .workspace-section{border:1px solid #2c4057;border-radius:12px;background:#101c2d;overflow:hidden}
+  .workspace-section>summary{padding:12px 15px;display:flex;justify-content:space-between;gap:12px;cursor:pointer;color:#c9dcea;font-size:13px;list-style:none}
+  .workspace-section>summary::-webkit-details-marker{display:none}
+  .section-hint{font-size:11px;color:#86a6be}
+  #workSectionSlot{padding:0 12px 12px}
+  #workSectionSlot>.switch-panel{display:block!important}
+  #workSectionSlot>.switch-panel>.hd{display:none}
+  #workSectionSlot>.switch-panel>.bd{padding:12px}
+  #workSectionSlot .section-visual{justify-content:center}
+  /* 詳細頁：欄位以緊湊易讀的表單網格顯示，避免兩端相距過遠 */
+  .panel-layout{max-width:1000px;margin:0 auto;width:100%}
+  .panel-layout .switch-panel .row{grid-template-columns:minmax(145px,1fr) minmax(150px,260px);max-width:670px;gap:16px}
+  .panel-layout .switch-panel>.bd{padding:16px 22px}
+  .switch-panel .kpis{gap:9px}
+  .switch-panel .kpi .v{font-size:16px}
+  .switch-panel .note{line-height:1.6}
+  .danger{color:var(--bad)!important}
+  @media(max-width:1250px){
+    .workspace{grid-template-columns:270px minmax(0,1fr)}
+    .workspace-views{grid-template-columns:1fr}
+    .work-slot #threeWrap{height:370px!important}
+  }
+  @media(max-width:850px){
+    .wrap{padding:0 12px;margin:15px auto}
+    .panel-tabs{display:flex;overflow-x:auto;scrollbar-width:thin;gap:6px;overscroll-behavior-x:contain;padding:2px 0 7px}
+    .panel-tab{flex:0 0 auto;min-width:102px;padding:10px 12px}
+    .workspace-tab{min-width:176px;padding-inline:18px}
+    .workspace{grid-template-columns:minmax(0,1fr)}
+    .quick-sidebar{position:static;max-height:none}
+    #quickToggle{display:inline-block}
+    .quick-inner{max-height:none}
+    .dashboard-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .workspace-views{grid-template-columns:1fr}
+    .work-slot #threeWrap{height:370px!important}
+  }
+  @media(max-width:520px){
+    .wrap{padding:0 10px}
+    h1{font-size:20px}
+    .intro-line{align-items:start}
+    .intro-line>p{font-size:11.5px}
+    .model-disclosure[open] .note{right:0;min-width:min(300px,88vw)}
+    .live-summary{gap:6px;padding:8px 10px}
+    .live-summary span{font-size:11px}
+    .dashboard-kpi{padding:9px}
+    .dashboard-kpi strong{font-size:14px}
+    .workspace-statusbar strong{font-size:14px}
+    .status-sub{font-size:10.5px}
+    .section-hint{display:none}
+    .quick-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .work-slot .shape-toolbar{gap:5px}
+    .work-slot .shape-toolbar button{font-size:11px;padding:7px}
+    .work-slot #threeWrap{height:330px!important}
+    .switch-panel>.bd{padding:10px!important}
+    .panel-layout .switch-panel .row{grid-template-columns:minmax(0,1fr) minmax(125px,45%);gap:7px}
+  }
+
+  /* 精簡頂部：將網站名稱併入整合工作台頁籤，操作限制置於即時摘要右側 */
+  .wrap{margin-top:12px}
+  .panel-tabs{margin-top:0}
+  .workspace-tab{gap:9px}
+  .workspace-brand{font-size:12.5px;font-weight:650;color:#d0e9f8;letter-spacing:0}
+  .workspace-label{font-size:14px;font-weight:750}
+  .workspace-divider{display:inline-block;flex:0 0 1px;height:16px;background:#5c99b5;opacity:.8}
+  .live-summary{align-items:center}
+  .live-summary .model-disclosure{margin-left:auto;flex:0 0 auto}
+  .live-summary .model-disclosure summary{white-space:nowrap}
+  .workspace-statusbar{min-height:25px}
+  @media(max-width:850px){
+    .workspace-tab{min-width:236px}
+  }
+  @media(max-width:520px){
+    .workspace-brand{font-size:11px}
+    .workspace-label{font-size:12.5px}
+    .live-summary .model-disclosure{margin-left:auto}
+    .model-disclosure[open] .note{max-width:calc(100vw - 24px)}
+  }
+
+  /* 2026 UX: folder-style section tabs and consolidated live measurement strip */
+  .panel-tabs{
+    position:relative;
+    align-items:end;
+    gap:6px;
+    margin:0;
+    padding:0 3px;
+    border-bottom:2px solid #35546d;
+  }
+  .panel-tab{
+    position:relative;
+    isolation:isolate;
+    min-height:43px;
+    padding:9px 6px;
+    border:1px solid #324962;
+    border-bottom:0;
+    border-radius:12px 12px 0 0;
+    background:linear-gradient(180deg,#1b2c43 0%,#101b2c 100%);
+    color:#b7cde0;
+    box-shadow:0 -2px 9px rgba(0,0,0,.15), inset 0 1px rgba(255,255,255,.045);
+    transform:translateY(1px);
+    transition:background .17s ease,color .17s ease,transform .17s ease,border-color .17s ease;
+  }
+  /* 頁籤上緣齊平：保留資料夾形狀，不繪製額外凸起的裝飾片。 */
+  .panel-tab::before{content:none}
+  .panel-tab:hover{background:linear-gradient(180deg,#234260,#162a41);transform:translateY(1px)}
+  .panel-tab.active{
+    min-height:43px;
+    transform:translateY(1px);
+    z-index:2;
+    background:linear-gradient(180deg,#195475 0%,#143852 100%);
+    color:#f1fbff;
+    border-color:#38bdf8;
+    border-bottom:2px solid #143852;
+    box-shadow:0 -4px 14px rgba(10,30,50,.25), inset 0 2px rgba(150,225,255,.17);
+  }
+  .panel-tab:focus-visible{outline:2px solid #7dd3fc;outline-offset:2px;z-index:3}
+
+  /* Compact numbers and actions share one persistent bar across all seven pages. */
+  .live-summary{
+    display:grid;
+    grid-template-columns:max-content minmax(0,1fr) max-content;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+    margin:8px 0 18px;
+    padding:8px 12px;
+    background:linear-gradient(125deg,#102036,#0b182a);
+    border:1px solid #2b4760;
+    border-radius:0 0 11px 11px;
+    color:#c4d7e6;
+  }
+  .summary-basic{display:flex;align-items:center;gap:10px;min-width:0;white-space:nowrap;font-size:11.5px;color:#b7ccdf}
+  .summary-basic>span:not(:last-of-type){padding-right:10px;border-right:1px solid #31475b}
+  .summary-basic span[hidden]{display:none!important}
+  .live-summary .dashboard-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;min-width:0}
+  .live-summary .dashboard-kpi{
+    display:flex;flex-direction:column;justify-content:center;min-width:0;
+    padding:6px 9px;
+    border:1px solid #324c63;border-radius:8px;
+    background:linear-gradient(155deg,#192d43,#112238);
+  }
+  .live-summary .dashboard-kpi span{margin:0 0 3px;font-size:10px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#a9bed0}
+  .live-summary .dashboard-kpi strong{font-size:14px;line-height:1.18;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .summary-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0}
+  .summary-actions .small-link{padding:8px 10px;font-size:11.5px}
+  .summary-actions .model-disclosure{margin:0;flex:none;font-size:11px}
+  .summary-actions .model-disclosure summary{padding:8px 9px;border-color:#39536a}
+  .summary-actions .model-disclosure[open] .note{top:calc(100% + 8px)}
+  .workspace-primary{gap:11px}
+  @media(max-width:1200px){
+    .live-summary{grid-template-columns:minmax(0,1fr) max-content;gap:8px 12px}
+    .summary-basic{grid-column:1;grid-row:1}
+    .summary-actions{grid-column:2;grid-row:1}
+    .live-summary .dashboard-kpis{grid-column:1/-1;grid-row:2}
+  }
+  @media(max-width:850px){
+    .panel-tabs{gap:5px;overflow-x:auto;overflow-y:hidden;padding-top:8px;padding-bottom:0;scrollbar-width:thin}
+    .panel-tab{flex:none;min-width:118px;border-radius:12px 12px 0 0;padding:9px 10px}
+    .panel-tab.workspace-tab{min-width:244px}
+  }
+  @media(max-width:620px){
+    .live-summary{grid-template-columns:minmax(0,1fr);margin-bottom:16px;padding:9px;gap:8px}
+    .summary-basic{grid-column:1;grid-row:auto;flex-wrap:wrap;gap:6px;font-size:11px}
+    .live-summary .dashboard-kpis{grid-column:1;grid-row:auto;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+    .live-summary .dashboard-kpi{padding:8px 10px}
+    .live-summary .dashboard-kpi strong{font-size:14px}
+    .summary-actions{grid-column:1;grid-row:auto;justify-content:space-between}
+    .summary-actions .model-disclosure[open] .note{right:0;max-width:calc(100vw - 44px);min-width:min(330px,calc(100vw - 44px))}
+  }
+  /* 左右眼切換：置於自由取型工具列，並在摘要列標示當前眼別 */
+  .eye-switch{display:inline-flex;align-items:center;gap:3px;margin-left:auto;padding:3px;
+    background:#0c1a2d;border:1px solid #37536e;border-radius:10px}
+  .eye-switch-label{padding:0 6px;color:#a9c1d5;font-size:11px;white-space:nowrap}
+  .shape-toolbar .eye-switch button,
+  .work-slot .shape-toolbar .eye-switch button{
+    appearance:none;border:1px solid transparent;border-radius:7px;
+    background:transparent;color:#adc5d9;font-size:12px;font-weight:600;
+    white-space:nowrap;padding:7px 10px;cursor:pointer}
+  .shape-toolbar .eye-switch button:hover,
+  .work-slot .shape-toolbar .eye-switch button:hover{background:#19334b;color:#e0f7ff}
+  .shape-toolbar .eye-switch button.active,
+  .work-slot .shape-toolbar .eye-switch button.active{
+    background:#145174;border-color:#38bdf8;color:#fff;box-shadow:inset 0 1px #ffffff1a}
+  .eye-summary{font-weight:700;color:#8bdfff}
+  @media(max-width:620px){.eye-switch{margin-left:0}}
+
+  /* 內建自由取型：預1、預2、預3，與重設按鈕同行排列 */
+  .shape-preset-buttons{display:inline-flex;gap:4px;align-items:center;flex-wrap:nowrap}
+  .shape-toolbar button.shape-preset,.work-slot .shape-toolbar button.shape-preset{
+    min-width:42px;padding:7px 9px;border:1px solid #426780;border-radius:8px;
+    background:#153047;color:#bcd9e9;font-size:12px;font-weight:650;white-space:nowrap
+  }
+  .shape-toolbar button.shape-preset:hover,.work-slot .shape-toolbar button.shape-preset:hover{
+    background:#1a4760;border-color:#56b9df;color:#e9f8ff
+  }
+  .shape-toolbar button.shape-preset.active,.work-slot .shape-toolbar button.shape-preset.active{
+    background:#145174;border-color:#38bdf8;color:#fff;box-shadow:inset 0 0 0 1px #38bdf844
+  }
+  @media(max-width:520px){
+    .shape-toolbar button.shape-preset,.work-slot .shape-toolbar button.shape-preset{
+      min-width:39px;padding:7px 8px;font-size:11px
+    }
+  }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>鏡片厚度模擬器</h1>
-    <p class="note">用途：在訂製前，輸入度數/折射率與框參數，估算裁型後邊緣厚度是否足夠做出溝尖與車溝，並檢查鏡坯片徑是否足夠。<br>聲明：本教學工具為厚度幾何近似值，前表面彎度設定與折射面設計（如非球面與多焦）仍會產生誤差，實務仍需以加工經驗為準。</p>
 
-    <div class="grid g-3">
-      <div class="card">
+
+    <nav class="panel-tabs" aria-label="模擬器顯示區切換" role="tablist">
+      <button type="button" class="panel-tab active workspace-tab" role="tab" id="tab-work" aria-controls="workspace" aria-selected="true" data-target="work"><span class="tab-count">◈</span><span class="workspace-brand">鏡片厚度模擬器</span><span class="workspace-divider" aria-hidden="true"></span><span class="workspace-label">整合工作台</span></button>
+      <button type="button" class="panel-tab" role="tab" id="tab-0" aria-controls="panel-0" aria-selected="false" data-target="0"><span class="tab-count">01</span>鏡片參數</button>
+      <button type="button" class="panel-tab" role="tab" id="tab-1" aria-controls="panel-1" aria-selected="false" data-target="1"><span class="tab-count">02</span>自由取型</button>
+      <button type="button" class="panel-tab" role="tab" id="tab-3" aria-controls="panel-3" aria-selected="false" data-target="3"><span class="tab-count">03</span>鏡框參數</button>
+      <button type="button" class="panel-tab" role="tab" id="tab-2" aria-controls="panel-2" aria-selected="false" data-target="2"><span class="tab-count">04</span>邊緣厚度</button>
+      <button type="button" class="panel-tab" role="tab" id="tab-4" aria-controls="panel-4" aria-selected="false" data-target="4"><span class="tab-count">05</span>3D 鏡片</button>
+      <button type="button" class="panel-tab" role="tab" id="tab-5" aria-controls="panel-5" aria-selected="false" data-target="5"><span class="tab-count">06</span>完整結果</button>
+    </nav>
+    <div class="live-summary" aria-live="polite">
+      <div class="summary-basic">
+        <span id="summaryEye" class="eye-summary" aria-label="目前模擬眼別">左眼 OS</span>
+        <span id="summaryPower">度數 —</span>
+        <span id="summaryThickness">中心厚 —</span>
+        <span id="summarySM" hidden>像倍率 —</span>
+      </div>
+      <div class="dashboard-kpis" aria-label="即時模擬總覽">
+        <div class="dashboard-kpi"><span>裁型最薄邊厚</span><strong id="dashEdge">—</strong></div>
+        <div class="dashboard-kpi"><span>所需最小片徑</span><strong id="dashBlank">—</strong></div>
+        <div class="dashboard-kpi"><span>加工／鏡坯</span><strong id="dashSafety">—</strong></div>
+        <div class="dashboard-kpi"><span>SM 像倍率</span><strong id="dashSM">—</strong></div>
+      </div>
+      <div class="summary-actions">
+        <button type="button" class="small-link summary-analyze" data-open-panel="5">查看完整分析 ↗</button>
+        <details class="model-disclosure">
+          <summary>使用範圍與模型限制</summary>
+          <div class="note">用途：在訂製前，輸入度數／折射率與框參數，估算裁型後邊緣厚度是否足夠做出溝尖與車溝，並檢查鏡坯片徑是否足夠。<br>本教學工具為厚度幾何近似值，前表面彎度設定與折射面設計（如非球面與多焦）仍會產生誤差，實務仍需以加工經驗為準。</div>
+        </details>
+      </div>
+    </div>
+
+    <section class="workspace" id="workspace" aria-label="整合操作工作台">
+      <aside class="card quick-sidebar" aria-label="快速參數">
+        <div class="hd quick-head"><span>常用參數</span><div class="quick-head-actions"><button class="small-link" type="button" id="quickToggle" aria-expanded="true" aria-controls="quickInner">展開參數</button><button class="small-link" type="button" data-open-panel="0">完整設定 ↗</button></div></div>
+        <div class="quick-inner" id="quickInner">
+          <details class="quick-group" open><summary>鏡片／處方 <span class="details-chevron">⌄</span></summary><div class="quick-fields" id="quickLens"></div></details>
+          <details class="quick-group" open><summary>眼位／鏡框 <span class="details-chevron">⌄</span></summary><div class="quick-fields" id="quickFitting"></div></details>
+          <details class="quick-group"><summary>尺寸／加工進階設定 <span class="details-chevron">⌄</span></summary><div class="quick-fields" id="quickMore"></div></details>
+          <p class="quick-hint">自由取型時 A、B、ED 自動計算並鎖定。快速欄位與完整設定為同一組資料。</p>
+        </div>
+      </aside>
+      <div class="workspace-primary">
+        <div class="workspace-views">
+          <div id="workTopSlot" class="work-slot"></div>
+          <div id="work3dSlot" class="work-slot"></div>
+        </div>
+        <details class="workspace-section" id="workspaceSection"><summary><span>裁型邊緣厚度與剖面對照</span><span class="section-hint">展開查看鏡坯／成品剖面與四方向厚度</span></summary><div id="workSectionSlot"></div></details>
+      </div>
+    </section>
+
+    <div class="grid g-3 panel-layout">
+      <div class="card switch-panel" data-panel="0" id="panel-0">
         <div class="hd">參數輸入 [訂製鏡片]</div>
         <div class="bd">
-          <div class="row"><label>鏡片類型</label><select id="lensType"><option value="minus">近視</option><option value="plus">遠視</option></select></div>
           <div class="row"><label>球鏡 S (±)</label><input id="D" type="number" step="0.25" value="-6" min="-20" max="15"></div>
+          <div class="note" id="autoLensType" aria-live="polite">自動判定：近視（S ＜ 0）</div>
           <div class="row"><label>散光 C</label><input id="Cyl" type="number" step="0.25" value="0" min="-8" max="0"></div>
           <div class="row"><label>軸度 A</label><input id="Axis" type="number" step="1" value="180" min="1" max="180"></div>
           <div class="row"><label>折射率 n</label>
@@ -202,35 +579,66 @@
           <div class="note" id="bc_display"></div>
           <div class="row" data-for="minus"><label>指定中心厚 (mm)</label><input id="centerT" type="number" step="0.1" value="1.2" min="1.0" max="5.0"></div>
           <div class="row" data-for="plus" style="display:none"><label>設定邊緣厚 (mm)</label><input id="edgeT" type="number" step="0.1" value="2.0" min="0.2" max="3.0"></div>
-          <div class="row"><label>鏡坯片徑 (mm)</label><input id="blankDia" type="number" step="1" value="65" min="50" max="80"></div>
+          <div class="row"><label>鏡坯片徑 (mm)</label><input id="blankDia" type="number" step="1" value="70" min="50" max="80"></div>
 </div>
       </div>
 
-      <div class="card">
-        <div class="hd">平面視圖（鏡坯 / 裁型 ）</div>
+      <div class="card switch-panel" data-panel="1" id="panel-1">
+        <div class="hd">平面視圖｜實際尺寸取型（校正後 1:1）</div>
         <div class="bd">
-          <div class="canvas"><svg id="topView" width="340" height="340"></svg></div>
-          <p class="note">圖示：外圈＝鏡坯片徑；內圈＝裁型直徑（ED）；<br>綠/紅環＝邊緣厚達標/不足；鏡坯不足→外圈紅色。</p>
+          <div class="shape-toolbar" role="group" aria-label="框型操作模式">
+            <button type="button" id="modeManual" class="shape-mode active">一般框型</button>
+            <button type="button" id="modeFree" class="shape-mode">自由取型</button>
+            <button type="button" id="resetShape" class="shape-reset">重設</button>
+            <div class="shape-preset-buttons" id="shapePresetButtons" role="group" aria-label="內建自由取型形狀">
+              <button type="button" class="shape-preset" data-shape-preset="預1" aria-pressed="false" title="預1：A 54.62／B 43.61／ED 56.72 mm">預1</button>
+              <button type="button" class="shape-preset" data-shape-preset="預2" aria-pressed="false" title="預2：A 53.07／B 32.66／ED 54.01 mm">預2</button>
+              <button type="button" class="shape-preset" data-shape-preset="預3" aria-pressed="false" title="預3：A 52.50／B 43.48／ED 52.68 mm">預3</button>
+            </div>
+            <button type="button" id="exportShapeJSON" class="shape-export" hidden title="匯出目前眼別的 14 個控制點，可傳給 ChatGPT 製作預設形狀">匯出取型</button>
+            <div class="eye-switch" role="group" aria-label="切換模擬左右眼">
+              <span class="eye-switch-label">眼別</span>
+              <button type="button" id="eyeOD" aria-pressed="false">右眼 OD</button>
+              <button type="button" id="eyeOS" class="active" aria-pressed="true">左眼 OS</button>
+            </div>
+          </div>
+          <p id="shapeInstruction" class="note">一般框型：依輸入 A／B／ED 產生近似輪廓；可切換自由取型。</p>
+          <div class="scale-tools">
+            <span class="scale-tag">50 mm 螢幕校正尺</span>
+            <label for="measuredRuler">實際尺量：</label>
+            <input id="measuredRuler" type="number" min="15" max="130" step="0.1" value="50" aria-label="目前畫面50mm校正尺的實際量測長度，毫米" />
+            <span>mm</span>
+            <button id="applyRuler" type="button">套用校正</button>
+            <button id="resetRuler" type="button">重設比例</button>
+            <span id="scaleStatus">尚未校正（以 CSS 96 DPI 為初值）</span>
+          </div>
+          <div class="canvas dimension-canvas"><svg id="topView" viewBox="0 0 144 115" aria-label="按毫米比例繪製的鏡片及自由取型控制點"></svg></div>
+          <div class="shape-metrics" id="shapeMetrics" aria-live="polite">A — / B — / ED —</div>
+          <p class="note">以實體尺校正下方 50 mm 比例尺，再比對鏡框。自由取型的 A／B／ED 會依輪廓自動更新。</p>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card switch-panel" data-panel="2" id="panel-2">
         <div class="hd">裁型邊緣厚度（含偏心影響）</div>
         <div class="bd">
+          <div class="section-header">鏡坯與裁型成品｜同座標厚度剖面</div>
+          <div class="section-visual"><svg id="cutSectionView" viewBox="0 0 600 346" role="img" aria-label="裁型鏡片與圓形鏡坯水平垂直截面對照"></svg></div>
+          <div class="section-header">四方向代表點｜溝尖與車溝</div>
           <div class="canvas"><svg id="sectionView" width="340" height="340"></svg></div>
-          <p class="note">橫切面鏡片裁型偏心而產生不同邊緣厚度，<br>評估最薄側是否可開車溝。</p>
+          <p class="note">上方為實際裁型輪廓的水平與垂直截面，與圓形鏡坯比較；下方四方向為加工示意。真正最薄邊緣另以輪廓多點取樣判斷，可能落在斜向。</p>
         </div>
       </div>
     </div>
 
-    <div class="grid g-3" style="margin-top:16px">
-      <div class="card">
+    <div class="grid g-3 panel-layout" style="margin-top:0">
+      <div class="card switch-panel" data-panel="3" id="panel-3">
         <div class="hd">參數輸入 [框參數] </div>
         <div class="bd">
+          <p id="freeFieldNotice" class="note">一般框型：A／B／ED 可以自行輸入。自由取型模式將由輪廓自動計算並鎖定欄位。</p>
           <div class="row"><label>有效直徑 ED (mm)</label><input id="ED" type="number" step="0.5" value="53" min="20" max="80"></div>
           <div class="row"><label>框寬 A (mm)</label><input id="A" type="number" step="0.5" value="52" min="20" max="80"></div>
-          <div class="row"><label>框高 B (mm)</label><input id="B" type="number" step="0.5" value="40" min="15" max="80"></div>
-          <div class="row"><label>中樑距 DBL (mm)</label><input id="DBL" type="number" step="0.5" value="18" min="10" max="40"></div>
+          <div class="row"><label>框高 B (mm)</label><input id="B" type="number" step="0.5" value="36" min="15" max="80"></div>
+          <div class="row"><label>中樑距 DBL (mm)</label><input id="DBL" type="number" step="0.5" value="17" min="10" max="40"></div>
           <div class="row"><label>瞳距 PD (mm)</label><input id="PD" type="number" step="0.5" value="62" min="40" max="80"></div>
           <div class="row"><label>瞳高 PH (mm)</label><input id="pupilH" type="number" step="0.5" value=""></div>
           <div class="row"><label>預留加工 (mm)</label><input id="allowance" type="number" step="0.5" value="2" min="0" max="4"></div>
@@ -240,15 +648,21 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card switch-panel" data-panel="4" id="panel-4">
         <div class="hd">3D 厚度視覺（概念示意）</div>
         <div class="bd">
+          <div class="three-toolbar" role="group" aria-label="3D 模型視角與顯示設定">
+            <button type="button" id="viewFront">正面視角</button>
+            <button type="button" id="viewSide">側面視角</button>
+            <button type="button" id="viewReset">重設視角</button>
+            <label class="blank-toggle"><input type="checkbox" id="showBlank" checked />顯示鏡坯</label>
+          </div>
           <div id="threeWrap" style="width:100%;height:340px;border-radius:12px;border:1px solid var(--border);background:#0a1322;overflow:hidden"></div>
-          <p class="note">此 3D 為旋轉對稱概念示意：依厚度函式產生鏡片（圓形）。<br>裁型厚度分布： 水平=綠，垂直=黃；超出鏡坯則為紅</p>
+          <p class="note"><b>半透明淺藍：</b>原始圓形鏡坯；<b>青色實體＋亮色輪廓：</b>裁型後成品，兩者共用前後表面與厚度函式。<br>綠色／黃色為水平、垂直剖面示意；若框型超出鏡坯，請以片徑警示為準。</p>
         </div>
       </div>
      
-      <div class="card">
+      <div class="card switch-panel" data-panel="5" id="panel-5">
         <div class="hd">裁型 / 鏡坯 & 厚度檢核</div>
         <div class="bd kpi-double">
 
@@ -306,7 +720,10 @@
             </div>
           </div> 
           <div class="kpi-subcard">
-            <div class="kpi-subtitle">SM放大倍率（近似）VD:12mm</div>
+            <div class="kpi-subtitle">SM 厚鏡片光學模型｜後頂點屈光力 × 形狀因素</div>
+            <div class="row" style="margin:10px 0"><label for="vertexDist">鏡片後頂點至角膜 VD (mm)</label><input id="vertexDist" type="number" min="0" max="30" step="0.5" value="12"></div>
+            <div class="row"><label for="pupilOffset">角膜至入瞳估計距離 (mm)</label><input id="pupilOffset" type="number" min="0" max="6" step="0.5" value="3"></div>
+            <p class="note">計算距離 h = VD + 入瞳偏移，預設 15 mm。處方球／柱鏡視為後頂點屈光力，分水平及垂直子午線；總覽採兩主子午線幾何平均。</p>
             <div class="kpis">
               <div class="kpi">
                 <div class="t">像倍率</div>
@@ -316,7 +733,19 @@
                 <div class="t">像倍率變化</div>
                 <div id="k_SMpct" class="v"></div>
               </div> 
-            </div> 
+            </div>
+            <div class="kpis" style="margin-top:10px">
+              <div class="kpi"><div class="t">形狀因素 SF</div><div id="smSF" class="v">—</div></div>
+              <div class="kpi"><div class="t">中心厚度 t</div><div id="smT" class="v">—</div></div>
+              <div class="kpi"><div class="t">水平方向 SM (180°)</div><div id="smH" class="v">—</div></div>
+              <div class="kpi"><div class="t">垂直方向 SM (90°)</div><div id="smV" class="v">—</div></div>
+              <div class="kpi"><div class="t">水平 PF / Fv</div><div id="smPFH" class="v">—</div></div>
+              <div class="kpi"><div class="t">垂直 PF / Fv</div><div id="smPFV" class="v">—</div></div>
+              <div class="kpi"><div class="t">後表屈光力 F₂ 180°（厚鏡片反推）</div><div id="smF2H" class="v">—</div></div>
+              <div class="kpi"><div class="t">後表屈光力 F₂ 90°（厚鏡片反推）</div><div id="smF2V" class="v">—</div></div>
+            </div>
+            <p class="note" id="smNotice" style="margin-top:10px"></p>
+            <p class="note" style="margin-top:10px">採用 Fv = F₂ + F₁ / [1 − (t/n)F₁]；SF = 1 / [1 − (t/n)F₁]；PF = 1 / (1 − hFv)；SM = SF × PF。F₂ 依處方後頂點度數反推，不再以薄鏡片 F₂ = 處方 − F₁ 直接代替。此為近軸厚鏡片模型，厚度仍取既有幾何估算；不含非球面、漸進鏡片、離軸視線及個人眼球光學差異。</p>
           </div>
         </div>
       </div>
@@ -326,6 +755,119 @@
 <script>
 (function(){
   const $ = (id)=>document.getElementById(id);
+
+  // === 工作台視圖：共用原本的取型 / 剖面 / 3D DOM，禁止複製圖形或計算狀態 ===
+  const WORK_PANEL_IDS = [1,2,4];
+  const _panelHomes = new Map();
+  let activeWorkspaceTab = 'work';
+  for(const id of WORK_PANEL_IDS){
+    const panel=document.getElementById('panel-'+id);
+    _panelHomes.set(id,{parent:panel.parentNode,next:panel.nextSibling});
+  }
+  function movePanelsIntoWorkspace(){
+    document.getElementById('workTopSlot').appendChild(document.getElementById('panel-1'));
+    document.getElementById('work3dSlot').appendChild(document.getElementById('panel-4'));
+    document.getElementById('workSectionSlot').appendChild(document.getElementById('panel-2'));
+  }
+  function restorePanelsHome(){
+    // 先回置較後的兄弟節點，保證 nextSibling 已存在於原父容器。
+    for(const id of [4,2,1]){
+      const panel=document.getElementById('panel-'+id),home=_panelHomes.get(id);
+      if(panel.parentNode===home.parent)continue;
+      if(home.next && home.next.parentNode===home.parent)home.parent.insertBefore(panel,home.next);
+      else home.parent.appendChild(panel);
+    }
+  }
+  const QUICK_FIELDS={
+    quickLens:[['D','球鏡 S'],['Cyl','散光 C'],['Axis','軸度 AX'],['n','折射率 n'],['BC','前彎 BC'],['centerT','中心厚 mm'],['edgeT','邊緣厚 mm'],['blankDia','鏡坯 Ø mm']],
+    quickFitting:[['PD','瞳距 PD'],['pupilH','瞳高 PH'],['DBL','中樑 DBL'],['rimType','框類']],
+    quickMore:[['A','框寬 A'],['B','框高 B'],['ED','有效徑 ED'],['allowance','預留加工(安全值)'],['grooveDepth','溝尖／車溝寬'],['minTip','最小殘厚']]
+  };
+  const quickInputs=new Map();
+  function setupQuickControls(){
+    Object.entries(QUICK_FIELDS).forEach(([block,fields])=>{
+      const node=document.getElementById(block);
+      fields.forEach(([id,title])=>{
+        const origin=$(id), row=document.createElement('div');row.className='quick-field';row.dataset.forInput=id;
+        const lbl=document.createElement('label');lbl.textContent=title;lbl.htmlFor='quick-'+id;
+        let input;
+        if(origin.tagName==='SELECT'){
+          input=document.createElement('select'); input.innerHTML=origin.innerHTML;
+        }else{
+          input=document.createElement('input'); input.type=origin.type;
+          for(const key of ['min','max','step','placeholder'])if(origin.hasAttribute(key))input.setAttribute(key,origin.getAttribute(key));
+        }
+        input.id='quick-'+id; input.value=origin.value;
+        input.addEventListener('input',()=>{
+          if(origin.disabled)return;
+          origin.value=input.value;
+          origin.dispatchEvent(new Event('input',{bubbles:true}));
+        });
+        input.addEventListener('change',()=>{
+          if(origin.disabled)return;
+          origin.value=input.value;
+          origin.dispatchEvent(new Event('change',{bubbles:true}));
+          syncQuickControls();
+        });
+        input.addEventListener('blur',()=>{syncQuickControls();});
+        row.append(lbl,input);node.append(row);quickInputs.set(id,{origin,input,row});
+      });
+    });
+    document.querySelectorAll('[data-open-panel]').forEach(btn=>btn.addEventListener('click',()=>activatePanel(Number(btn.dataset.openPanel))));
+    const quickSidebar=document.querySelector('.quick-sidebar'),quickToggle=$('quickToggle');
+    function setCollapsed(collapsed){
+      quickSidebar.classList.toggle('is-collapsed',collapsed);
+      quickToggle.textContent=collapsed?'展開參數':'收合參數';
+      quickToggle.setAttribute('aria-expanded',String(!collapsed));
+    }
+    const smallScreen=window.matchMedia('(max-width:850px)');
+    setCollapsed(smallScreen.matches);
+    quickToggle.addEventListener('click',()=>setCollapsed(!quickSidebar.classList.contains('is-collapsed')));
+    smallScreen.addEventListener('change',e=>setCollapsed(e.matches));
+  }
+  function syncQuickControls(){
+    const lensMode=Number($('D').value)>0?'plus':'minus';
+    for(const [id,{origin,input,row}] of quickInputs){
+      if(document.activeElement!==input)input.value=origin.value;
+      input.disabled=origin.disabled;
+      row.classList.toggle('is-locked',origin.disabled);
+      row.style.display=id==='centerT'&&lensMode==='plus'?'none':id==='edgeT'&&lensMode!=='plus'?'none':'';
+    }
+    if(document.getElementById('workspaceMode')){
+      document.getElementById('workspaceMode').textContent=(document.getElementById('modeFree').classList.contains('active')?'自由取型':'一般框型')+' · 取型、3D、計算同步';
+    }
+  }
+  function refresh3dSize(){
+    if(!_L3D)return;
+    const {wrap,camera,renderer}=_L3D;
+    const w=wrap.clientWidth,h=wrap.clientHeight;
+    if(w>0&&h>0){camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);}
+  }
+  function syncBlankVisibility(){
+    if(!_L3D)return;
+    const show=$('showBlank').checked;
+    for(const key of ['mesh','highlight','edge','rim','ring']){
+      const v=_L3D[key]; (Array.isArray(v)?v:[v]).forEach(obj=>{if(obj)obj.visible=show;});
+    }
+    // 切面與裁型成品仍保留顯示，單純關閉圓形鏡坯。
+  }
+  function initViewControls(){
+    const to=(x,y,z)=>{if(!_L3D)return;_L3D.camera.position.set(x,y,z);_L3D.controls.target.set(0,5,0);_L3D.controls.update();};
+    $('viewFront').addEventListener('click',()=>to(0,95,1));
+    $('viewSide').addEventListener('click',()=>to(0,8,95));
+    $('viewReset').addEventListener('click',()=>to(0,25,85));
+    $('showBlank').addEventListener('change',syncBlankVisibility);
+  }
+  function updateDashboardMetrics(res,optics){
+    $('dashEdge').textContent=res.estEdgeMin.toFixed(2)+' mm';
+    $('dashBlank').textContent=res.minBlank.toFixed(1)+' mm';
+    const ok=res.blankOK&&(res.rimType==='rimless'||res.halfOK);
+    const msg=!res.blankOK?'鏡坯不足':res.rimType==='rimless'?'鏡坯足夠':res.halfOK?'加工可行':'加工有風險';
+    $('dashSafety').textContent=msg;
+    $('dashSafety').className=ok?'ok':'bad';
+    $('dashSM').textContent=optics?res.SM.toFixed(4)+'×':'—';
+  }
+
   function updateGrooveLabel(rimType){
     const lbl = $("grooveLabel");
     if (!lbl) return;
@@ -364,8 +906,8 @@
   }
 
   const ids = [
-    "lensType","D","Cyl","Axis","n","centerT","edgeT","BC","blankDia",
-    "ED","A","B","DBL","PD","allowance","grooveDepth","minTip","rimType","pupilH"
+    "D","Cyl","Axis","n","centerT","edgeT","BC","blankDia",
+    "ED","A","B","DBL","PD","allowance","grooveDepth","minTip","rimType","pupilH","vertexDist","pupilOffset"
   ];
   ids.forEach(id=>$(id).addEventListener('input', update));
 
@@ -376,8 +918,7 @@
   // ===== 提示框, click = pin ~8s =====
   const TIP_MAP = {
     // [訂製鏡片] labels
-    "lensType": "鏡片類型：近視 / 遠視切換會影響球鏡正負號與厚度基準<br>（近視以中心厚為基準；遠視以邊緣厚為基準）",
-    "D": "球鏡 S (±)：-20.00 ~ +15.00 DS<br>正 / 負（近 / 遠視）由鏡片類型決定",
+    "D": "球鏡 S (±)：-20.00 ~ +15.00 DS<br>直接輸入正負號，自動選擇厚度估算模式。S＝0 時若 C＜0 採近視模式；S＝C＝0 依預設中心厚模式。混合散光依 S 符號選取厚度基準，請留意模型限制。",
     "Cyl": "散光 C：輸入負散（0 ~ -10.00D），<br>決定後表散光量（環曲面後散形式）",
     "Axis": "軸度 A：輸入1–180° （0與180等價）<br>散光量 ≧ 0.25D 時必須輸入",
     "n": "折射率 n：常用 1.50 / 1.56 / 1.61 / 1.67 / 1.74<br>折射率越高通常可降低厚度，但可能影響阿貝數與邊緣反射",
@@ -409,8 +950,8 @@
     "k_center": "鏡片光學中心厚度",
     "k_halfSafety": "判斷鏡片裁型最薄邊緣是否低於設定的最小剩餘厚度需求",
     "k_result": "判斷鏡片裁型厚度是否過薄之安全性提示",
-    "k_SM": "形狀因素放大率由鏡片本身的幾何結構決定<br>即使度數相同，不同的設計也會影響鏡片影像放大倍率<br>關鍵參數：光心厚度、折射率，以及前表面屈光力（前彎）",
-    "k_SMpct": "鏡片影像放大倍率百分比<br>正值為放大 / 負值為縮小"
+    "k_SM": "近軸厚鏡片模型：球鏡及散光處方視為後頂點屈光力，依光學中心厚度、前彎、折射率和入瞳距離計算兩子午線的形狀／屈光力因素。",
+    "k_SMpct": "相對未戴鏡（基準 1.000×）的理論眼鏡放大率變化：正值為放大，負值為縮小。並非與原厚度鏡片比較的差值。"
   };
 
   const _tipEl = document.createElement("div");
@@ -518,20 +1059,25 @@
     window.addEventListener("scroll", ()=>{ if (_tipTarget) _positionTip(_tipTarget); }, true);
     window.addEventListener("resize", ()=>{ if (_tipTarget) _positionTip(_tipTarget); });
   }
-  $("lensType").addEventListener('change', ()=>{
-    const t = $("lensType").value;
-  document.querySelector('[data-for="minus"]').style.display = (t==='minus')?'' : 'none';
-  document.querySelector('[data-for="plus"]').style.display  = (t==='plus') ?'' : 'none';
-  const bcRow = document.querySelector('[data-for="plusBC"]');
-  if (bcRow) bcRow.style.display = '';
-  const dInput = $("D");
-  let v = parseFloat(dInput.value);
-  if (!isNaN(v)) {
-    const mag = Math.abs(v);
-    dInput.value = (t === 'minus' ? -mag : mag);
+  // 從處方 S 的正負值自動判別厚度估算模式，不修改原始 S 正負號。
+  function lensTypeFromPrescription(S, C){
+    return (S > 0) ? "plus" : "minus";
   }
-  update();
-});
+  function syncAutoLensTypeUI(S, C){
+    const mode = lensTypeFromPrescription(S, C);
+    const minusRow = document.querySelector('[data-for="minus"]');
+    const plusRow = document.querySelector('[data-for="plus"]');
+    if (minusRow) minusRow.style.display = mode === "minus" ? "" : "none";
+    if (plusRow) plusRow.style.display = mode === "plus" ? "" : "none";
+    const info = $("autoLensType");
+    if (info){
+      if (S > 0 && S + C < 0) info.textContent = "自動判定：正球鏡模式（混合散光，部分子午線為負度數）";
+      else if (S > 0) info.textContent = "自動判定：遠視｜依邊緣厚度估算";
+      else if (S === 0 && C === 0) info.textContent = "自動判定：平光｜依中心厚度估算";
+      else info.textContent = "自動判定：近視｜依中心厚度估算";
+    }
+    return mode;
+  }
   $("rimType").addEventListener('change', ()=>{
     syncRimDefaults();
     updateGrooveLabel($("rimType").value);
@@ -613,11 +1159,6 @@
       }
 
       // Convention fixes (optional but consistent with your UI copy)
-      if (id === "D"){
-        const t = $("lensType")?.value;
-        const mag = Math.abs(parseFloat(el.value) || 0);
-        el.value = String(t === "minus" ? -mag : mag);
-      }
       if (id === "Cyl"){
         const vv = parseFloat(el.value);
         if (isFinite(vv)) el.value = String(Math.min(0, vv));
@@ -634,11 +1175,10 @@
   }
 
   function calc(){
-    const lensType = $("lensType").value; // minus/plus
-    let D  = readBoundedNumber("D");
+    const D = readBoundedNumber("D"); // S 原樣保留正負號
     const CylRaw = readBoundedNumber("Cyl");
     const Cyl = isNaN(CylRaw) ? 0 : Math.min(0, CylRaw);
-    D = (lensType === "minus") ? -Math.abs(D || 0) : Math.abs(D || 0);
+    const lensType = syncAutoLensTypeUI(D, Cyl);
     const AxisRaw = readBoundedNumber("Axis");
     let Axis = Math.round(readBoundedNumber("Axis"));
     Axis = (Axis === 180) ? 0 : Axis;
@@ -727,7 +1267,7 @@
     const frontPower     = BC;                   
     const backAxisPower  = (D || 0) - frontPower; 
     const backPerpPower  = backAxisPower + (Cyl || 0);
-    const ED = clamp($("ED").value,20,80);
+    const ED = clamp($("ED").value,20,120);
     const A  = clamp($("A").value,20,80);
     const B  = clamp($("B").value,20,80);
     const DBL= clamp($("DBL").value,10,40);
@@ -822,70 +1362,10 @@
         return 0;
     }
   }
-  function drawTop(res){
-    const svg = $("topView");
-    const W = svg.viewBox.baseVal.width  || 340;
-    const H = svg.viewBox.baseVal.height || 340;
-    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-    svg.innerHTML = "";
-    const cx = W / 2;
-    const cy = H / 2;
-    const blankR = Math.min(W, H) * 0.42;
-    const rBlankReal = res.blankDia / 2;
-    if (!rBlankReal || !isFinite(rBlankReal)) return;
-    const scale = blankR / rBlankReal;
-    const A = Number(res.A) || 0;
-    const B = Number(res.B) || 0;
-    // --- 垂直偏心：由瞳高 H 與 B 算出 ---
-    let pupilH = Number(res.pupilH);
-    if (!isFinite(pupilH)) {
-      // 若沒填，就用你現在的預設：B / 1.7
-      pupilH = B ? B / 1.7 : 0;
-    }
-    pupilH = Math.min(Math.max(pupilH, 0), B);
-    const halfB = B / 2;
-    const vDecY = pupilH - halfB;   // mm：光學中心→框中心 垂直偏心
-    const dy    = vDecY * scale;    // px
-    const dx    = (Number(res.dec) || 0) * scale;  // 水平偏心
-    // 框橢圓（boxing system：A×B）
-    const rxFrame = (A / 2) * scale;
-    const ryFrame = (B / 2) * scale;
-    // 框形狀：橢圓（以框中心為圓心，受 dx, dy 影響）
-    ellipse(svg, cx + dx, cy + dy, rxFrame, ryFrame, "none", "#4b5563", 2);
-    // ED 等效圓（虛線）
-    const rED = (res.ED / 2) * scale;
-    circle(svg, cx + dx, cy + dy, rED, "none", "#6b7280", 1, "4 4");
-    // 裁型半徑
-    const rCut = (res.cutR / rBlankReal) * blankR;
-    // 鏡坯外圈（不足時紅色）－以光學中心為圓心
-    circle(svg, cx, cy, blankR, "none", res.blankOK ? "#cbd5e1" : "#ef4444", 2);
-    // ★ 光學中心標示（鏡坯圓心）
-    // 黃色小十字＋小圓點
-    line(svg, cx - 6, cy, cx + 6, cy, "#facc15", 1.2);
-    line(svg, cx, cy - 6, cx, cy + 6, "#facc15", 1.2);
-    circle(svg, cx, cy, 2.5, "#facc15", "none", 0);
-    // 裁型圈（以框中心相對鏡坯中心之偏心顯示）
-    circle(svg, cx + dx, cy + dy, rCut, "none", "#374151", 2);
-    // 溝槽達標（薄側）外圈
-    const rimType = (res.rimType || "").toLowerCase();
-    const edgeColor =
-      (rimType === "rimless")
-        ? "rgba(148,163,184,0.25)"  // 無邊框：不做達標/不足判定，給中性色
-        : (res.tipRemain >= res.need
-            ? "rgba(34,197,94,0.4)"   // 綠：厚度足夠
-            : "rgba(239,68,68,0.4)");  // 紅：厚度不足
-    circle(svg, cx + dx, cy + dy, rCut + 8, "none", edgeColor, 8);
-    // 標註文字
-    text(svg, cx, cy - blankR - 8,
-         `鏡坯片徑 ${res.blankDia.toFixed(0)} mm`,
-         "#99B3C2");
-    text(svg,
-         cx + dx,
-         cy + dy - rCut + 32,
-         `裁型直徑 ≈ ${(res.cutR * 2).toFixed(1)} mm`,
-         "#839681",
-         "middle");
-  }
+
+
+const RIM_FEATURE_FRONT_RATIO = 0.4;
+const RIM_FEATURE_BACK_RATIO  = 0.6;
 
 function drawSection(res){
   const svg = $("sectionView");
@@ -923,12 +1403,10 @@ function drawSection(res){
     // 判定外側方向：左邊柱外側在左，右邊柱外側在右
     const isLeft  = xCenter < cx;
     const xOuter  = isLeft ? rectX : (rectX + barW);
-    // notch 垂直位置：從頂部往下固定比例（你原本的寫法）
+    // 加工位置採前表面 4：後表面 6 的比例，故中心位於厚度的 40% 深度處。
     const needPx     = need * scaleT;
-    let   fromTopPx  = hPx / 2.4;
-    const maxFromTop = (hPx * 1.7) / 3;
-    if (fromTopPx > maxFromTop) fromTopPx = maxFromTop;
-    // notch 中心高度
+    const fromTopPx  = hPx * RIM_FEATURE_FRONT_RATIO;
+    // notch 中心高度（較靠近前表面）
     const notchCenterY = yTop + fromTopPx;
     // 全框尖寬 / 車溝寬：控制 Y 高度
     const triHPx    = Math.min(hPx, tipWidth    * scaleT);
@@ -1006,10 +1484,10 @@ function drawSection(res){
     const vTop = Math.max(0, halfB - yP);
     const vBot = Math.max(0, pupilH);
     const decAbs = Math.abs(res.dec || 0);
-    const rTop = Math.sqrt(decAbs * decAbs + vTop * vTop);
-    const rBot = Math.sqrt(decAbs * decAbs + vBot * vBot);
-    const tTop = thicknessAtRadius(res, rTop, "vertical");
-    const tBot = thicknessAtRadius(res, rBot, "vertical");
+    const rTop = res.contour ? res.rTop : Math.sqrt(decAbs * decAbs + vTop * vTop);
+    const rBot = res.contour ? res.rBottom : Math.sqrt(decAbs * decAbs + vBot * vBot);
+    const tTop = res.contour ? res.tTop : thicknessAtRadius(res, rTop, "vertical");
+    const tBot = res.contour ? res.tBottom : thicknessAtRadius(res, rBot, "vertical");
     line(svg, cx - 140, baseYTop, cx + 140, baseYTop, "#C6E398", 1);
     const topGap = 120;
     const xTop = cx - topGap/2;
@@ -1046,94 +1524,7 @@ function drawSection(res){
   }
   text(svg, cx, baseY + 52, label, "#4FABB8","middle");
 }
-  function applyVerticalDec(res){
-    const B = Number(res.B) || 0;
-    if (!B) return res;
-    let pupilH = Number(res.pupilH);
-    if (!isFinite(pupilH)) {
-      pupilH = B / 1.7;
-    }
-    pupilH = Math.min(Math.max(pupilH, 0), B);
-    const decAbs = Math.abs(res.dec || 0);
-    const vTop = Math.max(0, B - pupilH);
-    const vBot = Math.max(0, pupilH);
-    const rTop    = Math.sqrt(decAbs * decAbs + vTop * vTop);
-    const rBottom = Math.sqrt(decAbs * decAbs + vBot * vBot);
-    const rL = Number(res.rL) || 0;
-    const rR = Number(res.rR) || 0;
-    // 四方位計算
-    const tL   = thicknessAt(res, "L");                  // 水平左
-    const tR   = thicknessAt(res, "R");                  // 水平右
-    const tTop = thicknessAtRadius(res, rTop, "vertical");   // 垂直上
-    const tBot = thicknessAtRadius(res, rBottom, "vertical"); // 垂直下
-    //處理資料與呼叫整合
-    const estEdgeMin = Math.min(tL, tR, tTop, tBot);
-    const estCenter =
-      (typeof res.estCenter === "number" && isFinite(res.estCenter))
-        ? res.estCenter
-        : thicknessAtRadius(res, 0, "horizontal");
-    const delta = Math.abs(estCenter - estEdgeMin);
-    const rimType     = (res.rimType || "").toLowerCase();
-    const grooveDepth = Number(res.grooveDepth) || 0.8; // 車溝深
-    const tipHeight   = Number(res.tipHeight)   || 0.5; // 溝尖高
-    const tipSpan     = Number(res.tipSpan)     || tipHeight;
-    const grooveSpan  = Number(res.grooveSpan)  || grooveDepth;
-    const minTip      = (typeof res.minTip === "number" && isFinite(res.minTip))
-          ? res.minTip
-          : 0;
-    let cutDepth = 0;
-    if (rimType === "full") {
-      cutDepth = tipHeight;
-    } else if (rimType === "groove") {
-      cutDepth = grooveDepth;
-    } else {
-      cutDepth = 0; // rimless / 其他：不扣深度
-    }
-    const need        = (rimType === "rimless") ? 0 : Math.max(0, minTip);
-    const tipRemain   = estEdgeMin - cutDepth;
-    const halfOK      = tipRemain >= need;
-    const halfB = B / 2;
-    const vDecY = pupilH - halfB;
-    const allowance = Number(res.allowance) || 0;
-    const blankDia  = Number(res.blankDia)  || 0;
-    const rMax    = Math.max(rL, rR, rTop, rBottom);
-    const hReq    = rMax + allowance;
-    const minBlank= hReq * 2;
-    const blankOK = blankDia >= minBlank;
-    const blankR = blankDia ? blankDia / 2 : rMax;
-    let maxBlankThick;
-    if (res.lensType === "minus") {
-      maxBlankThick = thicknessAtRadius(res, blankR, "horizontal");
-    } else {
-      maxBlankThick = thicknessAtRadius(res, 0, "horizontal");
-    }
-    let effectiveRemain;
-    if (rimType === "full") {
-      effectiveRemain = estEdgeMin - tipHeight;
-    } else if (rimType === "groove") {
-      effectiveRemain = estEdgeMin - grooveDepth;
-    } else {
-      effectiveRemain = estEdgeMin;
-    }
-    res.vDecY         = vDecY;
-    res.pupilH        = pupilH;
-    res.rTop          = rTop;
-    res.rBottom       = rBottom;
-    res.tTop          = tTop;
-    res.tBottom       = tBot;
-    res.estEdgeMin    = estEdgeMin;
-    res.tipRemain     = tipRemain;
-    res.halfOK        = halfOK;
-    res.need          = need;
-    res.rMax          = rMax;
-    res.hReq          = hReq;
-    res.minBlank      = minBlank;
-    res.blankOK       = blankOK;
-    res.maxBlankThick = maxBlankThick;
-    res.delta         = delta;
-    res.estCenter     = estCenter; 
-    return res;
-  }
+
   // ---- 統一的環曲面模型：在 r, θ 位置回傳前表 / 後表 sag 與厚度 ----
   function lensSurfacesAt(res, r, thetaRad){
     const n = Number(res.n) || 1.5;
@@ -1293,6 +1684,12 @@ function drawSection(res){
   }
   // 方便左右 / 上下呼叫用的小幫手
   function thicknessAt(res, side){
+    if(res.contour){
+      if(side==='L')return res.tL;
+      if(side==='R')return res.tR;
+      if(side==='Top')return res.tTop;
+      if(side==='Bottom')return res.tBottom;
+    }
     switch(side){
       case "L":
         return thicknessAtRadius(res, res.rL, "L");
@@ -1306,23 +1703,33 @@ function drawSection(res){
         return thicknessAtRadius(res, res.rL, "horizontal");
     }
   }
+  // 近軸厚鏡片模型：以處方 S/C/A 為後頂點屈光力 (BVP)。
+  // 若 F1 與 t 已知，厚鏡片的 F2 必須依 BVP 反推，避免將球鏡簡單拆為 F1 + F2。
   function spectacleMagnification(res){
-    const n  = Number(res.n) || 1.5;
-    const t  = (Number(res.centerT) || 0) / 1000;   // mm → m
-    const F1 = Number(res.frontPower) || 0;         // 前表度數（BC）
-    // 後頂點度數：先用球等效當粗略 Fv
-    const S   = Number(res.D)   || 0;
-    const C   = Number(res.Cyl) || 0;
-    const Fse = S + C / 2;                          // 球等效 D
-    // 鏡眼距 h（mm → m），若沒輸入就預設 12 mm
-    const h_mm = Number(res.vertex) || 12;
-    const h    = h_mm / 1000;
-    // Power factor & Shape factor
-    const PF = 1 / (1 - h * Fse);
-    const SF = 1 / (1 - (t / n) * F1);
-    const SM = PF * SF;
-    if (!isFinite(SM) || SM <= 0) return 1;      
-    return SM;
+    const n = Number(res.n);
+    const tMm = thicknessAtRadius(res, 0, "horizontal");
+    const t = tMm / 1000;
+    const F1 = Number(res.frontPower);
+    const vd = Number($("vertexDist").value);
+    const pupilOffset = Number($("pupilOffset").value);
+    const hMm = Math.min(36, Math.max(0, isFinite(vd) ? vd : 12) + Math.max(0, isFinite(pupilOffset) ? pupilOffset : 3));
+    const h = hMm / 1000;
+    const shapeDen = 1 - (t / n) * F1;
+    if (!(shapeDen > 0.000001) || !isFinite(shapeDen) || !(tMm > 0)) return null;
+    const SF = 1 / shapeDen;
+    const calcMeridian = angle => {
+      const Fv = meridionalPower(res, angle);
+      const F2 = Fv - F1 / shapeDen;
+      const thickBVP = F2 + F1 / (1 - t*F1/n);
+      const pfDen = 1 - h*thickBVP;
+      if (!(pfDen > 0.000001)) return null;
+      const PF = 1 / pfDen;
+      return {Fv:thickBVP,F2,PF,SM:SF*PF};
+    };
+    const H = calcMeridian(0), V = calcMeridian(90);
+    if (!H || !V) return null;
+    return {SF,tMm,hMm,H,V,SM:Math.sqrt(H.SM * V.SM),
+      astig:Math.abs(Number(res.Cyl)||0)>0.0001};
   }
   function ellipse(svg, cx, cy, rx, ry, fill, stroke, sw, dash){
     const el = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
@@ -1582,7 +1989,7 @@ function update3D(res){
   if (!_L3D) return;
   const scene = _L3D.scene;
   // ---------- 先清掉舊物件 ----------
-  ["mesh","edge","rim","ring","slice","edgeStyle"].forEach(key => {
+  ["mesh","edge","rim","ring","slice","edgeStyle","cutMesh","cutEdges"].forEach(key => {
     const obj = _L3D[key];
     if (!obj){ _L3D[key] = null; return; }
 
@@ -1773,11 +2180,10 @@ function update3D(res){
   }
   const halfB   = B / 2;
   const vDecReal = B ? (pupilH - halfB) : 0;          // 垂直偏心 mm
-  const hDecReal = Number(res.dec) || 0;              // 水平偏心 mm
+  const hDecReal = Number(res.hDec) || 0;              // 水平偏心 mm
   const cutRReal = Number(res.cutR) || (Number(res.ED) || 0) / 2;
   const offsetDist = Math.sqrt(hDecReal*hDecReal + vDecReal*vDecReal);
-  const ringInside =
-    cutRReal > 0 && (offsetDist + cutRReal <= rEdgeReal + 1e-6);
+  const ringInside = res.blankOK;
   // ---------- 4. 裁型圈（高亮） ----------
   if (cutRReal > 0){
     const ringRadius = cutRReal * sR;
@@ -2079,18 +2485,20 @@ function update3D(res){
   if (cutRReal > 0) { 
     const halfAReal = (Number(res.A) || 0) / 2;
     const halfBReal = (Number(res.B) || 0) / 2;
-    const spanXReal = (halfAReal > 0) ? Math.min(cutRReal, halfAReal) : cutRReal;
-    const spanZReal = (halfBReal > 0) ? Math.min(cutRReal, halfBReal) : cutRReal;
-    // 水平：沿 x 方向，水平（綠）＝A/2
-    const sliceX = buildCurtain(-spanXReal, +spanXReal, "x");
+    const sx=res.sectionSpanH||[hDecReal-halfAReal,hDecReal+halfAReal];
+    const sy=res.sectionSpanV||[vDecReal-halfBReal,vDecReal+halfBReal];
+    const sliceX = buildCurtain(sx[0]-hDecReal,sx[1]-hDecReal,"x");
     if (sliceX) slices.push(sliceX);
-    // 垂直：沿 z 方向，垂直（黃）＝B/2
-    const sliceZ = buildCurtain(-spanZReal, +spanZReal, "z");
+    const sliceZ = buildCurtain(sy[0]-vDecReal,sy[1]-vDecReal,"z");
     if (sliceZ) slices.push(sliceZ);
   }
   // 存起來方便之後清理
   _L3D.slice = slices;
   _L3D.edgeStyle = edgeStyles.length ? edgeStyles : null;
+  // The previous torus was a circle regardless of actual edging shape: remove it.
+  if(_L3D.ring){scene.remove(_L3D.ring);_L3D.ring.geometry.dispose();_L3D.ring.material.dispose();_L3D.ring=null;}
+  showCutMesh3D(res);
+  syncBlankVisibility();
 }
   // 繪圖小工具
   function circle(svg,cx,cy,r,fill,stroke,sw, dash){
@@ -2135,12 +2543,668 @@ function update3D(res){
     if (sw != null) el.setAttribute("stroke-width", sw);
     svg.appendChild(el);
   }
+
+  // ===== Unified shape geometry: one contour for 1:1, safety, sections and cut 3D =====
+  const SHAPE_SVG_NS = 'http://www.w3.org/2000/svg';
+  const shapeState = {
+    mode: 'manual', eye: 'OS', pixelsPerMm: 96/25.4, calibrated: false,
+    free: null, freeByEye: {OS:null,OD:null},
+    rawBounds: null, rawPoints: null, localPoints: null,
+    dragging: null
+  };
+  // 三組使用者提供的 OS 原始十四點輪廓，單位 mm；右眼按 x 鏡像載入。
+  // 內建在 HTML 中，不需要 JSON 外部檔或瀏覽器儲存空間。
+  const BUILTIN_FREE_PRESETS = Object.freeze({"預1":{"eye":"OS","points":{"L":[{"x":-17.16,"y":-29.35338},{"x":-23.4,"y":-22.64889},{"x":-22.22853,"y":-13.92633},{"x":-18.26282,"y":-4.11344},{"x":-12.17721,"y":4.60912},{"x":-6.0916,"y":10.65942}],"R":[{"x":23.54269,"y":-29.35338},{"x":30.42209,"y":-22.64889},{"x":31.21791,"y":-13.92633},{"x":29.62831,"y":-4.11344},{"x":25.92403,"y":4.60912},{"x":19.04463,"y":10.65942}],"T":[{"x":0,"y":-31.15338}],"B":[{"x":0,"y":12.45942}]},"measurements":{"A":54.618,"B":43.613,"ED":56.724}},"預2":{"eye":"OS","points":{"L":[{"x":-21.89535,"y":-16.2},{"x":-25.97489,"y":-11.63088},{"x":-25.33504,"y":-5.09845},{"x":-23.4829,"y":2.25053},{"x":-20.57239,"y":8.78296},{"x":-16.07433,"y":12.86215}],"R":[{"x":23.1289,"y":-16.2},{"x":27.09447,"y":-11.63088},{"x":27.094,"y":-5.09845},{"x":26,"y":2.25053},{"x":22.8643,"y":8.78296},{"x":15.3851,"y":12.86215}],"T":[{"x":0,"y":-18}],"B":[{"x":0,"y":14.66215}]},"measurements":{"A":53.069,"B":32.662,"ED":54.01}},"預3":{"eye":"OS","points":{"L":[{"x":-15.32367,"y":-27.07409},{"x":-22.20305,"y":-20.39638},{"x":-24.4303,"y":-11.70129},{"x":-22.46765,"y":-1.91932},{"x":-16.91122,"y":6.77577},{"x":-8.97346,"y":12.80135}],"R":[{"x":17.75032,"y":-27.07409},{"x":24.62971,"y":-20.39638},{"x":28.06877,"y":-11.70129},{"x":26.74645,"y":-1.91932},{"x":22.24838,"y":6.77577},{"x":13.78144,"y":12.80135}],"T":[{"x":0,"y":-28.87409}],"B":[{"x":0,"y":14.60135}]},"measurements":{"A":52.499,"B":43.475,"ED":52.678}}});
+  const activePresetByEye = {OS:null,OD:null};
+  function syncPresetUI(){
+    const enabled=shapeState.mode==='free';
+    const host=$('shapePresetButtons');
+    if(host)host.hidden=!enabled;
+    document.querySelectorAll('[data-shape-preset]').forEach(button=>{
+      const active=enabled && button.dataset.shapePreset===activePresetByEye[shapeState.eye];
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',String(active));
+    });
+  }
+  function copyPresetPoints(pts){
+    return Object.fromEntries(['L','R','T','B'].map(k=>[
+      k,pts[k].map(p=>({x:p.x,y:p.y}))
+    ]));
+  }
+  function applyBuiltinPreset(name){
+    const data=BUILTIN_FREE_PRESETS[name];
+    if(!data)return;
+    const osPoints=copyPresetPoints(data.points);
+    const next=shapeState.eye==='OS' ? osPoints : mirrorFreeHandles(osPoints);
+    shapeState.free=next;
+    shapeState.freeByEye[shapeState.eye]=next;
+    shapeState.mode='free';
+    shapeState.dragging=null;
+    activePresetByEye[shapeState.eye]=name;
+    syncShapeUI();
+    update();
+  }
+  // 隱藏匯出工具：必須依序點選 預3 → 預1 → 預2 → 預2 → 預2。
+  // 只監聽預設按鈕點擊；錯誤序列重新開始，若又點到預3則視為新序列起點。
+  const exportUnlockSequence=['預3','預1','預2','預2','預2'];
+  let exportUnlockIndex=0;
+  let exportUnlocked=false;
+  function syncExportVisibility(){
+    const button=$('exportShapeJSON');
+    const visible=exportUnlocked && shapeState.mode==='free';
+    button.hidden=!visible;
+    button.style.display=visible?'':'none';
+  }
+  function observePresetUnlock(name){
+    if(exportUnlocked)return;
+    if(name===exportUnlockSequence[exportUnlockIndex]){
+      exportUnlockIndex++;
+    }else{
+      exportUnlockIndex=name===exportUnlockSequence[0]?1:0;
+    }
+    if(exportUnlockIndex===exportUnlockSequence.length){
+      exportUnlocked=true;
+      syncExportVisibility();
+    }
+  }
+  document.querySelectorAll('[data-shape-preset]').forEach(button=>{
+    button.addEventListener('click',()=>{
+      const name=button.dataset.shapePreset;
+      applyBuiltinPreset(name);
+      observePresetUnlock(name);
+    });
+  });
+  function elSVG(tag, attributes, parent){
+    const el=document.createElementNS(SHAPE_SVG_NS,tag);
+    Object.entries(attributes||{}).forEach(([k,v])=>el.setAttribute(k,String(v)));
+    if(parent) parent.appendChild(el);
+    return el;
+  }
+  const finite=(n,fallback=0)=>Number.isFinite(Number(n))?Number(n):fallback;
+  // 自由取型上下肩點與 B 高控制點的固定垂直間距（mm）。
+  // L1/R1 與上 B、L6/R6 與下 B 不參與 B 高百分比縮放，避免肩線被拉開。
+  const FREE_B_SHOULDER_GAP_MM=1.8;
+  function resetFreeGeometry(){
+    let A=finite($('A').value,52),B=finite($('B').value,40);
+    A=Math.max(30,Math.min(70,A)); B=Math.max(25,Math.min(56,B));
+    const xs=[.66,.90,1,1,.89,.66],ys=[-.79,-.61,-.21,.24,.64,.79];
+    const initSide=(sign)=>xs.map((v,i)=>({
+      x:sign*A/2*v,
+      y:i===0 ? -B/2+FREE_B_SHOULDER_GAP_MM
+        :i===5 ? B/2-FREE_B_SHOULDER_GAP_MM
+        :B/2*ys[i]
+    }));
+    shapeState.free={
+      L:initSide(-1),
+      R:initSide(1),
+      // 上下各一點：兩者定義整條輪廓的 B 高界限。
+      T:[{x:0,y:-B*.5}],
+      B:[{x:0,y:B*.5}]
+    };
+    shapeState.freeByEye[shapeState.eye]=shapeState.free;
+  }
+  function rawHandles(){
+    if(!shapeState.free) resetFreeGeometry();
+    const f=shapeState.free;
+    return [f.L[0],f.T[0],f.R[0],...f.R.slice(1),...f.B,...f.L.slice(1).reverse()];
+  }
+  function catmullLoop(points,steps=12){
+    const out=[],n=points.length;
+    const coord=(i,t,k)=>{
+      const p0=points[(i-1+n)%n][k],p1=points[i][k],p2=points[(i+1)%n][k],p3=points[(i+2)%n][k];
+      const t2=t*t,t3=t2*t;
+      const v=.5*(2*p1+(-p0+p2)*t+(2*p0-5*p1+4*p2-p3)*t2+(-p0+3*p1-3*p2+p3)*t3);
+      return Math.max(Math.min(p1,p2),Math.min(Math.max(p1,p2),v));
+    };
+    for(let i=0;i<n;i++)for(let k=0;k<steps;k++){
+      const t=k/steps;
+      out.push({x:coord(i,t,'x'),y:coord(i,t,'y')});
+    }
+    return out;
+  }
+  function boundsOf(points){
+    return {xmin:Math.min(...points.map(p=>p.x)),xmax:Math.max(...points.map(p=>p.x)),
+      ymin:Math.min(...points.map(p=>p.y)),ymax:Math.max(...points.map(p=>p.y))};
+  }
+  // ED is the maximum chord between any two points on the traced perimeter (NOT 2×distance from optical centre).
+  function outlineED(points){
+    let d2=0;
+    for(let i=0;i<points.length;i++) for(let j=i+1;j<points.length;j++){
+      const a=points[i],b=points[j],dx=a.x-b.x,dy=a.y-b.y;
+      d2=Math.max(d2,dx*dx+dy*dy);
+    }
+    return Math.sqrt(d2);
+  }
+  function superellipse(t,a,b,n){
+    const c=Math.cos(t),s=Math.sin(t);
+    return {x:a*Math.sign(c)*Math.pow(Math.abs(c),2/n),y:b*Math.sign(s)*Math.pow(Math.abs(s),2/n)};
+  }
+  function manualOutline(){
+    const A=finite($('A').value,52),B=finite($('B').value,40),ED=finite($('ED').value,53);
+    const target=Math.max(A,B,Math.min(Math.hypot(A,B),ED));
+    let lo=2,hi=18;
+    for(let j=0;j<18;j++){
+      const mid=(lo+hi)/2;
+      const diag=Math.hypot(A*.5*Math.pow(Math.SQRT1_2,2/mid),B*.5*Math.pow(Math.SQRT1_2,2/mid))*2;
+      // Corner diagonal is monotonic; full boundary is sampled below.
+      if(diag<target)lo=mid;else hi=mid;
+    }
+    return Array.from({length:240},(_,i)=>superellipse(i*2*Math.PI/240,A/2,B/2,(lo+hi)/2));
+  }
+  function computeOutline(){
+    const raw=(shapeState.mode==='free')?catmullLoop(rawHandles(),12):manualOutline();
+    const bounds=boundsOf(raw);
+    const cx=(bounds.xmin+bounds.xmax)/2,cy=(bounds.ymin+bounds.ymax)/2;
+    const local=raw.map(p=>({x:p.x-cx,y:p.y-cy}));
+    shapeState.rawBounds=bounds;shapeState.rawPoints=raw;shapeState.localPoints=local;
+    const metrics={A:bounds.xmax-bounds.xmin,B:bounds.ymax-bounds.ymin,ED:outlineED(raw)};
+    if(shapeState.mode==='free'){
+      ['A','B','ED'].forEach(k=>$(k).value=metrics[k].toFixed(2));
+      const ph=$('pupilH');
+      if(ph.value!=='' && finite(ph.value)>metrics.B)ph.value=metrics.B.toFixed(2);
+    }
+    return {local,metrics};
+  }
+  function syncShapeUI(){
+    for(const k of ['A','B','ED']){
+      const input=$(k);input.disabled=shapeState.mode==='free';
+      input.classList.toggle('auto-locked',shapeState.mode==='free');
+      input.title=shapeState.mode==='free'?'由自由輪廓自動測量，不能手動輸入':'';
+    }
+    $('modeManual').classList.toggle('active',shapeState.mode==='manual');
+    $('modeFree').classList.toggle('active',shapeState.mode==='free');
+    $('resetShape').style.display=shapeState.mode==='free'?'':'none';
+    syncExportVisibility();
+    syncPresetUI();
+    $('shapeInstruction').textContent=shapeState.mode==='free'
+      ?'自由取型：左右各 6 個藍點調寬、上下橙點調 B 高；L1／R1、L6／R6 與 B 點維持 1.8 mm 端距，其餘點依 B 高比例縮放。'
+      :'一般框型：以 A、B、ED 輸入建立圓角輪廓（近似）；切換至自由取型可拖曳形狀。';
+    $('freeFieldNotice').textContent=shapeState.mode==='free'
+      ?'自由取型啟用中：A／B／ED 已鎖定，由輪廓幾何自動填入。DBL／PD／PH 仍可調整。'
+      :'一般框型：A／B／ED 可自行輸入。自由取型會自動填入並鎖定。';
+  }
+  function svgPolyline(parent,points,attrs={}){
+    return elSVG('path',{d:points.map((p,i)=>(i?'L':'M')+p.x.toFixed(3)+' '+p.y.toFixed(3)).join(' ')+' Z',...attrs},parent);
+  }
+  // Find real intersections with horizontal or vertical line (in optical-centre coordinates).
+  function intersectContour(points,dim,value){
+    let vals=[];
+    for(let i=0;i<points.length;i++){
+      const a=points[i],b=points[(i+1)%points.length],k=dim==='x'?'y':'x',q=dim==='x'?'x':'y';
+      if((a[k]<=value&&b[k]>value)||(b[k]<=value&&a[k]>value)){
+        const u=(value-a[k])/(b[k]-a[k]);vals.push(a[q]+u*(b[q]-a[q]));
+      }
+    }
+    if(vals.length<2)return null;
+    return [Math.min(...vals),Math.max(...vals)];
+  }
+  function enrichContour(res){
+    const geometry=computeOutline();
+    res.shapeMode=shapeState.mode;
+    // 以配戴者對面觀察的正面圖座標：OD 光心往鼻側（圖右），
+    // 因此裁型框心相對光心向圖左；OS 則向圖右。
+    // 沿用舊版 OS 的正向偏心以保持既有計算結果。
+    const inset=(res.framePD-res.PD)/2;
+    res.hDec=(shapeState.eye==='OD'?-1:1)*inset;
+    res.eye=shapeState.eye;
+    res.vDecY=res.pupilH-res.B/2;
+    res.localContour=geometry.local;
+    res.contour=geometry.local.map(p=>({x:p.x+res.hDec,y:p.y+res.vDecY}));
+    res.sectionSpanH=intersectContour(res.contour,'x',res.vDecY);
+    res.sectionSpanV=intersectContour(res.contour,'y',res.hDec);
+    return res;
+  }
+  function contourThickness(res,p){return thicknessAtPolar(res,Math.hypot(p.x,p.y),Math.atan2(p.y,p.x));}
+  // Fully replace prior four-point-only estimate. All safety metrics derive from the same traced contour.
+  function applyVerticalDec(res){
+    enrichContour(res);
+    const contour=res.contour;
+    const sampled=contour.map(p=>({p,t:contourThickness(res,p),r:Math.hypot(p.x,p.y)}));
+    const thin=sampled.reduce((a,b)=>b.t<a.t?b:a);
+    const far=sampled.reduce((a,b)=>b.r>a.r?b:a);
+    res.minPoint=thin.p;res.estEdgeMin=thin.t;res.rMax=far.r;
+    res.minBlank=2*(res.rMax+res.allowance);
+    res.hReq=res.rMax+res.allowance;
+    res.blankOK=res.blankDia>=res.minBlank-1e-8;
+    res.cutR=res.ED/2;
+    res.vDecY=res.pupilH-res.B/2;
+    const xs=res.sectionSpanH||[-res.A/2,res.A/2];
+    const ys=res.sectionSpanV||[-res.B/2,res.B/2];
+    res.rL=Math.abs(xs[0]);res.rR=Math.abs(xs[1]);
+    res.rTop=Math.abs(ys[0]);res.rBottom=Math.abs(ys[1]);
+    res.tL=contourThickness(res,{x:xs[0],y:res.vDecY});
+    res.tR=contourThickness(res,{x:xs[1],y:res.vDecY});
+    res.tTop=contourThickness(res,{x:res.hDec,y:ys[0]});
+    res.tBottom=contourThickness(res,{x:res.hDec,y:ys[1]});
+    res.estCenter=thicknessAtPolar(res,0,0);
+    res.delta=Math.abs(res.estCenter-res.estEdgeMin);
+    const cutDepth=res.rimType==='full'?res.tipHeight:res.rimType==='groove'?res.grooveDepth:0;
+    res.need=res.rimType==='rimless'?0:res.minTip;
+    res.tipRemain=res.estEdgeMin-cutDepth;
+    res.halfOK=res.tipRemain>=res.need;
+    res.maxBlankThick=res.lensType==='minus'
+      ?Math.max(...Array.from({length:72},(_,i)=>thicknessAtPolar(res,res.blankDia/2,i*Math.PI/36)))
+      :res.estCenter;
+    return res;
+  }
+  function applyPhysicalScale(){
+    const svg=$('topView'),W=144,H=115;
+    svg.style.width=(W*shapeState.pixelsPerMm)+'px';
+    svg.style.height=(H*shapeState.pixelsPerMm)+'px';
+    svg.setAttribute('width',W*shapeState.pixelsPerMm);
+    svg.setAttribute('height',H*shapeState.pixelsPerMm);
+  }
+  function drawTop(res){
+    const svg=$('topView');svg.innerHTML='';svg.setAttribute('viewBox','0 0 144 115');
+    applyPhysicalScale();
+    const cx=72,cy=51,R=res.blankDia/2;
+    const g=elSVG('g',{},svg);
+    // 5-mm lattice permits alignment against a physical frame; the SVG mm-to-CSS pixel ratio is calibrated below.
+    for(let k=-40;k<=40;k+=5){
+      line(g,cx+k,5,cx+k,94,'#223b54',.14);
+      line(g,22,cy+k,122,cy+k,'#223b54',.14);
+    }
+    elSVG('circle',{cx,cy,r:R,fill:'rgba(110,175,232,.07)',stroke:res.blankOK?'#93acc5':'#fb7185','stroke-width':.55},svg);
+    elSVG('circle',{cx,cy,r:1.0,fill:'#ffe08a',stroke:'#f0bc53','stroke-width':.25},svg);
+    line(svg,cx-4,cy,cx+4,cy,'#ffe08a',.32);line(svg,cx,cy-4,cx,cy+4,'#ffe08a',.32);
+    const contour=res.contour.map(p=>({x:cx+p.x,y:cy+p.y}));
+    svgPolyline(svg,contour,{fill:'rgba(37,195,206,.19)',stroke:res.blankOK?'#67e8f9':'#fb7185','stroke-width':.6,'stroke-linejoin':'round'});
+    const green=res.estEdgeMin>=res.need+(res.rimType==='groove'?res.grooveDepth:res.rimType==='full'?res.tipHeight:0);
+    elSVG('circle',{cx:cx+res.minPoint.x,cy:cy+res.minPoint.y,r:1.3,fill:green?'#4ade80':'#fb7185',stroke:'#e0fbff','stroke-width':.25},svg);
+    // Optical centre cross and pupil fitting point (same centre assumed in this teaching model)
+    const marks=[['光心',cx+1.8,cy-2.7],['薄側',cx+res.minPoint.x+2,cy+res.minPoint.y-1.4]];
+    marks.forEach(([name,x,y])=>elSVG('text',{x,y,'font-size':2.7,fill:'#e9d5ac'},svg).textContent=name);
+    if(shapeState.mode==='free'){
+      const bb=shapeState.rawBounds,mx=(bb.xmin+bb.xmax)/2,my=(bb.ymin+bb.ymax)/2;
+      for(const group of ['L','R','T','B'])shapeState.free[group].forEach((p,i)=>{
+        const isVert=group==='T'||group==='B';
+        const X=cx+res.hDec+p.x-mx,Y=cy+res.vDecY+p.y-my;
+        const dot=elSVG('circle',{cx:X,cy:Y,r:1.25,'data-group':group,'data-index':i,
+          class:'free-dot'+(isVert?' vert':''),'aria-label':group+(i+1)+' 拖曳控制點'},svg);
+        elSVG('title',{},dot).textContent=(isVert?'上下垂直拖曳':'左右水平拖曳')+' '+group+(i+1);
+        elSVG('text',{x:X,y:Y-2.1,class:'free-dot-label'},svg).textContent=isVert?(group==='T'?'上 B':'下 B'):group+(i+1);
+      });
+    }
+    elSVG('text',{x:23,y:6,'font-size':3.3,fill:'#cde4fa','font-weight':700},svg).textContent=
+      '1:1 校正後實尺寸｜框型＋鏡坯';
+    elSVG('text',{x:24,y:92,'font-size':2.7,fill:'#a7bfd0'},svg).textContent=`鏡坯 Ø${res.blankDia.toFixed(0)} mm　輪廓 A${res.A.toFixed(1)} B${res.B.toFixed(1)} ED${res.ED.toFixed(1)}`;
+    // Exactly 50 mm wide in SVG user units; physical size depends only on px/mm calibration.
+    const ry=102,sx=46;
+    line(svg,sx,ry,sx+50,ry,'#f9fbff',.48);
+    for(let k=0;k<=50;k+=5){line(svg,sx+k,ry-(k%10===0?2.4:1.25),sx+k,ry+(k%10===0?2.2:1.25),'#f9fbff',.33);}
+    elSVG('text',{x:sx+25,y:110,'font-size':2.8,fill:'#e4e9f2','text-anchor':'middle'},svg).textContent='50 mm 校正尺（請用實體尺對照）';
+    $('shapeMetrics').textContent=`${shapeState.mode==='free'?'自由取型':'一般框型'}　A ${res.A.toFixed(2)} mm　│ B ${res.B.toFixed(2)} mm　│ ED ${res.ED.toFixed(2)} mm　│ 最薄邊厚 ${res.estEdgeMin.toFixed(2)} mm　│ 所需片徑 ${res.minBlank.toFixed(1)} mm`;
+  }
+  function svgUserPoint(svg,event){
+    const point=svg.createSVGPoint();point.x=event.clientX;point.y=event.clientY;
+    return point.matrixTransform(svg.getScreenCTM().inverse());
+  }
+  // 上下各一個 B 控制點：以另一端為固定錨點，線性映射中間點的 Y。
+  // 但上肩 L1/R1 固定在上 B 下方 1.8 mm，下肩 L6/R6 固定在下 B 上方 1.8 mm；
+  // 這四點不按 B 高比例拉開，只隨各自 B 端點平移。X 座標完全不變。
+  function resizeFreeHeight(which, requestedY){
+    const f=shapeState.free;
+    if(!f || (which!=='T' && which!=='B')) return;
+    const top=f.T[0].y,bottom=f.B[0].y;
+    const oldSpan=bottom-top;
+    if(oldSpan<1e-6) return;
+    // B 高限制 18～70 mm，避免輪廓倒置，也保持畫布可操作。
+    const minHeight=18,maxHeight=70;
+    let newTop=top,newBottom=bottom;
+    if(which==='T'){
+      newTop=Math.max(-42,Math.min(bottom-minHeight,requestedY));
+      newTop=Math.max(newTop,bottom-maxHeight);
+    } else {
+      newBottom=Math.min(42,Math.max(top+minHeight,requestedY));
+      newBottom=Math.min(newBottom,top+maxHeight);
+    }
+    const scale=(newBottom-newTop)/oldSpan;
+    for(const group of ['L','R']){
+      f[group].forEach((point,i)=>{
+        if(i===0){
+          // 與上 B 維持絕對垂直距離，不隨放大比例改變。
+          point.y=newTop+FREE_B_SHOULDER_GAP_MM;
+        }else if(i===5){
+          // 與下 B 維持絕對垂直距離，不隨放大比例改變。
+          point.y=newBottom-FREE_B_SHOULDER_GAP_MM;
+        }else{
+          point.y=newTop+(point.y-top)*scale;
+        }
+      });
+    }
+    // B 高兩端點精確定位，避免多次拖曳造成累積誤差。
+    f.T[0].y=newTop;
+    f.B[0].y=newBottom;
+  }
+  // 左右眼專屬處方與取型形狀：其他共同參數（框心距、折射率等）維持共用。
+  const EYE_FIELDS=['D','Cyl','Axis','BC','centerT','edgeT','pupilH'];
+  const eyeProfiles={OS:null,OD:null};
+  function captureEyeFields(){
+    return Object.fromEntries(EYE_FIELDS.map(id=>[id,$(id).value]));
+  }
+  function mirrorFreeHandles(source){
+    const mirrorArray=arr=>arr.map(p=>({x:-p.x,y:p.y}));
+    return {L:mirrorArray(source.R),R:mirrorArray(source.L),
+      T:mirrorArray(source.T),B:mirrorArray(source.B)};
+  }
+  function syncEyeSwitchUI(){
+    for(const eye of ['OD','OS']){
+      const btn=$('eye'+eye),isActive=shapeState.eye===eye;
+      btn.classList.toggle('active',isActive);
+      btn.setAttribute('aria-pressed',String(isActive));
+    }
+    $('summaryEye').textContent=shapeState.eye==='OD'?'右眼 OD':'左眼 OS';
+  }
+  function setEye(eye){
+    if(eye!== 'OD' && eye!== 'OS')return;
+    if(shapeState.eye===eye)return;
+    const old=shapeState.eye;
+    eyeProfiles[old]=captureEyeFields();
+    if(shapeState.free)shapeState.freeByEye[old]=shapeState.free;
+    // 初次建立對側眼時，鏡像複製已調好的框型；此後兩眼各自存取。
+    if(!shapeState.freeByEye[eye] && shapeState.freeByEye[old]){
+      shapeState.freeByEye[eye]=mirrorFreeHandles(shapeState.freeByEye[old]);
+      activePresetByEye[eye]=activePresetByEye[old];
+    }
+    if(!eyeProfiles[eye])eyeProfiles[eye]={...eyeProfiles[old]};
+    shapeState.eye=eye;
+    shapeState.free=shapeState.freeByEye[eye];
+    for(const [id,value] of Object.entries(eyeProfiles[eye])){
+      $(id).value=value;
+      if($(id).dataset.lastValid!==undefined && value!=='' )$(id).dataset.lastValid=value;
+    }
+    shapeState.dragging=null;
+    syncAutoLensTypeUI(Number($('D').value)||0,Number($('Cyl').value)||0);
+    syncEyeSwitchUI();
+    syncPresetUI();
+    update();
+  }
+  $('eyeOD').addEventListener('click',()=>setEye('OD'));
+  $('eyeOS').addEventListener('click',()=>setEye('OS'));
+  syncEyeSwitchUI();
+
+  $('topView').addEventListener('pointerdown',e=>{
+    const handle=e.target.closest('[data-group]');
+    if(shapeState.mode!=='free'||!handle)return;
+    e.preventDefault();
+    const group=handle.getAttribute('data-group'),index=+handle.getAttribute('data-index');
+    shapeState.dragging={group,index,pointerId:e.pointerId};
+    $('topView').setPointerCapture(e.pointerId);
+  });
+  $('topView').addEventListener('pointermove',e=>{
+    const drag=shapeState.dragging;
+    if(!drag||drag.pointerId!==e.pointerId)return;
+    e.preventDefault();
+    const p=svgUserPoint($('topView'),e),b=shapeState.rawBounds;
+    const midx=(b.xmin+b.xmax)/2,midy=(b.ymin+b.ymax)/2;
+    const r=window.__lensRes;
+    if(!r)return;
+    const target=shapeState.free[drag.group][drag.index];
+    const rawX=p.x-72-r.hDec+midx,rawY=p.y-51-r.vDecY+midy;
+    if(drag.group==='L')target.x=Math.max(-38,Math.min(-4,rawX));
+    else if(drag.group==='R')target.x=Math.min(38,Math.max(4,rawX));
+    else resizeFreeHeight(drag.group,rawY);
+    activePresetByEye[shapeState.eye]=null;
+    syncPresetUI();
+    update();
+  });
+  for(const event of ['pointerup','pointercancel','lostpointercapture'])$('topView').addEventListener(event,()=>shapeState.dragging=null);
+  $('modeFree').addEventListener('click',()=>{
+    if(!shapeState.free)resetFreeGeometry();
+    shapeState.mode='free';syncShapeUI();update();
+  });
+  $('modeManual').addEventListener('click',()=>{shapeState.mode='manual';syncShapeUI();update();});
+  $('resetShape').addEventListener('click',()=>{
+    resetFreeGeometry();
+    activePresetByEye[shapeState.eye]=null;
+    shapeState.mode='free';syncShapeUI();update();
+  });
+  // 將 14 個原始可編輯控制點以毫米座標匯出；不能以畫面截圖或密集輪廓取樣替代。
+  // 供後續嵌入「預1／預2／預3」使用，且不輸出處方或其他個人資料。
+  $('exportShapeJSON').addEventListener('click',()=>{
+    if(shapeState.mode!=='free')return;
+    if(!shapeState.free)resetFreeGeometry();
+    // 更新精確的量測 A/B/ED（毫米），避免匯出使用過期的輸入值。
+    const geometry=computeOutline();
+    const suggested='預1';
+    const entered=window.prompt('請輸入形狀名稱（例如：預1、預2、預3）',suggested);
+    if(entered===null)return;
+    const name=(entered.trim()||suggested).slice(0,50);
+    const pts=shapeState.free;
+    const copy=arr=>arr.map(p=>({x:Number(p.x.toFixed(5)),y:Number(p.y.toFixed(5))}));
+    const data={
+      format:'lens-freeform-preset',version:1,
+      name,eye:shapeState.eye,units:'mm',
+      description:'原始 14 點控制座標，L/R 各 6 個水平調整點，T/B 各 1 個垂直調整點',
+      points:{L:copy(pts.L),R:copy(pts.R),T:copy(pts.T),B:copy(pts.B)},
+      measurements:{A:Number(geometry.metrics.A.toFixed(3)),B:Number(geometry.metrics.B.toFixed(3)),ED:Number(geometry.metrics.ED.toFixed(3))},
+      fixedShoulderGapMm:FREE_B_SHOULDER_GAP_MM
+    };
+    const filenameSafe=name.replace(/[^\p{L}\p{N}_-]+/gu,'_')||'預設';
+    const json=JSON.stringify(data,null,2);
+    const url=URL.createObjectURL(new Blob([json],{type:'application/json;charset=utf-8'}));
+    const a=document.createElement('a');
+    a.href=url;a.download=`鏡片自由取型_${filenameSafe}_${shapeState.eye}.json`;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+  });
+  $('applyRuler').addEventListener('click',()=>{
+    const measured=Number($('measuredRuler').value);
+    if(!Number.isFinite(measured)||measured<15||measured>130){$('scaleStatus').textContent='量測值須為 15～130 mm';return;}
+    shapeState.pixelsPerMm*=50/measured;shapeState.calibrated=true;
+    $('scaleStatus').textContent='已校正（顯示器縮放變更後請重新校正）';
+    $('measuredRuler').value='50';update();
+  });
+  $('resetRuler').addEventListener('click',()=>{
+    shapeState.pixelsPerMm=96/25.4;shapeState.calibrated=false;
+    $('scaleStatus').textContent='尚未校正（以 CSS 96 DPI 為初值）';$('measuredRuler').value='50';update();
+  });
+  syncShapeUI();
+  // Section: actual horizontal + vertical cut profiles superposed on original round blank.
+  function drawCutSection(res){
+    const svg=$('cutSectionView');svg.innerHTML='';
+    const blankR=res.blankDia/2,BC=Math.max(0,finite(res.BC));
+    const frontY=(x,y)=>{
+      const r2=x*x+y*y,denom=2000*(res.n-1);
+      return ((blankR*blankR-r2)*BC/Math.max(1,denom))*5;
+    };
+    const axes=[{dir:'H',name:'水平（左右）',span:res.sectionSpanH,fix:res.vDecY,base:44},
+                {dir:'V',name:'垂直（上下）',span:res.sectionSpanV,fix:res.hDec,base:193}];
+    const xScale=5.5,thickScale=5;
+    function lensPath(dir,start,end,fix,base,colour,alpha){
+      const N=100,front=[],back=[];
+      for(let i=0;i<=N;i++){
+        const s=start+(end-start)*i/N;
+        const x=dir==='H'?s:fix,y=dir==='H'?fix:s;
+        const depth=contourThickness(res,{x,y});
+        const fx=300+s*xScale;
+        const fy=base-frontY(x,y);
+        front.push({x:fx,y:fy});back.push({x:fx,y:fy+depth*thickScale});
+      }
+      svgPolyline(svg,[...front,...back.reverse()],{fill:colour,'fill-opacity':alpha,stroke:colour,'stroke-width':1,'stroke-linejoin':'round'});
+    }
+    axes.forEach(({dir,name,span,fix,base})=>{
+      elSVG('text',{x:24,y:base-16,fill:'#d7eaf9','font-size':13,'font-weight':650},svg).textContent=name+'｜圓形鏡坯 vs 裁型鏡片';
+      const rb=Math.sqrt(Math.max(0,blankR*blankR-fix*fix));
+      if(rb>0)lensPath(dir,-rb,rb,fix,base,'#8caac9',.10);
+      if(span)lensPath(dir,span[0],span[1],fix,base,'#36d5db',.42);
+      line(svg,300-rb*xScale,base+74,300+rb*xScale,base+74,'#3a576f',.8);
+      elSVG('text',{x:24,y:base+96,fill:'#90acbd','font-size':11},svg).textContent=span?
+        `裁型跨度 ${(span[1]-span[0]).toFixed(1)} mm｜兩端厚 ${contourThickness(res,dir==='H'?{x:span[0],y:fix}:{x:fix,y:span[0]}).toFixed(2)} / ${contourThickness(res,dir==='H'?{x:span[1],y:fix}:{x:fix,y:span[1]}).toFixed(2)} mm`:
+        '此取樣線未穿過有效裁型輪廓';
+    });
+    elSVG('text',{x:300,y:331,'text-anchor':'middle','font-size':10,fill:'#bacdd9'},svg).textContent=
+      `輪廓全周最薄 ${res.estEdgeMin.toFixed(2)} mm（不一定落在上述兩條剖面）｜灰＝鏡坯，青＝裁型成品；剖面縱向厚度為放大示意`;
+  }
+  // 僅用於 3D 顯示的分層間距，單位為 Three.js 場景座標。
+  // 原始厚度 / SM / 最薄邊緣計算完全不使用此偏移。
+  const CUT_SURFACE_VISUAL_GAP = 0.08;
+
+  // 裁型鏡片使用單一封閉輪廓建模；側面是真正連續的三角網格，而非裝飾環。
+  // 全框：外凸 V 尖；車溝：側壁凹槽；無框：直側壁。
+  // 尖寬／溝寬是厚度方向的 Y 寬，尖高／溝深是平面徑向 XZ 尺寸。
+  // 只改變 3D 可視網格，不改動光學模型與加工安全性算法。
+  function cutRimSamples(res){
+    const outline=res.contour;
+    const N=outline.length, sR=.6, sT=.8;
+    const blankR=res.blankDia/2, BC=Math.max(0,finite(res.BC)),denom=Math.max(1,2000*(res.n-1));
+    // 與 3D 裁型前後表使用同一個前表 sag 函式。
+    const frontY=(x,z)=>(blankR*blankR-x*x-z*z)*BC/denom*sT+CUT_SURFACE_VISUAL_GAP;
+    let twiceArea=0;
+    for(let i=0;i<N;i++){
+      const a=outline[i],b=outline[(i+1)%N];
+      twiceArea+=a.x*b.y-b.x*a.y;
+    }
+    // 使用多邊形方向求外法線，避免凸出方向跟輪廓旋轉方向一起反轉。
+    const orientation=twiceArea>=0?1:-1;
+    return outline.map((p,i)=>{
+      const prev=outline[(i-1+N)%N],next=outline[(i+1)%N];
+      const tx=next.x-prev.x,tz=next.y-prev.y;
+      const len=Math.hypot(tx,tz)||1;
+      const nx=orientation*tz/len, nz=-orientation*tx/len;
+      const yF=frontY(p.x,p.y);
+      const t=Math.max(0.01,contourThickness(res,p)*sT);
+      return {x:p.x*sR,z:p.y*sR,nx,nz,top:yF,bottom:yF-t-2*CUT_SURFACE_VISUAL_GAP,t};
+    });
+  }
+
+  function cutRimProfile(res,s){
+    const rim=String(res.rimType||'').toLowerCase();
+    const thickness=s.top-s.bottom;
+    // 極薄邊界時自動縮小可視的槽寬，使前後肩至少留少量材料。
+    const selectedWidth=rim==='full' ? Number(res.tipWidth) : Number(res.grooveWidth);
+    const rawWidth=Number.isFinite(selectedWidth)?selectedWidth:1;
+    // 加工位置採前表面 4：後表面 6，故可用寬度最多約為厚度的 80%。
+    const width=Math.min(Math.max(.1,rawWidth)*.8,thickness*.78);
+    const half=width/2;
+    const center=s.top-thickness*RIM_FEATURE_FRONT_RATIO;
+    let upper=center+half,lower=center-half;
+    if(upper>s.top){
+      const shift=upper-s.top; upper-=shift; lower-=shift;
+    }
+    if(lower<s.bottom){
+      const shift=s.bottom-lower; upper+=shift; lower+=shift;
+    }
+    if(rim==='full'){
+      const tip=Math.max(0,Number(res.tipHeight)||.5)*.6;
+      // 從前往後：上肩 → V 尖端 → 下肩，尖端中心落在 4:6 比例位置。
+      return [{y:s.top,r:0},{y:upper,r:0},{y:center,r:tip},{y:lower,r:0},{y:s.bottom,r:0}];
+    }
+    if(rim==='groove'){
+      const depth=Math.max(0,Number(res.grooveDepth)||.6)*.6;
+      // 從前往後：槽上緣 → 向內凹 → 槽底 → 回到外緣，槽體中心落在 4:6 比例位置。
+      return [{y:s.top,r:0},{y:upper,r:0},{y:upper,r:-depth},
+              {y:lower,r:-depth},{y:lower,r:0},{y:s.bottom,r:0}];
+    }
+    return [{y:s.top,r:0},{y:s.bottom,r:0}];
+  }
+
+  function buildCutLensGeometry(res){
+    if(!window.THREE||!res.contour?.length)return null;
+    const pts=res.contour,N=pts.length,R=22,sR=.6,sT=.8;
+    const positions=[],indices=[];
+    const blankR=res.blankDia/2,frontPower=Math.max(0,finite(res.BC)),denom=2000*(res.n-1);
+    const fy=(x,z)=>(blankR*blankR-x*x-z*z)*frontPower/Math.max(1,denom)*sT;
+    for(let ring=0;ring<=R;ring++){
+      const ratio=ring/R;
+      for(let i=0;i<N;i++){
+        const x=res.hDec+(pts[i].x-res.hDec)*ratio;
+        const z=res.vDecY+(pts[i].y-res.vDecY)*ratio;
+        const thickness=contourThickness(res,{x,y:z});
+        const front=fy(x,z);
+        positions.push(x*sR,front+CUT_SURFACE_VISUAL_GAP,z*sR,
+                       x*sR,front-thickness*sT-CUT_SURFACE_VISUAL_GAP,z*sR);
+      }
+    }
+    for(let j=0;j<R;j++)for(let i=0;i<N;i++){
+      const q=j*N+i,p=j*N+(i+1)%N,r=(j+1)*N+i,t=(j+1)*N+(i+1)%N;
+      indices.push(2*q,2*r,2*p,2*p,2*r,2*t);
+      indices.push(2*q+1,2*p+1,2*r+1,2*p+1,2*t+1,2*r+1);
+    }
+
+    // 沿任意封閉框型輪廓生成實體側壁斷面；不再使用原本的平整單一側面。
+    const rimSamples=cutRimSamples(res);
+    const profileCount=cutRimProfile(res,rimSamples[0]).length;
+    const first=positions.length/3;
+    for(const sample of rimSamples){
+      const profile=cutRimProfile(res,sample);
+      for(const p of profile){
+        positions.push(sample.x+sample.nx*p.r,p.y,sample.z+sample.nz*p.r);
+      }
+    }
+    for(let i=0;i<N;i++){
+      const next=(i+1)%N;
+      for(let j=0;j<profileCount-1;j++){
+        const a=first+i*profileCount+j,b=first+next*profileCount+j;
+        indices.push(a,b,a+1,b,b+1,a+1);
+      }
+    }
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+    geo.setIndex(indices);geo.computeVertexNormals();
+    geo.userData.rimProfile=res.rimType;
+    geo.userData.profilePoints=profileCount;
+    geo.userData.sideFaces=N*(profileCount-1)*2;
+    return geo;
+  }
+
+  function showCutMesh3D(res){
+    if(!_L3D||!window.THREE)return;
+    const scene=_L3D.scene;
+    const geo=buildCutLensGeometry(res);
+    if(!geo)return;
+    const mat=new THREE.MeshPhysicalMaterial({color:res.blankOK?0x38d9dd:0xff6d79,
+      transparent:true,opacity:.50,roughness:.14,metalness:0,side:THREE.DoubleSide,
+      depthTest:true,depthWrite:false,transmission:.12,clearcoat:.7,
+      polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
+    // 排序只決定繪製先後；表面間距 + 深度偏移共同避免真正的 Z-fighting。
+    const mesh=new THREE.Mesh(geo,mat);mesh.position.y=6;mesh.renderOrder=6;
+    scene.add(mesh);_L3D.cutMesh=mesh;
+    const sR=.6,sT=.8,blankR=res.blankDia/2,frontPower=Math.max(0,finite(res.BC)),denom=2000*(res.n-1);
+    const front=[],back=[];
+    for(const p of res.contour){
+      const zf=(blankR*blankR-p.x*p.x-p.y*p.y)*frontPower/Math.max(1,denom)*sT;
+      const t=contourThickness(res,p)*sT;
+      front.push(new THREE.Vector3(p.x*sR,6+zf+CUT_SURFACE_VISUAL_GAP,p.y*sR));
+      back.push(new THREE.Vector3(p.x*sR,6+zf-t-CUT_SURFACE_VISUAL_GAP,p.y*sR));
+    }
+    const outlineMat=new THREE.LineBasicMaterial({color:res.blankOK?0x8affff:0xff7777,opacity:.95,transparent:true,depthTest:false});
+    const loops=[front,back].map(points=>{
+      const l=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(points),outlineMat.clone());
+      l.renderOrder=13;scene.add(l);return l;
+    });
+    // 加工側壁描線：僅影響顯示，不更動 4:6 位置、尖寬、溝寬或厚度。
+    // 全框：尖端線白色 60%，上／下底線白色 30%。車溝維持原本青色槽底線。
+    if(res.rimType==='full'||res.rimType==='groove'){
+      const samples=cutRimSamples(res);
+      const specifications=res.rimType==='full'
+        ? [{index:2,color:0xffffff,opacity:.60},  // V 尖端
+           {index:1,color:0xffffff,opacity:.30},  // 上底線
+           {index:3,color:0xffffff,opacity:.30}]  // 下底線
+        : [{index:2,color:0x72ddfa,opacity:.78},
+           {index:3,color:0x72ddfa,opacity:.78}];
+      for(const {index,color,opacity} of specifications){
+        const positions=samples.map(p=>{
+          const v=cutRimProfile(res,p)[index];
+          return new THREE.Vector3(p.x+p.nx*v.r,6+v.y,p.z+p.nz*v.r);
+        });
+        const matLine=new THREE.LineBasicMaterial({color,opacity,transparent:true,
+          depthTest:false,depthWrite:false});
+        const path=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(positions),matLine);
+        path.renderOrder=index===2?15:14;scene.add(path);loops.push(path);
+      }
+    }
+    _L3D.cutEdges=loops;
+  }
+
   function update(){
+    if(shapeState.mode==='free')computeOutline();
     const res = calc();
     applyVerticalDec(res);
-    const SM = spectacleMagnification(res);
-    res.SM   = SM;
-    res.SM_pct = (SM - 1) * 100;
+    const optics = spectacleMagnification(res);
+    res.optics = optics;
+    res.SM = optics ? optics.SM : NaN;
+    res.SM_pct = (res.SM - 1) * 100;
     const thickDanger =
     (res.lensType === "minus") && (res.maxBlankThick > 12);    const thickText   = res.maxBlankThick.toFixed(2) + " mm";
     const vDec = res.vDecY || 0;
@@ -2211,10 +3275,24 @@ function update3D(res){
       $("k_result").textContent =
         rimOK ? "✅ 可行 (近似)" : "❌ 風險：厚度可能不足";
     }
-    // ===== SM放大率 =====
-    $("k_SM").textContent     = `${res.SM.toFixed(3)} ×`;
-    $("k_SMpct").textContent  =
-      (res.SM_pct >= 0 ? "+" : "") + res.SM_pct.toFixed(1) + " %"; 
+    $("summaryPower").textContent = `度數 ${res.D > 0 ? "+" : ""}${res.D.toFixed(2)}D${res.Cyl ? ` / ${res.Cyl.toFixed(2)}DC` : ""}`;
+    // 近視顯示鏡坯外緣的最厚處（含散光方向）；遠視顯示中心厚。
+    $("summaryThickness").textContent = res.lensType === "plus"
+      ? `中心厚 ${res.estCenter.toFixed(2)} mm`
+      : `坯緣厚 ${res.maxBlankThick.toFixed(2)} mm`;
+    const showSM = v => isFinite(v) ? v.toFixed(4) : "—";
+    $("summarySM").textContent = optics ? `像倍率 ${showSM(res.SM)}× (${res.SM_pct >= 0 ? "+" : ""}${res.SM_pct.toFixed(2)}%)` : "像倍率 —（參數無效）";
+    $("k_SM").textContent = optics ? `${showSM(res.SM)} ×` : "—";
+    $("k_SMpct").textContent = optics ? `${res.SM_pct >= 0 ? "+" : ""}${res.SM_pct.toFixed(2)} %` : "—";
+    $("smSF").textContent = optics ? `${showSM(optics.SF)} ×` : "—";
+    $("smT").textContent = optics ? `${optics.tMm.toFixed(2)} mm` : "—";
+    $("smH").textContent = optics ? `${showSM(optics.H.SM)} × (${((optics.H.SM-1)*100).toFixed(2)}%)` : "—";
+    $("smV").textContent = optics ? `${showSM(optics.V.SM)} × (${((optics.V.SM-1)*100).toFixed(2)}%)` : "—";
+    $("smPFH").textContent = optics ? `${showSM(optics.H.PF)} × / ${optics.H.Fv.toFixed(2)} D` : "—";
+    $("smPFV").textContent = optics ? `${showSM(optics.V.PF)} × / ${optics.V.Fv.toFixed(2)} D` : "—";
+    $("smF2H").textContent = optics ? `${optics.H.F2.toFixed(3)} D` : "—";
+    $("smF2V").textContent = optics ? `${optics.V.F2.toFixed(3)} D` : "—";
+    $("smNotice").textContent = optics ? `光學距離 h = ${optics.hMm.toFixed(1)} mm；${optics.astig ? "總倍率採水平／垂直兩子午線的幾何平均（非單一方向的實際倍率）。" : "無散光時兩方向放大率一致。"}注意：既有近視／遠視厚度模型仍為幾何近似，實際需按鏡片設計資料校核。` : "光學模型參數無效：請檢查中心厚度、折射率、前彎及距離。";
     function debugBackSurface(res){
       const S  = Number(res.D)   || 0;
       const C  = Number(res.Cyl) || 0;
@@ -2244,21 +3322,54 @@ function update3D(res){
       };
     }
     window.__lensRes = res;
-    debugBackSurface(res);
+    // Debug data can be inspected through window.__lensRes; avoid console spam while dragging.
     drawTop(res);
     drawSection(res);
-    update3D(res);
+    drawCutSection(res);
+    updateDashboardMetrics(res,optics);
+    syncQuickControls();
+    if (activeWorkspaceTab==='work' || document.getElementById("panel-4")?.classList.contains("active")) update3D(res);
   }
-  (function initLensTypeUI(){
-    const t = $("lensType").value;
-    const minusRow = document.querySelector('[data-for="minus"]');
-    const plusRow  = document.querySelector('[data-for="plus"]');
-    const bcRow    = document.querySelector('[data-for="plusBC"]');
-    if (minusRow) minusRow.style.display = (t === 'minus') ? '' : 'none';
-    if (plusRow)  plusRow.style.display  = (t === 'plus')  ? '' : 'none';
-    if (bcRow)    bcRow.style.display    = '';
-  })();
-  syncRimDefaults();update();init3D();
+  syncAutoLensTypeUI(Number($("D").value) || 0, Number($("Cyl").value) || 0);
+  function activatePanel(index){
+    activeWorkspaceTab=index;
+    const isWork=index==='work';
+    if(isWork)movePanelsIntoWorkspace();else restorePanelsHome();
+    $('workspace').hidden=!isWork;
+    document.querySelectorAll('.switch-panel').forEach(el=>{
+      const on=!isWork&&Number(el.dataset.panel)===index;
+      el.classList.toggle('active',on);
+      el.setAttribute('aria-hidden',String(!isWork&&!on));
+    });
+    document.querySelectorAll('.panel-tab').forEach(el=>{
+      const on=String(el.dataset.target)===String(index);
+      el.classList.toggle('active',on);
+      el.setAttribute('aria-selected',String(on));
+      el.tabIndex=on?0:-1;
+    });
+    // 無需複製 3D Canvas：移動原容器後重新量測尺寸並刷新幾何。
+    if(isWork||index===4){
+      requestAnimationFrame(()=>{
+        if(window.__lensRes)update3D(window.__lensRes);
+        refresh3dSize();
+      });
+    }
+  }
+  const allTabs=Array.from(document.querySelectorAll('.panel-tab'));
+  allTabs.forEach((btn,i)=>{
+    btn.addEventListener('click',()=>activatePanel(btn.dataset.target==='work'?'work':Number(btn.dataset.target)));
+    btn.addEventListener('keydown',e=>{
+      if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;
+      e.preventDefault();
+      const next=allTabs[(i+(e.key==='ArrowRight'?1:allTabs.length-1))%allTabs.length];
+      activatePanel(next.dataset.target==='work'?'work':Number(next.dataset.target));
+      next.focus();
+    });
+  });
+  setupQuickControls();
+  initViewControls();
+  activatePanel('work');
+  syncRimDefaults();update();
 })();
 </script>
 </body>
