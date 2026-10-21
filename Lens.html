@@ -502,6 +502,18 @@
       min-width:39px;padding:7px 8px;font-size:11px
     }
   }
+
+  /* 最薄邊厚低於「最小剩餘厚度需求」時的行內警示：不改變其他 KPI 色彩。 */
+  .live-summary .dashboard-kpi strong#dashEdge{white-space:normal}
+  .live-summary .dashboard-kpi .fragile-edge-label{
+    display:inline;
+    margin:0 0 0 5px;
+    color:#fb7185;
+    font-size:11px;
+    font-weight:750;
+    line-height:1.2;
+    white-space:nowrap;
+  }
 </style>
 </head>
 <body>
@@ -643,7 +655,7 @@
           <div class="row"><label>瞳高 PH (mm)</label><input id="pupilH" type="number" step="0.5" value=""></div>
           <div class="row"><label>預留加工 (mm)</label><input id="allowance" type="number" step="0.5" value="2" min="0" max="4"></div>
           <div class="row"><label id="grooveLabel">框溝寬 (mm)</label><input id="grooveDepth" type="number" step="0.1" value="1.0" min="0.5" max="2"></div>
-          <div class="row"><label>最小剩餘厚度需求 (mm)</label><input id="minTip" type="number" step="0.1" value="0" min="0" max="2"></div>
+          <div class="row"><label>最小剩餘厚度需求 (mm)</label><input id="minTip" type="number" step="0.1" value="1.0" min="0" max="2"></div>
           <div class="row"><label>框類</label><select id="rimType"><option value="full">全框</option><option value="groove">車溝框</option><option value="rimless">無邊框</option></select></div>
         </div>
       </div>
@@ -859,7 +871,18 @@
     $('showBlank').addEventListener('change',syncBlankVisibility);
   }
   function updateDashboardMetrics(res,optics){
-    $('dashEdge').textContent=res.estEdgeMin.toFixed(2)+' mm';
+    // 裁型最薄邊厚低於當前框類／使用者設定的最小剩餘厚度時，單獨以紅字提醒「易碎邊」。
+    // 無邊框不套用溝尖／車溝殘厚門檻；厚度計算公式本身不變。
+    const edgeEl=$('dashEdge');
+    edgeEl.textContent=res.estEdgeMin.toFixed(2)+' mm';
+    const fragileEdge=res.rimType!=='rimless' && Number.isFinite(res.estEdgeMin)
+      && Number.isFinite(res.minTip) && res.estEdgeMin < res.minTip;
+    if(fragileEdge){
+      const label=document.createElement('span');
+      label.className='fragile-edge-label';
+      label.textContent='（易碎邊）';
+      edgeEl.appendChild(label);
+    }
     $('dashBlank').textContent=res.minBlank.toFixed(1)+' mm';
     const ok=res.blankOK&&(res.rimType==='rimless'||res.halfOK);
     const msg=!res.blankOK?'鏡坯不足':res.rimType==='rimless'?'鏡坯足夠':res.halfOK?'加工可行':'加工有風險';
@@ -887,14 +910,14 @@
 
     if (rim === "groove") {
       grooveInput.value = "0.5";
-      minTipInput.value = "1.5";
+      minTipInput.value = "1.6";
     } else if (rim === "rimless") {
       // 無邊框：只看邊緣厚度，不檢核「最小剩餘厚度需求」
       grooveInput.value = "0.5";
       minTipInput.value = "0";
     } else {
       grooveInput.value = "1.0";
-      minTipInput.value = "0";
+      minTipInput.value = "1.0";
     }
   }
   function toggleRimUI(){
