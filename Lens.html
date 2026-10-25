@@ -296,11 +296,31 @@
   .work-slot #shapeMetrics{font-size:11.5px;line-height:1.5}
   .work-slot #threeWrap{height:400px!important;max-width:none}
   .work-slot #panel-4 .note{line-height:1.65}
-  .three-toolbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
-  .three-toolbar button{cursor:pointer;background:#12243b;border:1px solid #37536e;border-radius:8px;color:#d3e9ff;font-size:11px;padding:7px 9px}
+  /* 3D 工具列：左側視角快捷鍵，右側集中「重力 / 鏡坯」開關。 */
+  .three-toolbar{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;margin-bottom:9px}
+  .three-view-actions{display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-width:0}
+  .three-toolbar button{cursor:pointer;background:#12243b;border:1px solid #37536e;border-radius:8px;color:#d3e9ff;font-size:11px;padding:7px 9px;white-space:nowrap;transition:background .16s,border-color .16s}
   .three-toolbar button:hover{background:#174260;border-color:#38bdf8}
-  .blank-toggle{display:flex;align-items:center;gap:5px;margin-left:auto;color:#b8d5e6;font-size:11.5px;white-space:nowrap}
-  .blank-toggle input{width:15px;height:15px;accent-color:#38bdf8}
+  .three-toolbar button:focus-visible{outline:2px solid #7dd3fc;outline-offset:2px}
+  .three-display-controls{display:inline-flex;align-items:center;gap:3px;margin-left:auto;padding:3px;background:#0b1a2b;border:1px solid #39536a;border-radius:12px;box-shadow:inset 0 1px 2px #0004}
+  .three-switch{position:relative;display:inline-flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid transparent;border-radius:9px;color:#bbcfdf;white-space:nowrap;cursor:pointer;user-select:none;transition:background .16s}
+  .three-switch:hover{background:#193149}
+  .three-switch input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+  .three-switch-track{width:31px;height:18px;flex:0 0 31px;position:relative;border-radius:999px;background:#3d5166;border:1px solid #61768b;box-sizing:border-box;transition:background .16s,border-color .16s}
+  .three-switch-track::after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;background:#d9e6f0;border-radius:50%;box-shadow:0 1px 3px #0006;transition:transform .16s}
+  .three-switch input:checked + .three-switch-track{background:#147aa4;border-color:#4fc3ef}
+  .three-switch input:checked + .three-switch-track::after{transform:translateX(13px);background:#fff}
+  .three-switch input:focus-visible + .three-switch-track{outline:2px solid #7dd3fc;outline-offset:3px}
+  .three-switch-name{font-size:11.5px;font-weight:650;letter-spacing:.01em}
+  .three-switch input:checked ~ .three-switch-name{color:#e4f8ff}
+  .three-interaction-hint{margin:0 0 9px;padding:7px 10px;border-left:2px solid #386b88;background:#0d2031;border-radius:0 7px 7px 0;color:#9fbdd0;font-size:11px;line-height:1.65}
+  #threeWrap canvas{display:block;cursor:grab;touch-action:none}
+  #threeWrap canvas.lens-grabbing{cursor:grabbing}
+  @media(max-width:680px){
+    .three-toolbar{gap:7px}
+    .three-display-controls{margin-left:0}
+    .three-view-actions{width:100%}
+  }
   .workspace-section{border:1px solid #2c4057;border-radius:12px;background:#101c2d;overflow:hidden}
   .workspace-section>summary{padding:12px 15px;display:flex;justify-content:space-between;gap:12px;cursor:pointer;color:#c9dcea;font-size:13px;list-style:none}
   .workspace-section>summary::-webkit-details-marker{display:none}
@@ -664,11 +684,26 @@
         <div class="hd">3D 厚度視覺（概念示意）</div>
         <div class="bd">
           <div class="three-toolbar" role="group" aria-label="3D 模型視角與顯示設定">
-            <button type="button" id="viewFront">正面視角</button>
-            <button type="button" id="viewSide">側面視角</button>
-            <button type="button" id="viewReset">重設視角</button>
-            <label class="blank-toggle"><input type="checkbox" id="showBlank" checked />顯示鏡坯</label>
+            <div class="three-view-actions" role="group" aria-label="3D 視角與鏡片位置">
+              <button type="button" id="viewFront">正面視角</button>
+              <button type="button" id="viewSide">側面視角</button>
+              <button type="button" id="viewReset">重設視角</button>
+              <button type="button" id="resetLensPose" title="鏡片回到初始位置與方向，不改變目前鏡頭">鏡片歸位</button>
+            </div>
+            <div class="three-display-controls" role="group" aria-label="3D 物理與顯示開關">
+              <label class="three-switch physics-toggle" title="啟用後可左鍵抓取／拋動鏡片並受重力影響；關閉後才可 Shift＋左鍵翻轉鏡片">
+                <input type="checkbox" id="gravityToggle" checked />
+                <span class="three-switch-track" aria-hidden="true"></span>
+                <span class="three-switch-name">重力</span>
+              </label>
+              <label class="three-switch blank-toggle" title="勾選時以圓形鏡坯作為 3D 物理形狀；取消勾選時改用裁型鏡片作為 3D 物理形狀">
+                <input type="checkbox" id="showBlank" checked />
+                <span class="three-switch-track" aria-hidden="true"></span>
+                <span class="three-switch-name">顯示鏡坯</span>
+              </label>
+            </div>
           </div>
+          <p class="three-interaction-hint">左鍵：拖曳鏡片｜右鍵：旋轉視角｜Ctrl+右鍵：移動視角｜滾輪：縮放。<br>關閉重力：Shift＋左鍵翻轉</p>
           <div id="threeWrap" style="width:100%;height:340px;border-radius:12px;border:1px solid var(--border);background:#0a1322;overflow:hidden"></div>
           <p class="note"><b>半透明淺藍：</b>原始圓形鏡坯；<b>青色實體＋亮色輪廓：</b>裁型後成品，兩者共用前後表面與厚度函式。<br>綠色／黃色為水平、垂直剖面示意；若框型超出鏡坯，請以片徑警示為準。</p>
         </div>
@@ -863,12 +898,53 @@
     }
     // 切面與裁型成品仍保留顯示，單純關閉圓形鏡坯。
   }
+  function resetLensBody(view){
+    if(!view)return;
+    const body=view.physics;
+    body.dragging=false;body.mode=null;body.pointerId=null;
+    body.active=false;body.started=false;body.linearVelocity.set(0,0,0);
+    body.angularVelocity.set(0,0,0);
+    view.rotationState.dragging=false;
+    view.rotationState.velocity.set(0,0,0);
+    view.modelPivot.position.set(0,6,0);
+    view.modelPivot.quaternion.identity();
+    // 歸位也要尊重前後表面實際幾何，禁止初始狀態沉到地面下。
+    if(body.colliders) view.modelPivot.position.y=Math.max(6,lensFloorContact(view).supportY+2);
+    view.renderer.domElement.classList.remove('lens-grabbing');
+  }
   function initViewControls(){
-    const to=(x,y,z)=>{if(!_L3D)return;_L3D.camera.position.set(x,y,z);_L3D.controls.target.set(0,5,0);_L3D.controls.update();};
+    const to=(x,y,z)=>{
+      if(!_L3D)return;
+      resetLensBody(_L3D);
+      _L3D.camera.position.set(x,y,z);
+      _L3D.controls.target.set(0,5,0);
+      _L3D.controls.update();
+    };
     $('viewFront').addEventListener('click',()=>to(0,95,1));
     $('viewSide').addEventListener('click',()=>to(0,8,95));
     $('viewReset').addEventListener('click',()=>to(0,25,85));
-    $('showBlank').addEventListener('change',syncBlankVisibility);
+    $('resetLensPose').addEventListener('click',()=>resetLensBody(_L3D));
+    $('showBlank').addEventListener('change',()=>{
+      syncBlankVisibility();
+      if(_L3D){
+        updateLensCollider(_L3D,window.__lensRes);
+        // 切換網格時立刻依新模型接地，保留動量與當前鏡片姿態。
+        clampLensPosition(_L3D,false);
+        if(_L3D.physics.gravityEnabled)_L3D.physics.active=true;
+      }
+    });
+    $('gravityToggle').addEventListener('change',()=>{
+      if(!_L3D)return;
+      const body=_L3D.physics;
+      body.gravityEnabled=$('gravityToggle').checked;
+      if(!body.gravityEnabled){
+        body.active=false;body.linearVelocity.set(0,0,0);
+        body.angularVelocity.set(0,0,0);
+      } else {
+        // 恢復重力後，即使沒有拋擲速度，也要自動下落與翻滾。
+        body.active=true;
+      }
+    });
   }
   function updateDashboardMetrics(res,optics){
     // 裁型最薄邊厚低於當前框類／使用者設定的最小剩餘厚度時，單獨以紅字提醒「易碎邊」。
@@ -1852,6 +1928,335 @@ function drawSection(res){
   }
   let _L3D = null;
 
+  // 把所有「鏡坯 + 裁型鏡片 + 剖面 + 溝尖描線」放進同一旋轉支點。
+  // 模型原本以 y≈6 為基準，內層的 -6 位移抵銷支點 +6，初始幾何位置完全不變。
+  function attachLensVisualsToPivot(){
+    if(!_L3D)return;
+    const parent=_L3D.modelContents;
+    const names=['mesh','highlight','edge','rim','ring','slice','edgeStyle','cutMesh','cutEdges'];
+    for(const key of names){
+      const values=Array.isArray(_L3D[key])?_L3D[key]:[_L3D[key]];
+      for(const obj of values){
+        if(obj && obj.parent!==parent)parent.add(obj);
+      }
+    }
+  }
+
+  // 左鍵抓取、拖放與拋擲：以相機平面投射成世界座標位移，記錄出手速度。
+  // Shift + 左鍵沿用「拿起來旋轉」的互動；右鍵和滾輪仍交給 OrbitControls。
+  // 簡化剛體：重力、空氣阻力、橢圓盤接地範圍、彈跳和碰壁；非精密有限元素模擬。
+  function setupLensPhysicalDrag(view){
+    const canvas=view.renderer.domElement;
+    const camera=view.camera;
+    const body=view.physics;
+    const spin=view.rotationState;
+    const raycaster=new THREE.Raycaster();
+    const pointerNDC=new THREE.Vector2();
+    const rayNormal=new THREE.Vector3();
+    const point=new THREE.Vector3();
+    const desiredPos=new THREE.Vector3();
+    const desiredForce=new THREE.Vector3();
+    const prevPos=new THREE.Vector3();
+    const axisRight=new THREE.Vector3(), axisUp=new THREE.Vector3();
+    const spinQ=new THREE.Quaternion(), spinAxis=new THREE.Vector3();
+    const dragQ=new THREE.Quaternion(), torqueAxis=new THREE.Vector3();
+    const hitPlane=new THREE.Plane();
+    const grabbedOffset=new THREE.Vector3();
+    const screenPoint=new THREE.Vector3();
+    const worldGrabVec=new THREE.Vector3();
+    const torqueVec=new THREE.Vector3();
+    const throwSpin=new THREE.Vector3();
+    const localGrabPoint=new THREE.Vector3();
+    const flipSensitivity=.0082;
+    body.grabLocal = body.grabLocal || new THREE.Vector3();
+    const toRay=(event)=>{
+      const rect=canvas.getBoundingClientRect();
+      if(rect.width<1||rect.height<1)return null;
+      pointerNDC.set(((event.clientX-rect.left)/rect.width)*2-1,
+                    -((event.clientY-rect.top)/rect.height)*2+1);
+      camera.updateMatrixWorld();
+      raycaster.setFromCamera(pointerNDC,camera);
+      return rect;
+    };
+    function getActiveCandidates(){
+      const primary = body.useBlank ? view.mesh : view.cutMesh;
+      const secondary = body.useBlank ? view.cutMesh : view.mesh;
+      return [primary, secondary].filter(o=>o&&o.visible);
+    }
+    function hitLens(event){
+      const rect=toRay(event);if(!rect)return null;
+      view.scene.updateMatrixWorld(true);
+      const hits=raycaster.intersectObjects(getActiveCandidates(),false);
+      if(hits.length)return hits[0];
+      // 透明表面接近邊線時，容許小幅抓取誤差；畫布空白不會被當作鏡片。
+      screenPoint.copy(view.modelPivot.position).project(camera);
+      const dx=(pointerNDC.x-screenPoint.x)*rect.width/2;
+      const dy=(pointerNDC.y-screenPoint.y)*rect.height/2;
+      const approxScreenRadius=Math.min(170,Math.max(30,
+        rect.height*body.radius/Math.max(30,camera.position.distanceTo(view.modelPivot.position))));
+      return Math.hypot(dx,dy)<approxScreenRadius ? {point:view.modelPivot.position.clone(), object: body.useBlank?view.mesh:view.cutMesh} : null;
+    }
+    const rotate=(dx,dy,dt)=>{
+      camera.updateMatrixWorld();
+      axisRight.set(1,0,0).applyQuaternion(camera.quaternion);
+      axisUp.set(0,1,0).applyQuaternion(camera.quaternion);
+      spinAxis.copy(axisUp).multiplyScalar(dx*flipSensitivity)
+        .addScaledVector(axisRight,dy*flipSensitivity);
+      const angle=spinAxis.length();
+      if(angle>1e-7){
+        spinQ.setFromAxisAngle(spinAxis.normalize(),angle);
+        view.modelPivot.quaternion.premultiply(spinQ).normalize();
+        // 手動翻轉也不允許網格埋入地面。
+        clampLensPosition(view,true);
+        spin.velocity.copy(spinAxis).multiplyScalar(Math.min(angle/Math.max(.008,dt),8));
+      }
+    };
+    canvas.addEventListener('pointerdown',event=>{
+      // 觸控仍交由 OrbitControls 處理；滑鼠右鍵旋轉的是觀察鏡頭。
+      if(event.pointerType==='touch'||event.button!==0)return;
+      const wantFlip=!body.gravityEnabled && event.shiftKey;
+      const hit=wantFlip ? {point:view.modelPivot.position.clone(), object: body.useBlank?view.mesh:view.cutMesh} : hitLens(event);
+      if(!hit)return;
+      event.preventDefault();
+      body.dragging=true;body.mode=wantFlip?'flip':'move';
+      body.pointerId=event.pointerId;body.x=event.clientX;body.y=event.clientY;
+      body.timestamp=event.timeStamp;body.lastMotion=event.timeStamp;
+      body.active=false;body.linearVelocity.set(0,0,0);body.angularVelocity.set(0,0,0);
+      spin.velocity.set(0,0,0);spin.dragging=body.mode==='flip';
+      if(body.mode==='move'){
+        toRay(event);
+        camera.getWorldDirection(rayNormal);
+        hitPlane.setFromNormalAndCoplanarPoint(rayNormal,hit.point);
+        grabbedOffset.copy(view.modelPivot.position).sub(hit.point);
+        view.modelPivot.updateMatrixWorld(true);
+        localGrabPoint.copy(hit.point);
+        view.modelPivot.worldToLocal(localGrabPoint);
+        body.grabLocal.copy(localGrabPoint);
+        body.grabStrength=Math.min(1.45,Math.max(.15,body.grabLocal.length()/Math.max(1,body.radius)));
+      }
+      canvas.classList.add('lens-grabbing');
+      canvas.setPointerCapture(event.pointerId);
+    });
+    canvas.addEventListener('pointermove',event=>{
+      if(!body.dragging||body.pointerId!==event.pointerId)return;
+      event.preventDefault();
+      const dx=event.clientX-body.x,dy=event.clientY-body.y;
+      const dt=Math.max(.008,Math.min(.08,(event.timeStamp-body.timestamp)/1000));
+      if(body.mode==='flip'){
+        if(dx||dy){rotate(dx,dy,dt);body.lastMotion=event.timeStamp;}
+      }else if(toRay(event)&&raycaster.ray.intersectPlane(hitPlane,point)){
+        prevPos.copy(view.modelPivot.position);
+        desiredPos.copy(point).add(grabbedOffset);
+        desiredForce.copy(desiredPos).sub(view.modelPivot.position);
+        // 依抓取點位置決定跟手力度：抓越邊緣，拖動時越容易被拉起、偏轉與翻滾。
+        const follow=Math.min(.68,Math.max(.24,.28+body.grabStrength*.24));
+        view.modelPivot.position.addScaledVector(desiredForce,follow);
+        worldGrabVec.copy(body.grabLocal).applyQuaternion(view.modelPivot.quaternion);
+        torqueVec.crossVectors(worldGrabVec,desiredForce);
+        const torqueMag=torqueVec.length();
+        if(torqueMag>1e-6){
+          torqueAxis.copy(torqueVec).normalize();
+          dragQ.setFromAxisAngle(torqueAxis,Math.min(.14,torqueMag*.0045));
+          view.modelPivot.quaternion.premultiply(dragQ).normalize();
+          throwSpin.copy(torqueAxis).multiplyScalar(Math.min(6.4,torqueMag*.22));
+          body.angularVelocity.lerp(throwSpin,.18);
+        }
+        clampLensPosition(view,true);
+        throwSpin.copy(view.modelPivot.position).sub(prevPos).divideScalar(dt);
+        if(Math.hypot(dx,dy)>0.1){
+          throwSpin.clampLength(0,55);
+          body.linearVelocity.lerp(throwSpin,.58);
+          body.lastMotion=event.timeStamp;
+          // 額外加入拖拽方向引起的翻滾慣性；離中心越遠，拋出的旋轉感越明顯。
+          camera.updateMatrixWorld();
+          axisRight.set(1,0,0).applyQuaternion(camera.quaternion);
+          axisUp.set(0,1,0).applyQuaternion(camera.quaternion);
+          body.angularVelocity.addScaledVector(axisUp,Math.max(-1.8,Math.min(1.8,dx*.012))*body.grabStrength)
+            .addScaledVector(axisRight,Math.max(-1.8,Math.min(1.8,dy*.012))*body.grabStrength)
+            .clampLength(0,8);
+        }
+      }
+      body.x=event.clientX;body.y=event.clientY;body.timestamp=event.timeStamp;
+    });
+    function endDrag(event,cancel){
+      if(!body.dragging||event.pointerId!==body.pointerId)return;
+      if(cancel||event.timeStamp-body.lastMotion>115){
+        body.linearVelocity.set(0,0,0);
+        if(cancel)body.angularVelocity.set(0,0,0);
+        spin.velocity.set(0,0,0);
+      }
+      if(body.mode==='flip')body.angularVelocity.copy(spin.velocity).clampLength(0,7);
+      spin.dragging=false;
+      body.dragging=false;body.mode=null;body.pointerId=null;
+      // 放手後持續啟動物理：即使拖動速度趨近 0，也要自然落下並因偏心接地翻滾。
+      body.started=true;
+      body.active=body.gravityEnabled;
+      canvas.classList.remove('lens-grabbing');
+      if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);
+    }
+    canvas.addEventListener('pointerup',event=>endDrag(event,false));
+    canvas.addEventListener('pointercancel',event=>endDrag(event,true));
+    canvas.addEventListener('lostpointercapture',()=>{
+      if(body.dragging){
+        body.dragging=false;body.mode=null;body.pointerId=null;
+        spin.dragging=false;body.active=body.gravityEnabled;
+      }
+      canvas.classList.remove('lens-grabbing');
+    });
+  }
+  // ===== 網格接地物理 =====
+  // 輸入來源：鏡坯和裁型鏡片各自的 Three.js BufferGeometry 頂點。
+  // 前表面、後表面、側壁（含 V 尖或凹槽）都在此；求三角網格最低頂點的世界高度。
+  // 平坦地面與三角形的第一次接觸必定發生於某個頂點，因此能以網格精度阻止穿地。
+  const LENS_FLOOR_Y = 0.035;     // 輕微離地避免 Z-fighting，視覺網格 y=-0.01
+  function collectLensSurfaceVertices(view,obj){
+    if(!obj||!obj.geometry||!obj.geometry.getAttribute('position'))return null;
+    view.scene.updateMatrixWorld(true);
+    const inversePivot=view.modelPivot.matrixWorld.clone().invert();
+    const localMatrix=inversePivot.multiply(obj.matrixWorld);
+    const attr=obj.geometry.getAttribute('position');
+    const verts=new Float32Array(attr.count*3);
+    const vertex=new THREE.Vector3();
+    let r=0;
+    for(let i=0;i<attr.count;i++){
+      vertex.fromBufferAttribute(attr,i).applyMatrix4(localMatrix);
+      const j=i*3;
+      verts[j]=vertex.x;verts[j+1]=vertex.y;verts[j+2]=vertex.z;
+      r=Math.max(r,Math.hypot(vertex.x,vertex.z));
+    }
+    return {verts,count:attr.count,radius:r};
+  }
+  function getActiveLensShape(view){
+    const b=view.physics;
+    const data=b.colliders&&(b.useBlank?b.colliders.blank:b.colliders.cut);
+    return data||b.colliders?.blank||b.colliders?.cut||null;
+  }
+  function updateLensCollider(view,res){
+    if(!view||!res)return;
+    const body=view.physics;
+    // 每當度數、鏡坯直徑或取型輪廓改變，就從最新實際前／後表面及側壁重新建碰撞資料。
+    body.colliders={
+      blank:collectLensSurfaceVertices(view,view.mesh),
+      cut:collectLensSurfaceVertices(view,view.cutMesh)
+    };
+    body.useBlank=!!$('showBlank')?.checked;
+    const shape=getActiveLensShape(view);
+    body.radius=shape?.radius||20;
+    body.halfDepth=1.5;
+    clampLensPosition(view,false);
+    if(body.gravityEnabled && body.started)body.active=true;
+  }
+  // 取得真正網格在目前姿態下的最低點與接觸點；相對於旋轉軸的局部座標。
+  // 回傳 supportY=中心至少要離地多少、contact=最底部平均支點（世界相對座標）。
+  function lensFloorContact(view){
+    const shape=getActiveLensShape(view);
+    if(!shape||!shape.count) return {supportY:1.6,contact:new THREE.Vector3(0,-1.6,0)};
+    const {verts,count}=shape;
+    const q=view.modelPivot.quaternion;
+    const x=q.x,y=q.y,z=q.z,w=q.w;
+    // 旋轉矩陣的 Y 列，不需每個頂點分配 Three.Vector3。
+    const m10=2*(x*y+z*w),m11=1-2*(x*x+z*z),m12=2*(y*z-x*w);
+    let min=Infinity,ix=0;
+    for(let i=0;i<count;i++){
+      const j=i*3;
+      const h=m10*verts[j]+m11*verts[j+1]+m12*verts[j+2];
+      if(h<min){min=h;ix=j;}
+    }
+    // 相同接地面可能有多個接觸頂點；取局部鄰域重心，減少跳點抖動。
+    const epsilon=.045;
+    let cx=0,cy=0,cz=0,total=0;
+    for(let i=0;i<count;i++){
+      const j=i*3;
+      const h=m10*verts[j]+m11*verts[j+1]+m12*verts[j+2];
+      if(h<=min+epsilon){
+        const weight=1-(h-min)/epsilon;
+        cx+=verts[j]*weight;cy+=verts[j+1]*weight;cz+=verts[j+2]*weight;total+=weight;
+      }
+    }
+    if(total>0){cx/=total;cy/=total;cz/=total;}
+    else{cx=verts[ix];cy=verts[ix+1];cz=verts[ix+2];}
+    const contact=new THREE.Vector3(cx,cy,cz).applyQuaternion(q);
+    return {supportY:LENS_FLOOR_Y-min,contact};
+  }
+  function lensFloorSupport(view){return lensFloorContact(view).supportY;}
+  function clampLensPosition(view,held){
+    const p=view.modelPivot.position;
+    const support=lensFloorContact(view).supportY;
+    p.y=Math.max(support,p.y);
+    if(held)p.y=Math.min(73,Math.max(support,p.y));
+    // 邊界限制是方便操作用，不屬於實際鏡片碰撞模型。
+    const shape=getActiveLensShape(view);
+    const r=shape?.radius||20;
+    const limitX=Math.max(10,45-r*.55),limitZ=Math.max(10,38-r*.55);
+    p.x=Math.max(-limitX,Math.min(limitX,p.x));
+    p.z=Math.max(-limitZ,Math.min(limitZ,p.z));
+  }
+  function advanceLensPhysics(view,dt){
+    const body=view.physics;
+    if(!body.gravityEnabled||!body.active||body.dragging||dt<=0)return;
+    // 6ms 固定近似子步進；每步都用目前真實前後表面求接地點。
+    const steps=Math.max(1,Math.ceil(dt/.006));
+    const h=dt/steps,p=view.modelPivot.position,q=view.modelPivot.quaternion;
+    const axis=new THREE.Vector3(),rotation=new THREE.Quaternion();
+    const contactVelocity=new THREE.Vector3(),normalImpulse=new THREE.Vector3();
+    for(let i=0;i<steps;i++){
+      const shape=getActiveLensShape(view);
+      const r=Math.max(1,shape?.radius||20);
+      // 圓盤慣量近似僅用於推算速度；碰撞外形使用完整三角網格。
+      const invI=1/Math.max(10,.27*r*r);
+      body.linearVelocity.y-=body.gravity*h;
+      body.linearVelocity.multiplyScalar(Math.exp(-.20*h));
+      p.addScaledVector(body.linearVelocity,h);
+      const speed=body.angularVelocity.length();
+      if(speed>1e-5){
+        rotation.setFromAxisAngle(axis.copy(body.angularVelocity).normalize(),Math.min(.22,speed*h));
+        q.premultiply(rotation).normalize();
+      }
+      body.angularVelocity.multiplyScalar(Math.exp(-.28*h));
+      const {supportY,contact}=lensFloorContact(view);
+      if(p.y<=supportY+.028){
+        // 先做幾何投影，任何一個網格頂點都不會穿過 y=0 的地板。
+        p.y=Math.max(p.y,supportY);
+        contactVelocity.copy(body.angularVelocity).cross(contact).add(body.linearVelocity);
+        if(contactVelocity.y<0){
+          const denom=1+invI*(contact.x*contact.x+contact.z*contact.z);
+          const falling=contactVelocity.y<-.95;
+          const bounce=falling?.25:0;
+          const j=-(1+bounce)*contactVelocity.y/denom;
+          body.linearVelocity.y+=j;
+          // 接觸反作用力同時改變角速度，而不是碰撞後只改變垂直速度。
+          body.angularVelocity.x+=-contact.z*j*invI;
+          body.angularVelocity.z+= contact.x*j*invI;
+        }
+        // 地面支點偏離重心時，由重力產生持續翻倒／滾動力矩。
+        body.angularVelocity.x+=-contact.z*body.gravity*invI*h;
+        body.angularVelocity.z+= contact.x*body.gravity*invI*h;
+        // 簡化接觸摩擦：消耗滑動、旋轉能量；低速仍可因形狀傾斜繼續翻倒。
+        body.linearVelocity.x*=Math.exp(-3.2*h);
+        body.linearVelocity.z*=Math.exp(-3.2*h);
+        body.angularVelocity.multiplyScalar(Math.exp(-1.45*h));
+        // 幾何接觸處若已接近平衡且能量極小，才停止迴圈運動。
+        const stableContact=Math.hypot(contact.x,contact.z)<Math.max(.055,r*.012);
+        if(stableContact&&body.linearVelocity.length()<.10&&body.angularVelocity.length()<.07){
+          body.linearVelocity.set(0,0,0);body.angularVelocity.set(0,0,0);
+          body.active=false;
+          break;
+        }
+      }
+      const limitX=Math.max(10,45-r*.55),limitZ=Math.max(10,38-r*.55);
+      for(const [name,lim] of [['x',limitX],['z',limitZ]]){
+        if(Math.abs(p[name])>lim){
+          p[name]=Math.sign(p[name])*lim;
+          body.linearVelocity[name]*=-.28;
+          body.angularVelocity.multiplyScalar(.92);
+        }
+      }
+      if(p.y>77){p.y=77;if(body.linearVelocity.y>0)body.linearVelocity.y=0;}
+      // 關鍵：角速度改變姿態後每子步重新投影，避免由旋轉造成穿地。
+      p.y=Math.max(p.y,lensFloorContact(view).supportY);
+    }
+  }
+
   function init3D(){
     if (_L3D || !window.THREE) return;
     const wrap = document.getElementById('threeWrap');
@@ -1866,17 +2271,53 @@ function drawSection(res){
     wrap.appendChild(renderer.domElement);
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
+    // 左鍵留給鏡片拖曳；右鍵旋轉鏡頭；Ctrl + 右鍵平移鏡頭目標與相機。
+    // OrbitControls 在 mousedown 時讀取 mouseButtons.RIGHT；捕獲階段先依 Ctrl 決定模式。
+    controls.mouseButtons.LEFT = -1;
+    controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+    controls.mouseButtons.MIDDLE = THREE.MOUSE.DOLLY;
+    controls.enablePan = true;
+    controls.screenSpacePanning = true;
+    const applyRightButtonMode = (event) => {
+      if(event.button !== 2)return;
+      controls.mouseButtons.RIGHT = event.ctrlKey ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE;
+    };
+    // 同時支援滑鼠事件與 Pointer Events；不攔截既有 OrbitControls 的監聽器。
+    renderer.domElement.addEventListener('pointerdown', applyRightButtonMode, true);
+    renderer.domElement.addEventListener('mousedown', applyRightButtonMode, true);
     // lights
     const key = new THREE.DirectionalLight(0xffffff, 1.2); key.position.set(1,2,3);
     const fil = new THREE.DirectionalLight(0x88ccff, 0.8); fil.position.set(-2,1,0);
     const amb = new THREE.AmbientLight(0x334455, 1.4);
     scene.add(key, fil, amb);
-    // subtle grid
+    // 可視地板與網格共用 y=0 的接地平面；不再只有裝飾格線。
+    const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),
+      new THREE.MeshBasicMaterial({color:0x0a1322,side:THREE.DoubleSide,depthWrite:true}));
+    floor.rotation.x=-Math.PI/2;
+    floor.position.y=-.045;
+    floor.renderOrder=-2;
+    scene.add(floor);
     const grid = new THREE.GridHelper(200, 20, 0x1f3045, 0x182435);
-    grid.position.y = -0.01; scene.add(grid);
+    grid.position.y=-.01;scene.add(grid);
 
-    _L3D = {wrap, scene, camera, renderer, controls,
+    const modelPivot=new THREE.Group();
+    modelPivot.name='LensDragPivot';
+    modelPivot.position.set(0,6,0);
+    const modelContents=new THREE.Group();
+    modelContents.position.set(0,-6,0);
+    modelPivot.add(modelContents);
+    scene.add(modelPivot);
+    const rotationState={dragging:false,pointerId:null,x:0,y:0,
+      timestamp:0,lastMotion:0,velocity:new THREE.Vector3()};
+    // 預設靜止於原位，使用者第一次抓放後才啟動重力。
+    const physics={gravityEnabled:true,active:false,started:false,dragging:false,mode:null,pointerId:null,
+      x:0,y:0,timestamp:0,lastMotion:0,gravity:64,radius:21,halfDepth:1.6,useBlank:true,
+      blankRadius:21,blankRadiusX:21,blankRadiusZ:21,blankHalfDepth:1.6,
+      cutRadius:16,cutRadiusX:16,cutRadiusZ:12,cutHalfDepth:1.1,
+      grabLocal:new THREE.Vector3(),linearVelocity:new THREE.Vector3(),angularVelocity:new THREE.Vector3()};
+    _L3D = {wrap, scene, camera, renderer, controls,modelPivot,modelContents,rotationState,physics,
           mesh:null, ring:null, edge:null, slice:null, rim:null};
+    setupLensPhysicalDrag(_L3D);
 
     window.addEventListener('resize', ()=>{
       if(!_L3D) return;
@@ -1886,7 +2327,15 @@ function drawSection(res){
       renderer.setSize(wrap.clientWidth, wrap.clientHeight);
     });
 
-    (function loop(){ if(!_L3D) return; requestAnimationFrame(loop); _L3D.controls.update(); _L3D.renderer.render(_L3D.scene, _L3D.camera); })();
+    let prevFrame=performance.now();
+    (function loop(now){
+      if(!_L3D)return;
+      requestAnimationFrame(loop);
+      const dt=Math.max(0,Math.min(.05,(now-prevFrame)/1000));prevFrame=now;
+      _L3D.controls.update();
+      advanceLensPhysics(_L3D,dt);
+      _L3D.renderer.render(_L3D.scene,_L3D.camera);
+    })(prevFrame);
   }
 
 // 厚度模型：依 2D 厚度 + 度數場，建立「前表 / 後表 + 側邊圍牆」的實心鏡片
@@ -2019,12 +2468,12 @@ function update3D(res){
     if (Array.isArray(obj)){
       obj.forEach(o => {
         if (!o) return;
-        scene.remove(o);
+        if(o.parent)o.parent.remove(o);
         if (o.geometry) o.geometry.dispose();
         if (o.material) o.material.dispose();
       });
     }else{
-      scene.remove(obj);
+      if(obj.parent)obj.parent.remove(obj);
       if (obj.geometry) obj.geometry.dispose();
       if (obj.material) obj.material.dispose();
     }
@@ -2063,7 +2512,7 @@ function update3D(res){
   // ---------- 反光膜 ----------
   // 先清掉舊的 highlight
   if (_L3D.highlight) {
-    scene.remove(_L3D.highlight);
+    if(_L3D.highlight.parent)_L3D.highlight.parent.remove(_L3D.highlight);
     if (_L3D.highlight.geometry) _L3D.highlight.geometry.dispose();
     if (_L3D.highlight.material) _L3D.highlight.material.dispose();
     _L3D.highlight = null;
@@ -2521,7 +2970,10 @@ function update3D(res){
   // The previous torus was a circle regardless of actual edging shape: remove it.
   if(_L3D.ring){scene.remove(_L3D.ring);_L3D.ring.geometry.dispose();_L3D.ring.material.dispose();_L3D.ring=null;}
   showCutMesh3D(res);
+  // 所有與鏡片同座標的 3D 元件同步翻動，地面網格／燈光／鏡頭不受影響。
+  attachLensVisualsToPivot();
   syncBlankVisibility();
+  updateLensCollider(_L3D,res);
 }
   // 繪圖小工具
   function circle(svg,cx,cy,r,fill,stroke,sw, dash){
