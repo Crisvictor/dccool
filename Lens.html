@@ -316,6 +316,7 @@
   .three-interaction-hint{margin:0 0 9px;padding:7px 10px;border-left:2px solid #386b88;background:#0d2031;border-radius:0 7px 7px 0;color:#9fbdd0;font-size:11px;line-height:1.65}
   #threeWrap canvas{display:block;cursor:grab;touch-action:none}
   #threeWrap canvas.lens-grabbing{cursor:grabbing}
+   #threeWrap canvas.camera-panning{cursor:move}
   @media(max-width:680px){
     .three-toolbar{gap:7px}
     .three-display-controls{margin-left:0}
@@ -2257,7 +2258,82 @@ function drawSection(res){
     }
   }
 
-  function init3D(){
+  // Ctrl＋右鍵：真正平移鏡頭（Pan），不改變相機方向或鏡片本體。
+function installCtrlRightCameraPan(canvas,camera,controls){
+  const right=new THREE.Vector3(), up=new THREE.Vector3(), delta=new THREE.Vector3();
+  let active=false, pointerId=null, lastX=0, lastY=0, previousDamping=true;
+  const swallow=(event)=>{event.preventDefault();event.stopImmediatePropagation();};
+  const start=(event)=>{
+    if(event.button!==2 || !event.ctrlKey)return;
+    // pointerdown / mousedown 都處理：兼容不同瀏覽器的滑鼠事件順序。
+    swallow(event);
+    if(active)return;
+    active=true;
+    pointerId=event.pointerId===undefined?null:event.pointerId;
+    lastX=event.clientX;lastY=event.clientY;
+    previousDamping=controls.enableDamping;
+    // 終止先前右鍵旋轉的殘餘阻尼，拖動期間不允許 OrbitControls 更新視角。
+    controls.enableDamping=false;
+    controls.update();
+    controls.enabled=false;
+    canvas.classList.add('camera-panning');
+    if(pointerId!==null && canvas.setPointerCapture){
+      try{canvas.setPointerCapture(pointerId);}catch(_){}
+    }
+  };
+  const move=(event)=>{
+    if(!active)return;
+    if(pointerId!==null && event.pointerId!==undefined && event.pointerId!==pointerId)return;
+    swallow(event);
+    const dx=event.clientX-lastX, dy=event.clientY-lastY;
+    lastX=event.clientX;lastY=event.clientY;
+    if(!dx&&!dy)return;
+    const rect=canvas.getBoundingClientRect();
+    if(rect.height<=0||rect.width<=0)return;
+    camera.updateMatrixWorld();
+    // PerspectiveCamera 的螢幕高度：在目前觀察中心距離上的世界單位。
+    const distance=camera.position.distanceTo(controls.target);
+    const visibleHeight=2*distance*Math.tan((camera.fov*Math.PI/180)/2);
+    const visibleWidth=visibleHeight*camera.aspect;
+    right.set(1,0,0).applyQuaternion(camera.quaternion);
+    up.set(0,1,0).applyQuaternion(camera.quaternion);
+    // 往右拖 => 畫面跟著往右，鏡頭往左移；往下拖 => 鏡頭沿 camera-up 正向移。
+    delta.copy(right).multiplyScalar(-dx*visibleWidth/rect.width)
+      .addScaledVector(up,dy*visibleHeight/rect.height);
+    camera.position.add(delta);
+    controls.target.add(delta);
+    camera.updateMatrixWorld();
+  };
+  const stop=(event)=>{
+    if(!active)return;
+    if(event && event.type!=='blur' && event.pointerId!==undefined
+       && pointerId!==null && event.pointerId!==pointerId)return;
+    if(event && event.cancelable)swallow(event);
+    active=false;
+    const releasedId=pointerId;pointerId=null;
+    canvas.classList.remove('camera-panning');
+    if(releasedId!==null&&canvas.hasPointerCapture&&canvas.hasPointerCapture(releasedId)){
+      try{canvas.releasePointerCapture(releasedId);}catch(_){}
+    }
+    controls.enabled=true;
+    controls.enableDamping=previousDamping;
+    controls.update();
+  };
+  // 捕獲階段先攔截 Ctrl+右鍵，禁止 OrbitControls 同時啟動旋轉。
+  canvas.addEventListener('pointerdown',start,true);
+  canvas.addEventListener('mousedown',start,true);
+  window.addEventListener('pointermove',move,true);
+  window.addEventListener('pointerup',stop,true);
+  window.addEventListener('pointercancel',stop,true);
+  window.addEventListener('mouseup',event=>{
+    if(active && event.button===2)stop(event);
+  },true);
+  canvas.addEventListener('lostpointercapture',stop);
+  window.addEventListener('blur',stop);
+  canvas.addEventListener('contextmenu',event=>event.preventDefault());
+}
+
+function init3D(){
     if (_L3D || !window.THREE) return;
     const wrap = document.getElementById('threeWrap');
     if (!wrap) return;
@@ -2271,20 +2347,15 @@ function drawSection(res){
     wrap.appendChild(renderer.domElement);
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    // 左鍵留給鏡片拖曳；右鍵旋轉鏡頭；Ctrl + 右鍵平移鏡頭目標與相機。
-    // OrbitControls 在 mousedown 時讀取 mouseButtons.RIGHT；捕獲階段先依 Ctrl 決定模式。
+    // 右鍵旋轉仍由 OrbitControls 處理；Ctrl＋右鍵使用獨立的「螢幕平面平移」，
+    // 同時移動 camera.position 與 controls.target，保持觀看方向完全不變。
+    // 不再動態改寫 mouseButtons.RIGHT：舊做法可能被 OrbitControls 的 Ctrl 修飾鍵邏輯覆蓋。
     controls.mouseButtons.LEFT = -1;
     controls.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
     controls.mouseButtons.MIDDLE = THREE.MOUSE.DOLLY;
     controls.enablePan = true;
     controls.screenSpacePanning = true;
-    const applyRightButtonMode = (event) => {
-      if(event.button !== 2)return;
-      controls.mouseButtons.RIGHT = event.ctrlKey ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE;
-    };
-    // 同時支援滑鼠事件與 Pointer Events；不攔截既有 OrbitControls 的監聽器。
-    renderer.domElement.addEventListener('pointerdown', applyRightButtonMode, true);
-    renderer.domElement.addEventListener('mousedown', applyRightButtonMode, true);
+    installCtrlRightCameraPan(renderer.domElement, camera, controls);
     // lights
     const key = new THREE.DirectionalLight(0xffffff, 1.2); key.position.set(1,2,3);
     const fil = new THREE.DirectionalLight(0x88ccff, 0.8); fil.position.set(-2,1,0);
