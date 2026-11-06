@@ -2,8 +2,8 @@
 <html lang="zh-Hant"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#113c37">
-<meta name="description" content="先輸入鏡框採購總數與型號數，可自訂色號並個別剔除某型號不要的色號，依多中少自動分配叫貨數量。">
-<title>鏡框採購快速分配｜個別型號色號剔除｜OKURA COOL</title>
+<meta name="description" content="每個型號 × 色號只能叫貨 27、85、170、255 副或 0 副，並自動找出滿足最低採購量的最佳固定配比。">
+<title>鏡框採購快速分配｜單一色號固定支數｜OKURA COOL</title>
 <style>
 :root{--bg:#f5f7f4;--paper:#fff;--dark:#103e38;--dark2:#092d29;--accent:#137e6b;--accentp:#eaf6f0;--text:#203530;--sub:#667971;--line:#dee9e3;--warn:#9f6922;--red:#b3423a;--shadow:0 10px 26px rgba(19,64,51,.055)}
 *{box-sizing:border-box}body{margin:0;color:var(--text);font:14px/1.52 -apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",sans-serif;background:var(--bg)}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.44;cursor:default}.container{max-width:1490px;margin:auto;padding:0 25px}.site-header{background:var(--dark2);color:#fff}.site-header .container{height:63px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{display:flex;gap:11px;align-items:center;font-size:15px;font-weight:850;letter-spacing:.06em}.mark{width:31px;height:31px;border:1px solid #92cebf;border-radius:8px;display:grid;place-items:center;color:#b1eee0;font-family:Georgia,serif;font-size:19px;font-style:italic}.head-note{color:#b1cbc4;font-size:11px;font-weight:600}.hero{background:linear-gradient(115deg,#103c37,#19584f);color:white;padding:31px 0 34px}.hero .container{display:flex;align-items:center;justify-content:space-between;gap:20px}.eyebrow{letter-spacing:.22em;color:#a9d9cc;font-size:10px;font-weight:750}.hero h1{font-size:clamp(24px,2.6vw,35px);margin:8px 0 7px;line-height:1.3}.hero p{margin:0;color:#d2e8e1;font-size:13px}.hero-tag{border:1px solid #6da497;color:#cfebe3;border-radius:60px;padding:7px 13px;white-space:nowrap;font-size:11px}.workspace{padding-top:22px;padding-bottom:55px}.steps{display:grid;grid-template-columns:minmax(150px,1fr) minmax(150px,1fr);gap:16px;margin-bottom:18px}.step{border:1px solid var(--line);border-radius:15px;padding:17px 18px;background:var(--paper);box-shadow:var(--shadow)}.field-label{display:block;font-size:12px;font-weight:800;margin-bottom:9px}.stepnum{color:#168775;font-size:11px;margin-right:7px}.input-num{width:100%;height:47px;padding:8px 14px;border-radius:9px;border:1px solid #c9dbd2;background:#fff;color:#143c33;font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;outline:none}.hint{font-size:11px;color:var(--sub);margin:6px 0 0}.color-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.color-fields label{display:block;font-size:11px;color:#6f8177}.small-input{height:39px;width:100%;min-width:0;margin-top:4px;padding:0 10px;border:1px solid #d0dfd7;border-radius:9px;background:#fff;font-weight:750;color:var(--text);outline:none}.input-num:focus,.small-input:focus,.model-input:focus,.level:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px #17977c17}.columns{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}.board,.panel{background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);overflow:hidden}.board-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 19px;border-bottom:1px solid var(--line)}h2{font-size:17px;margin:0}.board-head p{font-size:11px;color:var(--sub);margin:5px 0 0}.buttons{display:flex;gap:7px;flex-wrap:wrap}.btn{border:1px solid #cadbd3;background:#fff;color:#2c5d52;border-radius:9px;padding:8px 11px;font-size:12px;font-weight:750}.btn:hover{background:#f2faf6}.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn-primary:hover{background:#096c5d}.btn-dark{background:var(--dark);color:#fff;border-color:var(--dark)}.btn-dark:hover{background:#1a5b51}.board-meta{display:flex;flex-wrap:wrap;align-items:center;gap:15px;padding:10px 19px;font-size:11px;color:var(--sub);background:#fbfcfa;border-bottom:1px solid var(--line)}.checkline{display:inline-flex;align-items:center;gap:5px;cursor:pointer}.checkline input{accent-color:var(--accent)}.table-wrap{overflow-x:auto;max-height:none}.matrix{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;min-width:805px}.matrix col.index{width:50px}.matrix col.model{width:170px}.matrix col.qty{width:80px}.matrix th{background:#f7faf8;position:sticky;top:0;z-index:2;border-bottom:1px solid #dce9e1;border-right:1px solid #edf1ef;text-align:center;padding:11px 7px;color:#52685f;font-size:11px}.matrix th:last-child,.matrix td:last-child{border-right:0}.matrix th .col-title{font-size:13px;color:#254b40}.matrix th .col-action{display:block;margin:5px auto 0;width:100%;max-width:120px;font-size:10px;height:27px;border:1px solid #d0e3d7;border-radius:7px;background:white;color:#476f60;outline:none}.matrix td{height:55px;padding:6px 7px;border-bottom:1px solid #edf2ee;border-right:1px solid #edf2ee;text-align:center}.matrix tbody tr:nth-child(even){background:#fcfdfc}.matrix tbody tr:hover{background:#f5faf7}.matrix td:first-child{color:#8ba197;font-size:12px;font-weight:850;font-variant-numeric:tabular-nums}.model-input{width:100%;height:34px;border:1px solid #e0e9e4;border-radius:7px;padding:0 8px;outline:0;font-size:12px;color:#233d34;background:white}.model-input::placeholder{color:#a2b0a8}.level-cell{display:flex;justify-content:center;align-items:center;gap:7px}.level{max-width:72px;width:100%;height:33px;border:1px solid #d9e6df;border-radius:8px;background:#fafcfa;color:#53685c;font-size:12px;font-weight:800;padding-left:5px;outline:none}.level[data-level="high"]{color:#08785a;background:#e5f5ed;border-color:#bce6d1}.level[data-level="low"]{color:#857f6e;background:#f6f4ef;border-color:#e9e6dc}.cell-qty{min-width:28px;color:#195748;font-size:17px;font-weight:850;font-variant-numeric:tabular-nums}.cell-qty.zero{color:#b3bbb5}.row-total{font-size:17px;color:#123e34;font-weight:900;font-variant-numeric:tabular-nums}.table-foot{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:12px 18px;font-size:12px;border-top:1px solid var(--line);background:#f9fcfa}.sum-grid{display:flex;gap:14px;flex-wrap:wrap}.sum-grid strong{color:#0d765f;font-size:14px}.board-actions{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;padding:13px 18px}.subtle{background:transparent;border:0;color:#638178;font-size:12px;font-weight:750;padding:8px 0}.subtle:hover{color:#056b54;text-decoration:underline}.panel{position:sticky;top:15px}.panel-heading{padding:19px 19px 12px}.panel-heading p{font-size:11px;color:var(--sub);margin:4px 0 0}.kpis{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #edf2ed;border-bottom:1px solid #edf2ed}.kpi{padding:14px 6px;text-align:center;border-right:1px solid #edf2ed}.kpi:last-child{border:0}.kpi strong{font-size:25px;line-height:1.1;display:block;font-variant-numeric:tabular-nums}.kpi:first-child strong{color:var(--accent)}.kpi span{font-size:10px;color:#8a9b91}.panel-content{padding:15px 17px 19px}.status{padding:10px 12px;border-radius:8px;background:#eaf6f0;color:#25684f;font-size:12px}.status.warning{background:#fff4e3;color:#925c22}.status.error{background:#fff0ed;color:#9f443a}.color-stat{margin-top:17px}.mini-heading{font-size:12px;font-weight:850;margin-bottom:7px}.stat-row{display:grid;grid-template-columns:45px 1fr 50px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f0f2f0;font-size:12px}.stat-row b{text-align:right;font-variant-numeric:tabular-nums}.track{height:6px;background:#ebf0ed;border-radius:30px;overflow:hidden}.track span{display:block;height:100%;background:#72bbaa;border-radius:30px}.results-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:19px}.results{max-height:375px;overflow:auto;margin-top:6px;border:1px solid #e5eee9;border-radius:9px}.result-row{border-bottom:1px solid #edf2ee;padding:9px 11px}.result-row:last-child{border:0}.result-top{display:flex;justify-content:space-between;gap:6px;font-size:12px}.result-top strong{font-size:12px}.result-top b{color:#117c65}.result-colors{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;color:#70847a;font-size:11px;margin-top:4px}.result-colors span{white-space:nowrap}.result-colors em{font-weight:800;font-style:normal;color:#2c5e50}.action-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.explain{margin-top:13px;font-size:11px;color:#788980;background:#f7faf8;padding:11px;border-radius:8px}.explain b{color:#50695e}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%) translateY(30px);background:#193b34;color:white;padding:11px 17px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:40;box-shadow:0 6px 22px #1239}.toast.show{transform:translateX(-50%) translateY(0);opacity:1}.footer{padding:0 20px 24px;color:#8ca098;text-align:center;font-size:11px}.modal-backdrop{position:fixed;inset:0;background:#061a16a3;display:none;place-items:center;padding:20px;z-index:30}.modal-backdrop.open{display:grid}.modal{background:white;border-radius:15px;width:min(510px,100%);padding:24px;box-shadow:0 20px 80px #0003}.modal h3{margin:0;font-size:19px}.modal p{color:#75867c;font-size:12px}.modal textarea{width:100%;height:225px;border:1px solid #ccded3;border-radius:10px;padding:12px;resize:vertical;outline:0}.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:13px}.modal .mode-hint{font-size:12px;color:#60776b;margin:8px 0}.btn:focus-visible,.subtle:focus-visible,.level:focus-visible{outline:3px solid #78bfb1;outline-offset:2px}
@@ -83,34 +83,81 @@
 @media(max-width:850px){.exclusion-row{grid-template-columns:1fr;gap:8px}.exclusion-list{padding:5px 14px 15px}.exclusion-head{padding:16px 15px}.exclusion-summary{padding:9px 15px}}
 @media(max-width:550px){.exclusion-tools{width:100%;align-items:center;gap:9px}.search-field{flex:1;min-width:125px}.search-field input{width:100%}.exclusion-tools .btn{height:33px}.exclusion-chip{min-width:59px;padding:7px 8px}.exclusion-summary span{display:block;margin-top:3px}.exclusion-head h2{font-size:16px}}
 @media print{.exclusion-board{display:none!important}}
+
+/* 四級需求權重 */
+.weight-legend{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin:-1px 0 18px;padding:13px 17px;border:1px solid #cfe4da;border-radius:12px;background:#f0f8f3}
+.weight-legend>div:first-child{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+.weight-legend strong{font-size:12px;color:#205446}
+.weight-legend>div:first-child span{color:#6b8376;font-size:11px}
+.weight-pills{display:flex;gap:7px;flex-wrap:wrap}
+.weight-pills span{padding:5px 9px;border-radius:8px;border:1px solid #cbded4;background:white;font-size:12px;color:#3d6958;display:flex;align-items:center;gap:8px}
+.weight-pills b{font-weight:850}.weight-pills em{font-style:normal;color:#147b61;font-weight:850;font-variant-numeric:tabular-nums}
+.weight-pills .no-order{color:#89938b}.weight-pills .no-order em{color:#a2aca3}
+.level[data-level="micro"]{color:#776597;background:#f4f0fc;border-color:#dfd5ef}
+@media(max-width:720px){.weight-legend{margin-top:0;padding:12px;align-items:flex-start}.weight-pills{gap:5px}.weight-pills span{padding:4px 7px}}
+@media print{.weight-legend{display:none!important}}
+.lots-panel{padding:13px 14px 12px;margin:13px 0 16px;background:#f3f8f5;border:1px solid #cee0d6;border-radius:11px}
+.lots-header{display:flex;align-items:center;justify-content:space-between;color:#214b3f;font-size:12px;gap:8px;margin-bottom:10px}.lots-header strong{font-weight:850}.lots-header span{font-size:11px;color:#5c806c}
+.lots-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.lot-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:9px 4px 8px;min-width:0;background:#fff;border:1px solid #bfdccf;border-radius:8px;font-variant-numeric:tabular-nums}
+.lot-item span{font-size:11px;color:#4a7565}.lot-item strong{font-size:19px;color:#166f56;font-weight:850}.lot-item.is-empty{opacity:.46}
+.lot-note{color:#577266;font-size:11px;line-height:1.55;margin-top:9px}
+@media(max-width:470px){.lots-grid{gap:4px}.lot-item strong{font-size:16px}.lot-item span{font-size:10px}}
+
+/* v7 — 每款型號固定批量 */
+.lot-mode-bar{margin:-7px 0 18px;padding:14px 17px;background:#fff;border:1px solid #d3e7db;border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:var(--shadow)}
+.lot-mode-bar label{font-size:13px;font-weight:850;color:#174d40}
+.lot-mode-hint{font-size:11px;color:#677d70;margin:3px 0 0;line-height:1.55;max-width:820px}
+.lot-mode-bar select{width:min(330px,100%);min-height:40px;border:1px solid #9acbb5;border-radius:8px;background:#ecf8ef;padding:6px 10px;color:#135742;font-weight:800;outline:none}
+.matrix col.qty{width:112px}
+.row-total strong{display:block;font-size:16px}
+.row-lot{font-size:9px;display:block;color:#6f8b7e;white-space:normal;line-height:1.3;font-weight:650;margin-top:4px}
+.result-pack{font-size:10px;color:#23765d;font-weight:750;margin:3px 0 5px;line-height:1.5}
+.result-colors small{font-size:9px;white-space:normal;color:#6a917d}
+@media(max-width:720px){.lot-mode-bar{align-items:stretch;flex-direction:column;padding:12px}.lot-mode-bar select{width:100%}}
+@media print{.lot-mode-bar select{border:0;background:none}}
+
+/* V8: only single-SKU legal quantities */
+.level-cell{gap:7px}.level{max-width:85px;min-width:85px;padding:0 5px}
+.level[data-level="auto"]{color:#285f91;background:#ecf5fc;border-color:#cddfed}
+.level[data-level="high"]{color:#08785a;background:#e5f5ed;border-color:#bce6d1}
+.level[data-level="medium"]{color:#346c72;background:#eaf5f4;border-color:#b9dcd8}
+.quantity-stack{min-width:36px;display:flex;flex-direction:column;align-items:center;line-height:1.18}
+.quantity-stack small{font-size:9px;color:#7b9188;margin-top:2px;white-space:nowrap}
+.lot-item small{font-size:10px;color:#668b77}
+.matrix td{height:62px}.matrix col.qty{width:120px}
+.row-lot{font-size:10px;line-height:1.45}
+@media(max-width:640px){.level{min-width:78px;max-width:78px}}
 </style></head>
 <body>
 <header class="site-header"><div class="container"><div class="brand"><span class="mark">O</span><span>OKURA COOL <span class="head-note">/ 採購數量速算</span></span></div><span class="head-note">FRAME ORDER / FLEXIBLE COLOR CODES</span></div></header>
-<section class="hero"><div class="container"><div><span class="eyebrow">PURCHASING · FLEXIBLE MODE</span><h1>鏡框叫貨數量快速分配</h1><p>輸入總數與型號數，設定色號及多／中／少；每款型號也能單獨剔除不叫的色號，即時計算。</p></div><div class="hero-tag">各型號獨立剔除色號 · 整數分配</div></div></section>
+<section class="hero"><div class="container"><div><span class="eyebrow">PURCHASING · FLEXIBLE MODE</span><h1>鏡框叫貨數量快速分配</h1><p>單一型號的單一色號只允許 27／85／170／255 副；未指定的組合自動找最小超量，不再拆分。</p></div><div class="hero-tag">每一個色號固定一種批量</div></div></section>
 <main class="workspace"><div class="container">
 <section class="steps" aria-label="採購基本設定">
- <div class="step"><label class="field-label" for="total"><span class="stepnum">01</span>本次總叫貨數量（副）</label><input id="total" class="input-num" type="number" min="0" max="10000000" step="1" inputmode="numeric" value="150"><p class="hint">所有明細的加總以本次總叫貨量為準</p></div>
- <div class="step"><label class="field-label" for="count"><span class="stepnum">02</span>本次採購型號數量（種）</label><input id="count" class="input-num" type="number" min="1" max="200" step="1" inputmode="numeric" value="15"><p class="hint">例如輸入 15，建立 15 列型號等待套用色號</p></div>
+ <div class="step"><label class="field-label" for="total"><span class="stepnum">01</span>本次最低採購需求（副）</label><input id="total" class="input-num" type="number" min="0" max="10000000" step="1" inputmode="numeric" value="1500"><p class="hint">輸入需求下限，系統會找出最接近且不低於需求的合法批量組合。</p></div>
+ <div class="step"><label class="field-label" for="count"><span class="stepnum">02</span>本次採購型號數量（種）</label><input id="count" class="input-num" type="number" min="1" max="200" step="1" inputmode="numeric" value="10"><p class="hint">例如輸入 10，並套用 3 種色號，將建立 30 個獨立採購組合</p></div>
  <div class="step colors-step"><div class="code-step-top"><div class="label-side"><label class="field-label" for="batchCodes"><span class="stepnum">03</span>輸入本次要叫貨的色號</label><p class="hint">一次輸入多個色號，例如 C1、C3、C5、C7。按「套用色號」後，全部型號同步產生這些色號。支援逗號、空格或換行分隔。</p></div><div class="code-batch"><input id="batchCodes" class="batch-input" type="text" placeholder="例：C1, C3, C5, C7" aria-label="批次輸入色號"><button type="button" id="applyCodes" class="btn btn-primary">套用色號</button></div></div>
   <div class="code-subhead"><div><strong style="font-size:12px">目前已啟用色號：<span id="codeCount">0</span> 種</strong><span class="hint" style="margin-left:8px">可直接修改名稱或個別移除</span></div><div class="new-code-row"><input id="newCode" maxlength="30" placeholder="新增色號，如 C8" aria-label="新增單一色號"><button type="button" id="addColor" class="btn">＋ 新增色號</button></div></div>
   <div id="colorEditor" class="code-tags" aria-label="目前色號清單"></div>
  </div>
 </section>
+<div class="weight-legend" aria-label="固定批量說明"><div><strong>固定批量限制</strong><span>每個「型號 × 色號」只能選 27、85、170、255 或不叫 0；不可拆單，也不可重複疊加。</span></div><div class="weight-pills"><span><b>批次</b><em>27 副</em></span><span><b>批次</b><em>85 副</em></span><span><b>批次</b><em>170 副</em></span><span><b>批次</b><em>255 副</em></span></div></div>
+<div class="lot-mode-bar"><div><label for="tieMode">同樣最少超額時的配比偏好</label><p id="minBatchHint" class="lot-mode-hint">每格只允許 27／85／170／255 或 0。</p></div><select id="tieMode" aria-label="同樣數量下的配比偏好"><option value="balanced">均衡分配（預設）</option><option value="popular">優先較多熱門等級</option></select></div>
 <section class="columns">
- <div class="board"><div class="board-head"><div><h2>每款型號需求分配</h2><p>各色號可設定「多／中／少／不叫」，下方另可快速剔除指定型號的特定色號。</p></div><div class="buttons"><button id="setAllMedium" type="button" class="btn">全部設為「中」</button><button id="pasteNames" type="button" class="btn">批次貼上型號</button></div></div>
- <div class="board-meta"><span id="matrixMeta">15 款型號 · 尚未設定色號</span><label class="checkline"><input id="minOne" type="checkbox" checked>數量足夠時，每個選購色號至少 1 副</label><span>色號欄頂端可整欄設定；手機可左右滑動表格</span></div>
+ <div class="board"><div class="board-head"><div><h2>每款型號需求分配</h2><p>每格可指定「多 255／中 170／少 85／微 27」固定支數，或選擇「自動」。系統只會在未指定的格子調整。</p></div><div class="buttons"><button id="setAllMedium" type="button" class="btn">全部改為「自動」</button><button id="pasteNames" type="button" class="btn">批次貼上型號</button></div></div>
+ <div class="board-meta"><span id="matrixMeta">15 款型號 · 尚未設定色號</span><span>手動指定的格子數量永遠不變；自動格每格至少 27 副</span><span>「型號合計」僅為各色號的加總，不需是單一固定批量；手機可左右滑動</span></div>
  <div class="table-wrap"><table class="matrix" id="matrix"><colgroup id="matrixCols"></colgroup><thead><tr id="matrixHead"></tr></thead><tbody id="grid"></tbody></table></div>
  <div class="table-foot"><div class="sum-grid"><span>共 <strong id="footModels">15</strong> 款</span><span><strong id="footColors">0</strong> 色號配置</span></div><span>已分配 <strong id="footUnits">0</strong> 副</span></div>
  <div class="board-actions"><span class="hint">型號可留白，系統會用「型號 01、02…」代稱。</span><div><button type="button" class="subtle" id="reset">載入示範</button> <button type="button" class="subtle" id="clear">清空</button></div></div>
  </div>
- <aside class="panel"><div class="panel-heading"><h2>自動分配結果</h2><p>依型號平均分配，並依各色號需求比例微調支數</p></div><div class="kpis"><div class="kpi"><strong id="statTotal">150</strong><span>總採購</span></div><div class="kpi"><strong id="statDone">0</strong><span>已分配</span></div><div class="kpi"><strong id="statDiff">150</strong><span>未分配</span></div></div><div class="panel-content"><div id="status" class="status warning" aria-live="polite">先輸入色號，才能分配。</div><div class="color-stat"><div class="mini-heading">各色號合計</div><div id="colorStats"></div></div><div class="results-head"><span class="mini-heading">型號分配清單</span><span class="hint" id="listMeta"></span></div><div id="results" class="results"></div><div class="action-row"><button type="button" class="btn btn-dark" id="copy">複製叫貨清單</button><button type="button" class="btn btn-primary" id="csv">匯出 CSV</button></div><div class="explain"><b>計算方式</b>：少 1／中 1.5／多 2；先分配各款型號的總量，再依色號比例分配，結果皆為整數。若勾選每色至少 1 副且數量足夠，會優先保留每個「有叫貨」色號的基本量。<br><b>新增或移除色號</b>：自動重新計算，保留相同色號原有設定。個別型號可在下方剔除特定色號，剔除後不參與分配及匯出；點選恢復後會回到原本的需求設定。</div></div></aside>
+ <aside class="panel"><div class="panel-heading"><h2>自動分配結果</h2><p>直接以每個型號色號為單位計算，僅有 27／85／170／255／0；右側統計各級組合數。</p></div><div class="kpis"><div class="kpi"><strong id="statTotal">1,500</strong><span>最低需求</span></div><div class="kpi"><strong id="statDone">0</strong><span>實際叫貨</span></div><div class="kpi"><strong id="statDiff">0</strong><span id="diffLabel">超出需求</span></div></div><div class="panel-content"><div id="status" class="status warning" aria-live="polite">先輸入色號，才能分配。</div><div class="lots-panel"><div class="lots-header"><strong>四種固定叫貨量的組合數</strong><span id="lotCount">0 個組合</span></div><div id="lotBreakdown" class="lots-grid" aria-live="polite"></div><div class="lot-note" id="lotNote">每個型號 × 色號最多僅對應一種固定數量。</div></div><div class="color-stat"><div class="mini-heading">各色號合計</div><div id="colorStats"></div></div><div class="results-head"><span class="mini-heading">型號分配清單</span><span class="hint" id="listMeta"></span></div><div id="results" class="results"></div><div class="action-row"><button type="button" class="btn btn-dark" id="copy">複製叫貨清單</button><button type="button" class="btn btn-primary" id="csv">匯出 CSV</button></div><div class="explain"><b>計算規則：</b>每一個型號 × 色號，只能是 <b>0、27、85、170、255</b> 副，不能出現 9／20／38 等中間數量，也不能把 85 拆成 27＋58。指定「多／中／少／微」後立即鎖定；只有選「自動」的組合會調整。目標為不低於需求且超出最少；若全部鎖定造成不足，則提示缺口，不會偷偷更動已指定數量。<br><b>重要：</b>每款型號合計為各色號固定支數的加總，因此型號合計可以是 54、112、197 等數字；只有單一色號支數必須屬於四種固定選項。</div></div></aside>
 </section>
   <section class="exclusion-board" aria-label="個別型號色號剔除">
     <div class="exclusion-head">
       <div>
         <div class="section-eyebrow">04 · PER-MODEL EXCLUSION</div>
         <h2>個別型號｜色號剔除</h2>
-        <p>只有指定型號不叫某個色號時，點選該型號下方的色號，即可單獨剔除；不影響其他型號。再次點選可恢復原本的「多／中／少」設定。</p>
+        <p>只有指定型號不叫某個色號時，點選該型號下方的色號，即可單獨剔除；不影響其他型號。再次點選可恢復原本的「自動」或指定批量設定。</p>
       </div>
       <div class="exclusion-tools">
         <label class="search-field"><span>篩選型號</span><input id="exclusionSearch" type="search" placeholder="輸入型號或序號" aria-label="搜尋要剔除色號的型號"></label>
@@ -122,48 +169,150 @@
     <div id="exclusionList" class="exclusion-list"></div>
   </section>
 </div></main>
-<div class="footer">OKURA COOL · 鏡框採購分配工具｜資料只儲存在目前瀏覽器，不會上傳伺服器</div>
+<div class="footer">OKURA COOL · 單色號固定採購數量分配工具｜資料只儲存在目前瀏覽器，不會上傳伺服器</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal"><h3 id="modalTitle">批次貼上型號名稱</h3><p>每行一個型號，可直接貼上 Excel 單欄資料，按順序填入目前型號列表。</p><textarea id="namesArea" placeholder="0115\n0116\n0117\n..." spellcheck="false"></textarea><div class="mode-hint" id="namePasteHint"></div><div class="modal-actions"><button class="btn" type="button" id="cancelModal">取消</button><button class="btn btn-primary" type="button" id="applyNames">套用型號名稱</button></div></div></div>
 <script>
+
 (()=>{'use strict';
-const KEY='okura-frame-order-exclusions-v4',PREVIOUS_KEY='okura-frame-order-flexible-v3',LEGACY_KEY='okura-frame-order-quick-v2',MAX_MODELS=200,MAX_COLORS=24,LEVELS={off:0,low:2,medium:3,high:4},LABELS={off:'不叫',low:'少',medium:'中',high:'多'};
+const KEY='okura-frame-order-single-sku-qty-v8',MAX_MODELS=200,MAX_COLORS=24;
+const QTY={off:0,micro:27,low:85,medium:170,high:255};
+const LABELS={auto:'自動',off:'不叫',micro:'微',low:'少',medium:'中',high:'多'};
+const GRADES={27:'微',85:'少',170:'中',255:'多',0:'不叫'};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=n=>Number(n).toLocaleString('zh-TW');
 const normal=s=>String(s??'').trim().slice(0,30);
-const newModel=(n=0)=>({name:'',levels:Array(n).fill('medium'),excluded:Array(n).fill(false)});
-const starter=()=>({total:150,codes:[],minOne:true,models:Array.from({length:15},()=>newModel())});
-const sample=()=>({total:150,codes:['C1','C2','C3','C4'],minOne:true,models:Array.from({length:15},()=>newModel(4))});
-function restore(){try{const saved=localStorage.getItem(KEY)||localStorage.getItem(PREVIOUS_KEY)||localStorage.getItem(LEGACY_KEY);if(!saved)return null;const a=JSON.parse(saved);if(!Array.isArray(a.models)||a.models.length<1||a.models.length>MAX_MODELS)return null;
- const rawCodes=Array.isArray(a.codes)?a.codes:[];const codes=[];const origIndices=[];rawCodes.slice(0,MAX_COLORS).forEach((c,i)=>{const name=normal(c);if(name&&!codes.some(x=>x.toUpperCase()===name.toUpperCase())){codes.push(name);origIndices.push(i)}});
- const models=a.models.map(m=>({name:String(m.name??'').slice(0,100),levels:origIndices.map(i=>Object.hasOwn(LEVELS,m.levels?.[i])?m.levels[i]:'medium'),excluded:origIndices.map(i=>m.excluded?.[i]===true)}));return{total:Number.isSafeInteger(a.total)&&a.total>=0&&a.total<=10000000?a.total:150,codes,minOne:a.minOne!==false,models};}catch(_){return null;}}
+const newModel=(n=0)=>({name:'',levels:Array(n).fill('auto'),excluded:Array(n).fill(false)});
+const starter=()=>({total:1500,codes:['C1','C2','C3'],tie:'balanced',models:Array.from({length:10},()=>newModel(3))});
+function restore(){try{
+ const raw=localStorage.getItem(KEY);if(!raw)return null;
+ const a=JSON.parse(raw);if(!Array.isArray(a.models)||!a.models.length||a.models.length>MAX_MODELS)return null;
+ const codes=[],indices=[];(Array.isArray(a.codes)?a.codes:[]).slice(0,MAX_COLORS).forEach((c,i)=>{const s=normal(c);if(s&&!codes.some(t=>t.toUpperCase()===s.toUpperCase())){codes.push(s);indices.push(i)}});
+ const models=a.models.map(m=>({name:String(m.name||'').slice(0,100),levels:indices.map(i=>Object.hasOwn(QTY,m.levels?.[i])||m.levels?.[i]==='auto'?m.levels[i]:'auto'),excluded:indices.map(i=>m.excluded?.[i]===true)}));
+ return{total:Number.isSafeInteger(a.total)&&a.total>=0&&a.total<=10000000?a.total:1500,codes,tie:a.tie==='popular'?'popular':'balanced',models};
+}catch(_){return null}}
 let state=restore()||starter(),latest=null,timer=null;
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(_){}}
 function toast(msg){const e=$('toast');e.textContent=msg;e.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>e.classList.remove('show'),2200)}
-// 最大餘數法，對同額餘數採循環順位，避免每次都偏向第一色。
-function apportion(total,weights,rotate=0){const n=weights.length,result=Array(n).fill(0);if(!n||total<=0)return result;const sum=weights.reduce((a,b)=>a+b,0);if(sum<=0)return result;const floors=weights.map(w=>Math.floor(total*w/sum));let remaining=total-floors.reduce((a,b)=>a+b,0);const order=weights.map((w,i)=>({i,rem:total*w%sum,w,tie:(i-rotate%n+n)%n})).filter(x=>x.w>0).sort((a,b)=>b.rem-a.rem||b.w-a.w||a.tie-b.tie);for(let k=0;k<remaining;k++)floors[order[k].i]++;return floors}
-function calc(){const k=state.codes.length,activePerModel=state.models.map(m=>m.levels.filter((l,j)=>!m.excluded[j]&&(LEVELS[l]||0)>0).length),activeTotal=activePerModel.reduce((a,b)=>a+b,0),units=state.models.map(()=>Array(k).fill(0)),hasBase=state.minOne&&state.total>=activeTotal&&activeTotal>0;
- let remaining=state.total;if(hasBase){state.models.forEach((m,i)=>m.levels.forEach((lvl,j)=>{if(!m.excluded[j]&&LEVELS[lvl]>0){units[i][j]=1;remaining--}}));}
- const additional=apportion(remaining,activePerModel.map(n=>n>0?1:0));
- state.models.forEach((m,i)=>{const extra=apportion(additional[i],m.levels.map((l,j)=>m.excluded[j]?0:(LEVELS[l]||0)),i%Math.max(1,k));extra.forEach((v,j)=>units[i][j]+=v)});
- const models=state.models.map((m,i)=>({name:m.name.trim()||`型號 ${String(i+1).padStart(2,'0')}`,qty:units[i].reduce((a,b)=>a+b,0),units:units[i],levels:m.levels,excluded:m.excluded}));
- const colorTotals=state.codes.map((_,j)=>units.reduce((a,row)=>a+row[j],0));const allocated=colorTotals.reduce((a,b)=>a+b,0);const zero=state.models.reduce((cnt,m,i)=>cnt+m.levels.filter((lvl,j)=>!m.excluded[j]&&(LEVELS[lvl]||0)>0&&units[i][j]===0).length,0);
- return{models,colorTotals,allocated,zero,activeTotal,eligible:activePerModel.filter(x=>x>0).length,excludedCount:state.models.reduce((n,m)=>n+m.excluded.filter(Boolean).length,0)};}
+// 絕對限制：每一個「型號 × 色號」只能叫 0／27／85／170／255 副。
+// 多、中、少、微是「固定的單組叫貨數量」，不是權重，也不允許重複批量疊加到同一格。
+// 指定的格子（包括「不叫」）絕不被修改；只對「自動」格子進行最小超量搜尋。
+// 每個自動格的最低為27，上限為255，增量僅 0,58,143,228。
+// 固定 high、medium 的計數後，low 的最小有效數量可以直接使用 ceil 求得，O(N²)。
+function optimizeAuto(goal,lockedTotal,n,tie='balanced'){
+ const base=lockedTotal+27*n,need=goal-base;
+ if(!n)return{counts:{27:0,85:0,170:0,255:0},total:lockedTotal,feasible:lockedTotal>=goal};
+ if(need<=0)return{counts:{27:n,85:0,170:0,255:0},total:base,feasible:true};
+ const maximum=lockedTotal+255*n;
+ if(maximum<goal)return{counts:{27:0,85:0,170:0,255:n},total:maximum,feasible:false};
+ let best=null;
+ // 該配比的代表值：同總數下「均衡」偏向低離散程度；「熱門」偏向更多255的選擇。
+ function better(c,prev){if(!prev)return true;
+  if(c.total!==prev.total)return c.total<prev.total;
+  if(tie==='popular'){
+   if(c.counts[255]!==prev.counts[255])return c.counts[255]>prev.counts[255];
+   if(c.counts[170]!==prev.counts[170])return c.counts[170]>prev.counts[170];
+  }else{
+   if(c.spread!==prev.spread)return c.spread<prev.spread;
+   if(c.counts[170]!==prev.counts[170])return c.counts[170]>prev.counts[170];
+  }
+  return c.counts[85]>prev.counts[85];
+ }
+ for(let h=0;h<=n;h++){
+  const afterH=need-228*h;
+  const remH=n-h;
+  // 剩餘 medium+low 可最多增加 143*remH，因此 h 太少時跳過。
+  if(afterH>143*remH)continue;
+  for(let m=0;m<=remH;m++){
+   const rem=remH-m;
+   const missing=afterH-143*m;
+   const l=missing<=0?0:Math.ceil(missing/58);
+   if(l>rem)continue;
+   const u=rem-l;
+   const total=base+228*h+143*m+58*l;
+   if(best&&total>best.total)continue;
+   const spread=255*255*h+170*170*m+85*85*l+27*27*u;
+   const candidate={counts:{255:h,170:m,85:l,27:u},total,feasible:true,spread};
+   if(better(candidate,best))best=candidate;
+  }
+ }
+ if(!best)throw new Error('固定支數搜尋未找到組合');
+ return best;
+}
+function packsText(counts){return[255,170,85,27].filter(q=>counts[q]).map(q=>`${q} × ${counts[q]}`).join(' ＋ ')||'—'}
+function emptyPacks(){return{27:0,85:0,170:0,255:0}}
+function calc(){
+ const k=state.codes.length;
+ const units=state.models.map(()=>Array(k).fill(0)), modelTotals=state.models.map(()=>0), modelPacks=state.models.map(()=>emptyPacks());
+ const auto=[], counts=emptyPacks();let lockedTotal=0,excludedCount=0,offCount=0;
+ state.models.forEach((m,i)=>m.levels.forEach((l,j)=>{
+  if(m.excluded[j]){excludedCount++;return;}
+  if(l==='off'){offCount++;return;}
+  if(l==='auto'){auto.push({i,j});return;}
+  const q=QTY[l]||0;units[i][j]=q;modelTotals[i]+=q;modelPacks[i][q]++;counts[q]++;lockedTotal+=q;
+ }));
+ const plan=optimizeAuto(state.total,lockedTotal,auto.length,state.tie);
+ // 將高量先補給目前叫貨較少的型號，讓每款型號較均衡。
+ // 此步只把合法的單批量交給一個格子，絕不更動批量或拆分。
+ const sequence=[];
+ for(const q of [255,170,85,27])for(let a=0;a<plan.counts[q];a++)sequence.push(q);
+ const pending=auto.slice();
+ for(const q of sequence){
+  let best=0;
+  for(let z=1;z<pending.length;z++){
+   const a=pending[z],b=pending[best];
+   if(modelTotals[a.i]<modelTotals[b.i]||modelTotals[a.i]===modelTotals[b.i]&&(a.j+a.i)%k<(b.j+b.i)%k)best=z;
+  }
+  const {i,j}=pending.splice(best,1)[0];units[i][j]=q;modelTotals[i]+=q;modelPacks[i][q]++;counts[q]++;
+ }
+ const allocated=modelTotals.reduce((a,b)=>a+b,0);
+ const models=state.models.map((m,i)=>({name:m.name.trim()||`型號 ${String(i+1).padStart(2,'0')}`,qty:modelTotals[i],units:units[i],levels:m.levels,excluded:m.excluded,packs:modelPacks[i]}));
+ const colorTotals=state.codes.map((_,j)=>units.reduce((a,row)=>a+row[j],0));
+ const gradeNumbers=Object.fromEntries([27,85,170,255].map(q=>[q,counts[q]*q]));
+ const activeCount=auto.length+[27,85,170,255].reduce((s,q)=>s+state.models.reduce((a,m)=>a+m.levels.filter((l,j)=>!m.excluded[j]&&QTY[l]===q).length,0),0);
+ const feasible=allocated>=state.total;
+ const fixedCount=activeCount-auto.length;
+ return{models,colorTotals,allocated,counts,gradeNumbers,autoCount:auto.length,fixedCount,activeCount,excludedCount,offCount,lockedTotal,feasible,minimum:lockedTotal+27*auto.length,maximum:lockedTotal+255*auto.length};
+}
 function drawColorEditor(){$('codeCount').textContent=state.codes.length;$('colorEditor').innerHTML=state.codes.length?state.codes.map((code,j)=>`<div class="code-item"><input data-edit-code="${j}" aria-label="修改色號 ${j+1}" maxlength="30" value="${esc(code)}"><button class="code-remove" data-remove-code="${j}" type="button" aria-label="移除色號 ${esc(code)}" title="移除此色號">×</button></div>`).join(''):'<div class="empty-codes">尚未加入色號，請在上方輸入後點「套用色號」，或在右側新增單一色號。</div>'}
-function drawMatrix(){const k=state.codes.length;$('matrix').style.minWidth=Math.max(660,50+170+80+132*k)+'px';$('matrixCols').innerHTML=`<col class="index"><col class="model">${state.codes.map(()=>'<col class="color-col">').join('')}<col class="qty">`;
- $('matrixHead').innerHTML=`<th>序</th><th>型號名稱 <span style="font-weight:500">(選填)</span></th>${state.codes.map((code,j)=>`<th><span class="col-title" title="${esc(code)}">${esc(code)}</span><select class="col-action" data-bulk-col="${j}" aria-label="${esc(code)} 整欄設定"><option value="">整欄套用…</option><option value="high">全部多</option><option value="medium">全部中</option><option value="low">全部少</option><option value="off">全部不叫</option></select></th>`).join('')}<th>型號合計</th>`;
- $('grid').innerHTML=state.models.map((m,i)=>`<tr><td>${String(i+1).padStart(2,'0')}</td><td><input class="model-input" data-model-name="${i}" value="${esc(m.name)}" placeholder="型號 ${String(i+1).padStart(2,'0')}" aria-label="第 ${i+1} 款型號名稱"></td>${m.levels.map((l,j)=>`<td>${m.excluded[j]?`<div class="level-cell excluded-cell"><span class="excluded-label">已剔除</span><button type="button" class="restore-color" data-restore-row="${i}" data-restore-col="${j}" aria-label="恢復第 ${i+1} 款 ${esc(state.codes[j])}">恢復</button><strong class="cell-qty zero" id="q-${i}-${j}">0</strong></div>`:`<div class="level-cell"><select class="level" data-level-row="${i}" data-level-col="${j}" data-level="${l}" aria-label="型號 ${i+1} ${esc(state.codes[j])} 需求"><option value="high" ${l==='high'?'selected':''}>多</option><option value="medium" ${l==='medium'?'selected':''}>中</option><option value="low" ${l==='low'?'selected':''}>少</option><option value="off" ${l==='off'?'selected':''}>不叫</option></select><strong class="cell-qty" id="q-${i}-${j}">–</strong></div>`}</td>`).join('')}<td class="row-total" id="row-${i}">–</td></tr>`).join('');drawExclusions();refresh();}
+function drawMatrix(){const k=state.codes.length;
+ $('matrix').style.minWidth=Math.max(760,300+158*k)+'px';
+ $('matrixCols').innerHTML=`<col class="index"><col class="model">${state.codes.map(()=>'<col class="color-col">').join('')}<col class="qty">`;
+ $('matrixHead').innerHTML=`<th>序</th><th>型號名稱 <span style="font-weight:500">(選填)</span></th>${state.codes.map((code,j)=>`<th><span class="col-title" title="${esc(code)}">${esc(code)}</span><select class="col-action" data-bulk-col="${j}" aria-label="${esc(code)} 整欄設定"><option value="">整欄套用…</option><option value="auto">全部自動</option><option value="high">多 255</option><option value="medium">中 170</option><option value="low">少 85</option><option value="micro">微 27</option><option value="off">全部不叫</option></select></th>`).join('')}<th>型號合計</th>`;
+ $('grid').innerHTML=state.models.map((m,i)=>`<tr><td>${String(i+1).padStart(2,'0')}</td><td><input class="model-input" data-model-name="${i}" value="${esc(m.name)}" placeholder="型號 ${String(i+1).padStart(2,'0')}" aria-label="第 ${i+1} 款型號名稱"></td>${m.levels.map((l,j)=>`<td>${m.excluded[j]?`<div class="level-cell excluded-cell"><span class="excluded-label">已剔除</span><button type="button" class="restore-color" data-restore-row="${i}" data-restore-col="${j}">恢復</button><strong class="cell-qty zero" id="q-${i}-${j}">0</strong></div>`:`<div class="level-cell"><select class="level" data-level-row="${i}" data-level-col="${j}" data-level="${l}" aria-label="型號 ${i+1} ${esc(state.codes[j])} 固定叫貨量"><option value="auto" ${l==='auto'?'selected':''}>自動</option><option value="high" ${l==='high'?'selected':''}>多 255</option><option value="medium" ${l==='medium'?'selected':''}>中 170</option><option value="low" ${l==='low'?'selected':''}>少 85</option><option value="micro" ${l==='micro'?'selected':''}>微 27</option><option value="off" ${l==='off'?'selected':''}>不叫 0</option></select><span class="quantity-stack"><strong class="cell-qty" id="q-${i}-${j}">—</strong><small id="grade-${i}-${j}"></small></span></div>`}</td>`).join('')}<td class="row-total"><strong id="row-${i}">—</strong><small class="row-lot" id="row-lot-${i}">—</small></td></tr>`).join('');drawExclusions();refresh();}
 function redraw(){drawColorEditor();drawMatrix();}
-function refresh(){latest=calc();const k=state.codes.length;$('count').value=state.models.length;$('matrixMeta').textContent=k?`${state.models.length} 款型號 · ${state.models.length*k} 個色號配置`:`${state.models.length} 款型號 · 尚未設定色號`;
+function refresh(){
+ latest=calc();const k=state.codes.length;
+ $('count').value=state.models.length;
+ $('matrixMeta').textContent=k?`${state.models.length} 款型號 × ${k} 色＝${state.models.length*k} 個組合；已鎖定 ${latest.fixedCount} 格，自動 ${latest.autoCount} 格`:`${state.models.length} 款型號 · 尚未設定色號`;
  $('footModels').textContent=fmt(state.models.length);$('footColors').textContent=fmt(state.models.length*k);$('footUnits').textContent=fmt(latest.allocated);
- $('statTotal').textContent=fmt(state.total);$('statDone').textContent=fmt(latest.allocated);$('statDiff').textContent=fmt(state.total-latest.allocated);
- state.models.forEach((m,i)=>{for(let j=0;j<k;j++){const el=$(`q-${i}-${j}`);if(el){const q=latest.models[i].units[j];el.textContent=q;el.classList.toggle('zero',q===0)}}const e=$(`row-${i}`);if(e)e.textContent=fmt(latest.models[i].qty)});
- const status=$('status');status.className='status';if(!k){status.classList.add('warning');status.textContent='尚未設定色號：請先輸入並套用色號，才會進行數量分配。'}else if(!latest.eligible){status.classList.add('warning');status.textContent='所有色號都設為「不叫」，目前無法分配；請開啟至少一個色號。'}else if(latest.zero>0&&state.total>0){status.classList.add('warning');status.textContent=`已分配全部採購數量，但有 ${fmt(latest.zero)} 個選購色號分配 0 副。${state.total<latest.activeTotal?`要全部選購色號至少 1 副，至少需要 ${fmt(latest.activeTotal)} 副。`:''}`}else if(state.total===0){status.textContent='總叫貨數量為 0，全部色號目前分配 0 副。'}else{status.textContent='✓ 分配完成，各明細加總與採購數量一致。'}
- $('colorStats').innerHTML=k?latest.colorTotals.map((q,j)=>`<div class="stat-row"><span>${esc(state.codes[j])}</span><div class="track"><span style="width:${state.total?Math.max(0,Math.min(100,100*q/state.total)):0}%"></span></div><b>${fmt(q)} 副</b></div>`).join(''):'<p class="hint">新增色號後，這裡會顯示各色號總叫貨量。</p>';
- $('listMeta').textContent=`${state.models.length} 款 / ${fmt(state.models.length*k)} 個色號配置`;
+ $('statTotal').textContent=fmt(state.total);$('statDone').textContent=fmt(latest.allocated);
+ $('statDiff').textContent=fmt(Math.abs(state.total-latest.allocated));$('diffLabel').textContent=latest.feasible?'超出需求':'仍差數量';
+ state.models.forEach((m,i)=>{
+  for(let j=0;j<k;j++){
+   const el=$(`q-${i}-${j}`);if(!el)continue;const q=latest.models[i].units[j];el.textContent=fmt(q);el.classList.toggle('zero',q===0);
+   const note=$(`grade-${i}-${j}`);if(note)note.textContent=m.levels[j]==='auto'?`自動：${GRADES[q]}`:m.levels[j]==='off'?'不叫':'固定';
+  }
+  const row=$(`row-${i}`);if(row)row.textContent=fmt(latest.models[i].qty);
+  const note=$(`row-lot-${i}`);if(note)note.textContent=packsText(latest.models[i].packs);
+ });
+ const status=$('status');status.className='status';
+ if(!k){status.classList.add('warning');status.textContent='尚未設定色號，請在上方輸入並套用。';}
+ else if(!latest.activeCount){status.classList.add('warning');status.textContent='全部色號均已剔除或不叫，目前無可分配組合。';}
+ else if(!latest.feasible){status.classList.add('error');status.textContent=`目前只能叫 ${fmt(latest.allocated)} 副，低於需求 ${fmt(state.total)} 副，尚差 ${fmt(state.total-latest.allocated)} 副。請將部分固定格改回「自動」、提高其固定等級，或增加可進貨的型號色號；不會擅自產生非法支數。`;}
+ else if(latest.allocated===state.total){status.textContent=`✓ 已精準達到 ${fmt(latest.allocated)} 副，每格皆為 27／85／170／255 或 0。`;}
+ else {status.textContent=`✓ 合法組合已達最低需求：${fmt(state.total)} → ${fmt(latest.allocated)} 副，超出 ${fmt(latest.allocated-state.total)} 副。每一格都只會是一種固定數量。`;}
+ $('lotCount').textContent=`共 ${fmt(latest.activeCount)} 個採購組合`;
+ $('lotBreakdown').innerHTML=[255,170,85,27].map(q=>`<div class="lot-item ${latest.counts[q]?'is-used':'is-empty'}"><span>${GRADES[q]} · 每格 ${q} 副</span><strong>× ${fmt(latest.counts[q])} 格</strong><small>共 ${fmt(latest.gradeNumbers[q])} 副</small></div>`).join('');
+ $('lotNote').textContent=`組合：${packsText(latest.counts)} ＝ ${fmt(latest.allocated)} 副。自動 ${latest.autoCount} 格、指定 ${latest.fixedCount} 格、剔除 ${latest.excludedCount} 格、不叫 ${latest.offCount} 格。`;
+ $('minBatchHint').textContent=k?`每格只能選 27／85／170／255 副或不叫 0 副；沒有其他支數。可指定固定批量，剩餘「自動」格由系統尋找最少超額的組合。`:'請先設定色號。';
+ $('colorStats').innerHTML=k?latest.colorTotals.map((q,j)=>`<div class="stat-row"><span>${esc(state.codes[j])}</span><div class="track"><span style="width:${latest.allocated?Math.min(100,100*q/latest.allocated):0}%"></span></div><b>${fmt(q)} 副</b></div>`).join(''):'<p class="hint">新增色號後，這裡會顯示各色號總叫貨量。</p>';
+ $('listMeta').textContent=`${state.models.length} 款 / ${fmt(state.models.length*k)} 格`;
  $('excludedCount').textContent=fmt(latest.excludedCount);
- $('results').innerHTML=latest.models.map((m,i)=>`<div class="result-row"><div class="result-top"><strong>${String(i+1).padStart(2,'0')} ${esc(m.name)}</strong><b>${fmt(m.qty)} 副</b></div><div class="result-colors">${k?m.units.map((q,j)=>m.excluded[j]?`<span class="result-excluded">${esc(state.codes[j])} <em>已剔除</em></span>`:`<span>${esc(state.codes[j])} <em>${fmt(q)}</em></span>`).join(''):'<span>尚未設定色號</span>'}</div></div>`).join('');persist();}
+ $('results').innerHTML=latest.models.map((m,i)=>`<div class="result-row"><div class="result-top"><strong>${String(i+1).padStart(2,'0')} ${esc(m.name)}</strong><b>${fmt(m.qty)} 副</b></div><div class="result-colors">${k?m.units.map((q,j)=>m.excluded[j]?`<span class="result-excluded">${esc(state.codes[j])} <em>已剔除</em></span>`:m.levels[j]==='off'?`<span class="result-excluded">${esc(state.codes[j])} <em>不叫</em></span>`:`<span>${esc(state.codes[j])} <em>${GRADES[q]} ${fmt(q)} 副</em>${m.levels[j]==='auto'?'<small>（自動）</small>':''}</span>`).join(''):'<span>尚未設定色號</span>'}</div></div>`).join('');
+ persist();
+}
 function drawExclusions(){
  const parent=$('exclusionList'),q=$('exclusionSearch').value.trim().toLocaleLowerCase(),only=$('excludedOnly').checked;
  if(!state.codes.length){parent.innerHTML='<div class="exclusion-empty">請先在上方設定色號，即可針對個別型號進行剔除。</div>';return;}
@@ -173,15 +322,20 @@ function drawExclusions(){
 function toggleExclusion(i,j,force){const m=state.models[i];if(!m||j<0||j>=state.codes.length)return;const next=typeof force==='boolean'?force:!m.excluded[j];if(m.excluded[j]===next)return;m.excluded[j]=next;drawMatrix();toast(`型號 ${m.name.trim()||String(i+1).padStart(2,'0')}／${state.codes[j]}：${next?'已剔除，不參與叫貨':'已恢復原先需求設定'}`)}
 function parseCodes(s){return String(s??'').split(/[\s,，、;；｜|]+/).map(normal).filter(Boolean)}
 function validateCodes(raw){if(!raw.length)return '至少需要輸入 1 個色號';if(raw.length>MAX_COLORS)return `最多設定 ${MAX_COLORS} 種色號`;const keys=new Set();for(const c of raw){const u=c.toUpperCase();if(keys.has(u))return `色號「${c}」重複，請修正後再套用`;keys.add(u)}return null}
-function replaceCodes(codes){const previous=new Map(state.codes.map((c,j)=>[c.toUpperCase(),j]));state.models.forEach(m=>{const old=m.levels,oldExcluded=m.excluded;m.levels=codes.map(c=>{const j=previous.get(c.toUpperCase());return j===undefined?'medium':old[j]??'medium'});m.excluded=codes.map(c=>{const j=previous.get(c.toUpperCase());return j===undefined?false:oldExcluded[j]===true})});state.codes=codes;redraw();}
+function replaceCodes(codes){const previous=new Map(state.codes.map((c,j)=>[c.toUpperCase(),j]));state.models.forEach(m=>{const old=m.levels,oldExcluded=m.excluded;m.levels=codes.map(c=>{const j=previous.get(c.toUpperCase());return j===undefined?'auto':old[j]??'auto'});m.excluded=codes.map(c=>{const j=previous.get(c.toUpperCase());return j===undefined?false:oldExcluded[j]===true})});state.codes=codes;redraw();}
 function applyBatch(){const codes=parseCodes($('batchCodes').value),err=validateCodes(codes);if(err){toast(err);return;}replaceCodes(codes);$('batchCodes').value='';toast(`已將 ${codes.length} 個色號套用到 ${state.models.length} 款型號`);}
 function addColor(){const value=normal($('newCode').value);if(!value){toast('請先輸入要新增的色號');$('newCode').focus();return;}const codes=[...state.codes,value],err=validateCodes(codes);if(err){toast(err);return;}replaceCodes(codes);$('newCode').value='';$('newCode').focus();toast(`已新增色號 ${value}`)}
-function changeCount(num){if(!Number.isSafeInteger(num)||num<1||num>MAX_MODELS){toast('型號數量需為 1 至 200 的整數');$('count').value=state.models.length;return;}if(num<state.models.length&&state.models.slice(num).some(m=>m.name.trim()||m.levels.some(x=>x!=='medium')||m.excluded.some(Boolean))){if(!confirm(`改為 ${num} 款將移除最後 ${state.models.length-num} 款的設定，是否繼續？`)){$('count').value=state.models.length;return;}}
+function changeCount(num){if(!Number.isSafeInteger(num)||num<1||num>MAX_MODELS){toast('型號數量需為 1 至 200 的整數');$('count').value=state.models.length;return;}if(num<state.models.length&&state.models.slice(num).some(m=>m.name.trim()||m.levels.some(x=>x!=='auto')||m.excluded.some(Boolean))){if(!confirm(`改為 ${num} 款將移除最後 ${state.models.length-num} 款的設定，是否繼續？`)){$('count').value=state.models.length;return;}}
  while(state.models.length<num)state.models.push(newModel(state.codes.length));state.models.length=num;drawMatrix();}
-function getCopyText(){const lines=[`鏡框叫貨數量分配｜總量 ${state.total} 副｜${state.models.length} 款 × ${state.codes.length} 色`,''];latest.models.forEach(m=>{lines.push(`【${m.name}】${m.qty} 副`);m.units.forEach((q,j)=>{if(!m.excluded[j]&&m.levels[j]!=='off')lines.push(`  ${state.codes[j]} × ${q} 副（${LABELS[m.levels[j]]}）`)});lines.push('')});lines.push(`總計：${latest.allocated} 副`);return lines.join('\n')}
+function getCopyText(){
+ const lines=[`鏡框叫貨清單｜最低需求 ${state.total} 副｜實際 ${latest.allocated} 副`, `固定單組數量：${packsText(latest.counts)}`,''];
+ latest.models.forEach((m,i)=>{lines.push(`【${m.name}】${m.qty} 副`);m.units.forEach((q,j)=>{if(!m.excluded[j]&&m.levels[j]!=='off'&&q>0)lines.push(`  ${state.codes[j]}：${GRADES[q]} × ${q} 副${m.levels[j]==='auto'?'（自動）':''}`)});lines.push('')});
+ lines.push(`總計 ${latest.allocated} 副｜最低需求 ${state.total} 副｜${latest.feasible?'超出':'不足'} ${Math.abs(latest.allocated-state.total)} 副`);
+ return lines.join('\n');
+}
 function showModal(){$('modal').classList.add('open');$('namesArea').value='';$('namePasteHint').textContent=`目前共 ${state.models.length} 款，最多貼入 ${state.models.length} 行。`;$('namesArea').focus();}
 function closeModal(){$('modal').classList.remove('open');}
-$('total').value=state.total;$('minOne').checked=state.minOne;redraw();
+$('total').value=state.total;$('tieMode').value=state.tie;redraw();
 $('total').addEventListener('input',e=>{const raw=e.target.value,v=Number(raw);if(raw===''||Number.isSafeInteger(v)&&v>=0&&v<=1e7){state.total=raw===''?0:v;refresh();}});
 $('total').addEventListener('blur',e=>{e.target.value=state.total});
 $('count').addEventListener('change',e=>changeCount(Number(e.target.value)));
@@ -189,7 +343,7 @@ $('applyCodes').addEventListener('click',applyBatch);$('batchCodes').addEventLis
 $('addColor').addEventListener('click',addColor);$('newCode').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addColor()}});
 $('colorEditor').addEventListener('change',e=>{if(!e.target.matches('[data-edit-code]'))return;const i=Number(e.target.dataset.editCode),old=state.codes[i],v=normal(e.target.value);const err=validateCodes(state.codes.map((c,j)=>j===i?v:c));if(err){toast(err);e.target.value=old;return;}state.codes[i]=v;redraw();toast(`色號 ${old} 已更名為 ${v}`)});
 $('colorEditor').addEventListener('click',e=>{const b=e.target.closest('[data-remove-code]');if(!b)return;const i=Number(b.dataset.removeCode),name=state.codes[i];replaceCodes(state.codes.filter((_,j)=>j!==i));toast(`已移除色號 ${name}，重新分配數量`)});
-$('minOne').addEventListener('change',e=>{state.minOne=e.target.checked;refresh()});
+$('tieMode').addEventListener('change',e=>{state.tie=e.target.value==='popular'?'popular':'balanced';refresh();toast('已更新同總數時的分配偏好')});
 $('grid').addEventListener('input',e=>{if(e.target.matches('[data-model-name]')){const i=Number(e.target.dataset.modelName);state.models[i].name=e.target.value.slice(0,100);refresh();drawExclusions()}});
 $('grid').addEventListener('change',e=>{if(e.target.matches('[data-level-row]')){const i=Number(e.target.dataset.levelRow),j=Number(e.target.dataset.levelCol);state.models[i].levels[j]=e.target.value;e.target.dataset.level=e.target.value;refresh();drawExclusions()}});
 $('grid').addEventListener('click',e=>{const b=e.target.closest('[data-restore-row]');if(b)toggleExclusion(Number(b.dataset.restoreRow),Number(b.dataset.restoreCol),false)});
@@ -197,12 +351,24 @@ $('exclusionList').addEventListener('click',e=>{const b=e.target.closest('[data-
 $('exclusionSearch').addEventListener('input',drawExclusions);$('excludedOnly').addEventListener('change',drawExclusions);
 $('clearExclusions').addEventListener('click',()=>{const n=state.models.reduce((a,m)=>a+m.excluded.filter(Boolean).length,0);if(!n){toast('目前沒有個別剔除的色號');return;}if(!confirm(`確定恢復全部 ${n} 個已剔除色號？將恢復原本的需求等級。`))return;state.models.forEach(m=>m.excluded.fill(false));drawMatrix();toast('所有剔除設定已恢復')});
 $('matrixHead').addEventListener('change',e=>{const sel=e.target.closest('[data-bulk-col]');if(!sel||!sel.value)return;const col=Number(sel.dataset.bulkCol),val=sel.value;state.models.forEach(m=>m.levels[col]=val);drawMatrix();toast(`已將 ${state.codes[col]} 整欄設為「${LABELS[val]}」`)});
-$('setAllMedium').addEventListener('click',()=>{state.models.forEach(m=>m.levels.fill('medium'));drawMatrix();toast('已將全部色號設為「中」')});
+$('setAllMedium').addEventListener('click',()=>{state.models.forEach(m=>m.levels.fill('auto'));drawMatrix();toast('已將全部未剔除的色號改為「自動」')});
 $('pasteNames').addEventListener('click',showModal);$('cancelModal').addEventListener('click',closeModal);$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 $('applyNames').addEventListener('click',()=>{const names=$('namesArea').value.replace(/\r/g,'').split('\n').map(s=>s.trim());if(!names.some(Boolean)){toast('請先貼上型號名稱');return;}let count=0;names.slice(0,state.models.length).forEach((s,i)=>{if(s){state.models[i].name=s.slice(0,100);count++}});drawMatrix();closeModal();toast(`已套用 ${count} 款型號名稱`)});
 $('copy').addEventListener('click',async()=>{if(!state.codes.length){toast('請先新增色號再複製');return;}const s=getCopyText();try{await navigator.clipboard.writeText(s);toast('已複製叫貨清單')}catch(_){const ta=document.createElement('textarea');ta.value=s;document.body.append(ta);ta.select();const ok=document.execCommand('copy');ta.remove();toast(ok?'已複製叫貨清單':'無法複製，請使用 CSV 匯出')}});
-$('csv').addEventListener('click',()=>{if(!state.codes.length){toast('請先新增色號再匯出');return;}const quote=s=>'"'+String(s??'').replace(/"/g,'""')+'"',preserve=s=>/^0\d+$/.test(String(s))?`="${s}"`:s;const rows=[['型號序號','型號','色號','需求程度','需求權重','叫貨支數','型號合計']];latest.models.forEach((m,i)=>m.units.forEach((q,j)=>{if(!m.excluded[j]&&m.levels[j]!=='off')rows.push([i+1,preserve(m.name),state.codes[j],LABELS[m.levels[j]],(LEVELS[m.levels[j]]||0)/2,q,m.qty])}));rows.push(['','總計','','','',latest.allocated,'']);const csv='\ufeff'+rows.map(row=>row.map(quote).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`鏡框叫貨分配_${new Date().toLocaleDateString('sv-SE')}.csv`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);toast('已匯出 CSV')});
-$('reset').addEventListener('click',()=>{if(!confirm('要載入示範（15 款 × C1～C4，共 150 副）嗎？目前的設定會被取代。'))return;state=sample();$('total').value=state.total;$('minOne').checked=true;redraw();toast('已載入示範')});
-$('clear').addEventListener('click',()=>{if(!confirm('確認清空採購數量、色號、型號名稱及需求設定？'))return;state=starter();state.total=0;$('total').value=0;$('minOne').checked=true;$('batchCodes').value='';$('newCode').value='';redraw();toast('已清空設定')});
+$('csv').addEventListener('click',()=>{
+ if(!state.codes.length){toast('請先新增色號');return;}
+ const quote=s=>'"'+String(s??'').replace(/"/g,'""')+'"',preserve=s=>/^0\d+$/.test(String(s))?`="${s}"`:s;
+ const rows=[['序號','型號','色號','固定需求設定','實際等級','該色號叫貨副數','型號合計']];
+ latest.models.forEach((m,i)=>m.units.forEach((q,j)=>{if(!m.excluded[j]&&m.levels[j]!=='off'&&q>0)rows.push([i+1,preserve(m.name),state.codes[j],LABELS[m.levels[j]],GRADES[q],q,m.qty])}));
+ rows.push(['','總計','','','',latest.allocated,'']);
+ rows.push(['','最低需求','','','',state.total,'']);
+ rows.push(['','需求差額','','','',latest.allocated-state.total,'']);
+ for(const q of [255,170,85,27])rows.push(['',`${GRADES[q]} ${q} 副組合數`,'','',latest.counts[q],latest.gradeNumbers[q],'']);
+ const csv='\ufeff'+rows.map(row=>row.map(quote).join(',')).join('\r\n');
+ const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`鏡框叫貨_固定單色號_${new Date().toLocaleDateString('sv-SE')}.csv`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);toast('已匯出合法固定支數 CSV');
+});
+$('reset').addEventListener('click',()=>{if(!confirm('要載入示範（10 款 × 3 色、最低需求 1,500 副）嗎？目前的設定會被取代。'))return;state=starter();$('total').value=state.total;$('tieMode').value=state.tie;redraw();toast('已載入 1,500 副示範');});
+$('clear').addEventListener('click',()=>{if(!confirm('確認清空採購數量、色號、型號名稱及需求設定？'))return;state={...starter(),total:0,codes:[],models:Array.from({length:10},()=>newModel())};$('total').value=0;$('tieMode').value=state.tie;$('batchCodes').value='';$('newCode').value='';redraw();toast('已清空設定');});
 })();
+
 </script></body></html>
