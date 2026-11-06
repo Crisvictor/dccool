@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-Hant"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#113c37">
+<meta name="description" content="先輸入鏡框採購總數與型號數，可自訂色號並個別剔除某型號不要的色號，依多中少自動分配叫貨數量。">
+<title>鏡框採購快速分配｜個別型號色號剔除｜OKURA COOL</title>
+<style>
+:root{--bg:#f5f7f4;--paper:#fff;--dark:#103e38;--dark2:#092d29;--accent:#137e6b;--accentp:#eaf6f0;--text:#203530;--sub:#667971;--line:#dee9e3;--warn:#9f6922;--red:#b3423a;--shadow:0 10px 26px rgba(19,64,51,.055)}
+*{box-sizing:border-box}body{margin:0;color:var(--text);font:14px/1.52 -apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",sans-serif;background:var(--bg)}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.44;cursor:default}.container{max-width:1490px;margin:auto;padding:0 25px}.site-header{background:var(--dark2);color:#fff}.site-header .container{height:63px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{display:flex;gap:11px;align-items:center;font-size:15px;font-weight:850;letter-spacing:.06em}.mark{width:31px;height:31px;border:1px solid #92cebf;border-radius:8px;display:grid;place-items:center;color:#b1eee0;font-family:Georgia,serif;font-size:19px;font-style:italic}.head-note{color:#b1cbc4;font-size:11px;font-weight:600}.hero{background:linear-gradient(115deg,#103c37,#19584f);color:white;padding:31px 0 34px}.hero .container{display:flex;align-items:center;justify-content:space-between;gap:20px}.eyebrow{letter-spacing:.22em;color:#a9d9cc;font-size:10px;font-weight:750}.hero h1{font-size:clamp(24px,2.6vw,35px);margin:8px 0 7px;line-height:1.3}.hero p{margin:0;color:#d2e8e1;font-size:13px}.hero-tag{border:1px solid #6da497;color:#cfebe3;border-radius:60px;padding:7px 13px;white-space:nowrap;font-size:11px}.workspace{padding-top:22px;padding-bottom:55px}.steps{display:grid;grid-template-columns:minmax(150px,1fr) minmax(150px,1fr);gap:16px;margin-bottom:18px}.step{border:1px solid var(--line);border-radius:15px;padding:17px 18px;background:var(--paper);box-shadow:var(--shadow)}.field-label{display:block;font-size:12px;font-weight:800;margin-bottom:9px}.stepnum{color:#168775;font-size:11px;margin-right:7px}.input-num{width:100%;height:47px;padding:8px 14px;border-radius:9px;border:1px solid #c9dbd2;background:#fff;color:#143c33;font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;outline:none}.hint{font-size:11px;color:var(--sub);margin:6px 0 0}.color-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.color-fields label{display:block;font-size:11px;color:#6f8177}.small-input{height:39px;width:100%;min-width:0;margin-top:4px;padding:0 10px;border:1px solid #d0dfd7;border-radius:9px;background:#fff;font-weight:750;color:var(--text);outline:none}.input-num:focus,.small-input:focus,.model-input:focus,.level:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px #17977c17}.columns{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}.board,.panel{background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);overflow:hidden}.board-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 19px;border-bottom:1px solid var(--line)}h2{font-size:17px;margin:0}.board-head p{font-size:11px;color:var(--sub);margin:5px 0 0}.buttons{display:flex;gap:7px;flex-wrap:wrap}.btn{border:1px solid #cadbd3;background:#fff;color:#2c5d52;border-radius:9px;padding:8px 11px;font-size:12px;font-weight:750}.btn:hover{background:#f2faf6}.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn-primary:hover{background:#096c5d}.btn-dark{background:var(--dark);color:#fff;border-color:var(--dark)}.btn-dark:hover{background:#1a5b51}.board-meta{display:flex;flex-wrap:wrap;align-items:center;gap:15px;padding:10px 19px;font-size:11px;color:var(--sub);background:#fbfcfa;border-bottom:1px solid var(--line)}.checkline{display:inline-flex;align-items:center;gap:5px;cursor:pointer}.checkline input{accent-color:var(--accent)}.table-wrap{overflow-x:auto;max-height:none}.matrix{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;min-width:805px}.matrix col.index{width:50px}.matrix col.model{width:170px}.matrix col.qty{width:80px}.matrix th{background:#f7faf8;position:sticky;top:0;z-index:2;border-bottom:1px solid #dce9e1;border-right:1px solid #edf1ef;text-align:center;padding:11px 7px;color:#52685f;font-size:11px}.matrix th:last-child,.matrix td:last-child{border-right:0}.matrix th .col-title{font-size:13px;color:#254b40}.matrix th .col-action{display:block;margin:5px auto 0;width:100%;max-width:120px;font-size:10px;height:27px;border:1px solid #d0e3d7;border-radius:7px;background:white;color:#476f60;outline:none}.matrix td{height:55px;padding:6px 7px;border-bottom:1px solid #edf2ee;border-right:1px solid #edf2ee;text-align:center}.matrix tbody tr:nth-child(even){background:#fcfdfc}.matrix tbody tr:hover{background:#f5faf7}.matrix td:first-child{color:#8ba197;font-size:12px;font-weight:850;font-variant-numeric:tabular-nums}.model-input{width:100%;height:34px;border:1px solid #e0e9e4;border-radius:7px;padding:0 8px;outline:0;font-size:12px;color:#233d34;background:white}.model-input::placeholder{color:#a2b0a8}.level-cell{display:flex;justify-content:center;align-items:center;gap:7px}.level{max-width:72px;width:100%;height:33px;border:1px solid #d9e6df;border-radius:8px;background:#fafcfa;color:#53685c;font-size:12px;font-weight:800;padding-left:5px;outline:none}.level[data-level="high"]{color:#08785a;background:#e5f5ed;border-color:#bce6d1}.level[data-level="low"]{color:#857f6e;background:#f6f4ef;border-color:#e9e6dc}.cell-qty{min-width:28px;color:#195748;font-size:17px;font-weight:850;font-variant-numeric:tabular-nums}.cell-qty.zero{color:#b3bbb5}.row-total{font-size:17px;color:#123e34;font-weight:900;font-variant-numeric:tabular-nums}.table-foot{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:12px 18px;font-size:12px;border-top:1px solid var(--line);background:#f9fcfa}.sum-grid{display:flex;gap:14px;flex-wrap:wrap}.sum-grid strong{color:#0d765f;font-size:14px}.board-actions{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;padding:13px 18px}.subtle{background:transparent;border:0;color:#638178;font-size:12px;font-weight:750;padding:8px 0}.subtle:hover{color:#056b54;text-decoration:underline}.panel{position:sticky;top:15px}.panel-heading{padding:19px 19px 12px}.panel-heading p{font-size:11px;color:var(--sub);margin:4px 0 0}.kpis{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #edf2ed;border-bottom:1px solid #edf2ed}.kpi{padding:14px 6px;text-align:center;border-right:1px solid #edf2ed}.kpi:last-child{border:0}.kpi strong{font-size:25px;line-height:1.1;display:block;font-variant-numeric:tabular-nums}.kpi:first-child strong{color:var(--accent)}.kpi span{font-size:10px;color:#8a9b91}.panel-content{padding:15px 17px 19px}.status{padding:10px 12px;border-radius:8px;background:#eaf6f0;color:#25684f;font-size:12px}.status.warning{background:#fff4e3;color:#925c22}.status.error{background:#fff0ed;color:#9f443a}.color-stat{margin-top:17px}.mini-heading{font-size:12px;font-weight:850;margin-bottom:7px}.stat-row{display:grid;grid-template-columns:45px 1fr 50px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f0f2f0;font-size:12px}.stat-row b{text-align:right;font-variant-numeric:tabular-nums}.track{height:6px;background:#ebf0ed;border-radius:30px;overflow:hidden}.track span{display:block;height:100%;background:#72bbaa;border-radius:30px}.results-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:19px}.results{max-height:375px;overflow:auto;margin-top:6px;border:1px solid #e5eee9;border-radius:9px}.result-row{border-bottom:1px solid #edf2ee;padding:9px 11px}.result-row:last-child{border:0}.result-top{display:flex;justify-content:space-between;gap:6px;font-size:12px}.result-top strong{font-size:12px}.result-top b{color:#117c65}.result-colors{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;color:#70847a;font-size:11px;margin-top:4px}.result-colors span{white-space:nowrap}.result-colors em{font-weight:800;font-style:normal;color:#2c5e50}.action-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.explain{margin-top:13px;font-size:11px;color:#788980;background:#f7faf8;padding:11px;border-radius:8px}.explain b{color:#50695e}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%) translateY(30px);background:#193b34;color:white;padding:11px 17px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:40;box-shadow:0 6px 22px #1239}.toast.show{transform:translateX(-50%) translateY(0);opacity:1}.footer{padding:0 20px 24px;color:#8ca098;text-align:center;font-size:11px}.modal-backdrop{position:fixed;inset:0;background:#061a16a3;display:none;place-items:center;padding:20px;z-index:30}.modal-backdrop.open{display:grid}.modal{background:white;border-radius:15px;width:min(510px,100%);padding:24px;box-shadow:0 20px 80px #0003}.modal h3{margin:0;font-size:19px}.modal p{color:#75867c;font-size:12px}.modal textarea{width:100%;height:225px;border:1px solid #ccded3;border-radius:10px;padding:12px;resize:vertical;outline:0}.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:13px}.modal .mode-hint{font-size:12px;color:#60776b;margin:8px 0}.btn:focus-visible,.subtle:focus-visible,.level:focus-visible{outline:3px solid #78bfb1;outline-offset:2px}
+@media(max-width:1150px){.columns{grid-template-columns:minmax(0,1fr)}.panel{position:static}.results{max-height:265px}.steps{grid-template-columns:1fr 1fr}.steps .colors-step{grid-column:1/-1}}
+@media(max-width:720px){.container{padding:0 13px}.site-header .container{height:55px}.head-note{display:none}.hero{padding:24px 0}.hero-tag{display:none}.hero h1{font-size:26px}.steps{gap:10px}.step{padding:14px 12px}.board-head{align-items:flex-start;flex-direction:column}.buttons{width:100%}.board-meta{gap:7px 12px}.table-wrap{margin:0}.matrix{min-width:780px}.board-actions{padding:13px}.result-colors{justify-content:start}.footer{padding-top:10px}}
+@media(max-width:360px){.step{padding:11px}.small-input{padding:0 6px}.hero p{font-size:12px}.btn{padding:8px}}
+@media print{body{background:white}.site-header,.hero,.steps,.board-actions,.buttons,.board-meta,.panel-actions,.action-row,.explain,.footer,.toast,.modal-backdrop,.col-action{display:none!important}.workspace{padding:0}.columns{display:block}.panel{margin-top:15px;break-before:page}.table-wrap{overflow:visible}.matrix{min-width:0}.matrix td,.matrix th{font-size:9px;padding:3px}.level{appearance:none;border:0;background:transparent!important;font-size:9px;width:36px}.model-input{border:0;background:none;font-size:10px}.board,.panel{box-shadow:none}}
+
+/* 自訂色號工作流程 */
+.steps .colors-step{grid-column:1/-1}
+.code-step-top{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.code-step-top .label-side{flex:1;min-width:200px}
+.code-batch{display:flex;gap:8px;align-items:center;flex:2;min-width:min(100%,320px)}
+.batch-input{width:100%;height:42px;border:1px solid #c9dbd2;border-radius:9px;padding:0 12px;min-width:0;outline:0;color:var(--text);font-weight:650}
+.code-batch .btn{white-space:nowrap;height:42px;padding:0 17px}
+.code-subhead{margin-top:17px;padding-top:14px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.code-tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:10px;min-height:42px;align-items:center}
+.code-item{border:1px solid #cfe2d8;border-radius:9px;background:#f6fbf8;padding:5px;display:flex;align-items:center;gap:4px}
+.code-item input{width:85px;min-width:68px;height:31px;border:0;border-radius:5px;padding:0 8px;background:transparent;color:#225749;font-weight:800;outline:0}
+.code-item input:focus{background:#fff;box-shadow:0 0 0 2px #78bfb17a}
+.code-remove{border:0;border-radius:6px;background:#e6f0eb;color:#53776a;font-size:18px;line-height:1;width:27px;height:29px}
+.code-remove:hover{background:#ffebe8;color:#a33e37}
+.new-code-row{display:flex;gap:8px;align-items:center}
+.new-code-row input{height:35px;max-width:130px;width:130px;border:1px solid #c9dbd2;border-radius:8px;padding:0 10px;outline:0}
+.empty-codes{font-size:12px;color:#788e80;padding:12px 0}
+.matrix{table-layout:fixed;min-width:700px}
+.matrix col.color-col{width:132px}
+.matrix th .col-title{font-size:14px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.matrix th .col-action{max-width:110px}
+.matrix th .col-title.muted{color:#a5b1a9}
+.level[data-level="off"]{color:#a2a7a4;background:#f0f2f0;border-color:#e4e8e3}
+.row-status{color:#b3423a;font-size:12px}
+.stat-row{grid-template-columns:minmax(45px,80px) 1fr 63px}
+.stat-row span{word-break:break-word}
+.btn:focus-visible,.code-remove:focus-visible,.batch-input:focus-visible{outline:3px solid #78bfb1;outline-offset:2px}
+.summary-note{margin-top:8px;color:#70847a;font-size:11px}
+@media(max-width:720px){.steps{grid-template-columns:1fr 1fr}.code-step-top{flex-direction:column}.code-batch{min-width:100%;width:100%}.new-code-row{width:100%}.new-code-row input{flex:1;max-width:none}.matrix{min-width:700px}.hero p{max-width:480px}}
+@media print{.steps,.code-tags,.new-code-row,.code-batch{display:none!important}}
+
+/* 每款型號獨立色號剔除 */
+.exclusion-board{margin-top:19px;background:var(--paper);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);overflow:hidden}
+.exclusion-head{padding:19px 20px 16px;display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap}
+.exclusion-head h2{font-size:18px;margin:4px 0}
+.exclusion-head p{font-size:12px;color:var(--sub);margin:4px 0 0;max-width:830px}
+.section-eyebrow{font-size:10px;font-weight:850;letter-spacing:.1em;color:#137e6b}
+.exclusion-tools{display:flex;align-items:end;gap:11px;flex-wrap:wrap}
+.search-field{display:flex;flex-direction:column;gap:5px;color:#72867b;font-size:11px;font-weight:700}
+.search-field input{width:175px;height:36px;border:1px solid #cbded4;border-radius:8px;padding:0 10px;outline:0;color:var(--text)}
+.search-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #17977c17}
+.exclusion-tools .checkline{height:35px;white-space:nowrap;font-size:11px;color:#667971}
+.exclusion-tools .btn{height:35px}
+.exclusion-summary{background:#f7faf8;border-top:1px solid #e7eee9;border-bottom:1px solid #e7eee9;font-size:12px;padding:10px 20px;color:#536b5f}
+.exclusion-summary strong{color:#a34d41;font-size:16px}
+.exclusion-summary span{color:#71867a}
+.exclusion-list{padding:7px 20px 16px;display:grid;gap:0}
+.exclusion-row{display:grid;grid-template-columns:minmax(130px,205px) minmax(0,1fr);gap:15px;align-items:center;padding:11px 4px;border-bottom:1px solid #edf2ee}
+.exclusion-row:last-child{border-bottom:0}
+.exclusion-model{display:flex;align-items:center;gap:9px;min-width:0}
+.exclusion-model .seq{color:#819a8e;font-size:11px;font-weight:800;min-width:25px}
+.exclusion-model strong{font-size:13px;color:#254f44;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exclusion-model small{display:block;font-size:10px;color:#a35a51;white-space:nowrap}
+.exclusion-chips{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.exclusion-chip{display:inline-flex;align-items:center;gap:5px;justify-content:center;border:1px solid #d2e3d8;border-radius:8px;padding:7px 10px;min-height:35px;min-width:67px;background:#f9fbf9;color:#416c5e;font-size:12px;font-weight:750;transition:background .12s,border-color .12s}
+.exclusion-chip:hover{background:#eaf6f0;border-color:#8fc3ab}
+.exclusion-chip .chip-mark{font-weight:900;font-size:13px;color:#81a797}
+.exclusion-chip.is-excluded{border-color:#e9bbb5;color:#9d4940;background:#fff0ed;text-decoration:line-through}
+.exclusion-chip.is-excluded:hover{background:#ffe3de}
+.exclusion-chip.is-excluded .chip-mark{color:#a74940}
+.exclusion-chip.is-off{border-style:dashed;color:#88968c}
+.exclusion-chip:focus-visible,.restore-color:focus-visible{outline:3px solid #78bfb1;outline-offset:2px}
+.exclusion-empty{padding:18px 0;color:#87998c;font-size:12px}
+.excluded-cell{gap:6px!important}
+.excluded-label{font-size:11px;color:#a45047;white-space:nowrap;font-weight:800}
+.restore-color{background:white;border:1px solid #e0c3bc;color:#a45047;border-radius:7px;padding:5px 7px;font-size:10px;font-weight:800;white-space:nowrap}
+.restore-color:hover{background:#fff1ed}
+.excluded-count{font-size:10px;color:#a75c51;margin-left:5px}
+@media(max-width:850px){.exclusion-row{grid-template-columns:1fr;gap:8px}.exclusion-list{padding:5px 14px 15px}.exclusion-head{padding:16px 15px}.exclusion-summary{padding:9px 15px}}
+@media(max-width:550px){.exclusion-tools{width:100%;align-items:center;gap:9px}.search-field{flex:1;min-width:125px}.search-field input{width:100%}.exclusion-tools .btn{height:33px}.exclusion-chip{min-width:59px;padding:7px 8px}.exclusion-summary span{display:block;margin-top:3px}.exclusion-head h2{font-size:16px}}
+@media print{.exclusion-board{display:none!important}}
+</style></head>
+<body>
+<header class="site-header"><div class="container"><div class="brand"><span class="mark">O</span><span>OKURA COOL <span class="head-note">/ 採購數量速算</span></span></div><span class="head-note">FRAME ORDER / FLEXIBLE COLOR CODES</span></div></header>
+<section class="hero"><div class="container"><div><span class="eyebrow">PURCHASING · FLEXIBLE MODE</span><h1>鏡框叫貨數量快速分配</h1><p>輸入總數與型號數，設定色號及多／中／少；每款型號也能單獨剔除不叫的色號，即時計算。</p></div><div class="hero-tag">各型號獨立剔除色號 · 整數分配</div></div></section>
+<main class="workspace"><div class="container">
+<section class="steps" aria-label="採購基本設定">
+ <div class="step"><label class="field-label" for="total"><span class="stepnum">01</span>本次總叫貨數量（副）</label><input id="total" class="input-num" type="number" min="0" max="10000000" step="1" inputmode="numeric" value="150"><p class="hint">所有明細的加總以本次總叫貨量為準</p></div>
+ <div class="step"><label class="field-label" for="count"><span class="stepnum">02</span>本次採購型號數量（種）</label><input id="count" class="input-num" type="number" min="1" max="200" step="1" inputmode="numeric" value="15"><p class="hint">例如輸入 15，建立 15 列型號等待套用色號</p></div>
+ <div class="step colors-step"><div class="code-step-top"><div class="label-side"><label class="field-label" for="batchCodes"><span class="stepnum">03</span>輸入本次要叫貨的色號</label><p class="hint">一次輸入多個色號，例如 C1、C3、C5、C7。按「套用色號」後，全部型號同步產生這些色號。支援逗號、空格或換行分隔。</p></div><div class="code-batch"><input id="batchCodes" class="batch-input" type="text" placeholder="例：C1, C3, C5, C7" aria-label="批次輸入色號"><button type="button" id="applyCodes" class="btn btn-primary">套用色號</button></div></div>
+  <div class="code-subhead"><div><strong style="font-size:12px">目前已啟用色號：<span id="codeCount">0</span> 種</strong><span class="hint" style="margin-left:8px">可直接修改名稱或個別移除</span></div><div class="new-code-row"><input id="newCode" maxlength="30" placeholder="新增色號，如 C8" aria-label="新增單一色號"><button type="button" id="addColor" class="btn">＋ 新增色號</button></div></div>
+  <div id="colorEditor" class="code-tags" aria-label="目前色號清單"></div>
+ </div>
+</section>
+<section class="columns">
+ <div class="board"><div class="board-head"><div><h2>每款型號需求分配</h2><p>各色號可設定「多／中／少／不叫」，下方另可快速剔除指定型號的特定色號。</p></div><div class="buttons"><button id="setAllMedium" type="button" class="btn">全部設為「中」</button><button id="pasteNames" type="button" class="btn">批次貼上型號</button></div></div>
+ <div class="board-meta"><span id="matrixMeta">15 款型號 · 尚未設定色號</span><label class="checkline"><input id="minOne" type="checkbox" checked>數量足夠時，每個選購色號至少 1 副</label><span>色號欄頂端可整欄設定；手機可左右滑動表格</span></div>
+ <div class="table-wrap"><table class="matrix" id="matrix"><colgroup id="matrixCols"></colgroup><thead><tr id="matrixHead"></tr></thead><tbody id="grid"></tbody></table></div>
+ <div class="table-foot"><div class="sum-grid"><span>共 <strong id="footModels">15</strong> 款</span><span><strong id="footColors">0</strong> 色號配置</span></div><span>已分配 <strong id="footUnits">0</strong> 副</span></div>
+ <div class="board-actions"><span class="hint">型號可留白，系統會用「型號 01、02…」代稱。</span><div><button type="button" class="subtle" id="reset">載入示範</button> <button type="button" class="subtle" id="clear">清空</button></div></div>
+ </div>
+ <aside class="panel"><div class="panel-heading"><h2>自動分配結果</h2><p>依型號平均分配，並依各色號需求比例微調支數</p></div><div class="kpis"><div class="kpi"><strong id="statTotal">150</strong><span>總採購</span></div><div class="kpi"><strong id="statDone">0</strong><span>已分配</span></div><div class="kpi"><strong id="statDiff">150</strong><span>未分配</span></div></div><div class="panel-content"><div id="status" class="status warning" aria-live="polite">先輸入色號，才能分配。</div><div class="color-stat"><div class="mini-heading">各色號合計</div><div id="colorStats"></div></div><div class="results-head"><span class="mini-heading">型號分配清單</span><span class="hint" id="listMeta"></span></div><div id="results" class="results"></div><div class="action-row"><button type="button" class="btn btn-dark" id="copy">複製叫貨清單</button><button type="button" class="btn btn-primary" id="csv">匯出 CSV</button></div><div class="explain"><b>計算方式</b>：少 1／中 1.5／多 2；先分配各款型號的總量，再依色號比例分配，結果皆為整數。若勾選每色至少 1 副且數量足夠，會優先保留每個「有叫貨」色號的基本量。<br><b>新增或移除色號</b>：自動重新計算，保留相同色號原有設定。個別型號可在下方剔除特定色號，剔除後不參與分配及匯出；點選恢復後會回到原本的需求設定。</div></div></aside>
+</section>
+  <section class="exclusion-board" aria-label="個別型號色號剔除">
+    <div class="exclusion-head">
+      <div>
+        <div class="section-eyebrow">04 · PER-MODEL EXCLUSION</div>
+        <h2>個別型號｜色號剔除</h2>
+        <p>只有指定型號不叫某個色號時，點選該型號下方的色號，即可單獨剔除；不影響其他型號。再次點選可恢復原本的「多／中／少」設定。</p>
+      </div>
+      <div class="exclusion-tools">
+        <label class="search-field"><span>篩選型號</span><input id="exclusionSearch" type="search" placeholder="輸入型號或序號" aria-label="搜尋要剔除色號的型號"></label>
+        <label class="checkline"><input type="checkbox" id="excludedOnly"> 只顯示已剔除</label>
+        <button type="button" class="btn" id="clearExclusions">全部恢復</button>
+      </div>
+    </div>
+    <div class="exclusion-summary" aria-live="polite"><strong id="excludedCount">0</strong> 個色號已被個別剔除 <span>｜藉由此處剔除的組合，叫貨量固定為 0 副，匯出清單也不會包含。</span></div>
+    <div id="exclusionList" class="exclusion-list"></div>
+  </section>
+</div></main>
+<div class="footer">OKURA COOL · 鏡框採購分配工具｜資料只儲存在目前瀏覽器，不會上傳伺服器</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal"><h3 id="modalTitle">批次貼上型號名稱</h3><p>每行一個型號，可直接貼上 Excel 單欄資料，按順序填入目前型號列表。</p><textarea id="namesArea" placeholder="0115\n0116\n0117\n..." spellcheck="false"></textarea><div class="mode-hint" id="namePasteHint"></div><div class="modal-actions"><button class="btn" type="button" id="cancelModal">取消</button><button class="btn btn-primary" type="button" id="applyNames">套用型號名稱</button></div></div></div>
+<script>
+(()=>{'use strict';
+const KEY='okura-frame-order-exclusions-v4',PREVIOUS_KEY='okura-frame-order-flexible-v3',LEGACY_KEY='okura-frame-order-quick-v2',MAX_MODELS=200,MAX_COLORS=24,LEVELS={off:0,low:2,medium:3,high:4},LABELS={off:'不叫',low:'少',medium:'中',high:'多'};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Number(n).toLocaleString('zh-TW');
+const normal=s=>String(s??'').trim().slice(0,30);
+const newModel=(n=0)=>({name:'',levels:Array(n).fill('medium'),excluded:Array(n).fill(false)});
+const starter=()=>({total:150,codes:[],minOne:true,models:Array.from({length:15},()=>newModel())});
+const sample=()=>({total:150,codes:['C1','C2','C3','C4'],minOne:true,models:Array.from({length:15},()=>newModel(4))});
+function restore(){try{const saved=localStorage.getItem(KEY)||localStorage.getItem(PREVIOUS_KEY)||localStorage.getItem(LEGACY_KEY);if(!saved)return null;const a=JSON.parse(saved);if(!Array.isArray(a.models)||a.models.length<1||a.models.length>MAX_MODELS)return null;
+ const rawCodes=Array.isArray(a.codes)?a.codes:[];const codes=[];const origIndices=[];rawCodes.slice(0,MAX_COLORS).forEach((c,i)=>{const name=normal(c);if(name&&!codes.some(x=>x.toUpperCase()===name.toUpperCase())){codes.push(name);origIndices.push(i)}});
+ const models=a.models.map(m=>({name:String(m.name??'').slice(0,100),levels:origIndices.map(i=>Object.hasOwn(LEVELS,m.levels?.[i])?m.levels[i]:'medium'),excluded:origIndices.map(i=>m.excluded?.[i]===true)}));return{total:Number.isSafeInteger(a.total)&&a.total>=0&&a.total<=10000000?a.total:150,codes,minOne:a.minOne!==false,models};}catch(_){return null;}}
+let state=restore()||starter(),latest=null,timer=null;
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(_){}}
+function toast(msg){const e=$('toast');e.textContent=msg;e.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>e.classList.remove('show'),2200)}
+// 最大餘數法，對同額餘數採循環順位，避免每次都偏向第一色。
+function apportion(total,weights,rotate=0){const n=weights.length,result=Array(n).fill(0);if(!n||total<=0)return result;const sum=weights.reduce((a,b)=>a+b,0);if(sum<=0)return result;const floors=weights.map(w=>Math.floor(total*w/sum));let remaining=total-floors.reduce((a,b)=>a+b,0);const order=weights.map((w,i)=>({i,rem:total*w%sum,w,tie:(i-rotate%n+n)%n})).filter(x=>x.w>0).sort((a,b)=>b.rem-a.rem||b.w-a.w||a.tie-b.tie);for(let k=0;k<remaining;k++)floors[order[k].i]++;return floors}
+function calc(){const k=state.codes.length,activePerModel=state.models.map(m=>m.levels.filter((l,j)=>!m.excluded[j]&&(LEVELS[l]||0)>0).length),activeTotal=activePerModel.reduce((a,b)=>a+b,0),units=state.models.map(()=>Array(k).fill(0)),hasBase=state.minOne&&state.total>=activeTotal&&activeTotal>0;
+ let remaining=state.total;if(hasBase){state.models.forEach((m,i)=>m.levels.forEach((lvl,j)=>{if(!m.excluded[j]&&LEVELS[lvl]>0){units[i][j]=1;remaining--}}));}
+ const additional=apportion(remaining,activePerModel.map(n=>n>0?1:0));
+ state.models.forEach((m,i)=>{const extra=apportion(additional[i],m.levels.map((l,j)=>m.excluded[j]?0:(LEVELS[l]||0)),i%Math.max(1,k));extra.forEach((v,j)=>units[i][j]+=v)});
+ const models=state.models.map((m,i)=>({name:m.name.trim()||`型號 ${String(i+1).padStart(2,'0')}`,qty:units[i].reduce((a,b)=>a+b,0),units:units[i],levels:m.levels,excluded:m.excluded}));
+ const colorTotals=state.codes.map((_,j)=>units.reduce((a,row)=>a+row[j],0));const allocated=colorTotals.reduce((a,b)=>a+b,0);const zero=state.models.reduce((cnt,m,i)=>cnt+m.levels.filter((lvl,j)=>!m.excluded[j]&&(LEVELS[lvl]||0)>0&&units[i][j]===0).length,0);
+ return{models,colorTotals,allocated,zero,activeTotal,eligible:activePerModel.filter(x=>x>0).length,excludedCount:state.models.reduce((n,m)=>n+m.excluded.filter(Boolean).length,0)};}
+function drawColorEditor(){$('codeCount').textContent=state.codes.length;$('colorEditor').innerHTML=state.codes.length?state.codes.map((code,j)=>`<div class="code-item"><input data-edit-code="${j}" aria-label="修改色號 ${j+1}" maxlength="30" value="${esc(code)}"><button class="code-remove" data-remove-code="${j}" type="button" aria-label="移除色號 ${esc(code)}" title="移除此色號">×</button></div>`).join(''):'<div class="empty-codes">尚未加入色號，請在上方輸入後點「套用色號」，或在右側新增單一色號。</div>'}
+function drawMatrix(){const k=state.codes.length;$('matrix').style.minWidth=Math.max(660,50+170+80+132*k)+'px';$('matrixCols').innerHTML=`<col class="index"><col class="model">${state.codes.map(()=>'<col class="color-col">').join('')}<col class="qty">`;
+ $('matrixHead').innerHTML=`<th>序</th><th>型號名稱 <span style="font-weight:500">(選填)</span></th>${state.codes.map((code,j)=>`<th><span class="col-title" title="${esc(code)}">${esc(code)}</span><select class="col-action" data-bulk-col="${j}" aria-label="${esc(code)} 整欄設定"><option value="">整欄套用…</option><option value="high">全部多</option><option value="medium">全部中</option><option value="low">全部少</option><option value="off">全部不叫</option></select></th>`).join('')}<th>型號合計</th>`;
+ $('grid').innerHTML=state.models.map((m,i)=>`<tr><td>${String(i+1).padStart(2,'0')}</td><td><input class="model-input" data-model-name="${i}" value="${esc(m.name)}" placeholder="型號 ${String(i+1).padStart(2,'0')}" aria-label="第 ${i+1} 款型號名稱"></td>${m.levels.map((l,j)=>`<td>${m.excluded[j]?`<div class="level-cell excluded-cell"><span class="excluded-label">已剔除</span><button type="button" class="restore-color" data-restore-row="${i}" data-restore-col="${j}" aria-label="恢復第 ${i+1} 款 ${esc(state.codes[j])}">恢復</button><strong class="cell-qty zero" id="q-${i}-${j}">0</strong></div>`:`<div class="level-cell"><select class="level" data-level-row="${i}" data-level-col="${j}" data-level="${l}" aria-label="型號 ${i+1} ${esc(state.codes[j])} 需求"><option value="high" ${l==='high'?'selected':''}>多</option><option value="medium" ${l==='medium'?'selected':''}>中</option><option value="low" ${l==='low'?'selected':''}>少</option><option value="off" ${l==='off'?'selected':''}>不叫</option></select><strong class="cell-qty" id="q-${i}-${j}">–</strong></div>`}</td>`).join('')}<td class="row-total" id="row-${i}">–</td></tr>`).join('');drawExclusions();refresh();}
+function redraw(){drawColorEditor();drawMatrix();}
+function refresh(){latest=calc();const k=state.codes.length;$('count').value=state.models.length;$('matrixMeta').textContent=k?`${state.models.length} 款型號 · ${state.models.length*k} 個色號配置`:`${state.models.length} 款型號 · 尚未設定色號`;
+ $('footModels').textContent=fmt(state.models.length);$('footColors').textContent=fmt(state.models.length*k);$('footUnits').textContent=fmt(latest.allocated);
+ $('statTotal').textContent=fmt(state.total);$('statDone').textContent=fmt(latest.allocated);$('statDiff').textContent=fmt(state.total-latest.allocated);
+ state.models.forEach((m,i)=>{for(let j=0;j<k;j++){const el=$(`q-${i}-${j}`);if(el){const q=latest.models[i].units[j];el.textContent=q;el.classList.toggle('zero',q===0)}}const e=$(`row-${i}`);if(e)e.textContent=fmt(latest.models[i].qty)});
+ const status=$('status');status.className='status';if(!k){status.classList.add('warning');status.textContent='尚未設定色號：請先輸入並套用色號，才會進行數量分配。'}else if(!latest.eligible){status.classList.add('warning');status.textContent='所有色號都設為「不叫」，目前無法分配；請開啟至少一個色號。'}else if(latest.zero>0&&state.total>0){status.classList.add('warning');status.textContent=`已分配全部採購數量，但有 ${fmt(latest.zero)} 個選購色號分配 0 副。${state.total<latest.activeTotal?`要全部選購色號至少 1 副，至少需要 ${fmt(latest.activeTotal)} 副。`:''}`}else if(state.total===0){status.textContent='總叫貨數量為 0，全部色號目前分配 0 副。'}else{status.textContent='✓ 分配完成，各明細加總與採購數量一致。'}
+ $('colorStats').innerHTML=k?latest.colorTotals.map((q,j)=>`<div class="stat-row"><span>${esc(state.codes[j])}</span><div class="track"><span style="width:${state.total?Math.max(0,Math.min(100,100*q/state.total)):0}%"></span></div><b>${fmt(q)} 副</b></div>`).join(''):'<p class="hint">新增色號後，這裡會顯示各色號總叫貨量。</p>';
+ $('listMeta').textContent=`${state.models.length} 款 / ${fmt(state.models.length*k)} 個色號配置`;
+ $('excludedCount').textContent=fmt(latest.excludedCount);
+ $('results').innerHTML=latest.models.map((m,i)=>`<div class="result-row"><div class="result-top"><strong>${String(i+1).padStart(2,'0')} ${esc(m.name)}</strong><b>${fmt(m.qty)} 副</b></div><div class="result-colors">${k?m.units.map((q,j)=>m.excluded[j]?`<span class="result-excluded">${esc(state.codes[j])} <em>已剔除</em></span>`:`<span>${esc(state.codes[j])} <em>${fmt(q)}</em></span>`).join(''):'<span>尚未設定色號</span>'}</div></div>`).join('');persist();}
+function drawExclusions(){
+ const parent=$('exclusionList'),q=$('exclusionSearch').value.trim().toLocaleLowerCase(),only=$('excludedOnly').checked;
+ if(!state.codes.length){parent.innerHTML='<div class="exclusion-empty">請先在上方設定色號，即可針對個別型號進行剔除。</div>';return;}
+ const shown=state.models.map((m,i)=>({m,i})).filter(({m,i})=>(!only||m.excluded.some(Boolean))&&(!q||(m.name||`型號 ${String(i+1).padStart(2,'0')}`).toLocaleLowerCase().includes(q)||String(i+1)===q));
+ parent.innerHTML=shown.length?shown.map(({m,i})=>{const name=m.name.trim()||`型號 ${String(i+1).padStart(2,'0')}`;const excluded=m.excluded.filter(Boolean).length;return `<div class="exclusion-row"><div class="exclusion-model"><span class="seq">${String(i+1).padStart(2,'0')}</span><div style="min-width:0"><strong title="${esc(name)}">${esc(name)}</strong>${excluded?`<small>${excluded} 色已剔除</small>`:''}</div></div><div class="exclusion-chips">${state.codes.map((code,j)=>{const x=m.excluded[j],off=m.levels[j]==='off';return `<button type="button" class="exclusion-chip ${x?'is-excluded':''} ${off&&!x?'is-off':''}" data-exclude-row="${i}" data-exclude-col="${j}" aria-pressed="${x}" title="${esc(name)} / ${esc(code)}：${x?'已剔除，點擊恢復':off?'目前需求為不叫，點擊可設為獨立剔除':'點擊剔除此型號的色號'}"><span class="chip-mark">${x?'×':'+'}</span>${esc(code)}</button>`}).join('')}</div></div>`}).join(''):'<div class="exclusion-empty">沒有符合篩選條件的型號。</div>';
+}
+function toggleExclusion(i,j,force){const m=state.models[i];if(!m||j<0||j>=state.codes.length)return;const next=typeof force==='boolean'?force:!m.excluded[j];if(m.excluded[j]===next)return;m.excluded[j]=next;drawMatrix();toast(`型號 ${m.name.trim()||String(i+1).padStart(2,'0')}／${state.codes[j]}：${next?'已剔除，不參與叫貨':'已恢復原先需求設定'}`)}
+function parseCodes(s){return String(s??'').split(/[\s,，、;；｜|]+/).map(normal).filter(Boolean)}
+function validateCodes(raw){if(!raw.length)return '至少需要輸入 1 個色號';if(raw.length>MAX_COLORS)return `最多設定 ${MAX_COLORS} 種色號`;const keys=new Set();for(const c of raw){const u=c.toUpperCase();if(keys.has(u))return `色號「${c}」重複，請修正後再套用`;keys.add(u)}return null}
+function replaceCodes(codes){const previous=new Map(state.codes.map((c,j)=>[c.toUpperCase(),j]));state.models.forEach(m=>{const old=m.levels,oldExcluded=m.excluded;m.levels=codes.map(c=>{const j=previous.get(c.toUpperCase());return j===undefined?'medium':old[j]??'medium'});m.excluded=codes.map(c=>{const j=previous.get(c.toUpperCase());return j===undefined?false:oldExcluded[j]===true})});state.codes=codes;redraw();}
+function applyBatch(){const codes=parseCodes($('batchCodes').value),err=validateCodes(codes);if(err){toast(err);return;}replaceCodes(codes);$('batchCodes').value='';toast(`已將 ${codes.length} 個色號套用到 ${state.models.length} 款型號`);}
+function addColor(){const value=normal($('newCode').value);if(!value){toast('請先輸入要新增的色號');$('newCode').focus();return;}const codes=[...state.codes,value],err=validateCodes(codes);if(err){toast(err);return;}replaceCodes(codes);$('newCode').value='';$('newCode').focus();toast(`已新增色號 ${value}`)}
+function changeCount(num){if(!Number.isSafeInteger(num)||num<1||num>MAX_MODELS){toast('型號數量需為 1 至 200 的整數');$('count').value=state.models.length;return;}if(num<state.models.length&&state.models.slice(num).some(m=>m.name.trim()||m.levels.some(x=>x!=='medium')||m.excluded.some(Boolean))){if(!confirm(`改為 ${num} 款將移除最後 ${state.models.length-num} 款的設定，是否繼續？`)){$('count').value=state.models.length;return;}}
+ while(state.models.length<num)state.models.push(newModel(state.codes.length));state.models.length=num;drawMatrix();}
+function getCopyText(){const lines=[`鏡框叫貨數量分配｜總量 ${state.total} 副｜${state.models.length} 款 × ${state.codes.length} 色`,''];latest.models.forEach(m=>{lines.push(`【${m.name}】${m.qty} 副`);m.units.forEach((q,j)=>{if(!m.excluded[j]&&m.levels[j]!=='off')lines.push(`  ${state.codes[j]} × ${q} 副（${LABELS[m.levels[j]]}）`)});lines.push('')});lines.push(`總計：${latest.allocated} 副`);return lines.join('\n')}
+function showModal(){$('modal').classList.add('open');$('namesArea').value='';$('namePasteHint').textContent=`目前共 ${state.models.length} 款，最多貼入 ${state.models.length} 行。`;$('namesArea').focus();}
+function closeModal(){$('modal').classList.remove('open');}
+$('total').value=state.total;$('minOne').checked=state.minOne;redraw();
+$('total').addEventListener('input',e=>{const raw=e.target.value,v=Number(raw);if(raw===''||Number.isSafeInteger(v)&&v>=0&&v<=1e7){state.total=raw===''?0:v;refresh();}});
+$('total').addEventListener('blur',e=>{e.target.value=state.total});
+$('count').addEventListener('change',e=>changeCount(Number(e.target.value)));
+$('applyCodes').addEventListener('click',applyBatch);$('batchCodes').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applyBatch()}});
+$('addColor').addEventListener('click',addColor);$('newCode').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addColor()}});
+$('colorEditor').addEventListener('change',e=>{if(!e.target.matches('[data-edit-code]'))return;const i=Number(e.target.dataset.editCode),old=state.codes[i],v=normal(e.target.value);const err=validateCodes(state.codes.map((c,j)=>j===i?v:c));if(err){toast(err);e.target.value=old;return;}state.codes[i]=v;redraw();toast(`色號 ${old} 已更名為 ${v}`)});
+$('colorEditor').addEventListener('click',e=>{const b=e.target.closest('[data-remove-code]');if(!b)return;const i=Number(b.dataset.removeCode),name=state.codes[i];replaceCodes(state.codes.filter((_,j)=>j!==i));toast(`已移除色號 ${name}，重新分配數量`)});
+$('minOne').addEventListener('change',e=>{state.minOne=e.target.checked;refresh()});
+$('grid').addEventListener('input',e=>{if(e.target.matches('[data-model-name]')){const i=Number(e.target.dataset.modelName);state.models[i].name=e.target.value.slice(0,100);refresh();drawExclusions()}});
+$('grid').addEventListener('change',e=>{if(e.target.matches('[data-level-row]')){const i=Number(e.target.dataset.levelRow),j=Number(e.target.dataset.levelCol);state.models[i].levels[j]=e.target.value;e.target.dataset.level=e.target.value;refresh();drawExclusions()}});
+$('grid').addEventListener('click',e=>{const b=e.target.closest('[data-restore-row]');if(b)toggleExclusion(Number(b.dataset.restoreRow),Number(b.dataset.restoreCol),false)});
+$('exclusionList').addEventListener('click',e=>{const b=e.target.closest('[data-exclude-row]');if(b)toggleExclusion(Number(b.dataset.excludeRow),Number(b.dataset.excludeCol))});
+$('exclusionSearch').addEventListener('input',drawExclusions);$('excludedOnly').addEventListener('change',drawExclusions);
+$('clearExclusions').addEventListener('click',()=>{const n=state.models.reduce((a,m)=>a+m.excluded.filter(Boolean).length,0);if(!n){toast('目前沒有個別剔除的色號');return;}if(!confirm(`確定恢復全部 ${n} 個已剔除色號？將恢復原本的需求等級。`))return;state.models.forEach(m=>m.excluded.fill(false));drawMatrix();toast('所有剔除設定已恢復')});
+$('matrixHead').addEventListener('change',e=>{const sel=e.target.closest('[data-bulk-col]');if(!sel||!sel.value)return;const col=Number(sel.dataset.bulkCol),val=sel.value;state.models.forEach(m=>m.levels[col]=val);drawMatrix();toast(`已將 ${state.codes[col]} 整欄設為「${LABELS[val]}」`)});
+$('setAllMedium').addEventListener('click',()=>{state.models.forEach(m=>m.levels.fill('medium'));drawMatrix();toast('已將全部色號設為「中」')});
+$('pasteNames').addEventListener('click',showModal);$('cancelModal').addEventListener('click',closeModal);$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+$('applyNames').addEventListener('click',()=>{const names=$('namesArea').value.replace(/\r/g,'').split('\n').map(s=>s.trim());if(!names.some(Boolean)){toast('請先貼上型號名稱');return;}let count=0;names.slice(0,state.models.length).forEach((s,i)=>{if(s){state.models[i].name=s.slice(0,100);count++}});drawMatrix();closeModal();toast(`已套用 ${count} 款型號名稱`)});
+$('copy').addEventListener('click',async()=>{if(!state.codes.length){toast('請先新增色號再複製');return;}const s=getCopyText();try{await navigator.clipboard.writeText(s);toast('已複製叫貨清單')}catch(_){const ta=document.createElement('textarea');ta.value=s;document.body.append(ta);ta.select();const ok=document.execCommand('copy');ta.remove();toast(ok?'已複製叫貨清單':'無法複製，請使用 CSV 匯出')}});
+$('csv').addEventListener('click',()=>{if(!state.codes.length){toast('請先新增色號再匯出');return;}const quote=s=>'"'+String(s??'').replace(/"/g,'""')+'"',preserve=s=>/^0\d+$/.test(String(s))?`="${s}"`:s;const rows=[['型號序號','型號','色號','需求程度','需求權重','叫貨支數','型號合計']];latest.models.forEach((m,i)=>m.units.forEach((q,j)=>{if(!m.excluded[j]&&m.levels[j]!=='off')rows.push([i+1,preserve(m.name),state.codes[j],LABELS[m.levels[j]],(LEVELS[m.levels[j]]||0)/2,q,m.qty])}));rows.push(['','總計','','','',latest.allocated,'']);const csv='\ufeff'+rows.map(row=>row.map(quote).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`鏡框叫貨分配_${new Date().toLocaleDateString('sv-SE')}.csv`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);toast('已匯出 CSV')});
+$('reset').addEventListener('click',()=>{if(!confirm('要載入示範（15 款 × C1～C4，共 150 副）嗎？目前的設定會被取代。'))return;state=sample();$('total').value=state.total;$('minOne').checked=true;redraw();toast('已載入示範')});
+$('clear').addEventListener('click',()=>{if(!confirm('確認清空採購數量、色號、型號名稱及需求設定？'))return;state=starter();state.total=0;$('total').value=0;$('minOne').checked=true;$('batchCodes').value='';$('newCode').value='';redraw();toast('已清空設定')});
+})();
+</script></body></html>
