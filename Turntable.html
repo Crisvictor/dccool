@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -337,6 +337,66 @@
     .hidden {
       display: none;
     }
+    /* A fixed metal housing surrounds the rotating SVG, keeping the pointer accurate. */
+    body { background: radial-gradient(ellipse at 25% 10%, #243f44, transparent 65%), #101c25; color: #eef3f1; padding: 28px 20px 60px; box-sizing: border-box; }
+    #fishCanvas { opacity: .35; }
+    #page-title { box-sizing: border-box; gap: 10px; flex-wrap: wrap; font-size: clamp(24px, 4vw, 32px); letter-spacing: .04em; }
+    .container { position: relative; gap: 60px; margin: 42px auto 0; max-width: 1000px; align-items: center; }
+    .wheel-container { width: min(380px, 100%); }
+    .wheel-stage { position: relative; width: 100%; padding-bottom: 16px; isolation: isolate; }
+    .wheel-rim { position: relative; box-sizing: border-box; width: 100%; aspect-ratio: 1; padding: 18px; border-radius: 50%; background: conic-gradient(from -30deg, #715735, #f4deb0 12%, #b59158 28%, #5e472b 42%, #dcc392 60%, #fff0cb 77%, #8a693d 92%, #715735); box-shadow: 0 2px 0 #f9e7bd inset, 0 -3px 0 #694f2d inset, 0 5px 0 #80623d, 0 10px 0 #4d3d29, 0 15px 0 #2c2924, 0 30px 38px #0008; }
+    .wheel-rim::before { content: ''; position: absolute; inset: 8px; border: 1px solid #fff2; border-radius: 50%; pointer-events: none; }
+    #wheel { display: block; width: 100%; height: 100%; border: 0; border-radius: 50%; background: #244943; box-shadow: 0 0 0 3px #3a3329, 0 0 0 5px #e2c58d; }
+    #wheel text { font-weight: 600; paint-order: stroke; stroke: #ffffff12; stroke-width: .4px; }
+    .wheel-gloss { position: absolute; inset: 18px; border-radius: 50%; pointer-events: none; background: linear-gradient(135deg, #ffffff42 0, transparent 40%, #00000012 65%, #00000055 100%); box-shadow: inset 0 3px 8px #fff5, inset 0 -8px 20px #0006; }
+    .wheel-hub { position: absolute; width: 18%; aspect-ratio: 1; left: 50%; top: 50%; transform: translate(-50%, -50%); border-radius: 50%; display: grid; place-items: center; pointer-events: none; background: linear-gradient(145deg, #fff0c8, #b58c4c 52%, #654d2d); box-shadow: 0 2px 1px #ffedc9 inset, 0 -3px 2px #694923 inset, 0 5px 0 #4e412e, 0 9px 12px #0007; }
+    .wheel-hub span { display: grid; place-items: center; width: 72%; height: 72%; border-radius: 50%; background: linear-gradient(145deg, #355b59, #172f33); box-shadow: inset 0 1px 2px #0008, 0 1px 0 #ffedb888; color: #e9cb8e; font-size: 28px; }
+    .arrow { top: -12px; border: 0; width: 30px; height: 48px; background: linear-gradient(110deg, #fff0c4, #d6ae65 50%, #977039); clip-path: polygon(10% 0, 90% 0, 100% 30%, 50% 100%, 0 30%); transform: translateX(-50%); filter: drop-shadow(0 4px 3px #0009); z-index: 3; }
+    .options-container { box-sizing: border-box; width: 320px; max-width: 100%; padding: 24px; border: 1px solid #49605f; border-radius: 20px; background: #192f36ed; box-shadow: 0 18px 45px #0003; }
+    textarea { box-sizing: border-box; width: 100%; height: 170px; padding: 14px; border: 1px solid #4a6363; border-radius: 12px; color: #edf4f2; background: #11262d; box-shadow: inset 0 2px 5px #0003; font: 16px/1.7 system-ui, sans-serif; z-index: 1; margin-bottom: 14px; }
+    textarea::placeholder { color: #a1b6b7; }
+    button { font-size: 17px; border: 1px solid #ffffff18; box-shadow: 0 2px 0 #0004; transition: background .2s, transform .2s; }
+    #spinButton { background: linear-gradient(#e9cd94, #c4a363); color: #263735; font-weight: bold; border-color: #f3dca9; margin: 16px auto 0; width: 80%; box-shadow: 0 4px 0 #77603b, 0 9px 18px #0004; }
+    #spinButton:hover { background: linear-gradient(#f7dfac, #d6b574); transform: translateY(-2px); }
+    #spinButton:disabled { transform: none; }
+    #updateButton { background: #356360; }
+    #updateButton:hover { background: #477a74; }
+    .template-buttons { flex-wrap: wrap; gap: 8px; margin-top: 0; }
+    .template-buttons button { flex: 1; padding: 9px 8px; background: #253f4a; font-size: 14px; white-space: nowrap; border-radius: 8px; }
+    .template-buttons button:hover { background: #365866; }
+    #timeDisplay { color: #a8bebd; background: transparent; box-shadow: none; font-size: 15px; line-height: 1.6; }
+    #audio-control-container { gap: 10px; padding: 8px 12px; border: 1px solid #3d555a; border-radius: 30px; background: #152a32; }
+    #sfx-button { font: 13px system-ui, sans-serif; padding: 7px 10px; background: #263c44; border: 1px solid #52666b; border-radius: 18px; color: #c3d0d0; box-shadow: none; white-space: nowrap; }
+    #sfx-button[aria-pressed="true"] { background: #3c574b; color: #f4dfaf; border-color: #baa271; }
+    #resultBox { position: fixed !important; top: auto !important; bottom: 24px; width: max-content; max-width: calc(100vw - 64px); height: auto; min-height: 42px; box-sizing: border-box; padding: 14px 24px; font-size: clamp(22px, 4vw, 32px); background: #244b43; border-color: #bfa775; z-index: 100; }
+    :focus-visible { outline: 2px solid #e9cd94; outline-offset: 4px; }
+    @media (max-width: 600px) { body { padding: 20px 16px 90px; } .container { margin-top: 32px; gap: 32px; } .wheel-container { width: min(340px, 100%); } #audio-control-container { margin: 6px 0 0; } .options-container { width: 100%; max-width: 380px; padding: 20px; } }
+
+    [hidden] { display: none !important; }
+    .wheel-container > .buttons { flex-direction: row; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; }
+    .wheel-container > .buttons #spinButton { margin: 0; flex: 1; }
+    #dice-controls { flex: 0 0 auto; color: #c5d8d4; font: 14px system-ui; }
+    #dice-count { width: 48px; padding: 10px 6px; border: 1px solid #66847c; border-radius: 8px; background: #142d31; color: white; font: 17px system-ui; }
+    .game-stage { position: relative; width: 100%; aspect-ratio: 1; display: grid; place-items: center; perspective: 1000px; }
+    .coin-scene { background: radial-gradient(ellipse at 50% 75%, #b68b3730, transparent 65%); }
+    .coin-scene::after { content: ''; position: absolute; width: 52%; height: 8%; bottom: 10%; background: #0007; border-radius: 50%; filter: blur(10px); }
+    .coin-3d { width: 55%; aspect-ratio: 1; position: relative; transform-style: preserve-3d; z-index: 1; }
+    .coin-face, .coin-edge { position: absolute; inset: 0; border-radius: 50%; backface-visibility: hidden; }
+    .coin-face { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 5px solid #cfa44e; box-sizing: border-box; color: #654417; background: radial-gradient(circle at 30% 20%, #fff0bf, #dfb65e 50%, #ad752e); box-shadow: inset 0 0 0 3px #ffe7a8, inset 0 0 0 7px #ad813d, inset 0 0 20px #80531c55; text-shadow: 0 1px #fff1c8; font: 600 25px system-ui; }
+    .coin-face b { font-size: 54px; line-height: 1.3; }
+    .coin-face small { font-size: 10px; letter-spacing: .22em; margin-top: 8px; }
+    .coin-heads { transform: translateZ(5px); }
+    .coin-tails { transform: rotateY(180deg) translateZ(5px); background: radial-gradient(circle at 30% 20%, #fff4ce, #d0a24e 55%, #956527); }
+    .coin-edge { background: #be9347; backface-visibility: visible; }
+    .glass-scene { border-radius: 50%; background: radial-gradient(ellipse at 50% 65%, #39635b, #142f33 68%); box-shadow: inset 0 -10px 20px #0006, 0 8px 0 #8d7751, 0 14px 0 #3d3e32, 0 26px 35px #0006; }
+    .glass-scene::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid #d7f5f180; background: radial-gradient(ellipse at 27% 16%, #fff7, transparent 24%), linear-gradient(125deg, #ffffff14, transparent 45%, #b9e7ed14); box-shadow: inset 5px 6px 14px #edfffa38, inset -4px -5px 12px #a8dbda30; pointer-events: none; z-index: 3; }
+    .die-slot { position: absolute; width: 13%; aspect-ratio: 1; transform: translate(-50%, -50%); perspective: 600px; }
+    .die { --size: 44px; width: var(--size); height: var(--size); position: relative; transform-style: preserve-3d; }
+    .die-face { position: absolute; inset: 0; border: 1px solid #baad92; border-radius: 7px; background: linear-gradient(135deg, #fffef1, #ddd5bc); display: grid; grid-template: repeat(3,1fr) / repeat(3,1fr); padding: 7px; gap: 3px; box-sizing: border-box; backface-visibility: hidden; box-shadow: inset 0 0 5px #a9956955; }
+    .pip { border-radius: 50%; background: #29473f; box-shadow: inset 0 1px 2px #0009; }
+    .die-face[data-value="1"] .pip { background: #a9554d; }
+    .game-status { min-height: 28px; margin: 18px 0 0; color: #eddbaf; font: 16px/1.6 system-ui; }
+    @media(max-width:400px) { .die { --size: 36px; } .die-face { padding: 5px; gap: 2px; } }
   </style>
 </head>
 <body>
@@ -356,14 +416,31 @@
     抽籤轉盤
     <div id="audio-control-container">
       <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5">
-      <button id="bgm-button">♫</button>
+      <button id="bgm-button" aria-label="播放或暫停音樂">♫</button>
+      <button id="sfx-button" type="button" aria-pressed="false" aria-label="歡呼音效" title="開啟或關閉抽中後的歡呼聲">音效：關</button>
     </div>
   </h1>
   <div class="container">
     <div class="wheel-container">
-      <div class="arrow"></div>
-      <svg id="wheel" viewBox="0 0 300 300"></svg>
+      <div class="wheel-stage">
+        <div class="arrow"></div>
+        <div class="wheel-rim">
+          <svg id="wheel" viewBox="0 0 300 300" role="img" aria-label="抽籤轉盤"></svg>
+          <div class="wheel-gloss" aria-hidden="true"></div>
+          <div class="wheel-hub" aria-hidden="true"><span>✦</span></div>
+        </div>
+      </div>
+      <div id="coin-stage" class="game-stage coin-scene" hidden aria-label="3D硬幣">
+        <div class="coin-3d" id="coin-3d">
+          <div class="coin-edge" style="transform:translateZ(-4px)"></div><div class="coin-edge" style="transform:translateZ(-2px)"></div><div class="coin-edge" style="transform:translateZ(0px)"></div><div class="coin-edge" style="transform:translateZ(2px)"></div><div class="coin-edge" style="transform:translateZ(4px)"></div>
+          <div class="coin-face coin-heads"><b>✦</b><span>正面</span><small>DCCOOL · HEADS</small></div>
+          <div class="coin-face coin-tails"><b>☾</b><span>反面</span><small>DCCOOL · TAILS</small></div>
+        </div>
+      </div>
+      <div id="dice-stage" class="game-stage glass-scene" hidden aria-label="玻璃罩內的3D骰子"></div>
+      <div id="game-status" class="game-status" role="status" aria-live="polite" hidden></div>
       <div class="buttons">
+        <div id="dice-controls" hidden><label><input id="dice-count" type="number" min="1" max="10" step="1" value="1" aria-label="骰子顆數"> 顆骰子</label></div>
         <button id="spinButton">啟動轉盤</button>
       </div>
       <div id="timeDisplay">
@@ -399,7 +476,7 @@
   <audio id="revolverSound" src="m/revolver.mp3"></audio>
   <audio id="revolver1Sound" src="m/revolver1.mp3"></audio>
   <audio id="diceSound" src="m/dice.mp3"></audio>
-  <audio id="cheerSound" src="m/cheer.mp3" preload="auto"></audio>
+  <audio id="cheerSound" src="m/cheer.mp3" preload="none" muted></audio>
   <script>
     // 全域變數
     const wheel = document.getElementById("wheel");
@@ -416,6 +493,25 @@
     const revolver1Sound = document.getElementById('revolver1Sound');
     const diceSound = document.getElementById('diceSound');
     const cheerSound = document.getElementById("cheerSound");
+    const sfxButton = document.getElementById('sfx-button');
+    let cheerEnabled = false;
+    cheerSound.muted = true;
+    sfxButton.addEventListener('click', () => {
+      cheerEnabled = !cheerEnabled;
+      cheerSound.muted = !cheerEnabled;
+      sfxButton.setAttribute('aria-pressed', String(cheerEnabled));
+      sfxButton.textContent = cheerEnabled ? '音效：開' : '音效：關';
+      if (!cheerEnabled) {
+        cheerSound.pause();
+        cheerSound.currentTime = 0;
+      }
+    });
+    function playCheer() {
+      // Check at playback time, including delayed result callbacks.
+      if (!cheerEnabled) return;
+      cheerSound.currentTime = 0;
+      cheerSound.play().catch(() => {});
+    }
 
     let useRevolverOverlay = true;
     let revolverOverlayImageUrl = "img/rmz.png";
@@ -427,6 +523,117 @@
     let currentChamberIndex = 0;
     let currentRotationAngle = 0;
     let time = 0;
+    let gameMode = 'wheel';
+    let wheelButtonContent = null;
+
+
+    function syncGameMode() {
+      gameMode = options.length === 2 && options.includes('正面') && options.includes('反面') ? 'coin' : options.length === 6 && options[0] === '⚀' ? 'dice' : 'wheel';
+      document.querySelector('.wheel-stage').hidden = gameMode !== 'wheel';
+      document.getElementById('coin-stage').hidden = gameMode !== 'coin';
+      document.getElementById('dice-stage').hidden = gameMode !== 'dice';
+      document.getElementById('dice-controls').hidden = gameMode !== 'dice';
+      const status = document.getElementById('game-status');
+      status.hidden = gameMode === 'wheel';
+      status.textContent = gameMode === 'coin' ? '翻轉硬幣，讓命運選一面' : '選擇 1～10 顆骰子';
+      resultBox.style.display = 'none';
+      if (gameMode !== 'wheel') {
+        if (!wheelButtonContent) wheelButtonContent = Array.from(spinButton.childNodes);
+        spinButton.textContent = gameMode === 'coin' ? '投擲硬幣' : '擲骰';
+      } else if (wheelButtonContent) {
+        spinButton.replaceChildren(...wheelButtonContent);
+        wheelButtonContent = null;
+      }
+      if (gameMode === 'dice') renderDice(Array(readDiceCount()).fill(1));
+    }
+    function readDiceCount() {
+      const input = document.getElementById('dice-count');
+      const count = Math.max(1, Math.min(10, Math.floor(Number(input.value) || 1)));
+      input.value = count;
+      return count;
+    }
+    function randomOutcome(sides) {
+      const buffer = new Uint32Array(1);
+      const limit = Math.floor(4294967296 / sides) * sides;
+      do { crypto.getRandomValues(buffer); } while (buffer[0] >= limit);
+      return buffer[0] % sides + 1;
+    }
+    function renderDice(values) {
+      const stage = document.getElementById('dice-stage');
+      stage.replaceChildren();
+      const rows = {1:[1],2:[2],3:[3],4:[2,2],5:[2,3],6:[3,3],7:[2,3,2],8:[3,2,3],9:[3,3,3],10:[2,3,3,2]}[values.length];
+      const pips = {1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]};
+      const faces = {1:'',6:'rotateY(180deg)',2:'rotateY(90deg)',5:'rotateY(-90deg)',3:'rotateX(90deg)',4:'rotateX(-90deg)'};
+      let index = 0;
+      for (let r = 0; r < rows.length; r++) for (let c = 0; c < rows[r]; c++) {
+        const slot = document.createElement('div'); slot.className = 'die-slot';
+        slot.style.left = (50 + (c-(rows[r]-1)/2)*22) + '%';
+        slot.style.top = (50 + (r-(rows.length-1)/2)*20) + '%';
+        const die = document.createElement('div'); die.className = 'die';
+        die.setAttribute('role','img'); die.setAttribute('aria-label','骰子 ' + (++index));
+        for (const [value, rotation] of Object.entries(faces)) {
+          const face = document.createElement('div'); face.className='die-face'; face.dataset.value=value;
+          face.style.transform = rotation + ' translateZ(calc(var(--size) / 2))';
+          for (const pos of pips[value]) { const pip = document.createElement('i'); pip.className='pip'; pip.style.gridArea = Math.ceil(pos/3) + ' / ' + ((pos-1)%3+1); face.appendChild(pip); }
+          die.appendChild(face);
+        }
+        slot.appendChild(die); stage.appendChild(slot);
+      }
+      return Array.from(stage.querySelectorAll('.die'));
+    }
+    async function run3DGame() {
+      if (spinning) return;
+      spinning = true;
+      const controls = Array.from(document.querySelectorAll('.template-buttons button, #updateButton, .palette-btn, #dice-count, #spinButton'));
+      controls.forEach(el => el.disabled = true);
+      resultBox.style.display = 'none';
+      const status = document.getElementById('game-status');
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      try {
+        if (gameMode === 'coin') {
+          status.textContent = '硬幣翻轉中…';
+          const result = randomOutcome(2);
+          const coin = document.getElementById('coin-3d');
+          const final = result === 1 ? 0 : 180;
+          coinSound.currentTime = 0; coinSound.play().catch(()=>{});
+          const animation = coin.animate(reduced ? [{opacity:.6},{opacity:1}] : [
+            {transform:'translateY(0) rotateX(0deg) rotateY(0deg)'},
+            {transform:'translateY(-35px) rotateX(900deg) rotateY(720deg)',offset:.35},
+            {transform:'translateY(-15px) rotateX(1800deg) rotateY(1440deg)',offset:.7},
+            {transform:'translateY(0) rotateX(2520deg) rotateY('+(2160+final)+'deg)'}
+          ],{duration:4000,easing:'cubic-bezier(.16,.5,.3,1)',fill:'forwards'});
+          await animation.finished;
+          coin.style.transform = 'rotateY('+final+'deg)'; animation.cancel();
+          status.textContent = '結果：' + (result === 1 ? '正面' : '反面');
+          coin.setAttribute('aria-label',result === 1 ? '正面' : '反面');
+        } else {
+          status.textContent = '骰子翻動中…';
+          const values = Array.from({length:readDiceCount()},()=>randomOutcome(6));
+          const dice = renderDice(values);
+          const rotations = {1:[0,0],2:[0,-90],3:[-90,0],4:[90,0],5:[0,90],6:[0,180]};
+          diceSound.currentTime=0; diceSound.play().catch(()=>{});
+          await Promise.all(dice.map(async (die,i) => {
+            const [rx,ry]=rotations[values[i]];
+            const end='rotateX('+(720+rx)+'deg) rotateY('+(1080+ry)+'deg)';
+            const animation=die.animate(reduced ? [{opacity:.6},{opacity:1}] : [
+              {transform:'rotateX(0deg) rotateY(0deg)'},
+              {transform:'translateY(-8px) rotateX(300deg) rotateY(470deg)',offset:.35},
+              {transform:'translateY(4px) rotateX(600deg) rotateY(850deg)',offset:.7},
+              {transform:end}
+            ],{duration:2000,easing:'cubic-bezier(.2,.65,.3,1)',fill:'forwards'});
+            await animation.finished;
+            die.style.transform='rotateX('+rx+'deg) rotateY('+ry+'deg)'; animation.cancel();
+            die.dataset.result=values[i]; die.setAttribute('aria-label','骰子 '+(i+1)+'：'+values[i]+' 點');
+          }));
+          status.textContent = values.join(' · ') + '　合計 '+values.reduce((a,b)=>a+b,0)+' 點';
+        }
+        playCheer();
+      } finally {
+        spinning=false; controls.forEach(el=>el.disabled=false);
+      }
+    }
+    document.getElementById('dice-count').addEventListener('change',()=>{ if(!spinning) renderDice(Array(readDiceCount()).fill(1)); });
+    document.querySelectorAll('.template-buttons button, #updateButton, .palette-btn').forEach(el=>el.addEventListener('click',event=>{ if(spinning) {event.preventDefault();event.stopImmediatePropagation();} },true));
 
     function isDarkColor(color) {
       const hex = color.replace("#", "");
@@ -438,12 +645,12 @@
     }
 
     const palettes = {
-      green: ["#7cc396", "#5aa575", "#89b699", "#00a15c", "#2dce89", "#acdcc8", "#8fd9b6", "#6abf9c", "#a1e5d4", "#94d9c4"],
-      pink: ["#FF8FC1", "#f9d0e2", "#eaa7c1", "#f5a4c0", "#ffe6ef", "#e3c3e3", "#e6b5e6", "#d49bd4", "#c985c0", "#f59abc"],
-      blue: ["#54A8C3", "#7aadbe", "#72b1c7", "#afced8", "#66a3b0", "#47B0B3", "#7DB2B2", "#5BAAAE", "#5197A2", "#54929A"],
-      yellow: ["#FFD700", "#FFC125", "#FFB90F", "#FFA500", "#FF8C00", "#FFD39B", "#FFEC8B", "#FFD700", "#FFA54F", "#FFDAB9"],
-      gray: ["#f5f5f5", "#757575", "#cccccc", "#383838", "#d4d4d4", "#4d4d4d", "#606060", "#8f8f8f", "#2e2e2e", "#1c1c1c"],
-      red: ["#8B0000", "#B22222", "#DC143C", "#b81414", "#FF6347", "#FF7F50", "#CD5C5C", "#E9967A", "#F08080", "#FA8072"],
+      green: ["#234E46","#80AD94","#396F60","#C4D9BB","#5D9279","#E5E9CD"],
+      pink: ["#75455F","#C18CA5","#975F7C","#E5BAC7","#B57D91","#F2DCD9"],
+      blue: ["#264C68","#80ACBA","#446D8C","#C5DCE0","#6293AD","#E2E9E5"],
+      yellow: ["#8C6233","#D9B563","#AE8645","#F1DDA4","#C89C54","#F7EAC9"],
+      gray: ["#33434D","#A9B4B6","#64757E","#DDE1DC","#869699","#EFF0E9"],
+      red: ["#763F42","#C78475","#A45C55","#E9B8A0","#BA7462","#F1D5BA"],
       gun: ["#151615","#151617"],
       coin: ["#cdcdcd","#bbbbbb"]
     };
@@ -453,6 +660,8 @@
     const colorPaletteBtn = document.getElementById('color-palette-btn');
     const colorPaletteContainer = document.getElementById('color-palette-container');
     const paletteButtons = document.querySelectorAll('.palette-btn');
+    const paletteNames = {green:'森林鼠尾草',pink:'玫瑰奶茶',blue:'海岸晨霧',yellow:'蜂蜜燕麥',gray:'岩石銀灰',red:'陶土夕陽'};
+    paletteButtons.forEach(button => { const p=palettes[button.dataset.palette]; button.style.background='conic-gradient('+p.join(',')+')'; button.title=paletteNames[button.dataset.palette]; button.setAttribute('aria-label',button.title); });
 
     colorPaletteBtn.addEventListener('click', () => {
       clickSound.currentTime = 0;
@@ -466,12 +675,14 @@
         clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
         const selectedPalette = button.getAttribute('data-palette');
         colors = palettes[selectedPalette];
+        userPalette = colors;
         drawWheel();
         colorPaletteContainer.classList.add('hidden');
       });
     });
 
     function drawWheel() {
+      syncGameMode();
       // 清空 SVG
       wheel.innerHTML = "";
       const numOptions = options.length;
@@ -488,6 +699,8 @@
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         path.setAttribute("d", describeArc(150, 150, 150, angle, angle + angleStep));
         path.setAttribute("fill", color);
+        path.setAttribute("stroke", "#ffffff55");
+        path.setAttribute("stroke-width", "0.7");
         if (colors === palettes.coin) {
           path.setAttribute("stroke", "#A0A0A0");
           path.setAttribute("stroke-width", "3");
@@ -556,6 +769,7 @@
 
     function spinWheel() {
       if (spinning) return;
+      if (gameMode !== 'wheel') { run3DGame(); return; }
       spinning = true;
       console.log("spinWheel 執行時, 左輪模式 =", revolverMode);
       if (revolverMode) {
@@ -730,8 +944,7 @@
             resultSound.play().catch(error => console.warn('結果音效失敗:', error));
             const cheerSound = document.getElementById("cheerSound");
             setTimeout(() => {
-              cheerSound.currentTime = 0;
-              cheerSound.play().catch(() => {});
+              playCheer();
             }, 500);
           }
           showConfetti();
@@ -823,8 +1036,7 @@ function cheatSpinToIndex(index, label) {
       resultSound.currentTime = 0;
       resultSound.play().catch(() => {});
       setTimeout(() => {
-        cheerSound.currentTime = 0;
-        cheerSound.play().catch(() => {});
+        playCheer();
       }, 500);
       showConfetti();
       setTimeout(() => {
@@ -948,7 +1160,7 @@ function cheatSpinToIndex(index, label) {
     const muteIcon = '🔇';
     const playIcon = '♫';
     const pauseIcon = '❚❚';
-    const soundList = [resultSound, startSound, gunshotSound, coinSound, scoreSound, clickSound];
+    const soundList = [resultSound, startSound, gunshotSound, coinSound, scoreSound, clickSound, cheerSound];
     soundList.forEach(sound => sound.volume = 0.5);
     coinSound.volume = 0.6;
     volumeSlider.addEventListener('input', (event) => {
