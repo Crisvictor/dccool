@@ -684,13 +684,14 @@
         .card .front { background-color: #f2e8d6; color: #253d3c; }
         .card-art { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
         .card:hover { transform: none; }
+        .tilt-surface { width: 100%; height: 100%; position: relative; border-radius: inherit; transform-style: preserve-3d; transform: perspective(700px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) scale(var(--tilt-scale, 1)); transition: transform .35s ease-out; }
+        .card.is-tilting .tilt-surface { transition: transform .08s linear; }
+        .tilt-surface::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; transform: translateZ(1px); background: radial-gradient(circle at var(--glow-x, 50%) var(--glow-y, 50%), #fff9 0, #ffe4af33 25%, transparent 65%); opacity: 0; transition: opacity .25s; }
+        .card.is-tilting .tilt-surface::after { opacity: .65; }
         .card:focus-visible { translate: 0 -12px; z-index: 8; }
         .draw-card { cursor: pointer; transition: translate .25s, transform .25s, box-shadow .25s; }
         @media (hover: hover) and (pointer: fine) {
-            .card:hover { translate: 0 -14px; rotate: -2deg; box-shadow: 0 18px 24px #0006, 0 0 0 2px #e5c58b99; z-index: 8; }
-            .card:nth-child(even):hover { rotate: 2deg; }
-            .card:has(+ .card:hover) { translate: -5px -3px; rotate: -2deg; }
-            .card:hover + .card { translate: 5px -3px; rotate: 2deg; }
+            .card:hover { box-shadow: 0 18px 24px #0006, 0 0 0 1px #e5c58b66; z-index: 8; }
             .draw-card:not(.selected):hover { translate: 0 -12px; z-index: 10; box-shadow: 0 15px 24px #0007, 0 0 0 2px var(--gold); }
         }
         #description-box { box-sizing: border-box; width: 100%; max-width: 770px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: #193238; font-size: 18px; line-height: 1.8; box-shadow: none; }
@@ -713,6 +714,8 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
             .card, .draw-card { translate: none !important; rotate: none !important; }
+            .tilt-surface { transform: none !important; }
+            .tilt-surface::after { display: none; }
             .draw-card:not(.selected):hover { transform: rotate(var(--rotate)); }
         }
     </style>
@@ -833,6 +836,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.example-option').forEach(option => {
         option.addEventListener('click', () => {
             inputArea.value = option.dataset.value.replace(/\\n/g, '\n');
+            if (inputArea.value.includes('命運之輪')) document.getElementById('flame-gif').src = 'img/F.gif';
         });
     });
     // 洗牌動畫效果
@@ -923,33 +927,48 @@ function initAnswerBookSingleDraw(items) {
 
     cardContainer.appendChild(card);
 }
-function showFlameAnimation() {
+let stopFlameAnimation = () => {};
+function showFlameAnimation(drawContainer) {
+    stopFlameAnimation();
     const flameOverlay = document.getElementById('flame-overlay');
     const flameGif = document.getElementById('flame-gif');
 
     flameOverlay.style.position = 'fixed';
     flameOverlay.style.opacity = '1'; 
-    flameOverlay.style.top = '0';
-    flameOverlay.style.left = '0';
-    flameOverlay.style.width = '100vw';
-    flameOverlay.style.height = '60vh';
+    const alignFlame = () => {
+        const rect = drawContainer.getBoundingClientRect();
+        flameOverlay.style.top = `${rect.top}px`;
+        flameOverlay.style.left = `${rect.left}px`;
+        flameOverlay.style.width = `${rect.width}px`;
+        flameOverlay.style.height = `${rect.height}px`;
+    };
+    alignFlame();
+    window.addEventListener('scroll', alignFlame, true);
+    window.addEventListener('resize', alignFlame);
+    flameOverlay.style.pointerEvents = 'none';
     flameOverlay.style.display = 'flex'; 
     flameOverlay.style.justifyContent = 'center';
     flameOverlay.style.alignItems = 'center';
     flameOverlay.style.backgroundColor = 'rgba(0, 10, 10, 0.1)';
     flameOverlay.style.zIndex = '1000';
-    flameGif.style.width = '700px'; 
+    flameGif.style.width = 'min(700px, 100%)';
     flameGif.style.height = 'auto'; 
 
     flameGif.src = ''; 
     flameGif.src = 'img/F.gif';
 
-    setTimeout(() => {
+    let hideTimer;
+    const fadeTimer = setTimeout(() => {
         flameOverlay.style.opacity = '0'; // 漸隱
-        setTimeout(() => {
-            flameOverlay.style.display = 'none'; // 完全隱藏
-        }, 300); // 漸隱動畫時間
+        hideTimer = setTimeout(() => stopFlameAnimation(), 300);
     }, 1080); // 顯示時間
+    stopFlameAnimation = () => {
+        clearTimeout(fadeTimer);
+        clearTimeout(hideTimer);
+        flameOverlay.style.display = 'none';
+        window.removeEventListener('scroll', alignFlame, true);
+        window.removeEventListener('resize', alignFlame);
+    };
 }
         //圖片禁止拖曳與右鍵
     document.querySelectorAll('.card img').forEach(img => {
@@ -1101,6 +1120,8 @@ function showGuideExplanation(type) {
 }
 
 function initTarotInteractiveDraw(items) {
+    // Warm only the tarot effect while shuffling, so it is ready when the fan opens.
+    document.getElementById('flame-gif').src = 'img/F.gif';
     requestAnimationFrame(() => {
         shuffleAnimation(items);
         shuffleSound.currentTime = 0; 
@@ -1120,7 +1141,6 @@ function initTarotInteractiveDraw(items) {
 
 // 2. 扇形牌列
 function startDrawPhase(items) {
-    showFlameAnimation();
     fireSound.currentTime = 0;
     fireSound.play();
 
@@ -1136,6 +1156,7 @@ function startDrawPhase(items) {
     }
     cardContainer.innerHTML = '';
     cardContainer.appendChild(drawContainer);
+    showFlameAnimation(drawContainer);
 
     // 動態調整卡牌尺寸與重疊量
     const isMobile = window.innerWidth < 768;
@@ -3451,6 +3472,7 @@ function endPokerGame() {
         });
 
         clearBtn.addEventListener('click', () => {
+            stopFlameAnimation();
             document.querySelectorAll('.tooltip').forEach(tooltip => { tooltip.style.opacity = '0'; tooltip.style.left = '0'; });
             cardContainer.classList.remove('tarot-mode');
             clickSound.currentTime = 0; // 重置播放位置
@@ -3564,6 +3586,42 @@ const prepareCardControls = () => {
         card.tabIndex = 0;
         card.setAttribute('role', 'button');
         card.setAttribute('aria-label', '卡片 ' + (index + 1) + '，按下翻牌或抽牌');
+        const inner = card.querySelector(':scope > .inner');
+        if (inner) {
+            // Tilt the visual surface; keep the hit area stable and the flip transform independent.
+            const surface = document.createElement('div');
+            surface.className = 'tilt-surface';
+            inner.before(surface);
+            surface.appendChild(inner);
+            let frame = 0;
+            const resetTilt = () => {
+                cancelAnimationFrame(frame);
+                frame = 0;
+                card.classList.remove('is-tilting');
+                surface.style.cssText = '';
+            };
+            card.addEventListener('pointermove', event => {
+                if (event.pointerType !== 'mouse' || !matchMedia('(hover: hover) and (pointer: fine)').matches || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    resetTilt();
+                    return;
+                }
+                const rect = card.getBoundingClientRect();
+                const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+                const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+                cancelAnimationFrame(frame);
+                frame = requestAnimationFrame(() => {
+                    card.classList.add('is-tilting');
+                    surface.style.setProperty('--tilt-x', `${(0.5 - y) * 26}deg`);
+                    surface.style.setProperty('--tilt-y', `${(x - 0.5) * 26}deg`);
+                    surface.style.setProperty('--tilt-scale', '1.04');
+                    surface.style.setProperty('--glow-x', `${x * 100}%`);
+                    surface.style.setProperty('--glow-y', `${y * 100}%`);
+                });
+            });
+            card.addEventListener('pointerleave', resetTilt);
+            card.addEventListener('pointercancel', resetTilt);
+            card.addEventListener('blur', resetTilt);
+        }
         card.addEventListener('keydown', event => {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
