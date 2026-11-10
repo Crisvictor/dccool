@@ -34,7 +34,7 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: 'YuPearl', Arial, sans-serif;
+            font-family: system-ui, "Microsoft JhengHei", sans-serif;
             min-height: 100vh;
             height: 100%;
             width: 100%;
@@ -78,7 +78,7 @@
             margin: 10px 0;
         }
         .button {
-            font-family: 'NaniFont-Regular', Arial, sans-serif !important;
+            font-family: system-ui, "Microsoft JhengHei", sans-serif !important;
             padding: 10px 20px;
             font-size: 18px;
             color: #fff;
@@ -153,7 +153,7 @@
             opacity: 1;
         }
         .example-option {
-            font-family: 'NaniFont-Regular', Arial, sans-serif !important;
+            font-family: system-ui, "Microsoft JhengHei", sans-serif !important;
             font-size: 16px;
             text-align: center;
             background-color: #176367;
@@ -354,27 +354,31 @@
             src: url('ttf/NaniFont-Regular.woff') format('woff');
             font-weight: normal;
             font-style: normal;
+            font-display: swap;
         }
         @font-face {
             font-family: 'Sangyo';
             src: url('ttf/sangyo.woff2') format('woff2');
             font-weight: normal;
             font-style: normal;
+            font-display: swap;
         }
         @font-face {
             font-family: 'YuPearl';
             src: url('ttf/YuPearl-Regular.woff2') format('woff2'); 
             font-weight: normal;
             font-style: normal;
+            font-display: swap;
         }
         @font-face {
             font-family: 'ThePeakFont';
             src: url('ttf/ThePeakFont.woff2') format('woff2');
             font-weight: normal;
             font-style: normal;
+            font-display: swap;
         }
         #description-box {
-            font-family: 'ThePeakFont', Arial, sans-serif !important;
+            font-family: system-ui, "Microsoft JhengHei", sans-serif !important;
             display: none;
             max-width: 550px;
             margin: 20px auto;
@@ -383,7 +387,7 @@
             border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
             border: 2px solid rgba(92, 125, 155, 0.4);
-            max-height: 230 px;
+            max-height: 230px;
             overflow-y: auto;
             color: #ffffff;
             font-size: 1.5em;
@@ -391,7 +395,7 @@
         }
         .guideBtn,
         .playerCountBtn {
-            font-family: 'ThePeakFont', Arial, sans-serif !important;
+            font-family: system-ui, "Microsoft JhengHei", sans-serif !important;
             background-color: #003d40;
             color: #fff;
             border: none;
@@ -433,12 +437,14 @@
             border-radius: 5px; 
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5); 
             text-align: center; 
-            font-family: "Sangyo", sans-serif !important; 
+            font-family: system-ui, "Microsoft JhengHei", sans-serif !important; 
         }
         .tooltip {
-            position: absolute;
+            position: fixed;
+            max-width: calc(100vw - 40px);
+            overflow: hidden;
             background-color: rgba(0, 0, 0, 0.8);
-            font-family: 'ThePeakFont', Arial, sans-serif !important;
+            font-family: system-ui, "Microsoft JhengHei", sans-serif !important;
             color: white;
             font-size: 1.2em;
             padding: 5px 10px;
@@ -645,37 +651,99 @@
                 margin-right: 8px;
             }
         }
+
+        /* Midnight teal / warm brass. Keep the original game layouts and card artwork. */
+        :root { color-scheme: dark; --ink: #edf4f2; --muted: #a7bdbb; --gold: #e5c58b; --line: #345553; }
+        body { color: var(--ink); background: radial-gradient(ellipse at 20% 0%, #234b4a 0, transparent 55%), radial-gradient(ellipse at 90% 70%, #243039 0, transparent 50%), #101d24; }
+        #main-content { min-height: 100vh; padding: 36px 20px 100px; box-sizing: border-box; }
+        #header-container { max-width: 920px; margin: 0 auto; justify-content: space-between; gap: 16px; padding: 0 0 24px; border-bottom: 1px solid var(--line); }
+        .eyebrow { display: block; color: var(--gold); font-size: 11px; letter-spacing: .22em; margin-bottom: 10px; }
+        h1 { font-size: clamp(18px, 3vw, 25px); font-weight: 650; letter-spacing: .04em; }
+        #time-display { color: var(--muted); background: transparent; box-shadow: none; font-variant-numeric: tabular-nums; }
+        .intro { text-align: center; margin: 38px 0 24px; font-size: clamp(23px, 4vw, 34px); font-weight: 600; letter-spacing: .08em; }
+        .intro span { display: block; font-size: 14px; color: var(--muted); font-weight: 400; letter-spacing: .04em; margin-top: 12px; }
+        #buttons-container { flex-wrap: wrap; gap: 10px; margin: 0 auto 20px; }
+        .button, #example-btn, .example-option, .guideBtn, .playerCountBtn, #motion-button { border: 1px solid var(--line); border-radius: 10px; box-shadow: none; transition: background .2s, border-color .2s, transform .2s; }
+        .button { padding: 12px 22px; font-size: 16px; }
+        #shuffle-btn { background: var(--gold); color: #263432; border-color: var(--gold); }
+        #shuffle-btn:hover { background: #f4d9a9; transform: translateY(-2px); box-shadow: 0 6px 22px #e5c58b22; }
+        #call-btn, #example-btn, .example-option, .guideBtn, .playerCountBtn { background: #254a49; color: var(--ink); }
+        #call-btn:hover, #example-btn:hover, .example-option:hover, .guideBtn:hover, .playerCountBtn:hover { background: #34615d; }
+        #clear-btn { color: #efb4a9; background: #392f33; border-color: #685054; }
+        #clear-btn:hover { background: #52383d; }
+        textarea { box-sizing: border-box; width: 100%; max-width: 620px; height: 168px; border: 1px solid #486462; border-radius: 14px; background: #142b30; color: var(--ink); padding: 20px; line-height: 1.8; box-shadow: 0 14px 36px #0002; font-family: inherit; resize: vertical; }
+        #input-area::placeholder { color: #9bb3b1; }
+        :focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+        .example-container { box-sizing: border-box; width: 100%; max-width: 620px; margin: 14px auto 24px; padding: 14px; background: #193238; border: 1px solid var(--line); border-radius: 14px; box-shadow: none; }
+        #example-btn { font-size: 14px; padding: 9px 14px; }
+        #example-options { box-sizing: border-box; width: 100%; padding: 10px 0 0; background: transparent; box-shadow: none; }
+        .example-option { font-size: 14px; }
+        .card-container { box-sizing: border-box; width: 100%; padding: 30px 18px; gap: 8px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(140deg, #21433fc9, #14282fe6); box-shadow: 0 24px 70px #0003, inset 0 1px #ffffff08; }
+        .card { flex-shrink: 0; border-radius: 8px; border: 0; box-shadow: 0 5px 12px #0004; transition: translate .25s ease, rotate .25s ease, box-shadow .25s ease; }
+        .card .back, .card .front, .shuffle-card, .draw-card { border-radius: 8px; }
+        .card .front { background-color: #f2e8d6; color: #253d3c; }
+        .card-art { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+        .card:hover { transform: none; }
+        .card:focus-visible { translate: 0 -12px; z-index: 8; }
+        .draw-card { cursor: pointer; transition: translate .25s, transform .25s, box-shadow .25s; }
+        @media (hover: hover) and (pointer: fine) {
+            .card:hover { translate: 0 -14px; rotate: -2deg; box-shadow: 0 18px 24px #0006, 0 0 0 2px #e5c58b99; z-index: 8; }
+            .card:nth-child(even):hover { rotate: 2deg; }
+            .card:has(+ .card:hover) { translate: -5px -3px; rotate: -2deg; }
+            .card:hover + .card { translate: 5px -3px; rotate: 2deg; }
+            .draw-card:not(.selected):hover { translate: 0 -12px; z-index: 10; box-shadow: 0 15px 24px #0007, 0 0 0 2px var(--gold); }
+        }
+        #description-box { box-sizing: border-box; width: 100%; max-width: 770px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: #193238; font-size: 18px; line-height: 1.8; box-shadow: none; }
+        #audio-control-container { padding: 10px 14px; border: 1px solid var(--line); border-radius: 30px; background: #142b30f2; box-shadow: 0 6px 24px #0003; }
+        #motion-button { padding: 6px 10px; background: transparent; color: var(--muted); cursor: pointer; }
+        #motion-button[aria-pressed="true"] { color: var(--gold); border-color: var(--gold); }
+        #video-background { opacity: .25; z-index: 0; pointer-events: none; }
+        #overlay { display: none; }
+        #main-content > :where(:not(#video-background, #overlay, #audio-control-container, #flame-overlay)) { position: relative; }
+        #main-content > #audio-control-container, #main-content > #flame-overlay { position: fixed; }
+        @media (max-width: 600px) {
+            #main-content { padding: 22px 12px 100px; }
+            #header-container { align-items: flex-start; flex-direction: column; gap: 10px; }
+            .intro { margin-top: 26px; }
+            .intro span { font-size: 12px; letter-spacing: 0; }
+            .button { padding: 11px 15px; font-size: 14px; }
+            .card-container { padding: 26px 8px; gap: 4px; }
+            #audio-control-container { bottom: 12px; left: 12px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+            .card, .draw-card { translate: none !important; rotate: none !important; }
+            .draw-card:not(.selected):hover { transform: rotate(var(--rotate)); }
+        }
     </style>
 </head>
 <body>
-    <div id="loading-screen">
-    <div class="loading-spinner"></div>
-    <p>資源載入中，請稍候...</p>
-    </div>
-    <div id="main-content" style="display: none;">
-        <video id="video-background" autoplay muted loop playsinline>
-            <source src="v/Wall.webm" type="video/webm">
+    <div id="main-content">
+        <video id="video-background" preload="none" muted loop playsinline aria-hidden="true">
+            <source data-src="v/Wall.webm" type="video/webm">
             Your browser does not support the video tag.
         </video>
         <div id="overlay"></div>
 
         <div id="header-container">
-            <h1>大倉酷抽籤與點名系統</h1>
+            <div class="brand"><span class="eyebrow">DCCOOL · CARD STUDIO</span><h1>大倉酷抽籤與點名系統</h1></div>
             <div id="time-display"></div>
         </div>
     
         <div id="audio-control-container">
-            <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5">
-            <button id="bgm-button">♫</button>
+            <input aria-label="音量" id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5">
+            <button id="bgm-button" aria-label="播放或暫停背景音樂">♫</button>
+            <button id="motion-button" type="button" aria-pressed="false">動態背景</button>
         </div>
 
+        <p class="intro">把選擇交給一張牌<span>輸入名單，洗牌，翻開你的下一個驚喜。</span></p>
         <div id="buttons-container">
             <button id="shuffle-btn" class="button">洗牌抽籤</button>
             <button id="call-btn" class="button">啟動點名</button>
             <button id="clear-btn" class="button">清除資料</button>
         </div>
 
-        <textarea id="input-area" placeholder="請輸入項目，每行一個項目"></textarea>
+        <textarea aria-label="抽籤與點名項目，每行一個" id="input-area" placeholder="請輸入項目，每行一個項目"></textarea>
 
         <div class="example-container">
             <button id="example-btn" class="button">範例選擇</button>
@@ -696,16 +764,16 @@
         </div>
 
         <div id="flame-overlay">
-            <img src="img/F.gif" id="flame-gif" alt="Fire Animation">
+            <img decoding="async" id="flame-gif" alt="Fire Animation">
         </div>
 
         <div id="shuffle-animation-container"></div>
         <div id="card-container" class="card-container"></div>
         <div id="description-box"></div>
-        <audio id="clickSound" src="m/click.mp3"></audio>
-        <audio id="scoreSound" src="m/Sou.mp3"></audio>
-        <audio id="coin1Sound" src="m/coin1.mp3"></audio>
-        <audio id="levelwinSound" src="m/levelwin.mp3"></audio>
+        <audio preload="none" id="clickSound" src="m/click.mp3"></audio>
+        <audio preload="none" id="scoreSound" src="m/Sou.mp3"></audio>
+        <audio preload="none" id="coin1Sound" src="m/coin1.mp3"></audio>
+        <audio preload="none" id="levelwinSound" src="m/levelwin.mp3"></audio>
 
     </div>
     <script>
@@ -720,88 +788,13 @@
         button.addEventListener('click', playScoreSound);
     });
 
-    const images = [
-    'img/t0.png', 'img/t1.png', 'img/t2.png', 'img/t3.png', 'img/t4.png',
-    'img/t5.png', 'img/t6.png', 'img/t7.png', 'img/t8.png', 'img/t9.png',
-    'img/t10.png', 'img/t11.png', 'img/t12.png', 'img/t13.png', 'img/t14.png',
-    'img/t15.png', 'img/t16.png', 'img/t17.png', 'img/t18.png', 'img/t19.png',
-    'img/t20.png', 'img/t21.png',
-
-    'img/joker_small.png', 'img/joker_big.png',
-    'img/3g.png', 'img/2g.png', 'img/1g.png', 'img/0g.png',
-    'img/1s.png', 'img/2s.png', 'img/backcard.png',
-
-    'img/W1.png', 'img/W2.png', 'img/W3.png', 'img/W4.png', 'img/W5.png',
-    'img/W6.png', 'img/W7.png', 'img/W8.png', 'img/W9.png', 'img/W10.png',
-    'img/W11.png', 'img/W12.png', 'img/W13.png', 'img/W14.png',
-
-    'img/F1.png', 'img/F2.png', 'img/F3.png', 'img/F4.png', 'img/F5.png',
-    'img/F6.png', 'img/F7.png', 'img/F8.png', 'img/F9.png', 'img/F10.png',
-    'img/F11.png', 'img/F12.png', 'img/F13.png', 'img/F14.png',
-
-    'img/S1.png', 'img/S2.png', 'img/S3.png', 'img/S4.png', 'img/S5.png',
-    'img/S6.png', 'img/S7.png', 'img/S8.png', 'img/S9.png', 'img/S10.png',
-    'img/S11.png', 'img/S12.png', 'img/S13.png', 'img/S14.png',
-
-    'img/C1.png', 'img/C2.png', 'img/C3.png', 'img/C4.png', 'img/C5.png',
-    'img/C6.png', 'img/C7.png', 'img/C8.png', 'img/C9.png', 'img/C10.png',
-    'img/C11.png', 'img/C12.png', 'img/C13.png', 'img/C14.png'
-    ];
-let loadedCount = 0;
-let totalResources = images.length + 1; 
-
-// 檢查資源載入
-function checkResourcesLoaded() {
-    loadedCount++;
-    console.log(`已載入資源數量: ${loadedCount}/${totalResources}`);
-    if (loadedCount >= totalResources) {
-        document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
+    // The interface is usable immediately; card artwork loads only for the active deck.
+    function createDeferredAudio(src) {
+        const audio = new Audio();
+        audio.preload = 'none';
+        audio.src = src;
+        return audio;
     }
-}
-
-// 預載圖片
-function preloadImages() {
-    totalResources += images.length;
-    images.forEach(src => {
-        const img = new Image();
-        img.src = src;
-        img.onload = checkResourcesLoaded;
-        img.onerror = () => {
-            console.error(`圖片載入失敗: ${src}`);
-            checkResourcesLoaded();
-        };
-    });
-}
-
-// 預載影片
-function preloadVideo() {
-    const video = document.getElementById('video-background');
-    if (!video) {
-        console.error('video-background 元素未找到！');
-        checkResourcesLoaded();
-        return;
-    }
-    totalResources++; // 增加影片資源
-    video.addEventListener('loadeddata', checkResourcesLoaded);
-    video.addEventListener('error', () => {
-        console.error('影片載入失敗！');
-        checkResourcesLoaded();
-    });
-}
-
-// 確保 DOM 和資源載入完成
-window.addEventListener('load', () => {
-    preloadImages();
-    preloadVideo();
-});
-
-// 設置4 秒超時保護
-setTimeout(() => {
-    console.warn('資源載入超時，自動切換到主畫面！');
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('main-content').style.display = 'block';
-}, 4000);
 
 window.addEventListener('DOMContentLoaded', () => {
     const flameOverlay = document.getElementById('flame-overlay');
@@ -812,13 +805,13 @@ window.addEventListener('DOMContentLoaded', () => {
     const inputArea = document.getElementById('input-area');
     const shuffleAnimationContainer = document.getElementById('shuffle-animation-container');
     const cardContainer = document.getElementById('card-container');
-    const flipSound = new Audio('m/card.mp3');
-    const shuffleSound = new Audio('m/shuffle.mp3');
-    const fireSound = new Audio('m/F.mp3');
-    const drawSound = new Audio('m/draw1.mp3');
-    const cutSound = new Audio('m/cut1.mp3');
-    const coin1Sound = new Audio('m/coin1.mp3');
-    const levelwinSound = new Audio('m/levelwin.mp3');
+    const flipSound = createDeferredAudio('m/card.mp3');
+    const shuffleSound = createDeferredAudio('m/shuffle.mp3');
+    const fireSound = createDeferredAudio('m/F.mp3');
+    const drawSound = createDeferredAudio('m/draw1.mp3');
+    const cutSound = createDeferredAudio('m/cut1.mp3');
+    const coin1Sound = createDeferredAudio('m/coin1.mp3');
+    const levelwinSound = createDeferredAudio('m/levelwin.mp3');
     const shuffleBtn = document.getElementById('shuffle-btn');
     const callBtn = document.getElementById('call-btn');
     const clearBtn = document.getElementById('clear-btn');
@@ -1147,7 +1140,7 @@ function startDrawPhase(items) {
     // 動態調整卡牌尺寸與重疊量
     const isMobile = window.innerWidth < 768;
     const cardWidth = isMobile ? 70 : 93.75;
-    const overlap = isMobile ? 65 : 85.75;
+    const overlap = cardWidth - Math.min(isMobile ? 5 : 8, Math.max(1, (drawContainer.clientWidth - cardWidth - 24) / (totalCards - 1)));
     const containerWidth = drawContainer.clientWidth || window.innerWidth;
     const totalWidth = cardWidth + (totalCards - 1) * (cardWidth - overlap);
     const startX = (containerWidth - totalWidth) / 2;
@@ -1176,6 +1169,7 @@ function startDrawPhase(items) {
     for (let i = 0; i < totalCards; i++) {
         const card = document.createElement('div');
         card.className = 'draw-card';
+        card.style.width = `${cardWidth}px`;
         card.style.position = 'absolute';
         card.style.left = `${centerX - cardWidth / 2}px`;
         card.style.top = `${baseY}px`;
@@ -3017,13 +3011,7 @@ const tarotImageMap = {
     // 一般翻牌設定
 function generateCardContent(item) {
     if (tarotImageMap[item]) {
-        return `
-            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; 
-                        background-image: url('${tarotImageMap[item]}'); 
-                        background-size: cover; 
-                        background-position: center; 
-                        border-radius: 4px;">
-            </div>`;
+        return `<img class="card-art" src="${tarotImageMap[item]}" alt="${item}" loading="lazy" decoding="async" width="197" height="304">`;
     }       
     if (/^10[shcd]$/.test(item)) { 
         const suit = item.charAt(2); 
@@ -3080,15 +3068,15 @@ document.addEventListener("DOMContentLoaded", () => {
             if (cardName) {
                 tooltip.textContent = cardName;
                 tooltip.style.opacity = "1";
-                tooltip.style.left = `${event.pageX + 10}px`;
-                tooltip.style.top = `${event.pageY + 10}px`;
+                tooltip.style.left = `${Math.max(8, Math.min(event.clientX + 10, window.innerWidth - tooltip.offsetWidth - 8))}px`;
+                tooltip.style.top = `${Math.max(8, Math.min(event.clientY + 10, window.innerHeight - tooltip.offsetHeight - 8))}px`;
             }
         }
     });
     document.getElementById("card-container").addEventListener("mousemove", function (event) {
         if (event.target.closest(".card")) {
-            tooltip.style.left = `${event.pageX + 10}px`;
-            tooltip.style.top = `${event.pageY + 10}px`;
+            tooltip.style.left = `${Math.max(8, Math.min(event.clientX + 10, window.innerWidth - tooltip.offsetWidth - 8))}px`;
+            tooltip.style.top = `${Math.max(8, Math.min(event.clientY + 10, window.innerHeight - tooltip.offsetHeight - 8))}px`;
         }
     });
     document.getElementById("card-container").addEventListener("mouseout", function (event) {
@@ -3103,8 +3091,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (cardName) {
                 tooltip.textContent = cardName;
                 tooltip.style.opacity = "1";
-                tooltip.style.left = `${event.pageX + 10}px`;
-                tooltip.style.top = `${event.pageY + 10}px`;
+                tooltip.style.left = `${Math.max(8, Math.min(event.clientX + 10, window.innerWidth - tooltip.offsetWidth - 8))}px`;
+                tooltip.style.top = `${Math.max(8, Math.min(event.clientY + 10, window.innerHeight - tooltip.offsetHeight - 8))}px`;
                 setTimeout(() => {
                     tooltip.style.opacity = "0";
                 }, 1500);
@@ -3463,6 +3451,7 @@ function endPokerGame() {
         });
 
         clearBtn.addEventListener('click', () => {
+            document.querySelectorAll('.tooltip').forEach(tooltip => { tooltip.style.opacity = '0'; tooltip.style.left = '0'; });
             cardContainer.classList.remove('tarot-mode');
             clickSound.currentTime = 0; // 重置播放位置
             clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
@@ -3493,7 +3482,7 @@ function endPokerGame() {
         updateTime();
         
     // 音效與 BGM 控制
-const bgmAudio = new Audio('https://crisvictor.github.io/dccool/m/lost-in-dreams.mp3');
+const bgmAudio = createDeferredAudio('https://crisvictor.github.io/dccool/m/lost-in-dreams.mp3');
 bgmAudio.loop = true; // 設置 BGM 循環播放
 bgmAudio.volume = 0.5; // 預設音量
 
@@ -3548,6 +3537,42 @@ bgmButton.addEventListener('click', () => {
 // 初始化：設定所有音效預設音量為 0.5 並更新滑桿背景
 setAllVolumes(0.5);
 updateSliderFill();
+
+// Background video is opt-in; ordinary draws never download it.
+const motionButton = document.getElementById('motion-button');
+const backgroundVideo = document.getElementById('video-background');
+motionButton.addEventListener('click', async () => {
+    if (!backgroundVideo.paused) {
+        backgroundVideo.pause();
+        motionButton.setAttribute('aria-pressed', 'false');
+        return;
+    }
+    const source = backgroundVideo.querySelector('source');
+    if (!source.hasAttribute('src')) {
+        source.src = source.dataset.src;
+        backgroundVideo.load();
+    }
+    try {
+        await backgroundVideo.play();
+        motionButton.setAttribute('aria-pressed', 'true');
+    } catch { motionButton.setAttribute('aria-pressed', 'false'); }
+});
+
+// Generated cards remain operable with Enter / Space as well as a mouse or touch.
+const prepareCardControls = () => {
+    document.querySelectorAll('.card:not([tabindex]), .draw-card:not([tabindex])').forEach((card, index) => {
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', '卡片 ' + (index + 1) + '，按下翻牌或抽牌');
+        card.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                card.click();
+            }
+        });
+    });
+};
+new MutationObserver(prepareCardControls).observe(cardContainer, { childList: true, subtree: true });
     </script>
 </body>
 </html>
