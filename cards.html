@@ -718,6 +718,85 @@
             .tilt-surface::after { display: none; }
             .draw-card:not(.selected):hover { transform: rotate(var(--rotate)); }
         }
+
+        /* 點名結果匯出區 */
+        #attendance-export { display:none; box-sizing:border-box; width:90%; max-width:770px; margin:18px auto 32px; padding:20px; background:#193238; border:1px solid var(--line); border-radius:16px; color:var(--ink); }
+        #attendance-export h2 { margin:0 0 8px; font-size:18px; }
+        #attendance-summary { font-size:14px; color:var(--muted); margin:0 0 14px; }
+        .attendance-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+        .attendance-actions button { background:#254a49; color:var(--ink); border:1px solid var(--line); border-radius:9px; padding:10px 14px; font:inherit; cursor:pointer; }
+        .attendance-actions button:hover { background:#34615d; }
+        .attendance-actions button.active { background:var(--gold); color:#263432; border-color:var(--gold); }
+        #attendance-output { display:block; width:100%; max-width:none; margin:14px 0 8px; height:170px; }
+        #attendance-export-status { color:var(--muted); font-size:13px; min-height:20px; }
+
+        /* 精簡頂部品牌區：縮減約一半垂直佔用 */
+        #main-content { padding-top: 16px; }
+        #header-container { padding-bottom: 11px; gap: 8px; }
+        .eyebrow { font-size: 9px; letter-spacing: .18em; margin-bottom: 3px; line-height: 1.2; }
+        #header-container h1 { font-size: clamp(16px, 2.2vw, 21px); line-height: 1.25; }
+        #time-display { font-size: 11px; padding: 0; }
+        .intro { margin: 22px 0 18px; }
+        .intro[hidden] { display: none !important; }
+        @media (max-width: 600px) {
+            #main-content { padding-top: 12px; }
+            #header-container { flex-direction: row; align-items: center; gap: 8px; padding-bottom: 9px; }
+            #header-container h1 { font-size: 16px; }
+            #time-display { font-size: 10px; text-align: right; white-space: nowrap; }
+            .eyebrow { font-size: 8px; }
+        }
+
+        /* 點名專用按鍵：保留各門市色系，以一致材質、動態與明確已點狀態呈現 */
+        #card-container .attendance-card {
+            box-sizing: border-box; position: relative; isolation: isolate;
+            display: inline-flex; justify-content: center; align-items: center;
+            width: auto; min-width: 92px; max-width: 210px; height: auto; min-height: 43px;
+            margin: 4px; padding: 9px 16px; line-height: 1.35;
+            font-family: inherit; font-size: 15px; font-weight: 700;
+            letter-spacing: .035em; text-align: center; white-space: normal;
+            writing-mode: horizontal-tb; overflow-wrap: anywhere;
+            color: #18302f; background: var(--attendance-color, #e6c35c);
+            border: 1px solid #ffffff69; border-radius: 11px;
+            box-shadow: 0 3px 0 #0004, 0 8px 15px #0002, inset 0 1px 0 #ffffff80;
+            cursor: pointer; user-select: none;
+            transform: none; translate: 0 0;
+            transition: transform .18s ease, translate .18s ease, box-shadow .18s ease,
+                        filter .18s ease, background .18s ease, opacity .18s ease;
+        }
+        #card-container .attendance-card::before {
+            content: ''; position: absolute; inset: 0; border-radius: inherit;
+            background: linear-gradient(155deg, #ffffff44, transparent 52%); pointer-events: none;
+        }
+        @media (hover:hover) and (pointer:fine) {
+            #card-container .attendance-card:not(.dimmed):hover {
+                transform: translateY(-3px); translate: 0 0; filter: brightness(1.09) saturate(1.07);
+                box-shadow: 0 5px 0 #0004, 0 13px 22px #0005, inset 0 1px 0 #ffffffa0;
+                z-index: 5;
+            }
+            #card-container .attendance-card.dimmed:hover {
+                transform: translateY(-2px); filter: brightness(1.17);
+                box-shadow: 0 6px 16px #0004, inset 0 1px 0 #ffffff24;
+            }
+        }
+        #card-container .attendance-card:active {
+            transform: translateY(1px) scale(.97) !important;
+            box-shadow: 0 1px 3px #0004, inset 0 2px 5px #0003 !important;
+        }
+        #card-container .attendance-card.dimmed {
+            background: #263f42 !important; color: #b2c3c0;
+            opacity: .7; border-color: #77908a40;
+            box-shadow: inset 0 2px 7px #0005, 0 2px 5px #0002;
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+            text-decoration: line-through; text-decoration-color: #a6b8aeaa;
+        }
+        #card-container .attendance-card.dimmed::after {
+            content: '✓'; position: absolute; top: -5px; right: -5px;
+            display: grid; place-items: center; width: 19px; height: 19px;
+            border-radius: 50%; font-size: 12px; color: #203632;
+            background: #b9dfcb; border: 2px solid #203c3d;
+            box-shadow: 0 2px 5px #0005;
+        }
+        #card-container .attendance-card:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
     </style>
 </head>
 <body>
@@ -773,6 +852,17 @@
         <div id="shuffle-animation-container"></div>
         <div id="card-container" class="card-container"></div>
         <div id="description-box"></div>
+        <section id="attendance-export" aria-label="點名匯出">
+            <h2>點名結果匯出</h2>
+            <p id="attendance-summary" aria-live="polite">已按下 0 項｜未按下 0 項</p>
+            <div class="attendance-actions">
+                <button type="button" id="export-pressed">匯出已按下項目</button>
+                <button type="button" id="export-unpressed">匯出未按下項目</button>
+                <button type="button" id="copy-attendance">複製結果</button>
+            </div>
+            <textarea id="attendance-output" aria-label="點名匯出結果" placeholder="請選擇上方匯出類型，結果將顯示於此，可直接複製或編輯。"></textarea>
+            <div id="attendance-export-status" aria-live="polite"></div>
+        </section>
         <audio preload="none" id="clickSound" src="m/click.mp3"></audio>
         <audio preload="none" id="scoreSound" src="m/Sou.mp3"></audio>
         <audio preload="none" id="coin1Sound" src="m/coin1.mp3"></audio>
@@ -805,6 +895,7 @@ window.addEventListener('DOMContentLoaded', () => {
     flameOverlay.style.opacity = '0';
 });
 
+    const introText = document.querySelector('.intro');
     const inputArea = document.getElementById('input-area');
     const shuffleAnimationContainer = document.getElementById('shuffle-animation-container');
     const cardContainer = document.getElementById('card-container');
@@ -986,6 +1077,7 @@ let drawnCards = [];
 
 // 洗牌抽籤系統
 shuffleBtn.addEventListener('click', () => {
+    resetAttendanceExport();
     clickSound.currentTime = 0; 
     clickSound.play().catch(error => console.warn('按鈕音效失敗:', error));
     
@@ -996,6 +1088,7 @@ shuffleBtn.addEventListener('click', () => {
     }
     descriptionBox.innerHTML = '';
     descriptionBox.style.display = 'none';
+    introText.hidden = true;
     inputArea.style.display = 'none';
     exampleContainer.style.display = 'none'; 
     cardContainer.style.display = 'flex';
@@ -3416,6 +3509,58 @@ function endPokerGame() {
     });
 }
 
+        // 點名狀態與匯出：以實際卡片狀態為準，保留輸入名單原有順序及重複項目。
+        const attendancePanel = document.getElementById('attendance-export');
+        const attendanceOutput = document.getElementById('attendance-output');
+        const attendanceSummary = document.getElementById('attendance-summary');
+        const attendanceStatus = document.getElementById('attendance-export-status');
+        const exportPressedBtn = document.getElementById('export-pressed');
+        const exportUnpressedBtn = document.getElementById('export-unpressed');
+        const copyAttendanceBtn = document.getElementById('copy-attendance');
+        let attendanceCards = [];
+        let attendanceExportMode = null;
+
+        function updateAttendanceSummary() {
+            const pressed = attendanceCards.filter(card => card.classList.contains('dimmed')).length;
+            attendanceSummary.textContent = `已按下 ${pressed} 項｜未按下 ${attendanceCards.length - pressed} 項｜總計 ${attendanceCards.length} 項`;
+        }
+        function exportAttendance(mode) {
+            attendanceExportMode = mode;
+            const pressed = mode === 'pressed';
+            const selected = attendanceCards.filter(card => card.classList.contains('dimmed') === pressed);
+            attendanceOutput.value = selected.map(card => card.dataset.attendanceItem).join('\n');
+            exportPressedBtn.classList.toggle('active', pressed);
+            exportUnpressedBtn.classList.toggle('active', !pressed);
+            attendanceStatus.textContent = `已匯出${pressed ? '已按下' : '未按下'}項目，共 ${selected.length} 項。`;
+        }
+        exportPressedBtn.addEventListener('click', () => exportAttendance('pressed'));
+        exportUnpressedBtn.addEventListener('click', () => exportAttendance('unpressed'));
+        copyAttendanceBtn.addEventListener('click', async () => {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(attendanceOutput.value);
+                } else {
+                    attendanceOutput.focus();
+                    attendanceOutput.select();
+                    if (!document.execCommand('copy')) throw new Error('copy failed');
+                }
+                attendanceStatus.textContent = '匯出欄位內容已複製。';
+            } catch {
+                attendanceOutput.focus();
+                attendanceOutput.select();
+                attendanceStatus.textContent = '無法自動複製，請使用 Ctrl+C 複製選取的文字。';
+            }
+        });
+        function resetAttendanceExport() {
+            attendanceCards = [];
+            attendanceExportMode = null;
+            attendancePanel.style.display = 'none';
+            attendanceOutput.value = '';
+            attendanceStatus.textContent = '';
+            exportPressedBtn.classList.remove('active');
+            exportUnpressedBtn.classList.remove('active');
+        }
+
         // 點名設定
         callBtn.addEventListener('click', () => {
             clickSound.currentTime = 0; // 重置播放位置
@@ -3425,10 +3570,13 @@ function endPokerGame() {
                 alert('請至少輸入一個項目進行點名！');
                 return;
             }
+            resetAttendanceExport();
+            introText.hidden = true;
             inputArea.style.display = 'none';
             exampleContainer.style.display = 'none'; 
             cardContainer.style.display = 'flex';
             cardContainer.innerHTML = '';
+            attendancePanel.style.display = 'block';
             const colorMap = {
                 '#728ee2': ["經國","大竹","南崁","南昌","中壢","環東","桃鶯","正光","八德","龍潭","楊梅","龜山","大園"],
                 '#9bc490': ["竹北"],
@@ -3440,38 +3588,42 @@ function endPokerGame() {
             items.forEach(item => {
                 const formattedItem = formatCardName(item);
                 const card = document.createElement('div');
-                card.className = 'card hoverable';
-                card.textContent = formattedItem; 
-                card.style.height = '28px'; 
-                card.style.lineHeight = '28px';
-                card.style.fontSize = '16px';
-                card.style.textAlign = 'center';
-                card.style.backgroundColor = '#e6c35c';
-                card.style.color = '#000';
-                card.style.fontWeight = 'bold';
-                card.style.borderRadius = '4px';
-                card.style.boxShadow = '0px 3px 5px rgba(0, 0, 0, 0.6)';
-                if (item.length >= 4) { 
-                    card.style.fontSize = '12px'; 
-                }
+                card.className = 'card attendance-card';
+                card.dataset.attendanceItem = item;
+                card.textContent = formattedItem;
+                if (item.length >= 8) card.style.fontSize = '13px';
+                let buttonColor = '#e6c35c';
                 for (const [color, keywords] of Object.entries(colorMap)) {
                     if (keywords.includes(item)) {
-                        card.style.backgroundColor = color;
+                        buttonColor = color;
                         break;
                     }
                 }
+                card.style.setProperty('--attendance-color', buttonColor);
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('aria-pressed', 'false');
                 card.addEventListener('click', () => {
                     cutSound.currentTime = 0;
                     cutSound.play();
                     card.classList.toggle('dimmed');
-                    card.classList.remove('hoverable'); 
-                    setTimeout(() => card.classList.add('hoverable'), 10); 
+                    card.setAttribute('aria-pressed', String(card.classList.contains('dimmed')));
+                    updateAttendanceSummary();
+                    if (attendanceExportMode) exportAttendance(attendanceExportMode);
+ 
+                });
+                card.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); card.click(); }
                 });
                 cardContainer.appendChild(card);
+                attendanceCards.push(card);
             });
+            updateAttendanceSummary();
         });
 
         clearBtn.addEventListener('click', () => {
+            resetAttendanceExport();
+            introText.hidden = false;
             stopFlameAnimation();
             document.querySelectorAll('.tooltip').forEach(tooltip => { tooltip.style.opacity = '0'; tooltip.style.left = '0'; });
             cardContainer.classList.remove('tarot-mode');
