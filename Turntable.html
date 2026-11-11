@@ -378,9 +378,9 @@
     #dice-controls { flex: 0 0 auto; color: #c5d8d4; font: 14px system-ui; }
     #dice-count { width: 48px; padding: 10px 6px; border: 1px solid #66847c; border-radius: 8px; background: #142d31; color: white; font: 17px system-ui; }
     .game-stage { position: relative; width: 100%; aspect-ratio: 1; display: grid; place-items: center; perspective: 1000px; }
-    .coin-scene { background: radial-gradient(ellipse at 50% 75%, #b68b3730, transparent 65%); }
+    .coin-scene { background: radial-gradient(ellipse at 50% 67%, #b68b3718, transparent 43%); overflow: hidden; }
     .coin-scene::after { content: ''; position: absolute; width: 52%; height: 8%; bottom: 10%; background: #0007; border-radius: 50%; filter: blur(10px); }
-    .coin-3d { width: 55%; aspect-ratio: 1; position: relative; transform-style: preserve-3d; z-index: 1; }
+    .coin-3d { width: 52%; aspect-ratio: 1; position: relative; transform-style: preserve-3d; z-index: 1; }
     .coin-face, .coin-edge { position: absolute; inset: 0; border-radius: 50%; backface-visibility: hidden; }
     .coin-face { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 5px solid #cfa44e; box-sizing: border-box; color: #654417; background: radial-gradient(circle at 30% 20%, #fff0bf, #dfb65e 50%, #ad752e); box-shadow: inset 0 0 0 3px #ffe7a8, inset 0 0 0 7px #ad813d, inset 0 0 20px #80531c55; text-shadow: 0 1px #fff1c8; font: 600 25px system-ui; }
     .coin-face b { font-size: 54px; line-height: 1.3; }
@@ -397,6 +397,27 @@
     .die-face[data-value="1"] .pip { background: #a9554d; }
     .game-status { min-height: 28px; margin: 18px 0 0; color: #eddbaf; font: 16px/1.6 system-ui; }
     @media(max-width:400px) { .die { --size: 36px; } .die-face { padding: 5px; gap: 2px; } }
+
+    #bullet-controls { flex: 0 0 auto; font: 13px system-ui; color: #c5d8d4; }
+    #bullet-count { width: 40px; padding: 10px 4px; border: 1px solid #66847c; border-radius: 8px; background: #142d31; color: white; font: 17px system-ui; }
+    .table-scene { border-radius: 50%; background: repeating-radial-gradient(ellipse at 25% 30%, #61442f22 0 3px, #ac82531a 4px 7px), radial-gradient(circle at 35% 25%, #725941, #46372b 70%); border: 9px solid #856a47; box-sizing: border-box; box-shadow: inset 0 0 0 2px #c8a97166, inset 0 0 35px #0006, 0 8px 0 #54422f, 0 15px 0 #30291f, 0 28px 35px #0008; }
+    .table-inlay { position: absolute; inset: 13px; border: 1px solid #c7aa7455; border-radius: 50%; }
+    .revolver-model { width: 96%; transform: perspective(800px) rotateX(16deg) rotateZ(-24deg); transform-style: preserve-3d; filter: drop-shadow(8px 16px 5px #0009); }
+    .gun-body { display: block; width: 100%; overflow: visible; }
+    #revolver-cylinder { transform-box: fill-box; transform-origin: center; }
+    .chamber-indicator { position: absolute; bottom: 12%; left: 12%; right: 12%; text-align: center; font: 11px system-ui; color: #dfcdaa; letter-spacing: .05em; }
+    #reload-round { margin-top: 14px; font-size: 14px; background: #354d49; }
+    #shot-flash { position: fixed; inset: 0; background: #fff5db; z-index: 10000; pointer-events: none; }
+    .revolver-webgl { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; touch-action: none; }
+    .model-loaded .revolver-model { display: none; }
+    .table-scene.model-loaded { background: transparent; border: 0; box-shadow: none; border-radius: 0; margin-bottom: 18px; }
+    .model-loaded .table-inlay { display: none; }
+    .model-loaded .revolver-webgl { border-radius: 0; }
+    .model-loaded .chamber-indicator { bottom: -10px; }
+    .chamber-indicator { z-index: 2; pointer-events: none; }
+    #model-tools { margin-top: 10px; font: 11px/1.7 system-ui; color: #acc0ba; }
+    #model-tools a { color: #c6d8cf; }
+    #reset-model-view { font: 12px system-ui; padding: 6px 10px; background: #29453f; margin-right: 8px; }
   </style>
 </head>
 <body>
@@ -433,16 +454,52 @@
       <div id="coin-stage" class="game-stage coin-scene" hidden aria-label="3D硬幣">
         <div class="coin-3d" id="coin-3d">
           <div class="coin-edge" style="transform:translateZ(-4px)"></div><div class="coin-edge" style="transform:translateZ(-2px)"></div><div class="coin-edge" style="transform:translateZ(0px)"></div><div class="coin-edge" style="transform:translateZ(2px)"></div><div class="coin-edge" style="transform:translateZ(4px)"></div>
-          <div class="coin-face coin-heads"><b>✦</b><span>正面</span><small>DCCOOL · HEADS</small></div>
-          <div class="coin-face coin-tails"><b>☾</b><span>反面</span><small>DCCOOL · TAILS</small></div>
+          <div class="coin-face coin-heads"><b>✦</b><span>正面</span></div>
+          <div class="coin-face coin-tails"><b>☾</b><span>反面</span></div>
         </div>
       </div>
       <div id="dice-stage" class="game-stage glass-scene" hidden aria-label="玻璃罩內的3D骰子"></div>
+
+      <div id="revolver-stage" class="game-stage table-scene" hidden aria-label="圓桌上的立體左輪手槍">
+        <div class="table-inlay" aria-hidden="true"></div>
+        <div class="revolver-model" id="revolver-model" aria-hidden="true">
+          <svg viewBox="0 0 400 280" class="gun-body">
+            <defs>
+              <linearGradient id="gunmetal" x2="0.25" y2="1"><stop stop-color="#7a858c"/><stop offset=".2" stop-color="#39434b"/><stop offset=".55" stop-color="#172129"/><stop offset=".85" stop-color="#454f57"/><stop offset="1" stop-color="#111920"/></linearGradient>
+              <linearGradient id="wood" x2="1" y2=".6"><stop stop-color="#bc8755"/><stop offset=".3" stop-color="#855032"/><stop offset=".7" stop-color="#603b29"/><stop offset="1" stop-color="#a36b43"/></linearGradient>
+              <radialGradient id="cylinder-metal" cx="35%" cy="25%"><stop stop-color="#8d989f"/><stop offset=".5" stop-color="#3b464f"/><stop offset="1" stop-color="#151e25"/></radialGradient>
+            </defs>
+            <path d="M37 94H172L189 80H257L282 116 268 157 308 235Q310 248 294 252L245 260Q231 260 225 247L198 177H169L151 142H37Z" fill="#0c131a" stroke="#0c1117" stroke-width="14" transform="translate(1 10)"/>
+            <path d="M37 94H172L189 80H257L282 116 268 157 308 235Q310 248 294 252L245 260Q231 260 225 247L198 177H169L151 142H37Z" fill="url(#gunmetal)" stroke="#657079" stroke-width="2"/>
+            <path d="M37 99H166V132H37Z" fill="url(#gunmetal)" stroke="#879299"/>
+            <path d="M44 107H154M44 126H154" stroke="#101a22" stroke-width="3"/>
+            <path d="M50 95V85H64V95M247 83L267 66 277 72 268 92" fill="#29353e" stroke="#6c7b86" stroke-width="2"/>
+            <path d="M192 165Q178 208 227 211L239 186" fill="none" stroke="#151f27" stroke-width="11"/>
+            <path d="M192 163Q178 203 226 205L237 183" fill="none" stroke="#64717b" stroke-width="3"/>
+            <path d="M207 161Q196 185 210 191" fill="none" stroke="#81909b" stroke-width="7"/>
+            <path d="M242 155L263 162 297 237 244 249 217 177Z" fill="url(#wood)" stroke="#4d3024" stroke-width="4"/>
+            <path d="M229 180l38 -9" stroke="#3d281e" stroke-opacity=".5" stroke-width="2"/><path d="M232 190l38 -9" stroke="#3d281e" stroke-opacity=".5" stroke-width="2"/><path d="M235 200l38 -9" stroke="#3d281e" stroke-opacity=".5" stroke-width="2"/><path d="M238 210l38 -9" stroke="#3d281e" stroke-opacity=".5" stroke-width="2"/><path d="M241 220l38 -9" stroke="#3d281e" stroke-opacity=".5" stroke-width="2"/><path d="M244 230l38 -9" stroke="#3d281e" stroke-opacity=".5" stroke-width="2"/>
+            <circle cx="258" cy="211" r="5" fill="#b0986c" stroke="#4c4438"/><path d="M255 211h6" stroke="#51473b"/>
+            <g id="revolver-cylinder">
+              <circle cx="199" cy="126" r="40" fill="#111b23" stroke="#a6b1b7" stroke-width="2"/>
+              <circle cx="199" cy="126" r="36" fill="url(#cylinder-metal)" stroke="#4c5a65" stroke-width="2"/>
+              <circle cx="199" cy="102" r="8" fill="#10181e" stroke="#7d8a92" stroke-width="2"/><circle cx="219.78460969082653" cy="114" r="8" fill="#10181e" stroke="#7d8a92" stroke-width="2"/><circle cx="219.78460969082653" cy="138" r="8" fill="#10181e" stroke="#7d8a92" stroke-width="2"/><circle cx="199" cy="150" r="8" fill="#10181e" stroke="#7d8a92" stroke-width="2"/><circle cx="178.21539030917347" cy="138" r="8" fill="#10181e" stroke="#7d8a92" stroke-width="2"/><circle cx="178.21539030917347" cy="114" r="8" fill="#10181e" stroke="#7d8a92" stroke-width="2"/>
+              <circle cx="199" cy="126" r="8" fill="#67747c" stroke="#172029" stroke-width="3"/><circle cx="199" cy="126" r="3" fill="#26323a"/>
+            </g>
+            <path d="M181 80H240" stroke="#abb5bb" stroke-width="3"/><ellipse cx="36" cy="115" rx="5" ry="18" fill="#10181c" stroke="#78868e" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="chamber-indicator" id="chamber-indicator">六格彈倉 · 等待裝填</div>
+      </div>
+      <div id="shot-flash" aria-hidden="true" hidden></div>
+      <div id="model-tools" hidden><button id="reset-model-view" type="button">重設左輪角度</button></div>
       <div id="game-status" class="game-status" role="status" aria-live="polite" hidden></div>
       <div class="buttons">
+        <div id="bullet-controls" hidden><label>裝上 <input id="bullet-count" type="number" min="1" max="6" step="1" value="1" aria-label="子彈顆數"> 顆子彈</label></div>
         <div id="dice-controls" hidden><label><input id="dice-count" type="number" min="1" max="10" step="1" value="1" aria-label="骰子顆數"> 顆骰子</label></div>
         <button id="spinButton">啟動轉盤</button>
       </div>
+      <button id="reload-round" type="button" hidden>重新裝彈，開始新局</button>
       <div id="timeDisplay">
         <div id="date"></div>
         <div id="time"></div>
@@ -524,22 +581,46 @@
     let currentRotationAngle = 0;
     let time = 0;
     let gameMode = 'wheel';
+    let revolverRound = null;
+    let revolverViewerPromise = null;
+    let revolverViewer = null;
+    function ensureRevolverViewer() {
+      if (!revolverViewerPromise) {
+        document.getElementById('chamber-indicator').textContent = '3D 模型載入中…';
+        revolverViewerPromise = import('./assets/revolver-viewer.js')
+          .then(module => module.createRevolverViewer(document.getElementById('revolver-stage')))
+          .then(viewer => { revolverViewer = viewer; if (!spinning) { document.getElementById('chamber-indicator').textContent = '六格彈倉 · 等待裝填'; viewer.setAmmoCount(readBulletCount()); } return viewer; })
+          .catch(error => { revolverViewerPromise = null; document.getElementById('chamber-indicator').textContent = '模型載入失敗，按擊發重試'; throw error; });
+      }
+      return revolverViewerPromise;
+    }
+    document.getElementById('reset-model-view').addEventListener('click', () => revolverViewer?.resetView());
     let wheelButtonContent = null;
 
 
     function syncGameMode() {
-      gameMode = options.length === 2 && options.includes('正面') && options.includes('反面') ? 'coin' : options.length === 6 && options[0] === '⚀' ? 'dice' : 'wheel';
+      gameMode = revolverMode ? 'revolver' : options.length === 2 && options.includes('正面') && options.includes('反面') ? 'coin' : options.length === 6 && options[0] === '⚀' ? 'dice' : 'wheel';
       document.querySelector('.wheel-stage').hidden = gameMode !== 'wheel';
       document.getElementById('coin-stage').hidden = gameMode !== 'coin';
       document.getElementById('dice-stage').hidden = gameMode !== 'dice';
       document.getElementById('dice-controls').hidden = gameMode !== 'dice';
+      document.getElementById('revolver-stage').hidden = gameMode !== 'revolver';
+      document.getElementById('model-tools').hidden = gameMode !== 'revolver';
+      document.getElementById('bullet-controls').hidden = gameMode !== 'revolver';
+      document.getElementById('reload-round').hidden = true;
+      document.getElementById('bullet-count').disabled = false;
+      revolverRound = null;
+      spinButton.disabled = false;
       const status = document.getElementById('game-status');
       status.hidden = gameMode === 'wheel';
       status.textContent = gameMode === 'coin' ? '翻轉硬幣，讓命運選一面' : '選擇 1～10 顆骰子';
+      document.querySelectorAll('.palette-btn').forEach(button => { button.disabled = false; });
+      if (gameMode === 'revolver') { status.textContent = '裝填 1～6 顆子彈，開始新的一局'; document.getElementById('revolver-cylinder').style.transform = 'rotate(0deg)'; document.getElementById('chamber-indicator').textContent = '六格彈倉 · 等待裝填'; }
+      if (gameMode === 'revolver') { revolverViewer?.reset(); revolverViewer?.setAmmoCount(readBulletCount()); ensureRevolverViewer().catch(() => {}); }
       resultBox.style.display = 'none';
       if (gameMode !== 'wheel') {
         if (!wheelButtonContent) wheelButtonContent = Array.from(spinButton.childNodes);
-        spinButton.textContent = gameMode === 'coin' ? '投擲硬幣' : '擲骰';
+        spinButton.textContent = gameMode === 'coin' ? '投擲硬幣' : gameMode === 'dice' ? '擲骰' : '擊發';
       } else if (wheelButtonContent) {
         spinButton.replaceChildren(...wheelButtonContent);
         wheelButtonContent = null;
@@ -581,8 +662,80 @@
       }
       return Array.from(stage.querySelectorAll('.die'));
     }
+
+    function readBulletCount() {
+      const input=document.getElementById('bullet-count');
+      const count=Math.max(1,Math.min(6,Math.floor(Number(input.value)||1)));
+      input.value=count; return count;
+    }
+    async function runRevolverRound() {
+      if(spinning || revolverRound?.ended) return;
+      spinning=true;
+      const controls=Array.from(document.querySelectorAll('.template-buttons button, #updateButton, .palette-btn, #bullet-count, #spinButton'));
+      controls.forEach(el=>el.disabled=true);
+      const status=document.getElementById('game-status');
+      const indicator=document.getElementById('chamber-indicator');
+      const cylinder=document.getElementById('revolver-cylinder');
+      const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      try {
+        const viewer = await ensureRevolverViewer();
+        if(!revolverRound) {
+          const bullets=readBulletCount();
+          const chambers=Array.from({length:6},(_,i)=>i<bullets);
+          for(let i=5;i>0;i--){const j=randomOutcome(i+1)-1;[chambers[i],chambers[j]]=[chambers[j],chambers[i]];}
+          revolverRound={chambers,index:0,angle:0,bullets,ended:false};
+        }
+        const round=revolverRound;
+        const first=round.index===0;
+        if (!round.loaded) {
+          status.textContent='子彈裝填中…';
+          await viewer.loadAmmo(round.bullets,reduced);
+          round.loaded=true;
+        }
+        status.textContent='左輪抬升中…';
+        await viewer.raiseForShot(reduced,!first);
+        status.textContent=first?'彈倉旋轉中…':'彈倉前進一格…';
+        const sound=first?revolverSound:revolver1Sound;
+        sound.currentTime=0;sound.play().catch(()=>{});
+        const angle=round.angle+(first?2160:60);
+        await viewer.spinCylinder(round.angle, angle, first ? 2200 : 260, reduced);
+        round.angle=angle;
+        status.textContent='槍口瞄準中…';
+        await viewer.aimAtCamera(reduced,!first);
+        await viewer.fire(reduced,!first);
+        const hit=round.chambers[round.index++];
+        indicator.textContent='第 '+round.index+' / 6 格 · '+(hit?'實彈':'空包');
+        if(hit){
+          round.ended=true;
+          status.textContent='實彈擊發 · 本局結束';
+          const flash=document.getElementById('shot-flash');
+          if(!reduced){flash.hidden=false;const blink=flash.animate([{opacity:.65},{opacity:0}],{duration:140,fill:'forwards'});await blink.finished;flash.hidden=true;blink.cancel();}
+          gunshotSound.currentTime=0;gunshotSound.play().catch(()=>{});
+          if(typeof confetti==='function') confetti({particleCount:100,colors:['#bc303a','#e65459','#7d2430'],spread:70,origin:{x:.5,y:.5}});
+          document.getElementById('reload-round').hidden=false;
+        }else{
+          missSound.currentTime=0;missSound.play().catch(()=>{});
+          const remaining=6-round.index;
+          status.textContent='空包 · 可繼續擊發（剩餘 '+remaining+' 格，實彈機率 '+round.bullets+'/'+remaining+'）';
+        }
+        viewer.lowerAfterShot(reduced);
+      }catch(error){
+        if(revolverViewer)revolverViewer.lowerAfterShot(true);
+        status.textContent='3D 模型尚未就緒，請重試或重新載入頁面';
+        console.error('Revolver model:',error);
+      }finally{
+        spinning=false;controls.forEach(el=>el.disabled=false);
+        document.getElementById('bullet-count').disabled=!!revolverRound&&!revolverRound.ended;
+        document.querySelectorAll('.palette-btn').forEach(button => { button.disabled = !!revolverRound && !revolverRound.ended; });
+        spinButton.disabled=!!revolverRound?.ended;
+      }
+    }
+    document.getElementById('bullet-count').addEventListener('change',()=>{const count=readBulletCount();if(!spinning)revolverViewer?.setAmmoCount(count);});
+    document.getElementById('reload-round').addEventListener('click',()=>{if(!spinning)syncGameMode();});
+
     async function run3DGame() {
       if (spinning) return;
+      if (gameMode === 'revolver') { await runRevolverRound(); return; }
       spinning = true;
       const controls = Array.from(document.querySelectorAll('.template-buttons button, #updateButton, .palette-btn, #dice-count, #spinButton'));
       controls.forEach(el => el.disabled = true);
@@ -633,6 +786,8 @@
       }
     }
     document.getElementById('dice-count').addEventListener('change',()=>{ if(!spinning) renderDice(Array(readDiceCount()).fill(1)); });
+    document.getElementById('dice-count').addEventListener('input', event => { if (!spinning && event.target.value !== '') renderDice(Array(readDiceCount()).fill(1)); });
+    document.getElementById('bullet-count').addEventListener('input', event => { if (!spinning && event.target.value !== '') revolverViewer?.setAmmoCount(readBulletCount()); });
     document.querySelectorAll('.template-buttons button, #updateButton, .palette-btn').forEach(el=>el.addEventListener('click',event=>{ if(spinning) {event.preventDefault();event.stopImmediatePropagation();} },true));
 
     function isDarkColor(color) {
@@ -1160,7 +1315,7 @@ function cheatSpinToIndex(index, label) {
     const muteIcon = '🔇';
     const playIcon = '♫';
     const pauseIcon = '❚❚';
-    const soundList = [resultSound, startSound, gunshotSound, coinSound, scoreSound, clickSound, cheerSound];
+    const soundList = [resultSound, startSound, gunshotSound, coinSound, scoreSound, clickSound, cheerSound, diceSound, missSound, revolverSound, revolver1Sound];
     soundList.forEach(sound => sound.volume = 0.5);
     coinSound.volume = 0.6;
     volumeSlider.addEventListener('input', (event) => {
