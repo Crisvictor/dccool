@@ -505,9 +505,10 @@
   @media(max-width:620px){.eye-switch{margin-left:0}}
 
   /* 內建自由取型：預1、預2、預3，與重設按鈕同行排列 */
-  .shape-preset-buttons{display:inline-flex;gap:4px;align-items:center;flex-wrap:nowrap}
+  .shape-preset-buttons{display:inline-flex;gap:6px;align-items:center;flex-wrap:nowrap;padding:4px 7px;border:1px solid #2d435a;border-radius:9px;background:#101f31}
+  .shape-preset-buttons::before{content:"內建輪廓";font-size:11px;color:#93b5cc;white-space:nowrap}
   .shape-toolbar button.shape-preset,.work-slot .shape-toolbar button.shape-preset{
-    min-width:42px;padding:7px 9px;border:1px solid #426780;border-radius:8px;
+    min-width:26px;width:26px;height:26px;flex:0 0 26px;padding:0;border:1px solid #426780;border-radius:50%;
     background:#153047;color:#bcd9e9;font-size:12px;font-weight:650;white-space:nowrap
   }
   .shape-toolbar button.shape-preset:hover,.work-slot .shape-toolbar button.shape-preset:hover{
@@ -518,7 +519,7 @@
   }
   @media(max-width:520px){
     .shape-toolbar button.shape-preset,.work-slot .shape-toolbar button.shape-preset{
-      min-width:39px;padding:7px 8px;font-size:11px
+      min-width:26px;padding:0;font-size:11px
     }
   }
 
@@ -554,7 +555,13 @@ body.wear-active .panel-tabs{margin-bottom:6px}
 .wear-accordion>div{padding:11px 12px 12px}
 .wear-subtitle{font-size:12px;color:#9dd2ed;font-weight:650;margin:7px 0 9px}
 .wear-divider{height:1px;background:#293e54;margin:13px 0 11px}
+.wear-preset-bar{display:flex;align-items:center;gap:6px;padding:5px 8px;margin:5px 0;border:1px solid #2d435a;border-radius:9px;background:#101f31;min-height:36px;box-sizing:border-box}
+.wear-preset-bar>span{font-size:11px;color:#93b5cc;margin-right:3px;white-space:nowrap}
+.wear-btn.wear-preset-dot{flex:0 0 26px;width:26px;height:26px;padding:0;border-radius:50%;font-size:11px;line-height:24px;text-align:center}
 .wear-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 9px}
+.wear-frame-dimensions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;grid-column:1/-1}
+.wear-frame-dimensions input{width:100%;min-width:0;padding-left:5px;padding-right:5px}
+.wear-frame-dimensions label{white-space:nowrap}
 .wear-field{display:flex;flex-direction:column;gap:5px;min-width:0}
 .wear-field.wide{grid-column:1 / -1}
 .wear-field label{font-size:11px;color:#b3c9db;display:block}
@@ -573,13 +580,6 @@ body.wear-active .panel-tabs{margin-bottom:6px}
 #wearShapeSVG .wear-point{fill:#24c6e8;stroke:#dbf8ff;stroke-width:.7;cursor:ew-resize}
 #wearShapeSVG .wear-point.vert{fill:#f4ae62;cursor:ns-resize}
 #wearShapeSVG .wear-point[data-group="B"]{cursor:move;fill:#ffbd63}
-.wear-bottom-b-control{margin:0 0 9px;padding:10px 12px;background:#102339;border:1px solid #294760;border-radius:10px;display:grid;gap:7px}
-.wear-bottom-b-control[hidden]{display:none}
-.wear-bottom-b-head{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#b7d7ea;font-size:12px;font-weight:600}
-#wearBottomBOffsetValue{font-weight:650;color:#7ed9f6;font-variant-numeric:tabular-nums}
-.wear-bottom-b-slider-row{display:flex;align-items:center;gap:9px;font-size:11px;color:#94b8ca}
-#wearBottomBOffset{min-width:0;flex:1;accent-color:#33bee8;cursor:ew-resize}
-.wear-bottom-b-slider-row .wear-btn{padding:5px 9px;flex:none}
 .wear-shape-limits{font-size:10.5px;color:#8faec3;line-height:1.5;margin:0}
 #wearShapeSVG .wear-point.active{fill:#fff}
 .wear-shape-metrics{color:#9cc9df;font-size:11px;padding:2px 4px}
@@ -630,6 +630,8 @@ body.wear-active .panel-tabs{margin-bottom:6px}
 .wear-image-reference::before{left:50%;width:1px;top:0;bottom:0}
 .wear-image-reference::after{top:50%;height:1px;left:0;right:0}
 .wear-image-object{position:absolute;left:50%;top:50%;transform:translate(calc(-50% + var(--shift-x,0px)),calc(-50% + var(--shift-y,0px)));font-size:46px;font-family:Arial,sans-serif;font-weight:800;letter-spacing:-4px;color:#e6faff;opacity:.95;filter:blur(var(--optical-blur,0px));text-shadow:0 0 14px #54b9ee55;will-change:transform}
+.wear-image-object.wear-image-ghost{color:#ffc889;opacity:.28;text-shadow:none;pointer-events:none;z-index:1}
+.wear-image-object:not(.wear-image-ghost){z-index:2}
 .wear-image-legend{font-size:10px;color:#97bad1;line-height:1.5;margin-top:6px}
 @media(max-width:620px){.wear-image-previews{grid-template-columns:1fr}}
 
@@ -780,7 +782,7 @@ body.wear-active .panel-tabs{margin-bottom:6px}
 
                     <div class="wear-field"><label for="w_od_n" title="鏡片折射率 n">折射率 n</label><select id="w_od_n"><option>1.50</option><option>1.56</option><option selected>1.60</option><option>1.67</option><option>1.74</option></select></div>
 
-                    <div class="wear-field"><label for="w_od_ocpd" title="光學中心單眼瞳距（mm）">光心單眼瞳距</label><input id="w_od_ocpd" type="number" min="20" max="40" step=".5" value="31"></div>
+                    <div class="wear-field"><label for="w_od_ocpd" title="光學中心單眼瞳距（mm）">光心 PD</label><input id="w_od_ocpd" type="number" min="20" max="40" step=".5" value="31"></div>
 
                     <div class="wear-field"><label for="w_od_och" title="光學中心高度（自框底，mm）">光心高</label><input id="w_od_och" type="number" min="0" max="60" step=".5" value="20"></div>
 
@@ -797,7 +799,7 @@ body.wear-active .panel-tabs{margin-bottom:6px}
 
                     <div class="wear-field"><label for="w_os_n" title="鏡片折射率 n">折射率 n</label><select id="w_os_n"><option>1.50</option><option>1.56</option><option selected>1.60</option><option>1.67</option><option>1.74</option></select></div>
 
-                    <div class="wear-field"><label for="w_os_ocpd" title="光學中心單眼瞳距（mm）">光心單眼瞳距</label><input id="w_os_ocpd" type="number" min="20" max="40" step=".5" value="31"></div>
+                    <div class="wear-field"><label for="w_os_ocpd" title="光學中心單眼瞳距（mm）">光心 PD</label><input id="w_os_ocpd" type="number" min="20" max="40" step=".5" value="31"></div>
 
                     <div class="wear-field"><label for="w_os_och" title="光學中心高度（自框底，mm）">光心高</label><input id="w_os_och" type="number" min="0" max="60" step=".5" value="20"></div>
 
@@ -826,28 +828,29 @@ body.wear-active .panel-tabs{margin-bottom:6px}
                   <button type="button" class="wear-btn active" id="wearModeNormal">一般框型</button><button type="button" class="wear-btn" id="wearModeFree">自由取型</button>
                   <button type="button" class="wear-btn" id="wearResetShape">重設</button>
                 </div>
-                <div class="wear-group-row"><span style="font-size:11px;color:#93b5cc">內建輪廓</span>
-                  <button type="button" class="wear-btn" data-wear-preset="預1">預1</button>
-                  <button type="button" class="wear-btn" data-wear-preset="預2">預2</button>
-                  <button type="button" class="wear-btn" data-wear-preset="預3">預3</button>
+                <div class="wear-preset-bar" role="group" aria-label="內建輪廓">
+                  <span>內建輪廓</span>
+                  <button type="button" class="wear-btn wear-preset-dot" data-wear-preset="A" aria-pressed="false" title="輪廓 A">A</button>
+                  <button type="button" class="wear-btn wear-preset-dot" data-wear-preset="B" aria-pressed="false" title="輪廓 B">B</button>
+                  <button type="button" class="wear-btn wear-preset-dot" data-wear-preset="C" aria-pressed="false" title="輪廓 C">C</button>
+                  <button type="button" class="wear-btn wear-preset-dot" data-wear-preset="D" aria-pressed="false" title="輪廓 D">D</button>
+                  <button type="button" class="wear-btn wear-preset-dot" data-wear-preset="E" aria-pressed="false" title="輪廓 E">E</button>
+                  <button type="button" class="wear-btn wear-preset-dot" data-wear-preset="F" aria-pressed="false" title="輪廓 F">F</button>
                 </div>
                 <div class="wear-shape-container">
                   <svg id="wearShapeSVG" viewBox="0 0 220 140" role="img" aria-label="鏡框輪廓示意，自由取型模式可調整14個控制點"></svg>
                   <div class="wear-shape-metrics" id="wearShapeMetrics">框型 A — · B —</div>
                 </div>
-                <div class="wear-bottom-b-control" id="wearBottomBControls" hidden>
-                  <div class="wear-bottom-b-head"><label for="wearBottomBOffset">下 B 點水平偏移</label><output id="wearBottomBOffsetValue" for="wearBottomBOffset">置中 · 0%</output></div>
-                  <div class="wear-bottom-b-slider-row"><span>鼻側</span><input type="range" id="wearBottomBOffset" min="-33" max="33" step="1" value="0" aria-label="下 B 點水平偏移，負數偏鼻側，正數偏顳側"><span>顳側</span><button type="button" class="wear-btn" id="wearBottomBReset">置中</button></div>
-                </div>
                 <div class="wear-fields">
+                  <div class="wear-frame-dimensions">
                   <div class="wear-field"><label for="w_frameA">框寬 A (mm)</label><input id="w_frameA" type="number" min="35" max="75" step=".5" value="52"></div>
                   <div class="wear-field"><label for="w_frameB">框高 B (mm)</label><input id="w_frameB" type="number" min="20" max="65" step=".5" value="38"></div>
                   <div class="wear-field"><label for="w_dbl">中樑 DBL (mm)</label><input id="w_dbl" type="number" min="10" max="30" step=".5" value="18"></div>
-                  <div class="wear-field"><label for="w_frameMaterial">鏡框材質</label><select id="w_frameMaterial"><option value="metal" selected>鈦金屬／細框</option><option value="acetate">板料／厚框</option><option value="black">霧黑金屬</option><option value="brow" hidden disabled>眉框（黑色膠眉＋金屬上框）</option></select></div>
+                  </div>
+                  <div class="wear-field"><label for="w_frameMaterial">鏡框材質</label><select id="w_frameMaterial"><option value="metal" selected>鈦金屬／細框</option><option value="double-metal">金屬雙槓框</option><option value="acetate">板料／厚框</option><option value="black">霧黑金屬</option><option value="brow">眉框（上膠框＋金屬下框）</option></select></div>
                   <div class="wear-field"><label for="w_rimType">框類型</label><select id="w_rimType"><option value="full" selected>全框</option><option value="groove">車溝框</option><option value="rimless">無邊框</option></select></div>
                   <div class="wear-field"><label for="w_nosepad">鼻托類型</label><select id="w_nosepad"><option value="integrated">一體式鼻托</option><option value="adjustable" selected>鼻托架＋鼻墊</option></select></div>
                   <div class="wear-field"><label for="w_temple">鏡腿長度 (mm)</label><input id="w_temple" type="number" min="120" max="160" step="5" value="140"></div>
-                  <p id="wearRimChoiceHint" class="wear-geometry-note" style="grid-column:1/-1;margin:1px 0 0">全框可選板料及一體式鼻托；車溝框與無邊框使用鼻托架。</p>
                 </div>
                 <div class="wear-step-actions"><button class="wear-btn primary" type="button" data-wear-next="3">下一步｜配戴設定 ›</button></div>
               </div>
@@ -916,8 +919,8 @@ body.wear-active .panel-tabs{margin-bottom:6px}
               <div class="wear-vector"><div class="wear-vector-title">OS 光心／視線偏移</div><svg viewBox="0 0 240 145" id="w_os_vector"></svg><div class="wear-vector-caption">非視網膜影像精確成像</div></div>
             </div>
             <div class="wear-image-previews">
-              <div class="wear-image-card"><div class="wear-image-title">OD｜稜鏡影像偏移示意</div><div class="wear-image-scene"><div class="wear-image-reference"></div><div class="wear-image-object" id="w_od_image">E</div></div><div class="wear-image-legend" id="w_od_image_note">基準視標位於十字中心</div></div>
-              <div class="wear-image-card"><div class="wear-image-title">OS｜稜鏡影像偏移示意</div><div class="wear-image-scene"><div class="wear-image-reference"></div><div class="wear-image-object" id="w_os_image">E</div></div><div class="wear-image-legend" id="w_os_image_note">偏移方向與量均為示意</div></div>
+              <div class="wear-image-card"><div class="wear-image-title">OD｜稜鏡影像偏移示意</div><div class="wear-image-scene"><div class="wear-image-reference"></div><div class="wear-image-object wear-image-ghost" id="w_od_image_other" aria-label="OS 另一眼影像對照">E</div><div class="wear-image-object" id="w_od_image">E</div></div><div class="wear-image-legend" id="w_od_image_note">基準視標位於十字中心</div></div>
+              <div class="wear-image-card"><div class="wear-image-title">OS｜稜鏡影像偏移示意</div><div class="wear-image-scene"><div class="wear-image-reference"></div><div class="wear-image-object wear-image-ghost" id="w_os_image_other" aria-label="OD 另一眼影像對照">E</div><div class="wear-image-object" id="w_os_image">E</div></div><div class="wear-image-legend" id="w_os_image_note">偏移方向與量均為示意</div></div>
             </div>
             <div class="wear-source" style="padding-top:0">視標方向採稜鏡基底反向的表觀位移示意；模糊程度僅用以提醒屈光力變化，非經校正的視力、視網膜成像或影像放大率預測。</div>
           </div>
@@ -989,9 +992,12 @@ body.wear-active .panel-tabs{margin-bottom:6px}
             <button type="button" id="modeFree" class="shape-mode">自由取型</button>
             <button type="button" id="resetShape" class="shape-reset">重設</button>
             <div class="shape-preset-buttons" id="shapePresetButtons" role="group" aria-label="內建自由取型形狀">
-              <button type="button" class="shape-preset" data-shape-preset="預1" aria-pressed="false" title="預1：A 54.62／B 43.61／ED 56.72 mm">預1</button>
-              <button type="button" class="shape-preset" data-shape-preset="預2" aria-pressed="false" title="預2：A 53.07／B 32.66／ED 54.01 mm">預2</button>
-              <button type="button" class="shape-preset" data-shape-preset="預3" aria-pressed="false" title="預3：A 52.50／B 43.48／ED 52.68 mm">預3</button>
+              <button type="button" class="shape-preset" data-shape-preset="A" aria-pressed="false" title="輪廓 A">A</button>
+              <button type="button" class="shape-preset" data-shape-preset="B" aria-pressed="false" title="輪廓 B">B</button>
+              <button type="button" class="shape-preset" data-shape-preset="C" aria-pressed="false" title="輪廓 C">C</button>
+              <button type="button" class="shape-preset" data-shape-preset="D" aria-pressed="false" title="輪廓 D">D</button>
+              <button type="button" class="shape-preset" data-shape-preset="E" aria-pressed="false" title="輪廓 E">E</button>
+              <button type="button" class="shape-preset" data-shape-preset="F" aria-pressed="false" title="輪廓 F">F</button>
             </div>
             <button type="button" id="exportShapeJSON" class="shape-export" hidden title="匯出目前眼別的 14 個控制點，可傳給 ChatGPT 製作預設形狀">匯出取型</button>
             <div class="eye-switch" role="group" aria-label="切換模擬左右眼">
@@ -3467,7 +3473,7 @@ function update3D(res){
   };
   // 三組使用者提供的 OS 原始十四點輪廓，單位 mm；右眼按 x 鏡像載入。
   // 內建在 HTML 中，不需要 JSON 外部檔或瀏覽器儲存空間。
-  const BUILTIN_FREE_PRESETS = Object.freeze({"預1":{"eye":"OS","points":{"L":[{"x":-17.16,"y":-29.35338},{"x":-23.4,"y":-22.64889},{"x":-22.22853,"y":-13.92633},{"x":-18.26282,"y":-4.11344},{"x":-12.17721,"y":4.60912},{"x":-6.0916,"y":10.65942}],"R":[{"x":23.54269,"y":-29.35338},{"x":30.42209,"y":-22.64889},{"x":31.21791,"y":-13.92633},{"x":29.62831,"y":-4.11344},{"x":25.92403,"y":4.60912},{"x":19.04463,"y":10.65942}],"T":[{"x":0,"y":-31.15338}],"B":[{"x":0,"y":12.45942}]},"measurements":{"A":54.618,"B":43.613,"ED":56.724}},"預2":{"eye":"OS","points":{"L":[{"x":-21.89535,"y":-16.2},{"x":-25.97489,"y":-11.63088},{"x":-25.33504,"y":-5.09845},{"x":-23.4829,"y":2.25053},{"x":-20.57239,"y":8.78296},{"x":-16.07433,"y":12.86215}],"R":[{"x":23.1289,"y":-16.2},{"x":27.09447,"y":-11.63088},{"x":27.094,"y":-5.09845},{"x":26,"y":2.25053},{"x":22.8643,"y":8.78296},{"x":15.3851,"y":12.86215}],"T":[{"x":0,"y":-18}],"B":[{"x":0,"y":14.66215}]},"measurements":{"A":53.069,"B":32.662,"ED":54.01}},"預3":{"eye":"OS","points":{"L":[{"x":-15.32367,"y":-27.07409},{"x":-22.20305,"y":-20.39638},{"x":-24.4303,"y":-11.70129},{"x":-22.46765,"y":-1.91932},{"x":-16.91122,"y":6.77577},{"x":-8.97346,"y":12.80135}],"R":[{"x":17.75032,"y":-27.07409},{"x":24.62971,"y":-20.39638},{"x":28.06877,"y":-11.70129},{"x":26.74645,"y":-1.91932},{"x":22.24838,"y":6.77577},{"x":13.78144,"y":12.80135}],"T":[{"x":0,"y":-28.87409}],"B":[{"x":0,"y":14.60135}]},"measurements":{"A":52.499,"B":43.475,"ED":52.678}}});
+  const BUILTIN_FREE_PRESETS = window.LENS_FRAME_PRESETS = Object.freeze({"A":{"eye":"OS","points":{"L":[{"x":-17.16,"y":-29.35338},{"x":-23.4,"y":-22.64889},{"x":-22.22853,"y":-13.92633},{"x":-18.26282,"y":-4.11344},{"x":-12.17721,"y":4.60912},{"x":-6.0916,"y":10.65942}],"R":[{"x":23.54269,"y":-29.35338},{"x":30.42209,"y":-22.64889},{"x":31.21791,"y":-13.92633},{"x":29.62831,"y":-4.11344},{"x":25.92403,"y":4.60912},{"x":19.04463,"y":10.65942}],"T":[{"x":0,"y":-31.15338}],"B":[{"x":0,"y":12.45942}]}},"B":{"eye":"OS","points":{"L":[{"x":-21.89535,"y":-16.2},{"x":-25.97489,"y":-11.63088},{"x":-25.33504,"y":-5.09845},{"x":-23.4829,"y":2.25053},{"x":-20.57239,"y":8.78296},{"x":-16.07433,"y":12.86215}],"R":[{"x":23.1289,"y":-16.2},{"x":27.09447,"y":-11.63088},{"x":27.094,"y":-5.09845},{"x":26,"y":2.25053},{"x":22.8643,"y":8.78296},{"x":15.3851,"y":12.86215}],"T":[{"x":0,"y":-18}],"B":[{"x":0,"y":14.66215}]}},"C":{"eye":"OS","points":{"L":[{"x":-15.32367,"y":-27.07409},{"x":-22.20305,"y":-20.39638},{"x":-24.4303,"y":-11.70129},{"x":-22.46765,"y":-1.91932},{"x":-16.91122,"y":6.77577},{"x":-8.97346,"y":12.80135}],"R":[{"x":17.75032,"y":-27.07409},{"x":24.62971,"y":-20.39638},{"x":28.06877,"y":-11.70129},{"x":26.74645,"y":-1.91932},{"x":22.24838,"y":6.77577},{"x":13.78144,"y":12.80135}],"T":[{"x":0,"y":-28.87409}],"B":[{"x":0,"y":14.60135}]}},"D":{"eye":"OS","points":{"L":[{"x":-14.004145091268635,"y":-29.353379999999998},{"x":-20.950041045025863,"y":-22.735256392496687},{"x":-20.189550949193787,"y":-14.125059307578352},{"x":-14.070720222847589,"y":-4.438577715863968},{"x":-6.039682802707638,"y":4.171619369054373},{"x":3.038881237450566,"y":10.143980169425063}],"R":[{"x":21.19600931776695,"y":-29.353379999999998},{"x":29.227046737906917,"y":-22.735256392496687},{"x":31.21791,"y":-14.125059307578352},{"x":30.274573357925163,"y":-4.438577715863968},{"x":27.13199349787039,"y":4.171619369054373},{"x":20.846833777760875,"y":10.143980169425063}],"T":[{"x":0,"y":-31.15338}],"B":[{"x":11.419094197596593,"y":11.943980169425064}]},"frame":{"a":52.17,"b":43.1,"dbl":15.5}},"E":{"eye":"OS","points":{"L":[{"x":-19.533015268296168,"y":-24.138452377267342},{"x":-25.97489,"y":-19.982777404099604},{"x":-25.33504,"y":-14.041446061309443},{"x":-22.573305263705144,"y":-7.357451711345014},{"x":-19.060110080184934,"y":-1.416120368554786},{"x":-15.254146397742035,"y":2.293956800308318}],"R":[{"x":20.999660185168025,"y":-24.138452377267342},{"x":27.258382832398006,"y":-19.982777404099604},{"x":27.378115654232452,"y":-14.041446061309443},{"x":21.9271648272548,"y":-7.357451711345014},{"x":12.558646571496935,"y":-1.416120368554786},{"x":1.7262925220136092,"y":2.293956800308318}],"T":[{"x":0,"y":-25.938452377267343}],"B":[{"x":-8.520524529624318,"y":4.093956800308318}]},"frame":{"a":53.35,"b":30.03,"dbl":15.5}},"F":{"eye":"OS","points":{"L":[{"x":-18.35295467669505,"y":-16.2},{"x":-24.629945180816996,"y":-13.085926606672915},{"x":-26.59732037469985,"y":-8.633763726999907},{"x":-24.64783261547813,"y":-3.6250830431718004},{"x":-20.57239,"y":0.8270798365012091},{"x":-13.744202333917693,"y":3.6072425473352014}],"R":[{"x":17.364861145872005,"y":-16.2},{"x":23.9899372819076,"y":-13.085926606672915},{"x":26.582359238556755,"y":-8.633763726999907},{"x":24.94427208421866,"y":-3.6250830431718004},{"x":20.274936028038447,"y":0.8270798365012091},{"x":12.979106372205408,"y":3.6072425473352014}],"T":[{"x":0,"y":-18}],"B":[{"x":0.49822471125654505,"y":5.407242547335201}]},"frame":{"a":53.18,"b":23.41,"dbl":16.5}}});
   const activePresetByEye = {OS:null,OD:null};
   function syncPresetUI(){
     const enabled=shapeState.mode==='free';
@@ -3487,6 +3493,7 @@ function update3D(res){
   function applyBuiltinPreset(name){
     const data=BUILTIN_FREE_PRESETS[name];
     if(!data)return;
+    if(data.frame)$('DBL').value=data.frame.dbl;
     const osPoints=copyPresetPoints(data.points);
     const next=shapeState.eye==='OS' ? osPoints : mirrorFreeHandles(osPoints);
     shapeState.free=next;
@@ -3499,7 +3506,7 @@ function update3D(res){
   }
   // 隱藏匯出工具：必須依序點選 預3 → 預1 → 預2 → 預2 → 預2。
   // 只監聽預設按鈕點擊；錯誤序列重新開始，若又點到預3則視為新序列起點。
-  const exportUnlockSequence=['預3','預1','預2','預2','預2'];
+  const exportUnlockSequence=['C','A','B','B','B'];
   let exportUnlockIndex=0;
   let exportUnlocked=false;
   function syncExportVisibility(){
@@ -4329,7 +4336,8 @@ function update3D(res){
  if(!root)return;
  const $=(id)=>document.getElementById(id);
  const svgNS='http://www.w3.org/2000/svg';
- const PRESETS={"預1":{"L":[{"x":-17.16,"y":-29.35338},{"x":-23.4,"y":-22.64889},{"x":-22.22853,"y":-13.92633},{"x":-18.26282,"y":-4.11344},{"x":-12.17721,"y":4.60912},{"x":-6.0916,"y":10.65942}],"R":[{"x":23.54269,"y":-29.35338},{"x":30.42209,"y":-22.64889},{"x":31.21791,"y":-13.92633},{"x":29.62831,"y":-4.11344},{"x":25.92403,"y":4.60912},{"x":19.04463,"y":10.65942}],"T":[{"x":0,"y":-31.15338}],"B":[{"x":0,"y":12.45942}]},"預2":{"L":[{"x":-21.89535,"y":-16.2},{"x":-25.97489,"y":-11.63088},{"x":-25.33504,"y":-5.09845},{"x":-23.4829,"y":2.25053},{"x":-20.57239,"y":8.78296},{"x":-16.07433,"y":12.86215}],"R":[{"x":23.1289,"y":-16.2},{"x":27.09447,"y":-11.63088},{"x":27.094,"y":-5.09845},{"x":26,"y":2.25053},{"x":22.8643,"y":8.78296},{"x":15.3851,"y":12.86215}],"T":[{"x":0,"y":-18}],"B":[{"x":0,"y":14.66215}]},"預3":{"L":[{"x":-15.32367,"y":-27.07409},{"x":-22.20305,"y":-20.39638},{"x":-24.4303,"y":-11.70129},{"x":-22.46765,"y":-1.91932},{"x":-16.91122,"y":6.77577},{"x":-8.97346,"y":12.80135}],"R":[{"x":17.75032,"y":-27.07409},{"x":24.62971,"y":-20.39638},{"x":28.06877,"y":-11.70129},{"x":26.74645,"y":-1.91932},{"x":22.24838,"y":6.77577},{"x":13.78144,"y":12.80135}],"T":[{"x":0,"y":-28.87409}],"B":[{"x":0,"y":14.60135}]}};
+ const PRESETS=Object.fromEntries(Object.entries(window.LENS_FRAME_PRESETS).map(([name,data])=>[name,data.points]));
+ const PRESET_FRAMES=Object.fromEntries(Object.entries(window.LENS_FRAME_PRESETS).filter(([,data])=>data.frame).map(([name,data])=>[name,data.frame]));
  const DEFAULTS={od:{s:-4,c:-1,a:180,n:1.6,ocpd:31,och:20,wearpd:32,wearh:20},
    os:{s:-3.5,c:-.5,a:90,n:1.6,ocpd:31,och:20,wearpd:32,wearh:20},
    frame:{a:52,b:38,dbl:18,material:'metal',nosepad:'adjustable',temple:140},
@@ -4344,23 +4352,23 @@ function update3D(res){
  const clone=(x)=>JSON.parse(JSON.stringify(x));
  const set=(id,val)=>{$(id).value=val;};
  function syncWearFrameOptions(){
+   if($('w_frameMaterial').value==='brow'&&$('w_rimType').value==='groove')$('w_rimType').value='full';
    const rim=$('w_rimType').value;
-   const groove=rim==='groove', noIntegrated=groove||rim==='rimless';
+   const groove=rim==='groove', noIntegrated=rim!=='full'||$('w_frameMaterial').value!=='acetate';
    const material=$('w_frameMaterial'),pad=$('w_nosepad');
    const acetate=material.querySelector('option[value="acetate"]');
    const brow=material.querySelector('option[value="brow"]');
-   acetate.hidden=groove;acetate.disabled=groove;
-   brow.hidden=!groove;brow.disabled=!groove;
-   if(groove&&material.value==='acetate')material.value='metal';
-   if(!groove&&material.value==='brow')material.value='metal';
+   const doubleMetal=material.querySelector('option[value="double-metal"]');
+   doubleMetal.hidden=rim==='rimless';doubleMetal.disabled=rim==='rimless';
+   if(rim==='rimless'&&material.value==='double-metal')material.value='metal';
+   acetate.hidden=rim!=='full';acetate.disabled=rim!=='full';
+   brow.hidden=rim==='rimless';brow.disabled=rim==='rimless';
+   if(rim!=='full'&&material.value==='acetate')material.value='metal';
+   if(rim==='rimless'&&material.value==='brow')material.value='metal';
    const integrated=pad.querySelector('option[value="integrated"]');
    integrated.hidden=noIntegrated;integrated.disabled=noIntegrated;
    if(noIntegrated&&pad.value==='integrated')pad.value='adjustable';
-   const hint=$('wearRimChoiceHint');
-   if(hint)hint.textContent=groove
-     ? '車溝框：下緣尼龍繩、上半部金屬框圈；材質可選金屬或眉框（上緣約 B 高 80% 起黑色膠眉，端片約 B 高 90%）。鼻托限定鼻托架。'
-     :rim==='rimless'?'無邊框：鼻托限定鼻托架，不使用一體式鼻托。'
-     :'全框：可選鈦金屬、板料或霧黑金屬；可切換一體式鼻托與鼻托架。';
+
  }
  const getData=()=>({
    eyes:{od:{s:num('w_od_s'),c:num('w_od_c'),a:num('w_od_a',180),n:num('w_od_n',1.6),
@@ -4387,21 +4395,6 @@ function update3D(res){
  function freeHorizontalSpan(f){
    const points=[...f.L,...f.R];
    return {left:Math.min(...points.map(p=>p.x)),right:Math.max(...points.map(p=>p.x))};
- }
- function bottomBPercent(f){
-   if(!f)return 0;
-   const span=freeHorizontalSpan(f);
-   const a=Math.max(1,span.right-span.left);
-   return Math.max(-33,Math.min(33,100*(f.B[0].x-f.T[0].x)/a));
- }
- function updateBottomBControls(){
-   const row=$('wearBottomBControls');if(!row)return;
-   row.hidden=state.mode!=='free';
-   if(state.mode!=='free'||!state.free)return;
-   const percent=bottomBPercent(state.free);
-   const value=$('wearBottomBOffsetValue');
-   $('wearBottomBOffset').value=Math.round(percent);
-   value.textContent=Math.abs(percent)<.5?'置中 · 0%':`${Math.abs(percent).toFixed(1)}% · ${percent>0?'顳側':'鼻側'}`;
  }
  function setBottomBOffset(f,targetX){
    const span=freeHorizontalSpan(f),a=Math.max(FREE_LIMITS.aMin,span.right-span.left);
@@ -4448,7 +4441,7 @@ function update3D(res){
    const b=boundsFromFree(state.free);
    set('w_frameA',+(b.xmax-b.xmin).toFixed(2));
    set('w_frameB',+(b.ymax-b.ymin).toFixed(2));
-   updateBottomBControls();
+   
  }
  function baseOutline(a,b){
    const contour=[];
@@ -4512,7 +4505,7 @@ function update3D(res){
    }
    $('wearShapeMetrics').textContent=`${state.mode==='free'?'自由取型（14 點）':'一般框型'}｜A ${fmt(a,1)} mm · B ${fmt(b,1)} mm · 框心距 ${fmt(a+num('w_dbl',18),1)} mm`;
    state.svgParams={center,scale,freeBounds:state.free?boundsFromFree(state.free):null};
-   updateBottomBControls();
+   
  }
  function setMode(mode,preset=null){
    state.mode=mode;
@@ -4520,12 +4513,19 @@ function update3D(res){
    $('wearModeFree').classList.toggle('active',mode==='free');
    $('w_frameA').readOnly=mode==='free';$('w_frameB').readOnly=mode==='free';
    if(mode==='free'){
-     if(preset)state.free=pointsFromPreset(preset);
-     if(!state.free)state.free=pointsFromPreset('預2');
+     if(preset){state.free=pointsFromPreset(preset);if(PRESET_FRAMES[preset])set('w_dbl',PRESET_FRAMES[preset].dbl);}
+     if(!state.free)state.free=pointsFromPreset('B');
      updateFreeDims();
+     if(preset){
+       const b=num('w_frameB');
+       for(const eye of ['od','os']){
+         set('w_wearh_'+eye,+(b*.66).toFixed(4));
+         set('w_'+eye+'_och',+(b/2+3).toFixed(4));
+       }
+     }
    }
    state.basePreset=preset;
-   root.querySelectorAll('[data-wear-preset]').forEach(btn=>btn.classList.toggle('active',btn.dataset.wearPreset===preset));
+   root.querySelectorAll('[data-wear-preset]').forEach(btn=>{const active=btn.dataset.wearPreset===preset;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));});
    renderAll();
  }
  function restoreDefaults(){
@@ -4629,6 +4629,8 @@ function update3D(res){
  }
  function displayResults(data,out){
    const od=out.od,os=out.os;
+   // Both eyes use one scale, preserving their relative separation at large prism values.
+   const imageScale=Math.min(12,57/Math.max(.001,Math.abs(od.prismX),Math.abs(os.prismX)),30/Math.max(.001,Math.abs(od.prismY),Math.abs(os.prismY)));
    $('w_k_od').textContent=fmt(od.total)+' Δ';
    $('w_k_os').textContent=fmt(os.total)+' Δ';
    $('w_k_od_dir').textContent=od.hText+' / '+od.vText;
@@ -4656,10 +4658,14 @@ function update3D(res){
      const img=$('w_'+eye+'_image');
      if(img){
        // 稜鏡令入射光朝基底偏折，表觀物方視標偏移採與基底相反方向；px 為示意比例。
-       img.style.setProperty('--shift-x',fmt(safe(-d.prismX*12,-57,57),1)+'px');
-       img.style.setProperty('--shift-y',fmt(safe(d.prismY*12,-30,30),1)+'px');
-       img.style.setProperty('--optical-blur',fmt(safe(Math.abs(d.deltaSE)*.65,0,2.6),2)+'px');
-       $('w_'+eye+'_image_note').textContent=`合成 ${fmt(d.total)}Δ｜相對 ΔM ${signed(d.deltaSE,3)}D（視覺僅示意）`;
+       const other=eye==='od'?'os':'od';
+       for(const [node,result] of [[img,d],[$('w_'+eye+'_image_other'),out[other]]]){
+         node.style.setProperty('--shift-x',fmt(-result.prismX*imageScale,2)+'px');
+         node.style.setProperty('--shift-y',fmt(result.prismY*imageScale,2)+'px');
+         node.style.setProperty('--optical-blur',fmt(safe(Math.abs(result.deltaSE)*.65,0,2.6),2)+'px');
+       }
+       $('w_'+eye+'_image_note').textContent=`實色：${eye.toUpperCase()}｜淡橘：${other.toUpperCase()} 對照｜合成 ${fmt(d.total)}Δ｜相對 ΔM ${signed(d.deltaSE,3)}D（共同尺度示意，非融合影像）`;
+
      }
    }
  }
@@ -4687,6 +4693,9 @@ function update3D(res){
  }
 
  // ========== 3D 模型 ========== 
+ // Adult reference dimensions (mm): PMC4238270 (globe), PMC9046297 (iris).
+ // Pupil is a 3 mm bright-light reference, not a universal physiological mean (NBK381).
+ const EYE_DIMENSIONS=Object.freeze({horizontal:24.2,vertical:23.7,axial:24,iris:12,pupil:3});
  const THREE_G=()=>window.THREE;
  function disposeModel(){
    if(!state.scene)return;
@@ -4717,7 +4726,14 @@ function update3D(res){
      const key=new T.DirectionalLight(0xffffff,1.3);key.position.set(-25,80,95);scene.add(key);
      const fill=new T.DirectionalLight(0x64bdff,.7);fill.position.set(70,15,-30);scene.add(fill);
      const grid=new T.GridHelper(320,16,0x213951,0x1b2c3f);grid.position.y=-37;scene.add(grid);
-     state.scene={scene,camera,renderer,controls,container,group:null};
+     // Reusable softbox reflection for polished acetate; no network texture dependency.
+     const studio=new T.Scene();studio.background=new T.Color(0x10141a);
+     for(const [x,y,z,w,h] of [[-65,55,80,38,110],[75,30,-35,28,100],[0,100,0,120,25]]){
+       const panel=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({color:0xffffff,side:T.DoubleSide}));panel.position.set(x,y,z);panel.lookAt(0,0,0);studio.add(panel);
+     }
+     const pmrem=new T.PMREMGenerator(renderer),studioTarget=pmrem.fromScene(studio,.06);pmrem.dispose();
+     studio.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});
+     state.scene={scene,camera,renderer,controls,container,group:null,studioTarget};
      refresh3D();
      let last=0;
      const loop=(now)=>{
@@ -4759,24 +4775,132 @@ function update3D(res){
    parent.add(mesh);
    return mesh;
  }
+ // Continuous chamfered rectangle, swept along the temple instead of joined boxes.
+ function meshPrismaticPath(points,h0,h1,d0,d1,material,parent,name='',sculptTemple=false,frontThickening=0,metalSleeve=false){
+   const T=THREE_G(),curve=new T.CatmullRomCurve3(points.map(p=>new T.Vector3(p.x,p.y,p.z))),N=sculptTemple?144:128,positions=[],indices=[];
+   const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
+   const pathLength=curve.getLength(),capRadius=h1/2,bodyEnd=sculptTemple?1-capRadius/curve.getLength():1;
+   for(let i=0;i<=N;i++){
+     const t=sculptTemple?Math.min(i,128)/128*bodyEnd:i/N,q=smooth(t),p=curve.getPointAt(t),axis=curve.getTangentAt(t);
+     const capAngle=sculptTemple&&i>128?(i-128)/16*Math.PI/2:0;
+     if(capAngle)p.addScaledVector(axis,capRadius*Math.sin(capAngle));
+     const across=new T.Vector3().crossVectors(axis,new T.Vector3(0,1,0)).normalize(),up=new T.Vector3().crossVectors(across,axis).normalize();
+     // Narrow to half at the ear bend, recover before the rounded terminal.
+     const waist=sculptTemple&&!metalSleeve?1-.5*smooth((t-.60)/.18)*(1-smooth((t-.78)/(bodyEnd-.78))):1;
+     const round=Math.max(.0001,Math.cos(capAngle));
+     const height=metalSleeve?h0+(h1-h0)*smooth((t*pathLength-(pathLength-7))/(7-capRadius)):h0+(h1-h0)*q;
+     const h=height/2*waist*round,d=(d0+(d1-d0)*q+frontThickening*(1-smooth(t/.40)))/2*round,c=Math.min(.35,d*.3,h*.3);
+     for(const [x,y] of [[-d+c,-h],[d-c,-h],[d,-h+c],[d,h-c],[d-c,h],[-d+c,h],[-d,h-c],[-d,-h+c]]){const v=p.clone().addScaledVector(across,x).addScaledVector(up,y);positions.push(v.x,v.y,v.z);}
+   }
+   for(let i=0;i<N;i++)for(let k=0;k<8;k++){const a=i*8+k,b=i*8+(k+1)%8;indices.push(a,a+8,b,b,a+8,b+8);}
+   for(let k=1;k<7;k++){indices.push(0,k,k+1);const a=N*8;indices.push(a,a+k+1,a+k);}
+   const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));geo.setIndex(indices);geo.computeVertexNormals();
+   const mesh=new T.Mesh(geo,material);mesh.name=name;parent.add(mesh);return mesh;
+ }
+ // Two front knuckles straddle one temple knuckle on a shared vertical pin.
+ function makeInterleavedHinge(p,side,acetate,m,parent,eye){
+   const T=THREE_G(),g=new T.Group();g.name=`TwoToOneHinge_${eye.toUpperCase()}`;g.position.set(p.x,p.y,p.z);parent.add(g);
+   const h=acetate?5.7:3.6,r=acetate?.85:.64,gap=.12,band=(h-2*gap)/3;
+   for(let k=0;k<3;k++){
+     const y=-h/2+band/2+k*(band+gap),knuckle=new T.Mesh(new T.CylinderGeometry(r,r,band,24),m.highlights);
+     knuckle.position.y=y;knuckle.name=k===1?'TempleCenterKnuckle':'FrontForkKnuckle_'+k;g.add(knuckle);
+     const rear=k===1;
+     meshPrismaticPath([{x:0,y,z:rear?-.15:.15},{x:rear?0:-side*.65,y,z:rear?-4:2.5}],band*.82,band*.82,acetate?.65:.48,acetate?.65:.48,m.highlights,g,rear?'TempleLeaf':'FrontForkLeaf');
+   }
+   const pin=new T.Mesh(new T.CylinderGeometry(.26,.26,h+.35,16),m.highlights);pin.name='HingePin';g.add(pin);
+   const head=new T.Mesh(new T.CylinderGeometry(r*.72,r*.72,.18,24),m.highlights);head.position.y=h/2+.1;g.add(head);
+   const slot=box(0,h/2+.2,0,r*1.02,.025,.13,m.templeSleeve,g);slot.name='ScrewdriverSlot';
+   if(acetate){
+     for(const z of [1.3,-4.5])for(const y of [-1.65,1.65]){
+       const rivet=new T.Mesh(new T.SphereGeometry(.38,12,8),m.highlights);rivet.scale.z=.3;rivet.position.set(-side*.5,y,z);g.add(rivet);
+     }
+   }
+   g.userData={structure:'2-front / 1-temple',mount:acetate?'inset-riveted-plates':'slim-welded-leaves'};
+   return g;
+ }
+ // Butt joint hardware sits on the inner wall, leaving the exterior flat mating faces visible.
+ function makeButtJointHinge(p,side,brow,m,parent,eye){
+   const T=THREE_G(),g=makeInterleavedHinge({x:p.x-side*2,y:p.y,z:p.z-.1},side,true,m,parent,eye);
+   g.name=`${brow?'BrowWing':'AcetateButt'}Hinge_${eye.toUpperCase()}`;
+   for(const child of [...g.children])if(!['HingePin','ScrewdriverSlot','TempleCenterKnuckle','FrontForkKnuckle_0','FrontForkKnuckle_2'].includes(child.name)){
+     g.remove(child);child.traverse(o=>{if(o.geometry)o.geometry.dispose();});
+   }
+   for(const direction of [-1,1]){
+     const shape=new T.Shape(),length=brow?5.8:5,height=brow?2.3:2.7;
+     shape.moveTo(.5,-height);shape.lineTo(length-1,-height);shape.quadraticCurveTo(length,-height,length,0);shape.quadraticCurveTo(length,height,length-1,height);shape.lineTo(.5,height);shape.closePath();
+     const geo=new T.ExtrudeGeometry(shape,{depth:.48,bevelEnabled:true,bevelSize:.12,bevelThickness:.08,bevelSegments:2,steps:1});
+     const plate=new T.Mesh(geo,m.highlights);plate.rotation.y=direction*Math.PI/2;plate.position.x=side*.25;plate.name=direction<0?'FrontInsetPlate':'TempleInsetPlate';g.add(plate);
+     for(const distance of (brow?[3.8]:[2.2,4])){
+       const screw=new T.Mesh(new T.CylinderGeometry(.48,.48,.22,20),m.highlights);screw.rotation.z=Math.PI/2;screw.position.set(-side*.12,0,-direction*distance);g.add(screw);
+       box(-side*.25,0,-direction*distance,.03,.12,.6,m.templeSleeve,g).name='MountScrewSlot';
+     }
+     for(const y of (direction<0?[-1.94,1.94]:[0]))meshPrismaticPath([{x:0,y,z:0},{x:side*.25,y,z:-direction*1.2}],1.5,1.5,.5,.5,m.highlights,g,'KnucklePlateNeck');
+   }
+   g.userData={structure:'2-front / 1-temple',mount:brow?'brow-wing-rounded-inset':'90-degree-butt-joint-inner-plates',jointGap:.22};return g;
+ }
+ // Offset away from the opening, with bounded miters and one consistent winding.
+ function outwardContour(points,distance){
+   let area=0;for(let i=0;i<points.length;i++){const a=points[i],b=points[(i+1)%points.length];area+=a.x*b.y-b.x*a.y;}
+   const sign=area>=0?1:-1;
+   return points.map((p,i)=>{const a=points[(i+points.length-1)%points.length],b=points[(i+1)%points.length],dx=b.x-a.x,dy=b.y-a.y,l=Math.hypot(dx,dy)||1;return {x:p.x+sign*dy/l*distance,y:p.y-sign*dx/l*distance,z:p.z};});
+ }
+ function sculptBrow(points,material,parent,side){
+   const T=THREE_G(),path=points.filter((p,i)=>!i||Math.hypot(p.x-points[i-1].x,p.y-points[i-1].y)>1e-5).map(p=>({...p}));
+   const temporal=side*path[0].x>side*path[path.length-1].x?0:path.length-1;
+   const root=path[temporal],wingX=side*(Math.max(...path.map(p=>side*p.x))+5.5);
+   const extension=Array.from({length:8},(_,i)=>{const t=(i+1)/8,q=t*t*(3-2*t);return {x:root.x+(wingX-root.x)*t,y:root.y-.8*q,z:root.z,wing:t};});
+   if(temporal===0)path.unshift(...extension.slice().reverse());else path.push(...extension);
+   let area=0;for(let i=0;i<path.length;i++){const a=path[i],b=path[(i+1)%path.length];area+=a.x*b.y-b.x*a.y;}const sign=area>=0?1:-1;
+   const positions=[],indices=[],N=path.length;
+   for(let i=0;i<N;i++){
+     const p=path[i],a=path[Math.max(0,i-1)],b=path[Math.min(N-1,i+1)];
+     const incoming=new T.Vector2(p.x-a.x,p.y-a.y),outgoing=new T.Vector2(b.x-p.x,b.y-p.y);
+     if(incoming.length()<1e-6)incoming.copy(outgoing);if(outgoing.length()<1e-6)outgoing.copy(incoming);incoming.normalize();outgoing.normalize();
+     const n1=new T.Vector2(sign*incoming.y,-sign*incoming.x),n2=new T.Vector2(sign*outgoing.y,-sign*outgoing.x),n=n1.clone().add(n2).normalize();
+     const miter=Math.min(1.5,1/Math.max(.2,n.dot(n1))),near=side*p.x,extent=Math.max(...points.map(p=>side*p.x)),u=Math.max(0,Math.min(1,(near-extent+5)/10)),width=2.5+.8*u*u*(3-2*u),clearance=.18;
+     // The terminal grows upward into a broad wing, following the marked silhouette.
+     const wingBlend=p.wing===undefined?0:p.wing*p.wing*(3-2*p.wing);
+     const wingWidth=6.0+1.1*Math.sin(Math.PI*(p.wing||0));
+     const profile=[[clearance+.18,-1.1],[clearance,-.9],[clearance,1.25],[clearance+.18,1.43],[clearance+width-.18,1.43],[clearance+width,1.25],[clearance+width,-.9],[clearance+width-.18,-1.1]];
+     for(const [d,z] of profile){
+       const fraction=(d-clearance)/width;
+       positions.push(p.x+n.x*d*miter*(1-wingBlend),p.y+n.y*d*miter*(1-wingBlend)+(fraction*wingWidth)*wingBlend,p.z+z);
+     }
+   }
+   for(let i=0;i<N-1;i++)for(let k=0;k<8;k++){const a=i*8+k,b=i*8+(k+1)%8,c=a+8,d=b+8;if(sign>0)indices.push(a,b,c,b,d,c);else indices.push(a,c,b,b,c,d);}
+   for(let k=1;k<7;k++){if(sign>0)indices.push(0,k+1,k,(N-1)*8,(N-1)*8+k,(N-1)*8+k+1);else indices.push(0,k,k+1,(N-1)*8,(N-1)*8+k+1,(N-1)*8+k);}
+   const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));geo.setIndex(indices);geo.computeVertexNormals();geo.computeBoundingSphere();
+   const mesh=new T.Mesh(geo,material);mesh.name=`SculptedAcetateBrow_${side<0?'OD':'OS'}`;geo.userData={width:2.5,terminalWidth:6,clearance:.18,joint:{x:wingX-side*1.2,y:root.y-.8+3,z:root.z-1.1,outerX:wingX}};parent.add(mesh);
+ }
+ function makeBrowHinge(p,side,m,parent,eye){
+   const T=THREE_G(),g=makeInterleavedHinge({x:p.x-side*1.45,y:p.y,z:p.z-.25},side,true,m,parent,eye);g.name=`BrowCornerHinge_${eye.toUpperCase()}`;g.scale.y=.72;
+   for(const child of [...g.children])if(!['HingePin','ScrewdriverSlot','TempleCenterKnuckle','FrontForkKnuckle_0','FrontForkKnuckle_2'].includes(child.name)){g.remove(child);child.traverse(o=>{if(o.geometry)o.geometry.dispose();});}
+   // Front leaf lies on the BACK of the brow (XY); temple leaf lies on its INNER side (YZ).
+   box(-side*1.3,0,-.02,3.4,3.6,.5,m.highlights,g).name='BrowBackMountPlate';
+   box(side*.02,0,-2.9,.5,3.6,5.4,m.highlights,g).name='TempleInnerMountPlate';
+   for(const y of [-1.94,1.94])meshPrismaticPath([{x:-side*1.3,y,z:.03},{x:0,y,z:0}],1.5,1.5,.5,.5,m.highlights,g,'FrontForkElbow');
+   meshPrismaticPath([{x:0,y:0,z:0},{x:0,y:0,z:-1.8}],1.5,1.5,.5,.5,m.highlights,g,'TempleCenterLeaf');
+   for(const x of [-side*.5,-side*2.1]){const screw=new T.Mesh(new T.CylinderGeometry(.38,.38,.2,16),m.highlights);screw.rotation.x=Math.PI/2;screw.position.set(x,0,-.30);g.add(screw);}
+   g.userData={structure:'2-front / 1-temple',mount:'perpendicular-back-brow-to-inner-temple',frontPlateContactGap:.02,templePlateEmbed:.02,templeEndGap:.04};return g;
+ }
  function materialSet(frame){
    const T=THREE_G();
    const acetate=frame.material==='acetate',black=frame.material==='black';
    const rim = acetate
-     ? new T.MeshPhysicalMaterial({color:0x7a533f,transparent:true,opacity:.65,roughness:.34,metalness:0.05,transmission:.2,clearcoat:.45,clearcoatRoughness:.16})
+     ? new T.MeshPhysicalMaterial({envMap:state.scene?.studioTarget.texture,envMapIntensity:.8,color:0x050607,transparent:false,opacity:1,roughness:.14,metalness:0,transmission:0,clearcoat:1,clearcoatRoughness:.06,side:T.FrontSide,depthWrite:true})
      : new T.MeshStandardMaterial({color:black?0x17191c:0xbec5cc,metalness:black?.28:.84,roughness:black?.56:.28});
    const temple = acetate
-     ? new T.MeshPhysicalMaterial({color:0x7a533f,transparent:true,opacity:.65,roughness:.34,metalness:0.05,transmission:.18,clearcoat:.42,clearcoatRoughness:.16})
+     ? new T.MeshPhysicalMaterial({envMap:state.scene?.studioTarget.texture,envMapIntensity:.8,color:0x050607,transparent:false,opacity:1,roughness:.14,metalness:0,transmission:0,clearcoat:1,clearcoatRoughness:.06})
      : new T.MeshStandardMaterial({color:black?0x17191c:0xc4cad0,metalness:black?.24:.8,roughness:black?.52:.32});
    const silver = new T.MeshStandardMaterial({color:0xd7dbe0,metalness:.84,roughness:.24});
    return {
      rim,
      highlights:silver,
      noseArm: acetate ? silver : rim,
-     brow:new T.MeshPhysicalMaterial({color:0x0b0b0e,metalness:.02,roughness:.49,clearcoat:.24,clearcoatRoughness:.4}),
+     brow:new T.MeshPhysicalMaterial({envMap:state.scene?.studioTarget.texture,envMapIntensity:.65,color:0x08090b,metalness:0,roughness:.19,clearcoat:1,clearcoatRoughness:.08}),
      nylon:new T.MeshStandardMaterial({color:0xc1c8cf,metalness:.06,roughness:.55}),
      temple,
-     templeSleeve:new T.MeshPhysicalMaterial({color:0x060709,metalness:.38,roughness:.16,clearcoat:1,clearcoatRoughness:.05}),
+     templeSleeve:new T.MeshPhysicalMaterial({envMap:state.scene?.studioTarget.texture,envMapIntensity:.8,color:0x030405,metalness:0,roughness:.14,clearcoat:1,clearcoatRoughness:.05}),
      pad:new T.MeshPhysicalMaterial({color:0xf5e5cb,transparent:true,opacity:.82,roughness:.24,metalness:0,transmission:.42,clearcoat:.24}),
      lensOD:new T.MeshPhysicalMaterial({color:0x38d9dd,transparent:true,opacity:.20,roughness:.08,metalness:0,side:T.DoubleSide,depthWrite:false,clearcoat:1,clearcoatRoughness:.03,reflectivity:.96,transmission:.18}),
      lensOS:new T.MeshPhysicalMaterial({color:0x55e1e1,transparent:true,opacity:.20,roughness:.08,metalness:0,side:T.DoubleSide,depthWrite:false,clearcoat:1,clearcoatRoughness:.03,reflectivity:.96,transmission:.18}),
@@ -4786,7 +4910,7 @@ function update3D(res){
      eyeHighlight:new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.78,depthTest:false}),
      guide:new T.LineDashedMaterial({color:0x91c6e1,dashSize:1.5,gapSize:1.1,transparent:true,opacity:.8,depthTest:false}),
      eye:new T.MeshPhysicalMaterial({color:0xf3f2ee,transparent:true,opacity:.35,roughness:.42,metalness:0,transmission:.58,clearcoat:.22}),
-     iris:new T.MeshPhysicalMaterial({color:0x4f7d8b,transparent:true,opacity:.35,roughness:.26,metalness:.05,transmission:.24,clearcoat:.15})
+     iris:new T.MeshPhysicalMaterial({color:0x17242c,transparent:true,opacity:.35,roughness:.26,metalness:.05,transmission:.24,clearcoat:.15})
    };
  }
  function nosePadGeometry(){
@@ -4835,16 +4959,16 @@ function update3D(res){
        const v=(j/rows)*2-1;
        const baseY=targetY+v*halfHeight;
        const rim=nasalRimPointAtY(seat,side,baseY);
-       // 平直貼框邊位於鏡圈鼻側往鏡片內嵌 1.5mm 處。
-       const attachX=rim.x+side*embed;
-       const arcRadius=width*Math.sqrt(Math.max(0,1-v*v));
+       // 貼框邊移向鼻側鏡圈外緣，避開鏡片開孔。
+       const attachX=rim.x-side*1.15;
+       const arcRadius=width*Math.pow(Math.max(0,1-v*v),2);
        for(let k=0;k<=columns;k++){
          const u=k/columns;
          // D 的弧度只朝臉側 -Z 發展，不再向兩鼻托之間的 X 方向鼓出。
          const rearReach=arcRadius*u;
          const x=attachX-side*(layer*thickness);
          const y=baseY-rearReach*sinP;  // 朝臉側的部分下俯約 8°
-         const z=rim.z+.035-rearReach*cosP;
+         const z=rim.z-.85-rearReach*cosP;
          positions.push(x,y,z);
        }
      }
@@ -4875,7 +4999,7 @@ function update3D(res){
    geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));
    geo.setIndex(indices);
    geo.computeVertexNormals();geo.computeBoundingSphere();
-   geo.userData={shape:'D-toast-rearward',height,width,thickness,embed,pitchDeg:8,attachmentY:targetY};
+   geo.userData={shape:'outer-rim-smooth-saddle',height,width,thickness,embed,pitchDeg:8,attachmentY:targetY};
    return geo;
  }
  function makeNosePad(side,frameMat,parent,materialOverride=null){
@@ -4999,6 +5123,153 @@ function wearContourAnchor(points,side,temporal,targetY=0){
    const extra=rimType==='groove'?[curve(2),curve(3)]:rimType==='full'?[curve(2)]:[];
    return {geometry:geo,res,front,back,seat,shoulderFront,shoulderBack,extra};
  }
+ // 不用度數正負直接推估位移：以實際的鼻側溝尖／車溝座為鏡架固定 Z 基準。
+ // 遠視與近視的前後表面相對曲率保持不變，只平移該眼的整片幾何與追蹤線。
+ function normalizeWearLensMountDatum(cut,nasalIndex){
+   if(!cut||!cut.seat||!cut.seat.length)return 0;
+   const i=Math.max(0,Math.min(cut.seat.length-1,nasalIndex));
+   const datum=Number(cut.seat[i].z)||0;
+   const attr=cut.geometry.getAttribute('position');
+   for(let n=0;n<attr.count;n++)attr.setZ(n,attr.getZ(n)-datum);
+   attr.needsUpdate=true;
+   cut.geometry.computeVertexNormals();
+   cut.geometry.computeBoundingSphere();
+   const seen=new Set();
+   for(const key of ['front','back','seat','shoulderFront','shoulderBack']){
+     for(const p of (cut[key]||[])){
+       if(!seen.has(p)){p.z-=datum;seen.add(p);}
+     }
+   }
+   for(const path of (cut.extra||[]))for(const p of path){
+     if(!seen.has(p)){p.z-=datum;seen.add(p);}
+   }
+   cut.mountDatumZ=datum;
+   return datum;
+ }
+ // A single machined blank with two lens openings and integral bridge/endpieces.
+ function sculptAcetateFront(eyes,frameB,material,parent){
+   const T=THREE_G(),smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
+   const parts=eyes.map(e=>{
+     const seat=e.seat.map(p=>new T.Vector3(p.x,p.y,p.z));
+     if(T.ShapeUtils.isClockWise(seat))seat.reverse();
+     let outer=seat.map((p,i)=>{
+       const a=seat[(i+seat.length-2)%seat.length],b=seat[(i+2)%seat.length],n=new T.Vector2(b.y-a.y,a.x-b.x).normalize();
+       const width=2.5+smooth((p.y+frameB*.30)/(frameB*.55)),v=p.clone();
+       v.x+=n.x*(width-.25);v.y+=n.y*(width-.25);
+       return v;
+     });
+     // Replace the temporal arc with a straight 12 mm terminal cut in the same blank.
+     const temporalAt=y=>{let best=0,cost=Infinity;outer.forEach((p,i)=>{const c=Math.abs(p.y-y)*4-e.side*p.x;if(c<cost){cost=c;best=i;}});return best;};
+     const top=e.outer.y+.3+6,bottom=e.outer.y+.3-6;
+     const first=temporalAt(e.side>0?bottom:top),last=temporalAt(e.side>0?top:bottom);
+     if(first!==last){
+       const terminalX=e.side*(Math.max(...seat.map(p=>e.side*p.x))+13),outline=[];
+       outline.push(outer[first],new T.Vector3(terminalX,e.side>0?bottom:top,e.outer.z),new T.Vector3(terminalX,e.side>0?top:bottom,e.outer.z),outer[last]);
+       for(let i=(last+1)%outer.length;i!==first;i=(i+1)%outer.length)outline.push(outer[i]);
+       outer=outline;
+     }
+     function at(y){let best=0,cost=Infinity;outer.forEach((p,i)=>{const d=Math.abs(p.y-y)*3+e.side*p.x;if(d<cost){cost=d;best=i;}});return best;}
+     const bridgeHalf=2.1+smooth((frameB-20)/45);
+     const upper=at(e.nasal.y+bridgeHalf),lower=at(e.nasal.y-bridgeHalf),start=e.side<0?upper:lower,end=e.side<0?lower:upper,arc=[];
+     for(let i=start,n=0;n<=outer.length;n++,i=(i+1)%outer.length){arc.push(outer[i]);if(i===end)break;}
+     const transform=p=>parent.worldToLocal(e.unit.localToWorld(p.clone()));
+     return {side:e.side,arc:arc.map(transform),seat:seat.map(transform)};
+   }).sort((a,b)=>a.side-b.side);
+   const [left,right]=parts,shape=new T.Shape();shape.moveTo(left.arc[0].x,left.arc[0].y);
+   for(const p of left.arc.slice(1))shape.lineTo(p.x,p.y);
+   function bridge(a,b){const h=Math.min(8,Math.max(3.5,Math.abs(b.x-a.x)*.23));shape.bezierCurveTo(a.x+(b.x-a.x)*.28,a.y+h,b.x-(b.x-a.x)*.28,b.y+h,b.x,b.y);}
+   bridge(left.arc[left.arc.length-1],right.arc[0]);for(const p of right.arc.slice(1))shape.lineTo(p.x,p.y);
+   bridge(right.arc[right.arc.length-1],left.arc[0]);shape.closePath();
+   for(const part of parts){const hole=new T.Path();part.seat.forEach((p,i)=>i?hole.lineTo(p.x,p.y):hole.moveTo(p.x,p.y));hole.closePath();shape.holes.push(hole);}
+   let geo=new T.ExtrudeGeometry(shape,{depth:3,steps:1,bevelEnabled:true,bevelSize:.25,bevelThickness:.25,bevelSegments:3,curveSegments:32}),attr=geo.getAttribute('position');
+   geo.setAttribute('blankDepth',new T.Float32BufferAttribute(Array.from({length:attr.count},(_,i)=>attr.getZ(i)-1.5),1));
+   // Smooth depth field and its analytic gradient. Nearest-edge switching and
+   // recomputing normals on non-indexed triangles previously exposed the tessellation.
+   function depth(points,x,y){
+     let sw=0,sz=0,wx=0,wy=0,zx=0,zy=0;
+     for(const p of points){const dx=x-p.x,dy=y-p.y,r=dx*dx+dy*dy+9,w=1/(r*r),gx=-4*dx*w/r,gy=-4*dy*w/r;sw+=w;sz+=w*p.z;wx+=gx;wy+=gy;zx+=gx*p.z;zy+=gy*p.z;}
+     const z=sz/sw;return {z,x:(zx-z*wx)/sw,y:(zy-z*wy)/sw};
+   }
+   let normals=geo.getAttribute('normal');const span=right.arc[right.arc.length-1].x-left.arc[0].x;
+   for(let i=0;i<attr.count;i++){
+     const x=attr.getX(i),y=attr.getY(i),u=Math.max(0,Math.min(1,(x-left.arc[0].x)/span)),w=smooth(u),dw=6*u*(1-u)/span;
+     const a=depth(left.seat,x,y),b=depth(right.seat,x,y),z=a.z*(1-w)+b.z*w;
+     const dx=a.x*(1-w)+b.x*w+(b.z-a.z)*dw,dy=a.y*(1-w)+b.y*w;
+     attr.setZ(i,attr.getZ(i)-1.5+z);
+     // Inverse-transpose of the bend Jacobian preserves face/bevel boundaries.
+     const n=new T.Vector3(normals.getX(i)-dx*normals.getZ(i),normals.getY(i)-dy*normals.getZ(i),normals.getZ(i)).normalize();
+     normals.setXYZ(i,n.x,n.y,n.z);
+   }
+   // Insert cross-sections before bending so front triangles actually follow the elbow.
+   for(const e of eyes){
+     const matrix=new T.Matrix4().copy(e.unit.matrixWorld).invert().multiply(parent.matrixWorld),edge=Math.max(...e.seat.map(p=>e.side*p.x))+3;
+     for(const offset of [0,.45,.9,1.35,1.8,2.25,2.7,Math.PI,4,5,6,7,8,8.5,9,9.5,10]){
+       const source=geo.attributes.position,ns=geo.attributes.normal,ds=geo.attributes.blankDepth,positions=[],normalValues=[],depthValues=[];
+       const emit=poly=>{for(let j=1;j+1<poly.length;j++)for(const v of [poly[0],poly[j],poly[j+1]]){positions.push(...v.p);normalValues.push(...v.n);depthValues.push(v.h);}};
+       for(let i=0;i<source.count;i+=3){
+         const tri=[0,1,2].map(k=>{const p=new T.Vector3().fromBufferAttribute(source,i+k);return {p:p.toArray(),n:new T.Vector3().fromBufferAttribute(ns,i+k).toArray(),h:ds.getX(i+k),d:e.side*p.clone().applyMatrix4(matrix).x-edge-offset};});
+         if(tri.every(v=>v.d>=-1e-6)||tri.every(v=>v.d<=1e-6)){emit(tri);continue;}
+         for(const sign of [-1,1]){const poly=[];for(let k=0;k<3;k++){const a=tri[k],b=tri[(k+1)%3];if(sign*a.d>=0)poly.push(a);if(a.d*b.d<0){const t=a.d/(a.d-b.d);poly.push({p:a.p.map((v,j)=>v+(b.p[j]-v)*t),n:a.n.map((v,j)=>v+(b.n[j]-v)*t),h:a.h+(b.h-a.h)*t,d:0});}}emit(poly);}
+       }
+       const next=new T.BufferGeometry();next.setAttribute('position',new T.Float32BufferAttribute(positions,3));next.setAttribute('normal',new T.Float32BufferAttribute(normalValues,3));next.setAttribute('blankDepth',new T.Float32BufferAttribute(depthValues,1));geo.dispose();geo=next;
+     }
+   }
+   attr=geo.attributes.position;normals=geo.attributes.normal;
+   // Fold the integral terminal strip through 90 degrees; the end face is a YX plane.
+   for(const e of eyes){
+     const toLocal=new T.Matrix4().copy(e.unit.matrixWorld).invert().multiply(parent.matrixWorld),toParent=new T.Matrix4().copy(parent.matrixWorld).invert().multiply(e.unit.matrixWorld);
+     const localNormal=new T.Matrix3().getNormalMatrix(toLocal),parentNormal=new T.Matrix3().getNormalMatrix(toParent),edge=Math.max(...e.seat.map(p=>e.side*p.x))+3,r=2;
+     for(let i=0;i<attr.count;i++){
+       const v=new T.Vector3().fromBufferAttribute(attr,i).applyMatrix4(toLocal),u=e.side*v.x-edge;if(u<=0)continue;
+       const angle=Math.min(Math.PI/2,u/r),tail=Math.max(0,u-r*Math.PI/2),d=v.z-e.outer.z;
+       v.x=e.side*(edge+r*Math.sin(angle)+d*Math.sin(angle));v.z=e.outer.z-r*(1-Math.cos(angle))-tail+d*Math.cos(angle);
+       v.applyMatrix4(toParent);attr.setXYZ(i,v.x,v.y,v.z);
+       const n=new T.Vector3().fromBufferAttribute(normals,i).applyMatrix3(localNormal).applyAxisAngle(new T.Vector3(0,1,0),e.side*angle).applyMatrix3(parentNormal).normalize();normals.setXYZ(i,n.x,n.y,n.z);
+     }
+   }
+   geo.computeBoundingSphere();geo.userData={type:'single-acetate-front',upperRim:3.5,lowerRim:2.5,blankDepth:3.5,bridgeExtra:2*smooth((frameB-20)/45)};
+   // Measure the terminal cap, then reshape its return to match the unchanged temple.
+   for(const e of eyes){
+     const inverse=new T.Matrix4().copy(e.unit.matrixWorld).invert().multiply(parent.matrixWorld),terminalZ=e.outer.z-(12-Math.PI),temporalEdge=Math.max(...e.seat.map(p=>e.side*p.x));
+     const capNormal=new T.Vector3(),capCenter=new T.Vector3();let areaSum=0;
+     const capPoints=[];
+     for(let i=0;i<attr.count;i+=3){
+       const vertices=[0,1,2].map(k=>new T.Vector3().fromBufferAttribute(attr,i+k).applyMatrix4(inverse));
+       const center=vertices[0].clone().add(vertices[1]).add(vertices[2]).multiplyScalar(1/3);
+       if(e.side*center.x<temporalEdge||center.z>terminalZ+3)continue;
+       const cross=vertices[1].clone().sub(vertices[0]).cross(vertices[2].clone().sub(vertices[0])),area=cross.length();
+       if(area<1e-8||cross.z/area>-.70)continue;
+       capNormal.add(cross);capCenter.addScaledVector(center,area);areaSum+=area;capPoints.push(...vertices);
+     }
+     const temple=e.unit.getObjectByName(`AcetateTemple_${e.eye.toUpperCase()}`);
+     if(!temple||!areaSum)continue;
+     capNormal.normalize();capCenter.multiplyScalar(1/areaSum);
+     const minY=Math.min(...capPoints.map(v=>v.y)),maxY=Math.max(...capPoints.map(v=>v.y));
+     const a=temple.geometry.attributes.position,origin=new T.Vector3();for(let i=0;i<8;i++)origin.add(new T.Vector3().fromBufferAttribute(a,i));origin.multiplyScalar(1/8);
+     const toParent=new T.Matrix4().copy(parent.matrixWorld).invert().multiply(e.unit.matrixWorld),normalLocal=new T.Matrix3().getNormalMatrix(inverse),normalParent=new T.Matrix3().getNormalMatrix(toParent);
+     const gap=.12,midY=(minY+maxY)/2,depths=geo.attributes.blankDepth;
+     // Make the endpiece follow the temple's X-facing side plane, rather than
+     // rotating the whole temple to a skew cap. Blend only the final 5 mm of the return.
+     let maxOutsideError=0;
+     for(let i=0;i<attr.count;i++){
+       const v=new T.Vector3().fromBufferAttribute(attr,i).applyMatrix4(inverse);
+       if(e.side*v.x<temporalEdge)continue;
+       const distance=capNormal.dot(v.clone().sub(capCenter));
+       if(distance < -5)continue;
+       const w=smooth((distance+5)/3.5),h=depths.getX(i);
+       const target=new T.Vector3(origin.x+e.side*h,origin.y+(v.y-midY)*12/Math.max(1,maxY-minY),origin.z+gap+distance/capNormal.z);
+       v.lerp(target,w);
+       if(Math.abs(distance)<.001&&h>1.7)maxOutsideError=Math.max(maxOutsideError,Math.abs(v.x-(origin.x+e.side*h)));
+       v.applyMatrix4(toParent);attr.setXYZ(i,v.x,v.y,v.z);
+       const n=new T.Vector3().fromBufferAttribute(normals,i).applyMatrix3(normalLocal).normalize();
+       const targetNormal=Math.abs(n.x)>.8?new T.Vector3(Math.sign(n.x),0,0):Math.abs(n.z)>.8?new T.Vector3(0,0,Math.sign(n.z)):new T.Vector3(n.x,n.y,n.z);
+       n.lerp(targetNormal,w).normalize().applyMatrix3(normalParent).normalize();normals.setXYZ(i,n.x,n.y,n.z);
+     }
+     temple.userData.jointAlignment={mode:'endpiece-follows-temple-side-plane',outerSurface:e.side*origin.x+1.75,gap,maxOutsideError};
+   }
+   geo.deleteAttribute('blankDepth');geo.computeBoundingSphere();
+   const mesh=new T.Mesh(geo,material);mesh.name='AcetateContinuousFront';parent.add(mesh);return mesh;
+ }
  function wearLineLoop(points,material,parent,name=''){
    const T=THREE_G(),geo=new T.BufferGeometry().setFromPoints(points);
    const line=new T.LineLoop(geo,material);line.name=name;line.renderOrder=4;parent.add(line);return line;
@@ -5078,7 +5349,7 @@ function wearContourAnchor(points,side,temporal,targetY=0){
    const backLine=new T.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.3,depthWrite:false});
    const shoulderLine=new T.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.3,depthWrite:false});
    const grooveLine=new T.LineBasicMaterial({color:0x6be9ff,transparent:true,opacity:.75,depthWrite:false});
-   const bridgeAnchors=[];
+   const bridgeAnchors=[],acetateEyes=[],topBridgeAnchors=[];
    for(const eye of ['od','os']){
      const side=eye==='od'?-1:1;
      const eyeUnit=new T.Group();eyeUnit.name=`LensFrame_${eye.toUpperCase()}`;
@@ -5091,6 +5362,9 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      const ocX=side*(e.ocpd-framePD/2),ocY=e.och-f.b/2;
      const cut=wearCutLensSource(localShape,e,rimType,ocX,ocY);
      if(!cut)continue;
+     // 共用框架 Z 軸裝配基準：鼻側座點對齊 0，消除正負鏡片帶來的中樑前後差。
+     const sharedNasalIndex=wearContourAnchor(localShape,side,false,f.b*.13);
+     normalizeWearLensMountDatum(cut,sharedNasalIndex);
      const lens=new T.Mesh(cut.geometry,eye==='od'?frameMat.lensOD:frameMat.lensOS);
      lens.name=`WornCutLens_${eye.toUpperCase()}`;lens.position.z=lensSeatZ;
      lens.renderOrder=2;eyeUnit.add(lens);
@@ -5114,34 +5388,40 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      }
      const contourSeat=cut.seat.map(p=>({x:p.x,y:p.y,z:p.z+lensSeatZ}));
      if(rimType==='full'){
-       // 框圈的中心線沿著實際的 V 溝尖，非固定 Z 深度的懸浮雙圓圈。
-       meshTube(contourSeat,Math.max(.58,rimRadius),frameMat.rim,eyeUnit,true).name=`BevelSeatFrame_${eye.toUpperCase()}`;
+       // 金屬框維持細圓管；板料由內外雙輪廓生成實體寬框面、後側壁與窄倒角。
+       if(f.material==='acetate'){
+         // Both rims are cut together after positioning both eyes.
+       }else if(f.material==='brow'){
+         const lower=upperRimArc(contourSeat.map(p=>({x:p.x,y:-p.y,z:p.z})), -f.b*.20).map(p=>({x:p.x,y:-p.y,z:p.z}));
+         meshTube(lower,.68,frameMat.rim,eyeUnit).name=`BrowMetalLowerRim_${eye.toUpperCase()}`;
+         const browPoints=upperRimArc(contourSeat,f.b*.18);
+         if(browPoints.length>2)sculptBrow(browPoints,frameMat.brow,eyeUnit,side);
+       }else{
+         meshTube(contourSeat,Math.max(.58,rimRadius),frameMat.rim,eyeUnit,true).name=`BevelSeatFrame_${eye.toUpperCase()}`;
+       }
      }else if(rimType==='groove'){
        // 下半部為槽內尼龍繩；上方約 50% 另有真正的金屬半框圈。
        meshTube(contourSeat,Math.max(.30,rimRadius*.36),frameMat.nylon,eyeUnit,true)
          .name=`NylonGrooveCord_${eye.toUpperCase()}`;
-       const metalUpper=upperRimArc(contourSeat,0);
+       const metalUpper=upperRimArc(outwardContour(contourSeat,Math.max(.66,rimRadius)+.12),0);
        if(metalUpper.length>=2){
          meshTube(metalUpper,Math.max(.66,rimRadius),frameMat.rim,eyeUnit,false)
            .name=`MetalUpperHalfRim_${eye.toUpperCase()}`;
        }
-       if(f.material==='brow'){
-         // 眉框：上框仍為金屬，從 B 高 80% 的位置起包覆黑色膠眉。
-         const browStartY=f.b*(.80-.50);
-         const browPoints=upperRimArc(contourSeat,browStartY);
-         if(browPoints.length>=2){
-           meshTube(browPoints,Math.max(1.75,rimRadius*2.1),frameMat.brow,eyeUnit,false)
-             .name=`BlackBrowOverlay_${eye.toUpperCase()}`;
-         }
-       }
      }
-     const endpieceRatio=(rimType==='groove'&&f.material==='brow')
-       ?.90:Math.max(.50,Math.min(.90,.50+((f.b-28)/(24))*0.40));
-     // 以實際側壁輪廓插值取 B 高 50–90% 的端片點，而非偏向最外側 X 的近似索引。
-     const outerAtHeight=nasalRimPointAtY(cut.seat,-side,f.b*(endpieceRatio-.50));
-     const noseIndex=wearContourAnchor(localShape,side,false,f.b*.13);
+     if(f.material==='double-metal'){
+       const top=contourSeat.reduce((a,b)=>b.y>a.y?b:a);
+       topBridgeAnchors.push({unit:eyeUnit,point:new T.Vector3(top.x,top.y+.4,top.z)});
+     }
+     const endpieceRatio=.75;
+     // 只有眉框保留專屬高度規則；雙槓及其餘框系由顳側最突出點起始。
+     const outerAtHeight=f.material==='brow'
+       ?nasalRimPointAtY(cut.seat,-side,f.b*(endpieceRatio-.50))
+       :cut.seat.reduce((a,b)=>side*b.x>side*a.x?b:a);
+     const noseIndex=sharedNasalIndex;
      const outer=new T.Vector3(outerAtHeight.x,outerAtHeight.y,outerAtHeight.z+lensSeatZ);
-     const nasal=cut.seat[noseIndex].clone();nasal.z+=lensSeatZ;
+     eyeUnit.userData.endpieceOrigin={x:outer.x,y:outer.y,z:outer.z,rule:f.material==='brow'?'special-height':'temporal-extreme'};
+     const nasal=f.material==='brow'?(()=>{const p=nasalRimPointAtY(cut.seat,side,f.b*.22);return new T.Vector3(p.x,p.y,p.z);})():cut.seat[noseIndex].clone();nasal.z+=lensSeatZ;
      // 無邊框在前表面設置約 5mm 的鏡片內延伸段，沿前表弧度保留 0.72mm 間隔。
      const rimlessNasalEdge={x:nasal.x,y:nasal.y};
      const rimlessNasalInner={x:nasal.x+side*5,y:nasal.y};
@@ -5160,7 +5440,7 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      }
      const noseJoint=new T.Mesh(new T.SphereGeometry(Math.max(.55,rimRadius*.66),12,9),frameMat.rim);
      noseJoint.name=`NoseBridgeConnector_${eye.toUpperCase()}`;
-     noseJoint.position.copy(bridgeEdgeAttach);eyeUnit.add(noseJoint);
+     noseJoint.position.copy(bridgeEdgeAttach);if(!(f.material==='acetate'&&rimType==='full'))eyeUnit.add(noseJoint);else noseJoint.geometry.dispose();
      bridgeAnchors.push({eye,side,unit:eyeUnit,point:bridgeEdgeAttach});
      padAnchors.push({eye,side,unit:eyeUnit,point:nasal.clone(),bridgeAttach:bridgeEdgeAttach.clone(),bridgeInnerAttach:bridgeInnerAttach.clone(),rimType,
        seat:cut.seat.map(p=>new T.Vector3(p.x,p.y,p.z+lensSeatZ))});
@@ -5170,37 +5450,41 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      const tipB={x:outer.x+side*3.4,y:outer.y+.18,z:tipBaseZ};
      const tipC={x:outer.x+side*6.0,y:outer.y+.25,z:tipBaseZ-2.0};
      const hingeP={x:outer.x+side*7.7,y:outer.y+.3,z:tipBaseZ-3.6};
-     // 端片回到原本的 L 型延伸基礎，不做片狀，僅把端片本體加粗。
+     const acetateFront=(f.material==='acetate'&&rimType==='full');
+     // 板料款端片改為與面材同語彙的一體式厚片；金屬款維持圓管。
      const endpieceRadius=Math.max(rimRadius*1.28, style.templeRadius*(f.material==='acetate'?1.64:1.36));
      if(rimType==='rimless'){
        meshTube(temporalMount,Math.max(.66,endpieceRadius*.78),frameMat.highlights,eyeUnit,false)
          .name=`RimlessTempleFrontMount_${eye.toUpperCase()}`;
      }
-     meshTube([tipA,tipB,tipC,hingeP],endpieceRadius,frameMat.rim,eyeUnit)
-       .name=`TempleEndpiece_${eye.toUpperCase()}`;
-     const jointB=sphere(tipB.x,tipB.y,tipB.z,endpieceRadius*.94,frameMat.rim,eyeUnit);
-     const jointC=sphere(tipC.x,tipC.y,tipC.z,endpieceRadius*.98,frameMat.rim,eyeUnit);
-     const hingeNode=sphere(hingeP.x,hingeP.y,hingeP.z,Math.max(1.28,endpieceRadius*1.02),frameMat.rim,eyeUnit);
-     // CylinderGeometry 原生軸向即為局部 Y；不再旋轉至 X 軸。
-     const screw=new T.Mesh(new T.CylinderGeometry(.56,.56,style.screwLength,14),frameMat.highlights);
-     screw.name=`VerticalHingeScrew_${eye.toUpperCase()}`;
-     screw.position.set(hingeP.x,hingeP.y,hingeP.z);eyeUnit.add(screw);
-     const capTop=new T.Mesh(new T.CylinderGeometry(1,1,.32,14),frameMat.highlights);
-     capTop.position.set(hingeP.x,hingeP.y+style.screwLength/2-.25,hingeP.z);eyeUnit.add(capTop);
-     const capBot=new T.Mesh(new T.CylinderGeometry(1,1,.32,14),frameMat.highlights);
-     capBot.position.set(hingeP.x,hingeP.y-style.screwLength/2+.25,hingeP.z);eyeUnit.add(capBot);
-     const tlen=Math.max(120,Math.min(160,f.temple));
-     const start={x:hingeP.x+side*.4,y:hingeP.y,z:hingeP.z-1};
-     const pts=wearSmoothTemple(start,side,tlen);
-     meshTube(pts,style.templeRadius,frameMat.temple,eyeUnit)
-       .name=`GradualEarBend30deg_${eye.toUpperCase()}`;
-     if(style.sleeve){
-       const sleevePts=pts.slice(Math.floor(pts.length*style.sleeveStart));
-       meshTube(sleevePts,style.templeRadius+style.sleeveExtra,frameMat.templeSleeve,eyeUnit)
-         .name=`TempleSleeve_${eye.toUpperCase()}`;
+     if(acetateFront){
+       acetateEyes.push({eye,side,unit:eyeUnit,seat:contourSeat,outer,nasal});
+       hingeP.x=side*(Math.max(...contourSeat.map(p=>side*p.x))+5);hingeP.z=tipBaseZ-(12-Math.PI);
+     }else if(f.material==='brow'){
+       const browMesh=eyeUnit.getObjectByName(`SculptedAcetateBrow_${eye.toUpperCase()}`),joint=browMesh.geometry.userData.joint;
+       hingeP.x=joint.x;hingeP.y=joint.y;hingeP.z=joint.z;
+       const lozenge=new T.Mesh(new T.SphereGeometry(1,16,10),frameMat.highlights);lozenge.scale.set(1.1,.32,.12);lozenge.position.set(joint.outerX-side*2.4,joint.y,joint.z+2.65);eyeUnit.add(lozenge);
+     }else{
+       meshPrismaticPath([tipA,tipB,tipC,hingeP],f.material==='brow'?5.5:2.8,f.material==='brow'?5:3.4,f.material==='brow'?2.6:1.5,1.5,f.material==='brow'?frameMat.brow:frameMat.rim,eyeUnit,`SculptedEndpiece_${eye.toUpperCase()}`);
      }
-     const tail=pts[pts.length-1];
-     sphere(tail.x,tail.y,tail.z,style.sleeve?style.templeRadius+style.sleeveExtra*.35:style.templeRadius*.92,style.sleeve?frameMat.templeSleeve:frameMat.temple,eyeUnit);
+     if(f.material==='brow')makeBrowHinge(hingeP,side,frameMat,eyeUnit,eye);
+     else if(acetateFront)makeButtJointHinge(hingeP,side,false,frameMat,eyeUnit,eye);
+     else makeInterleavedHinge(hingeP,side,false,frameMat,eyeUnit,eye);
+     const tlen=Math.max(120,Math.min(160,f.temple));
+     const start={x:hingeP.x,y:hingeP.y,z:hingeP.z-(acetateFront?.22:f.material==='brow'?.04:3.2)};
+     const pts=wearSmoothTemple(start,side,tlen);
+     if(acetateFront||f.material==='brow')pts.forEach((p,i)=>{const t=Math.max(0,Math.min(1,(i/(pts.length-1)-.08)/.40));p.x=start.x+side*3*t*t*(3-2*t);});
+     if(acetateFront){
+       meshPrismaticPath(pts,12,8,2.5,2.5,frameMat.temple,eyeUnit,`AcetateTemple_${eye.toUpperCase()}`,true,1.0);
+     }else{
+       const brow=f.material==='brow';
+       meshPrismaticPath(brow?pts:pts.slice(0,-2),brow?6:3.4,brow?3.3:1.8,brow?2.4:1.35,brow?2:1.05,brow?frameMat.brow:frameMat.temple,eyeUnit,`TaperedMetalTemple_${eye.toUpperCase()}`,brow);
+       if(!brow){
+         const sleevePts=pts.slice(Math.floor((pts.length-1)*.50));
+         meshPrismaticPath(sleevePts,3.2,6.2,2.3,2.3,frameMat.templeSleeve,eyeUnit,`RoundedTempleTip_${eye.toUpperCase()}`,true,0,true);
+       }
+     }
+
      const guides=new T.Group();guides.name='Guides_'+eye.toUpperCase();eyeUnit.add(guides);
      sphere(ocX,ocY,1.6+lensSeatZ,1.4,frameMat.oc,guides);
      const point=out[eye].geo;
@@ -5209,10 +5493,19 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      guides.visible=state.guideVisible;
      if(state.faceVisible){
        const eyeX=side*e.wearpd, eyeY=e.wearh-f.b/2;
-       const sclera=sphere(eyeX,eyeY,-data.vertex-6.4,5.45,frameMat.eye,group); sclera.scale.set(1.02,1,.96);
-       const iris=sphere(eyeX,eyeY,-data.vertex-1.55,2.2,frameMat.iris,group); iris.scale.set(1,.98,.42);
-       const pupil=sphere(eyeX,eyeY,-data.vertex-.72,0.92,frameMat.pupilCore,group); pupil.scale.set(1,.98,.32);
-       const glint=sphere(eyeX+side*.68,eyeY+.7,-data.vertex-.2,.34,frameMat.eyeHighlight,group); glint.scale.set(1,.8,.28);
+       const size=EYE_DIMENSIONS,cornealApexZ=-data.vertex;
+       const sclera=new T.Mesh(new T.SphereGeometry(1,48,32),frameMat.eye);
+       sclera.name=`PhysiologicalEyeball_${eye.toUpperCase()}`;sclera.material.depthWrite=false;
+       sclera.scale.set(size.horizontal/2,size.vertical/2,size.axial/2);
+       // Keep the anterior eye datum fixed while enlarging the globe rearward.
+       sclera.position.set(eyeX,eyeY,cornealApexZ-size.axial/2);group.add(sclera);
+       const iris=new T.Mesh(new T.RingGeometry(size.pupil/2,size.iris/2,64),frameMat.iris);
+       iris.material.side=T.DoubleSide;iris.material.depthWrite=false;iris.material.opacity=.8;iris.material.transmission=0;iris.renderOrder=1;iris.name=`PhysiologicalIris_${eye.toUpperCase()}`;
+       iris.position.set(eyeX,eyeY,cornealApexZ-3);group.add(iris);
+       const pupil=new T.Mesh(new T.CircleGeometry(size.pupil/2,48),frameMat.pupilCore);
+       pupil.material.side=T.DoubleSide;pupil.material.depthWrite=false;pupil.material.opacity=.95;pupil.material.transmission=0;pupil.renderOrder=1.1;pupil.name=`PhysiologicalPupil_${eye.toUpperCase()}`;
+       pupil.position.set(eyeX,eyeY,cornealApexZ-2.98);group.add(pupil);
+       const glint=sphere(eyeX+side*1.2,eyeY+1.2,cornealApexZ+.03,.34,frameMat.eyeHighlight,group);glint.scale.set(1,.8,.28);
        const axisMat=new T.LineDashedMaterial({color:0xffc077,transparent:true,opacity:.45,dashSize:2,gapSize:1.4});
        lineBetween(new T.Vector3(eyeX,eyeY,-data.vertex-2),new T.Vector3(eyeX,eyeY,8),axisMat,group);
      }
@@ -5225,8 +5518,15 @@ function wearContourAnchor(points,side,temporal,targetY=0){
        sphere(tHead.x,tHead.y,tHead.z,.75,mountMat,eyeUnit).name=`RimlessTemporalFrontFix_${eye.toUpperCase()}`;
      }
    }
+   if(acetateEyes.length===2){group.updateMatrixWorld(true);sculptAcetateFront(acetateEyes,f.b,frameMat.rim,group);}
+   if(topBridgeAnchors.length===2){
+     group.updateMatrixWorld(true);
+     const points=topBridgeAnchors.map(a=>group.worldToLocal(a.unit.localToWorld(a.point.clone()))).sort((a,b)=>a.x-b.x);
+     const middle=points[0].clone().lerp(points[1],.5);middle.z+=.35;
+     meshTube([points[0],middle,points[1]],.82,frameMat.rim,group).name='DoubleMetalTopBridge';
+   }
    // 鼻橋以兩眼轉動後「真正的鼻側鏡圈接點」建立，跟著面弧及前傾同步更新。
-   if(bridgeAnchors.length===2){
+   if(bridgeAnchors.length===2 && !(f.material==='acetate'&&rimType==='full')){
      group.updateMatrixWorld(true);
      const pts=bridgeAnchors.map(a=>group.worldToLocal(a.unit.localToWorld(a.point.clone())));
      pts.sort((a,b)=>a.x-b.x);
@@ -5235,24 +5535,24 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      const span=right.x-left.x;
      // 鼻橋拱高隨 B 高分級增加：小框保持收斂，大 B 框略為抬高。
      const bridgeHeightStep=f.b<35?.45:f.b<45?1.05:f.b<55?1.75:2.45;
-     const hump=Math.min(9.5,Math.max(3.1,span*.18)+bridgeHeightStep);
+     const hump=f.material==='brow'?Math.min(4.2,span*.12+1):Math.min(9.5,Math.max(3.1,span*.18)+bridgeHeightStep);
      const center=midpoint.clone();center.y+=hump;center.z+=1.6;
      const bridgePts=[left.clone(),left.clone().lerp(center,.35),center,
                       right.clone().lerp(center,.35),right.clone()];
      const bridgeRadius=rimType==='rimless'?.75:Math.max(.90,rimRadius*1.02);
-     meshTube(bridgePts,bridgeRadius,
-       rimType==='rimless'?frameMat.highlights:frameMat.rim,group).name='ConnectedNoseBridge';
+     meshTube(bridgePts,bridgeRadius,rimType==='rimless'?frameMat.highlights:frameMat.rim,group).name='ConnectedNoseBridge';
    }
-   const padRatio=f.b>40 ? Math.min(.50,.33+(f.b-40)*(0.17/18)) : .33;
-   const padY=f.b*padRatio-f.b/2;
+
+   const nosePadDrop=3.5;
    if(f.nosepad==='adjustable'){
      for(const anchor of padAnchors){
        const side=anchor.side;
        if(anchor.rimType==='rimless' && anchor.bridgeAttach){
          // 無邊框：從中樑鏡片銜接點先朝 -Z 退 6mm；下延 6–15mm 時持續再朝 -Z 傾約 8°。
-         const root={x:anchor.bridgeAttach.x,y:anchor.bridgeAttach.y,z:anchor.bridgeAttach.z};
+         const root=nasalRimPointAtY(anchor.seat,side,anchor.bridgeAttach.y);
+         root.z+=anchor.bridgeAttach.z-anchor.point.z;
          const rear={x:root.x,y:root.y,z:root.z-6};
-         const drop=Math.max(6,Math.min(15,6+(f.b-28)*(9/37)));
+         const drop=Math.max(8.5,Math.min(18.5,8.5+(f.b-28)*(10/37)));
          const flare=Math.tan(Math.PI/180*8)*drop*.45;
          const zSlope=Math.tan(Math.PI/180*8);
          const dropMid={x:rear.x+side*flare*.45,y:rear.y-drop*.45,z:rear.z-drop*.45*zSlope};
@@ -5267,7 +5567,12 @@ function wearContourAnchor(points,side,temporal,targetY=0){
        }
        // 焊接點從鏡圈本身的 B/2 高度取得；鼻托架與鼻墊跟眼鏡圈同層旋轉。
        // 因此前傾角與面弧改變時，焊點、U 彎、罩子之間不再產生座標系錯位。
-       const root=nasalRimPointAtY(anchor.seat,side,0);
+       const halfRim=anchor.rimType==='groove';
+       // Use the actual offset upper-rim centerline so the raised root remains welded to it.
+       const attachmentSeat=halfRim?outwardContour(anchor.seat,Math.max(.66,rimRadius)+.12):anchor.seat;
+       const root=nasalRimPointAtY(attachmentSeat,side,halfRim?2:-nosePadDrop);
+       // 半框起點再上移 2 mm；下延段隨 B 高由 5.5 mm 漸增，最高維持 6 mm。
+       const armDrop=halfRim?5.5+.5*Math.max(0,Math.min(1,(f.b-28)/37)):3;
        const yLevel=root.y;
        // 1. 鼻側焊接處先沿 -Z（臉側）退約 5mm。
        const rear={x:root.x,y:yLevel,z:root.z-5};
@@ -5283,24 +5588,25 @@ function wearContourAnchor(points,side,temporal,targetY=0){
        }
        const exit={x:openingX,y:yLevel,z:backZ};
        armPath.push(exit);
-       // 3. U 形末端垂直向下延伸約 3mm，再接到鼻墊罩上端。
-       const coverTopY=yLevel-3.0;
+       // 3. 下延段及兩個過渡點同步伸長，接至鼻墊罩上端。
+       const coverTopY=yLevel-armDrop;
        const coverPos={x:openingX+side*.78,y:coverTopY-1.1,z:backZ+.10};
-       armPath.push({x:openingX+side*.25,y:yLevel-1.1,z:backZ+.01});
-       armPath.push({x:openingX+side*.52,y:yLevel-2.15,z:backZ+.05});
+       armPath.push({x:openingX+side*.25,y:yLevel-armDrop*(1.1/3),z:backZ+.01});
+       armPath.push({x:openingX+side*.52,y:yLevel-armDrop*(2.15/3),z:backZ+.05});
        armPath.push({x:coverPos.x,y:coverTopY,z:coverPos.z});
-       meshTube(armPath,.44,frameMat.noseArm,anchor.unit)
-         .name=`SNosePadArm_${side<0?'OD':'OS'}_5mmBack_2x2U_3mmDrop`;
+       const arm=meshTube(armPath,.44,frameMat.noseArm,anchor.unit);
+       arm.name=`SNosePadArm_${side<0?'OD':'OS'}_5mmBack_2x2U_${armDrop.toFixed(2)}mmDrop`;
+       arm.userData={attachmentY:yLevel,drop:armDrop,minDrop:halfRim?5.5:3,maxDrop:halfRim?6:3,attachment:halfRim?'upper-rim-centerline':'nasal-rim'};
        nosePadAssembly(side,frameMat,anchor.unit,coverPos.x,coverPos.y,coverPos.z);
      }
    }else{
-     // 一體式鼻托：保留 B 高 40% 定位和上下接點，改成 2mm 厚的 D 形吐司薄片。
+     // 一體式鼻托：外緣定位，上下端以零斜率曲線緩入框面。
      for(const anchor of padAnchors){
        const side=anchor.side;
        const seat=anchor.seat||[];
        if(!seat.length)continue;
-       const targetY=f.b*.40-f.b/2;
-       const padHeight=Math.max(7,Math.min(12,7+(f.b-28)*5/22));
+       const targetY=f.b*.40-f.b/2-nosePadDrop;
+       const padHeight=Math.max(12,Math.min(20,12+(f.b-28)*8/22));
        // 直接使用每一高度的鏡圈實際鼻側曲線作為平直附著邊：
        // 對自由取型、較斜的鼻側輪廓及面弧改變，都能維持上下端貼合。
        const pad=new T.Mesh(
@@ -5319,8 +5625,13 @@ function wearContourAnchor(points,side,temporal,targetY=0){
  }
  function renderAll(){
    syncWearFrameOptions();
-   const d=getData();
    if(state.mode==='free')updateFreeDims();
+   const frameHeight=num('w_frameB',38);
+   for(const eye of ['od','os']){
+     const input=$('w_'+eye+'_och');input.max=String(frameHeight);
+     if(input.value.trim()!==''&&Number.isFinite(Number(input.value)))input.value=String(safe(Number(input.value),0,frameHeight));
+   }
+   const d=getData();
    d.frame.a=num('w_frameA',52);d.frame.b=num('w_frameB',38);
    state.frameValues=d.frame;
    state.frameContour=contourForFrame(d.frame);
@@ -5358,22 +5669,9 @@ function wearContourAnchor(points,side,temporal,targetY=0){
  $('wearModeNormal').addEventListener('click',()=>setMode('normal'));
  $('wearModeFree').addEventListener('click',()=>setMode('free'));
  $('wearResetShape').addEventListener('click',()=>{
-   state.free=pointsFromPreset('預2');if(state.mode==='free'){setMode('free','預2');}else{setMode('normal');}
+   state.free=pointsFromPreset('B');if(state.mode==='free'){setMode('free','B');}else{setMode('normal');}
  });
  for(const btn of root.querySelectorAll('[data-wear-preset]'))btn.addEventListener('click',()=>setMode('free',btn.dataset.wearPreset));
- $('wearBottomBOffset').addEventListener('input',event=>{
-   if(state.mode!=='free'||!state.free)return;
-   const f=state.free,a=freeHorizontalSpan(f),width=a.right-a.left;
-   setBottomBOffset(f,f.T[0].x+width*Number(event.target.value)/100);
-   state.basePreset=null;root.querySelectorAll('[data-wear-preset]').forEach(btn=>btn.classList.remove('active'));
-   updateFreeDims();renderAll();
- });
- $('wearBottomBReset').addEventListener('click',()=>{
-   if(state.mode!=='free'||!state.free)return;
-   setBottomBOffset(state.free,state.free.T[0].x);
-   state.basePreset=null;root.querySelectorAll('[data-wear-preset]').forEach(btn=>btn.classList.remove('active'));
-   updateFreeDims();renderAll();
- });
  $('wearResetAll').addEventListener('click',restoreDefaults);
  $('wearZeroAlign').addEventListener('click',()=>{
    // 在傾角與面弧存在時，單純使 PD / PH 同值不等於直視投影剛好穿過 OC；
