@@ -216,9 +216,7 @@
   #exportShapeJSON[hidden]{display:none!important}
 
 
-  .scale-tools{margin:10px 0;display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;color:#b9c9dc}
   .scale-tools input{width:78px;flex:none;padding:6px 8px}
-  #scaleStatus{font-size:11px;color:#85c8e5}
   .scale-tag{font-weight:650;color:#e2e8f0}
   .switch-panel .canvas.dimension-canvas{display:block;overflow:auto;aspect-ratio:auto!important;height:auto!important;max-width:100%;justify-content:initial;min-height:0;padding:10px;background:#0c182a;touch-action:pan-x pan-y}
   .switch-panel .canvas.dimension-canvas svg#topView{width:auto!important;height:auto!important;max-width:none!important;min-width:0!important;aspect-ratio:auto!important;display:block;overflow:visible;touch-action:none;user-select:none}
@@ -590,8 +588,16 @@ body.wear-active .panel-tabs{margin-bottom:6px}
 .wear-3d-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:11px 13px 0}
 .wear-3d-toolbar .wear-btn{padding:7px 9px}
 .wear-toolbar-spacer{flex:1}
-.wear-mini-check{display:inline-flex;align-items:center;gap:5px;cursor:pointer;color:#b3cada;font-size:11.5px;white-space:nowrap}
-.wear-mini-check input{width:15px;height:15px;accent-color:#38bdf8}
+.wear-mini-check{position:relative;display:inline-flex;align-items:center;gap:8px;cursor:pointer;color:#d7ecf8;font-size:11.5px;white-space:nowrap;padding:5px 9px 5px 7px;border:1px solid #2c4963;border-radius:999px;background:linear-gradient(180deg,#102338,#0b192b);box-shadow:inset 0 1px 0 #1f3b56;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease,color .18s ease}
+.wear-mini-check:hover{border-color:#3f6486;background:linear-gradient(180deg,#132a42,#0e1d31);color:#eef9ff}
+.wear-mini-check input{position:absolute;opacity:0;pointer-events:none}
+.wear-mini-switch{position:relative;display:inline-block;width:34px;height:19px;border-radius:999px;background:linear-gradient(180deg,#1a2e43,#101d2d);border:1px solid #35546d;box-shadow:inset 0 1px 2px #06101acc,0 0 0 1px #0b1522;flex:none;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease}
+.wear-mini-switch::after{content:"";position:absolute;left:2px;top:2px;width:13px;height:13px;border-radius:50%;background:linear-gradient(180deg,#f8fcff,#bfd4e4);box-shadow:0 1px 2px #0007;transition:transform .2s ease,background .18s ease}
+.wear-mini-label{line-height:1.1;font-weight:600;letter-spacing:.01em}
+.wear-mini-check input:checked + .wear-mini-switch{background:linear-gradient(180deg,#0ea5d7,#0b7ab2);border-color:#5bd8ff;box-shadow:inset 0 1px 0 #9be9ff66,0 0 0 1px #0b1522,0 0 10px #38bdf826}
+.wear-mini-check input:checked + .wear-mini-switch::after{transform:translateX(15px);background:linear-gradient(180deg,#ffffff,#dff6ff)}
+.wear-mini-check input:focus-visible + .wear-mini-switch{outline:2px solid #8de8ff;outline-offset:2px}
+.wear-mini-check input:not(:checked) ~ .wear-mini-label{color:#bfd3e1}
 #wearThree{height:410px;min-width:0;margin:9px 12px 0;border:1px solid #233a53;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse at 48% 48%,#122942,#0a1627 74%);position:relative}
 #wearThree canvas{display:block;touch-action:none}
 .wear-3d-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:22px;text-align:center;color:#a7c9df;font-size:13px;line-height:1.6}
@@ -643,6 +649,77 @@ body.wear-active .panel-tabs{margin-bottom:6px}
   .wear-geometry-details[open]>summary{border-bottom:1px solid #29435d}
   .wear-geometry-details>.wear-fields{padding:4px 12px 14px}
   .wear-geometry-note{margin:8px 13px;color:#95aeca;font-size:11px;line-height:1.6}
+
+/* v21: 全站一致的三欄處方輸入；保持內容集中而非平均撐滿整個面板 */
+.rx-triple{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:438px;width:100%;margin:0 0 8px}
+.rx-triple .rx-cell.row{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:5px!important;min-width:0!important;max-width:none!important;grid-template-columns:none!important;margin:0!important}
+.rx-triple .rx-cell label{font-size:11.5px;color:#b5cfe0;white-space:nowrap}
+.rx-triple .rx-cell input{min-width:0;width:100%;max-width:130px;height:36px;padding:7px 8px;font-size:13px;font-variant-numeric:tabular-nums}
+.wear-rx-triple{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:438px;width:100%;min-width:0}
+.wear-rx-triple .wear-field{min-width:0;max-width:130px}
+.wear-rx-triple .wear-field label{white-space:nowrap;font-size:11px}
+.wear-rx-triple .wear-field input{min-width:0;max-width:130px;width:100%}
+#quickLens{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px 6px}
+#quickLens .quick-field{grid-column:span 3}
+#quickLens .quick-field[data-for-input="D"],#quickLens .quick-field[data-for-input="Cyl"],#quickLens .quick-field[data-for-input="Axis"]{grid-column:span 2}
+#quickLens .quick-field label{font-size:10.5px;letter-spacing:-.15px}
+#quickLens .quick-field input{min-width:0;width:100%;padding:8px 5px}
+.scale-tools{margin:10px 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:#b9c9dc}
+.scale-tools-main{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0;flex:1 1 420px}
+#scaleStatus{flex:1 0 100%;font-size:11px;color:#85c8e5}
+@media(max-width:430px){.rx-triple,.wear-rx-triple{gap:6px}.rx-triple .rx-cell label,.wear-rx-triple .wear-field label{font-size:10px}}
+
+
+/* v24｜OD/OS：折射率、光心 PD、光心高緊湊三欄排列。 */
+.wear-optics-triple{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  width:100%;
+  max-width:438px;
+  min-width:0;
+}
+.wear-optics-triple .wear-field{min-width:0;max-width:130px;gap:5px}
+.wear-optics-triple .wear-field label{
+  font-size:11px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  line-height:1.4;
+}
+.wear-optics-triple .wear-field input,
+.wear-optics-triple .wear-field select{
+  min-width:0;
+  width:100%;
+  max-width:130px;
+  box-sizing:border-box;
+  padding:7px 6px;
+  font-variant-numeric:tabular-nums;
+}
+@media(max-width:430px){
+  .wear-optics-triple{gap:6px}
+  .wear-optics-triple .wear-field label{font-size:10.5px}
+  .wear-optics-triple .wear-field input,
+  .wear-optics-triple .wear-field select{font-size:12px;padding:6px 5px}
+}
+/* v24｜統一垂直與水平捲軸：冷灰藍軌道、微亮青藍滑塊。 */
+:root{scrollbar-color:#456c88 #0c1928;scrollbar-width:thin}
+*{scrollbar-width:thin;scrollbar-color:#456c88 #0c1928}
+*::-webkit-scrollbar{width:9px;height:9px}
+*::-webkit-scrollbar-track{background:#0c1928;border-radius:999px}
+*::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#527b98,#315571);
+  border:2px solid #0c1928;
+  border-radius:999px;
+  min-height:38px;
+}
+*::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,#62a9c6,#477894);
+}
+*::-webkit-scrollbar-thumb:active{background:#4cb2d5}
+*::-webkit-scrollbar-corner{background:#0c1928}
+
 </style>
 </head>
 <body>
@@ -695,22 +772,36 @@ body.wear-active .panel-tabs{margin-bottom:6px}
               <div>
                 <div class="wear-subtitle">右眼 OD｜鏡片參數</div>
                 <div class="wear-fields">
-                  <div class="wear-field"><label for="w_od_s">球鏡 SPH (D)</label><input id="w_od_s" type="number" min="-20" max="15" step=".25" value="-4.00"></div>
-                  <div class="wear-field"><label for="w_od_c">柱鏡 CYL (D)</label><input id="w_od_c" type="number" min="-10" max="10" step=".25" value="-1.00"></div>
-                  <div class="wear-field"><label for="w_od_a">散光軸 AX (°)</label><input id="w_od_a" type="number" min="1" max="180" step="1" value="180"></div>
-                  <div class="wear-field"><label for="w_od_n">折射率 n</label><select id="w_od_n"><option>1.50</option><option>1.56</option><option selected>1.60</option><option>1.67</option><option>1.74</option></select></div>
-                  <div class="wear-field"><label for="w_od_ocpd">光心單眼瞳距 (mm)</label><input id="w_od_ocpd" type="number" min="20" max="40" step=".5" value="31"></div>
-                  <div class="wear-field"><label for="w_od_och">光心高度（自框底）mm</label><input id="w_od_och" type="number" min="0" max="60" step=".5" value="20"></div>
+                  <div class="wear-rx-triple" role="group" aria-label="OD 處方 SPH CYL AX">
+                    <div class="wear-field"><label for="w_od_s">球鏡 SPH</label><input id="w_od_s" type="number" min="-20" max="15" step=".25" value="-4.00"></div>
+                    <div class="wear-field"><label for="w_od_c">柱鏡 CYL</label><input id="w_od_c" type="number" min="-10" max="10" step=".25" value="-1.00"></div>
+                    <div class="wear-field"><label for="w_od_a">軸度 AX</label><input id="w_od_a" type="number" min="1" max="180" step="1" value="180"></div>
+                  </div><div class="wear-optics-triple" role="group" aria-label="OD 折射率與光學中心設定">
+
+                    <div class="wear-field"><label for="w_od_n" title="鏡片折射率 n">折射率 n</label><select id="w_od_n"><option>1.50</option><option>1.56</option><option selected>1.60</option><option>1.67</option><option>1.74</option></select></div>
+
+                    <div class="wear-field"><label for="w_od_ocpd" title="光學中心單眼瞳距（mm）">光心單眼瞳距</label><input id="w_od_ocpd" type="number" min="20" max="40" step=".5" value="31"></div>
+
+                    <div class="wear-field"><label for="w_od_och" title="光學中心高度（自框底，mm）">光心高</label><input id="w_od_och" type="number" min="0" max="60" step=".5" value="20"></div>
+
+                  </div>
                 </div>
                 <div class="wear-divider"></div>
                 <div class="wear-subtitle">左眼 OS｜鏡片參數</div>
                 <div class="wear-fields">
-                  <div class="wear-field"><label for="w_os_s">球鏡 SPH (D)</label><input id="w_os_s" type="number" min="-20" max="15" step=".25" value="-3.50"></div>
-                  <div class="wear-field"><label for="w_os_c">柱鏡 CYL (D)</label><input id="w_os_c" type="number" min="-10" max="10" step=".25" value="-.50"></div>
-                  <div class="wear-field"><label for="w_os_a">散光軸 AX (°)</label><input id="w_os_a" type="number" min="1" max="180" step="1" value="90"></div>
-                  <div class="wear-field"><label for="w_os_n">折射率 n</label><select id="w_os_n"><option>1.50</option><option>1.56</option><option selected>1.60</option><option>1.67</option><option>1.74</option></select></div>
-                  <div class="wear-field"><label for="w_os_ocpd">光心單眼瞳距 (mm)</label><input id="w_os_ocpd" type="number" min="20" max="40" step=".5" value="31"></div>
-                  <div class="wear-field"><label for="w_os_och">光心高度（自框底）mm</label><input id="w_os_och" type="number" min="0" max="60" step=".5" value="20"></div>
+                  <div class="wear-rx-triple" role="group" aria-label="OS 處方 SPH CYL AX">
+                    <div class="wear-field"><label for="w_os_s">球鏡 SPH</label><input id="w_os_s" type="number" min="-20" max="15" step=".25" value="-3.50"></div>
+                    <div class="wear-field"><label for="w_os_c">柱鏡 CYL</label><input id="w_os_c" type="number" min="-10" max="10" step=".25" value="-.50"></div>
+                    <div class="wear-field"><label for="w_os_a">軸度 AX</label><input id="w_os_a" type="number" min="1" max="180" step="1" value="90"></div>
+                  </div><div class="wear-optics-triple" role="group" aria-label="OS 折射率與光學中心設定">
+
+                    <div class="wear-field"><label for="w_os_n" title="鏡片折射率 n">折射率 n</label><select id="w_os_n"><option>1.50</option><option>1.56</option><option selected>1.60</option><option>1.67</option><option>1.74</option></select></div>
+
+                    <div class="wear-field"><label for="w_os_ocpd" title="光學中心單眼瞳距（mm）">光心單眼瞳距</label><input id="w_os_ocpd" type="number" min="20" max="40" step=".5" value="31"></div>
+
+                    <div class="wear-field"><label for="w_os_och" title="光學中心高度（自框底，mm）">光心高</label><input id="w_os_och" type="number" min="0" max="60" step=".5" value="20"></div>
+
+                  </div>
                 </div>
                 <details class="wear-geometry-details">
                   <summary>鏡片厚度建模進階｜前彎、近視中心厚、遠視邊緣厚</summary>
@@ -747,8 +838,6 @@ body.wear-active .panel-tabs{margin-bottom:6px}
                 <div class="wear-bottom-b-control" id="wearBottomBControls" hidden>
                   <div class="wear-bottom-b-head"><label for="wearBottomBOffset">下 B 點水平偏移</label><output id="wearBottomBOffsetValue" for="wearBottomBOffset">置中 · 0%</output></div>
                   <div class="wear-bottom-b-slider-row"><span>鼻側</span><input type="range" id="wearBottomBOffset" min="-33" max="33" step="1" value="0" aria-label="下 B 點水平偏移，負數偏鼻側，正數偏顳側"><span>顳側</span><button type="button" class="wear-btn" id="wearBottomBReset">置中</button></div>
-                  <p class="wear-shape-limits" id="wearShapePointRange">可直接拖曳下 B 點調整水平位置；偏移範圍為 A 寬的 ±33%（OD 鏡片自動鏡像）。</p>
-                  <p class="wear-shape-limits">尺寸限制：A 35～75 mm、B 20～65 mm；左右控制點不得跨過對側，B 點與肩點保持 1.8 mm 間距。</p>
                 </div>
                 <div class="wear-fields">
                   <div class="wear-field"><label for="w_frameA">框寬 A (mm)</label><input id="w_frameA" type="number" min="35" max="75" step=".5" value="52"></div>
@@ -777,11 +866,11 @@ body.wear-active .panel-tabs{margin-bottom:6px}
                 <div class="wear-divider"></div>
                 <div class="wear-subtitle">鏡架配戴姿態</div>
                 <div class="wear-fields">
-                  <div class="wear-field"><label for="w_wrap">面弧角（單側 °）</label><input id="w_wrap" type="number" min="0" max="25" step=".5" value="5"></div>
+                  <div class="wear-field"><label for="w_wrap">面弧角（單側 °）</label><input id="w_wrap" type="number" min="-10" max="25" step=".5" value="5"></div>
                   <div class="wear-field"><label for="w_pan">前傾角 (°)</label><input id="w_pan" type="number" min="-10" max="25" step=".5" value="8"></div>
                   <div class="wear-field"><label for="w_vertex">實際後頂點距 (mm)</label><input id="w_vertex" type="number" min="5" max="30" step=".5" value="12"></div>
                   <div class="wear-field"><label for="w_refvertex">比較基準頂點距 (mm)</label><input id="w_refvertex" type="number" min="5" max="30" step=".5" value="12"></div>
-                  <div class="wear-field wide"><label for="w_wrap_range">面弧角快速調整</label><input id="w_wrap_range" class="wear-range" type="range" min="0" max="25" step=".5" value="5"></div>
+                  <div class="wear-field wide"><label for="w_wrap_range">面弧角快速調整</label><input id="w_wrap_range" class="wear-range" type="range" min="-10" max="25" step=".5" value="5"></div>
                   <div class="wear-field wide"><label for="w_pan_range">前傾角快速調整</label><input id="w_pan_range" class="wear-range" type="range" min="-10" max="25" step=".5" value="8"></div>
                   <div class="wear-field wide"><label for="w_vertex_range">頂點距快速調整</label><input id="w_vertex_range" class="wear-range" type="range" min="5" max="30" step=".5" value="12"></div>
                 </div>
@@ -789,7 +878,7 @@ body.wear-active .panel-tabs{margin-bottom:6px}
                   <button class="wear-btn" id="wearZeroAlign" type="button" title="配戴瞳距與瞳高對齊鏡片光學中心">瞳位對齊光心</button>
                   <button class="wear-btn" id="wearResetAll" type="button">重設教學設定</button>
                 </div>
-                <p class="note" style="margin-top:7px">註：前傾與面弧改變鏡片法線方向；直視投影與傾斜鏡片的近似球柱鏡變化同步計算。未含鏡眼真實三維形態。</p>
+                <p class="note" style="margin-top:7px">註：前傾與面弧會影響直視落點及近似球柱鏡效果；頂點距在目前模型主要影響眼平面等效度數，尚未加入眼球旋轉中心及斜向入射造成的額外稜鏡。</p>
               </div>
             </details>
           </div>
@@ -804,8 +893,8 @@ body.wear-active .panel-tabs{margin-bottom:6px}
               <button class="wear-btn" type="button" id="wearSide">側面</button>
               <button class="wear-btn" type="button" id="wearCameraReset">重設視角</button>
               <span class="wear-toolbar-spacer"></span>
-              <label class="wear-mini-check"><input id="wearShowGuides" type="checkbox" checked>顯示光心／瞳位</label>
-              <label class="wear-mini-check"><input id="wearShowFace" type="checkbox" checked>配戴眼位</label>
+              <label class="wear-mini-check"><input id="wearShowGuides" type="checkbox" checked><span class="wear-mini-switch" aria-hidden="true"></span><span class="wear-mini-label">顯示光心／瞳位</span></label>
+              <label class="wear-mini-check"><input id="wearShowFace" type="checkbox" checked><span class="wear-mini-switch" aria-hidden="true"></span><span class="wear-mini-label">配戴眼位</span></label>
             </div>
             <div id="wearThree" aria-label="左右眼鏡片、鏡圈、鼻橋、鉸鏈、鏡腿與鼻托的互動三維模型"><div class="wear-3d-fallback">3D 模型載入中。如果無法顯示，請確認網路能載入 Three.js；下方稜鏡與屈光力計算可獨立使用。</div></div>
             <div class="wear-3d-note">左鍵拖曳：旋轉視角｜右鍵拖曳：平移｜滾輪：縮放。<span style="color:#71d9f8">青點</span>＝鏡片光學中心，<span style="color:#ffc178">橘點</span>＝直視落點／瞳位；虛線為位置差示意。鏡框、鼻橋、鉸鏈、鏡腿與鼻托隨配戴參數同步改變。</div>
@@ -869,10 +958,12 @@ body.wear-active .panel-tabs{margin-bottom:6px}
       <div class="card switch-panel" data-panel="0" id="panel-0">
         <div class="hd">參數輸入 [訂製鏡片]</div>
         <div class="bd">
-          <div class="row"><label>球鏡 S (±)</label><input id="D" type="number" step="0.25" value="-6" min="-20" max="15"></div>
+          <div class="rx-triple" role="group" aria-label="鏡片處方｜球鏡、柱鏡、軸度">
+            <div class="rx-cell row"><label for="D">球鏡 SPH</label><input id="D" type="number" step="0.25" value="-6" min="-20" max="15"></div>
+            <div class="rx-cell row"><label for="Cyl">柱鏡 CYL</label><input id="Cyl" type="number" step="0.25" value="0" min="-8" max="0"></div>
+            <div class="rx-cell row"><label for="Axis">軸度 AX</label><input id="Axis" type="number" step="1" value="180" min="1" max="180"></div>
+          </div>
           <div class="note" id="autoLensType" aria-live="polite">自動判定：近視（S ＜ 0）</div>
-          <div class="row"><label>散光 C</label><input id="Cyl" type="number" step="0.25" value="0" min="-8" max="0"></div>
-          <div class="row"><label>軸度 A</label><input id="Axis" type="number" step="1" value="180" min="1" max="180"></div>
           <div class="row"><label>折射率 n</label>
             <select id="n">
               <option value="1.50">1.50</option>
@@ -911,12 +1002,14 @@ body.wear-active .panel-tabs{margin-bottom:6px}
           </div>
           <p id="shapeInstruction" class="note">一般框型：依輸入 A／B／ED 產生近似輪廓；可切換自由取型。</p>
           <div class="scale-tools">
-            <span class="scale-tag">50 mm 螢幕校正尺</span>
-            <label for="measuredRuler">實際尺量：</label>
-            <input id="measuredRuler" type="number" min="15" max="130" step="0.1" value="50" aria-label="目前畫面50mm校正尺的實際量測長度，毫米" />
-            <span>mm</span>
-            <button id="applyRuler" type="button">套用校正</button>
-            <button id="resetRuler" type="button">重設比例</button>
+            <div class="scale-tools-main">
+              <span class="scale-tag">50 mm 螢幕校正尺</span>
+              <label for="measuredRuler">實際尺量：</label>
+              <input id="measuredRuler" type="number" min="15" max="130" step="0.1" value="50" aria-label="目前畫面50mm校正尺的實際量測長度，毫米" />
+              <span>mm</span>
+              <button id="applyRuler" type="button">套用校正</button>
+              <button id="resetRuler" type="button">重設比例</button>
+            </div>
             <span id="scaleStatus">尚未校正（以 CSS 96 DPI 為初值）</span>
           </div>
           <div class="canvas dimension-canvas"><svg id="topView" viewBox="0 0 144 115" aria-label="按毫米比例繪製的鏡片及自由取型控制點"></svg></div>
@@ -943,8 +1036,8 @@ body.wear-active .panel-tabs{margin-bottom:6px}
         <div class="bd">
           <p id="freeFieldNotice" class="note">一般框型：A／B／ED 可以自行輸入。自由取型模式將由輪廓自動計算並鎖定欄位。</p>
           <div class="row"><label>有效直徑 ED (mm)</label><input id="ED" type="number" step="0.5" value="53" min="20" max="80"></div>
-          <div class="row"><label>框寬 A (mm)</label><input id="A" type="number" step="0.5" value="52" min="20" max="80"></div>
-          <div class="row"><label>框高 B (mm)</label><input id="B" type="number" step="0.5" value="36" min="15" max="80"></div>
+          <div class="row"><label>框寬 A (mm)</label><input id="A" type="number" step="0.5" value="52" min="35" max="75"></div>
+          <div class="row"><label>框高 B (mm)</label><input id="B" type="number" step="0.5" value="36" min="20" max="65"></div>
           <div class="row"><label>中樑距 DBL (mm)</label><input id="DBL" type="number" step="0.5" value="17" min="10" max="40"></div>
           <div class="row"><label>瞳距 PD (mm)</label><input id="PD" type="number" step="0.5" value="62" min="40" max="80"></div>
           <div class="row"><label>瞳高 PH (mm)</label><input id="pupilH" type="number" step="0.5" value=""></div>
@@ -1101,7 +1194,7 @@ body.wear-active .panel-tabs{margin-bottom:6px}
     }
   }
   const QUICK_FIELDS={
-    quickLens:[['D','球鏡 S'],['Cyl','散光 C'],['Axis','軸度 AX'],['n','折射率 n'],['BC','前彎 BC'],['centerT','中心厚 mm'],['edgeT','邊緣厚 mm'],['blankDia','鏡坯 Ø mm']],
+    quickLens:[['D','SPH'],['Cyl','CYL'],['Axis','AX'],['n','折射率 n'],['BC','前彎 BC'],['centerT','中心厚 mm'],['edgeT','邊緣厚 mm'],['blankDia','鏡坯 Ø mm']],
     quickFitting:[['PD','瞳距 PD'],['pupilH','瞳高 PH'],['DBL','中樑 DBL'],['rimType','框類']],
     quickMore:[['A','框寬 A'],['B','框高 B'],['ED','有效徑 ED'],['allowance','預留加工(安全值)'],['grooveDepth','溝尖／車溝寬'],['minTip','最小殘厚']]
   };
@@ -3446,7 +3539,7 @@ function update3D(res){
   const FREE_B_SHOULDER_GAP_MM=1.8;
   function resetFreeGeometry(){
     let A=finite($('A').value,52),B=finite($('B').value,40);
-    A=Math.max(30,Math.min(70,A)); B=Math.max(25,Math.min(56,B));
+    A=Math.max(LENS_FREE_LIMITS.aMin,Math.min(LENS_FREE_LIMITS.aMax,A)); B=Math.max(LENS_FREE_LIMITS.bMin,Math.min(LENS_FREE_LIMITS.bMax,B));
     const xs=[.66,.90,1,1,.89,.66],ys=[-.79,-.61,-.21,.24,.64,.79];
     const initSide=(sign)=>xs.map((v,i)=>({
       x:sign*A/2*v,
@@ -3641,7 +3734,7 @@ function update3D(res){
         const X=cx+res.hDec+p.x-mx,Y=cy+res.vDecY+p.y-my;
         const dot=elSVG('circle',{cx:X,cy:Y,r:1.25,'data-group':group,'data-index':i,
           class:'free-dot'+(isVert?' vert':''),'aria-label':group+(i+1)+' 拖曳控制點'},svg);
-        elSVG('title',{},dot).textContent=(isVert?'上下垂直拖曳':'左右水平拖曳')+' '+group+(i+1);
+        elSVG('title',{},dot).textContent=(group==='B'?'可上下調高及左右偏移':isVert?'上下調整 B 高':'左右調整寬度')+' '+group+(i+1);
         elSVG('text',{x:X,y:Y-2.1,class:'free-dot-label'},svg).textContent=isVert?(group==='T'?'上 B':'下 B'):group+(i+1);
       });
     }
@@ -3662,39 +3755,59 @@ function update3D(res){
   // 上下各一個 B 控制點：以另一端為固定錨點，線性映射中間點的 Y。
   // 但上肩 L1/R1 固定在上 B 下方 1.8 mm，下肩 L6/R6 固定在下 B 上方 1.8 mm；
   // 這四點不按 B 高比例拉開，只隨各自 B 端點平移。X 座標完全不變。
-  function resizeFreeHeight(which, requestedY){
+
+  // 鏡片厚度模擬器自由取型：與配戴頁共用限制規格，左右眼依顳鼻方向對應偏移。
+  const LENS_FREE_LIMITS=Object.freeze({aMin:35,aMax:75,bMin:20,bMax:65,sideGap:2,bOffset:.33,shoulder:1.8});
+  function lensFreeSpan(f){
+    const all=[...f.L,...f.R];
+    return {left:Math.min(...all.map(p=>p.x)),right:Math.max(...all.map(p=>p.x))};
+  }
+  function lensTemporalSign(){return shapeState.eye==='OD'?-1:1;}
+  function lensBottomBPercent(f){
+    if(!f)return 0;
+    const span=lensFreeSpan(f),width=Math.max(1,span.right-span.left);
+    return Math.max(-33,Math.min(33,(f.B[0].x-f.T[0].x)/width*100*lensTemporalSign()));
+  }
+  function moveLensBottomB(f,targetX){
+    const span=lensFreeSpan(f),width=Math.max(LENS_FREE_LIMITS.aMin,span.right-span.left);
+    const center=f.T[0].x,limit=width*LENS_FREE_LIMITS.bOffset;
+    f.B[0].x=Math.max(Math.max(span.left+LENS_FREE_LIMITS.sideGap,center-limit),
+      Math.min(Math.min(span.right-LENS_FREE_LIMITS.sideGap,center+limit),targetX));
+  }
+  function lensSideXLimits(f,group,index){
+    const pt=f[group][index];
+    const others=[...f.L,...f.R,...f.T,...f.B].filter(p=>p!==pt);
+    const othersMin=Math.min(...others.map(p=>p.x)),othersMax=Math.max(...others.map(p=>p.x));
+    const peer=f[group==='L'?'R':'L'][index];
+    let min=othersMax-LENS_FREE_LIMITS.aMax,max=othersMin+LENS_FREE_LIMITS.aMax;
+    if(group==='L'){
+      max=Math.min(max,peer.x-LENS_FREE_LIMITS.sideGap);
+      if(othersMax-othersMin<LENS_FREE_LIMITS.aMin)max=Math.min(max,othersMax-LENS_FREE_LIMITS.aMin);
+    }else{
+      min=Math.max(min,peer.x+LENS_FREE_LIMITS.sideGap);
+      if(othersMax-othersMin<LENS_FREE_LIMITS.aMin)min=Math.max(min,othersMin+LENS_FREE_LIMITS.aMin);
+    }
+    return min<=max?{min,max}:{min:pt.x,max:pt.x};
+  }
+  function resizeFreeHeight(which,requestedY){
     const f=shapeState.free;
-    if(!f || (which!=='T' && which!=='B')) return;
-    const top=f.T[0].y,bottom=f.B[0].y;
-    const oldSpan=bottom-top;
-    if(oldSpan<1e-6) return;
-    // B 高限制 18～70 mm，避免輪廓倒置，也保持畫布可操作。
-    const minHeight=18,maxHeight=70;
-    let newTop=top,newBottom=bottom;
-    if(which==='T'){
-      newTop=Math.max(-42,Math.min(bottom-minHeight,requestedY));
-      newTop=Math.max(newTop,bottom-maxHeight);
-    } else {
-      newBottom=Math.min(42,Math.max(top+minHeight,requestedY));
-      newBottom=Math.min(newBottom,top+maxHeight);
+    if(!f||!['T','B'].includes(which))return;
+    const oldTop=f.T[0].y,oldBottom=f.B[0].y;
+    let top=oldTop,bottom=oldBottom;
+    if(which==='T')top=Math.max(oldBottom-LENS_FREE_LIMITS.bMax,Math.min(oldBottom-LENS_FREE_LIMITS.bMin,requestedY));
+    else bottom=Math.max(oldTop+LENS_FREE_LIMITS.bMin,Math.min(oldTop+LENS_FREE_LIMITS.bMax,requestedY));
+    const oldSpan=Math.max(.001,oldBottom-oldTop-2*LENS_FREE_LIMITS.shoulder);
+    const newSpan=Math.max(.001,bottom-top-2*LENS_FREE_LIMITS.shoulder);
+    for(const group of ['L','R'])for(let i=0;i<6;i++){
+      const pt=f[group][i];
+      if(i===0)pt.y=top+LENS_FREE_LIMITS.shoulder;
+      else if(i===5)pt.y=bottom-LENS_FREE_LIMITS.shoulder;
+      else{
+        const u=Math.max(0,Math.min(1,(pt.y-oldTop-LENS_FREE_LIMITS.shoulder)/oldSpan));
+        pt.y=top+LENS_FREE_LIMITS.shoulder+u*newSpan;
+      }
     }
-    const scale=(newBottom-newTop)/oldSpan;
-    for(const group of ['L','R']){
-      f[group].forEach((point,i)=>{
-        if(i===0){
-          // 與上 B 維持絕對垂直距離，不隨放大比例改變。
-          point.y=newTop+FREE_B_SHOULDER_GAP_MM;
-        }else if(i===5){
-          // 與下 B 維持絕對垂直距離，不隨放大比例改變。
-          point.y=newBottom-FREE_B_SHOULDER_GAP_MM;
-        }else{
-          point.y=newTop+(point.y-top)*scale;
-        }
-      });
-    }
-    // B 高兩端點精確定位，避免多次拖曳造成累積誤差。
-    f.T[0].y=newTop;
-    f.B[0].y=newBottom;
+    f.T[0].y=top;f.B[0].y=bottom;
   }
   // 左右眼專屬處方與取型形狀：其他共同參數（框心距、折射率等）維持共用。
   const EYE_FIELDS=['D','Cyl','Axis','BC','centerT','edgeT','pupilH'];
@@ -3761,9 +3874,13 @@ function update3D(res){
     if(!r)return;
     const target=shapeState.free[drag.group][drag.index];
     const rawX=p.x-72-r.hDec+midx,rawY=p.y-51-r.vDecY+midy;
-    if(drag.group==='L')target.x=Math.max(-38,Math.min(-4,rawX));
-    else if(drag.group==='R')target.x=Math.min(38,Math.max(4,rawX));
-    else resizeFreeHeight(drag.group,rawY);
+    if(drag.group==='L'||drag.group==='R'){
+      const limits=lensSideXLimits(shapeState.free,drag.group,drag.index);
+      target.x=Math.max(limits.min,Math.min(limits.max,rawX));
+    }else{
+      resizeFreeHeight(drag.group,rawY);
+      if(drag.group==='B')moveLensBottomB(shapeState.free,rawX);
+    }
     activePresetByEye[shapeState.eye]=null;
     syncPresetUI();
     update();
@@ -4927,6 +5044,23 @@ function wearContourAnchor(points,side,temporal,targetY=0){
    }
    return output;
  }
+ function rimlessFrontAt(cut,x,y,ocX,ocY,seatZ,offset=.72){
+   // 使用厚度模擬器的實際前表面拋物線（非固定深度）：從前緣真實採樣點換算到內縮位置。
+   const base=cut.front[0];
+   if(!base)return seatZ+offset;
+   const r0=(base.x-ocX)**2+(base.y-ocY)**2;
+   const r1=(x-ocX)**2+(y-ocY)**2;
+   const coefficient=Math.max(0,Number(cut.res.BC)||0)/Math.max(1,2000*((Number(cut.res.n)||1.5)-1));
+   return base.z+(r0-r1)*coefficient+seatZ+offset;
+ }
+ function rimlessFrontPath(cut,a,b,ocX,ocY,seatZ,offset=.72){
+   const steps=8,out=[];
+   for(let i=0;i<=steps;i++){
+     const u=i/steps,x=a.x+(b.x-a.x)*u,y=a.y+(b.y-a.y)*u;
+     out.push({x,y,z:rimlessFrontAt(cut,x,y,ocX,ocY,seatZ,offset)});
+   }
+   return out;
+ }
  function assemble3D(data,out){
    if(!state.scene)return;
    const T=THREE_G(),ctx=state.scene;
@@ -5008,19 +5142,40 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      const noseIndex=wearContourAnchor(localShape,side,false,f.b*.13);
      const outer=new T.Vector3(outerAtHeight.x,outerAtHeight.y,outerAtHeight.z+lensSeatZ);
      const nasal=cut.seat[noseIndex].clone();nasal.z+=lensSeatZ;
+     // 無邊框在前表面設置約 5mm 的鏡片內延伸段，沿前表弧度保留 0.72mm 間隔。
+     const rimlessNasalEdge={x:nasal.x,y:nasal.y};
+     const rimlessNasalInner={x:nasal.x+side*5,y:nasal.y};
+     const rimlessOuterEdge={x:outer.x,y:outer.y};
+     const rimlessOuterInner={x:outer.x-side*5,y:outer.y};
+     const nasalMount=rimlessFrontPath(cut,rimlessNasalEdge,rimlessNasalInner,ocX,ocY,lensSeatZ);
+     const temporalMount=rimlessFrontPath(cut,rimlessOuterEdge,rimlessOuterInner,ocX,ocY,lensSeatZ);
+     const bridgeEdgeAttach=rimType==='rimless'
+       ?new T.Vector3(nasalMount[0].x,nasalMount[0].y,nasalMount[0].z)
+       :nasal;
+     const bridgeInnerAttach=rimType==='rimless'
+       ?new T.Vector3(nasalMount[nasalMount.length-1].x,nasalMount[nasalMount.length-1].y,nasalMount[nasalMount.length-1].z)
+       :nasal;
+     if(rimType==='rimless'){
+       meshTube(nasalMount,.50,frameMat.highlights,eyeUnit,false).name=`RimlessBridgeFrontMount_${eye.toUpperCase()}`;
+     }
      const noseJoint=new T.Mesh(new T.SphereGeometry(Math.max(.55,rimRadius*.66),12,9),frameMat.rim);
      noseJoint.name=`NoseBridgeConnector_${eye.toUpperCase()}`;
-     noseJoint.position.copy(nasal);eyeUnit.add(noseJoint);
-     bridgeAnchors.push({eye,side,unit:eyeUnit,point:nasal});
-     padAnchors.push({eye,side,unit:eyeUnit,point:nasal.clone(),
+     noseJoint.position.copy(bridgeEdgeAttach);eyeUnit.add(noseJoint);
+     bridgeAnchors.push({eye,side,unit:eyeUnit,point:bridgeEdgeAttach});
+     padAnchors.push({eye,side,unit:eyeUnit,point:nasal.clone(),bridgeAttach:bridgeEdgeAttach.clone(),bridgeInnerAttach:bridgeInnerAttach.clone(),rimType,
        seat:cut.seat.map(p=>new T.Vector3(p.x,p.y,p.z+lensSeatZ))});
      // 端片由鏡圈顳側實際溝尖定位；先向顳側水平外展，再退到鉸鏈。
-     const tipA={x:outer.x,y:outer.y,z:outer.z};
-     const tipB={x:outer.x+side*3.4,y:outer.y+.18,z:outer.z};
-     const tipC={x:outer.x+side*6.0,y:outer.y+.25,z:outer.z-2.0};
-     const hingeP={x:outer.x+side*7.7,y:outer.y+.3,z:outer.z-3.6};
+     const tipA=rimType==='rimless'?{...temporalMount[0]}:{x:outer.x,y:outer.y,z:outer.z};
+     const tipBaseZ=rimType==='rimless'?temporalMount[0].z:outer.z;
+     const tipB={x:outer.x+side*3.4,y:outer.y+.18,z:tipBaseZ};
+     const tipC={x:outer.x+side*6.0,y:outer.y+.25,z:tipBaseZ-2.0};
+     const hingeP={x:outer.x+side*7.7,y:outer.y+.3,z:tipBaseZ-3.6};
      // 端片回到原本的 L 型延伸基礎，不做片狀，僅把端片本體加粗。
-     const endpieceRadius=Math.max(rimRadius*1.22, style.templeRadius*(f.material==='acetate'?1.58:1.28));
+     const endpieceRadius=Math.max(rimRadius*1.28, style.templeRadius*(f.material==='acetate'?1.64:1.36));
+     if(rimType==='rimless'){
+       meshTube(temporalMount,Math.max(.66,endpieceRadius*.78),frameMat.highlights,eyeUnit,false)
+         .name=`RimlessTempleFrontMount_${eye.toUpperCase()}`;
+     }
      meshTube([tipA,tipB,tipC,hingeP],endpieceRadius,frameMat.rim,eyeUnit)
        .name=`TempleEndpiece_${eye.toUpperCase()}`;
      const jointB=sphere(tipB.x,tipB.y,tipB.z,endpieceRadius*.94,frameMat.rim,eyeUnit);
@@ -5062,13 +5217,12 @@ function wearContourAnchor(points,side,temporal,targetY=0){
        lineBetween(new T.Vector3(eyeX,eyeY,-data.vertex-2),new T.Vector3(eyeX,eyeY,8),axisMat,group);
      }
      if(rimType==='rimless'){
-       // 無邊框連接件直接定位於真實裁型側壁，與上方鼻橋採同樣錨點。
+       // 鼻側與顳側各約 5mm 的前表面裝配段，彎度與實際鏡片 BC 一致，不穿入鏡片。
        const mountMat=frameMat.highlights;
-       const drillN=nasal.clone();drillN.x-=side*.35;
-       const drillT=outer.clone();drillT.x-=side*.4;
-       sphere(drillN.x,drillN.y,drillN.z,.77,mountMat,eyeUnit);
-       sphere(drillT.x,drillT.y,drillT.z,.77,mountMat,eyeUnit);
-       meshTube([tipA,{x:outer.x+side*1.4,y:outer.y,z:outer.z-.35},tipB],.35,mountMat,eyeUnit);
+       meshTube(temporalMount,.5,mountMat,eyeUnit,false).name=`RimlessTempleFrontMount_${eye.toUpperCase()}`;
+       const nHead=nasalMount[nasalMount.length-1],tHead=temporalMount[temporalMount.length-1];
+       sphere(nHead.x,nHead.y,nHead.z,.75,mountMat,eyeUnit).name=`RimlessNasalFrontFix_${eye.toUpperCase()}`;
+       sphere(tHead.x,tHead.y,tHead.z,.75,mountMat,eyeUnit).name=`RimlessTemporalFrontFix_${eye.toUpperCase()}`;
      }
    }
    // 鼻橋以兩眼轉動後「真正的鼻側鏡圈接點」建立，跟著面弧及前傾同步更新。
@@ -5079,11 +5233,14 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      const [left,right]=pts;
      const midpoint=left.clone().lerp(right,.5);
      const span=right.x-left.x;
-     const hump=Math.min(6.5,Math.max(3.1,span*.18));
+     // 鼻橋拱高隨 B 高分級增加：小框保持收斂，大 B 框略為抬高。
+     const bridgeHeightStep=f.b<35?.45:f.b<45?1.05:f.b<55?1.75:2.45;
+     const hump=Math.min(9.5,Math.max(3.1,span*.18)+bridgeHeightStep);
      const center=midpoint.clone();center.y+=hump;center.z+=1.6;
      const bridgePts=[left.clone(),left.clone().lerp(center,.35),center,
                       right.clone().lerp(center,.35),right.clone()];
-     meshTube(bridgePts,rimType==='rimless'?.59:Math.max(.75,rimRadius*.86),
+     const bridgeRadius=rimType==='rimless'?.75:Math.max(.90,rimRadius*1.02);
+     meshTube(bridgePts,bridgeRadius,
        rimType==='rimless'?frameMat.highlights:frameMat.rim,group).name='ConnectedNoseBridge';
    }
    const padRatio=f.b>40 ? Math.min(.50,.33+(f.b-40)*(0.17/18)) : .33;
@@ -5091,6 +5248,23 @@ function wearContourAnchor(points,side,temporal,targetY=0){
    if(f.nosepad==='adjustable'){
      for(const anchor of padAnchors){
        const side=anchor.side;
+       if(anchor.rimType==='rimless' && anchor.bridgeAttach){
+         // 無邊框：從中樑鏡片銜接點先朝 -Z 退 6mm；下延 6–15mm 時持續再朝 -Z 傾約 8°。
+         const root={x:anchor.bridgeAttach.x,y:anchor.bridgeAttach.y,z:anchor.bridgeAttach.z};
+         const rear={x:root.x,y:root.y,z:root.z-6};
+         const drop=Math.max(6,Math.min(15,6+(f.b-28)*(9/37)));
+         const flare=Math.tan(Math.PI/180*8)*drop*.45;
+         const zSlope=Math.tan(Math.PI/180*8);
+         const dropMid={x:rear.x+side*flare*.45,y:rear.y-drop*.45,z:rear.z-drop*.45*zSlope};
+         const coverTopY=rear.y-drop;
+         const dropEnd={x:rear.x+side*flare,y:coverTopY,z:rear.z-drop*zSlope};
+         const coverPos={x:dropEnd.x+side*.78,y:coverTopY-1.1,z:dropEnd.z+.10};
+         const armPath=[root,rear,dropMid,dropEnd];
+         meshTube(armPath,.46,frameMat.noseArm,anchor.unit)
+           .name=`RimlessNosePadArm_${side<0?'OD':'OS'}_6mmBack_8degMinusZ`;
+         nosePadAssembly(side,frameMat,anchor.unit,coverPos.x,coverPos.y,coverPos.z);
+         continue;
+       }
        // 焊接點從鏡圈本身的 B/2 高度取得；鼻托架與鼻墊跟眼鏡圈同層旋轉。
        // 因此前傾角與面弧改變時，焊點、U 彎、罩子之間不再產生座標系錯位。
        const root=nasalRimPointAtY(anchor.seat,side,0);
@@ -5247,12 +5421,9 @@ function wearContourAnchor(points,side,temporal,targetY=0){
    if(group==='T'||group==='B'){
      resizeFreeHeight(f,group,yReal); // B 高可放大也可縮小，側面 y 座標跟著比例縮放。
      if(group==='B')setBottomBOffset(f,xReal); // 直接拖曳下 B 點亦可移動水平位置。
-     const current=(f.B[0].y-f.T[0].y).toFixed(1);
-     $('wearShapePointRange').textContent=`${group==='T'?'上':'下'} B：目前 B ${current} mm，允許 ${FREE_LIMITS.bMin}～${FREE_LIMITS.bMax} mm；下 B 水平偏移最大 ±33% A。`;
    }else{
      const limits=sidePointXLimits(f,group,index);
      f[group][index].x=safe(xReal,limits.min,limits.max);
-     $('wearShapePointRange').textContent=`${group}${index+1}：X ${fmt(f[group][index].x,1)} mm，允許 ${fmt(limits.min,1)}～${fmt(limits.max,1)} mm。`;
    }
    state.basePreset=null;
    root.querySelectorAll('[data-wear-preset]').forEach(btn=>btn.classList.remove('active'));
