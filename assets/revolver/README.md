@@ -16,7 +16,7 @@ The creator's page says the asset is free to use and requests optional attributi
 - A real 3D wooden tabletop lies in XY with Z as height. A world-fixed overhead light at (0, 0, 8) casts shadows onto the actual tabletop; no transparent shadow plane or CSS tabletop is used after loading.
 - 1–6 brass/copper decorative rounds are displayed on the table. Before the first shot only, the cylinder moves out, rounds animate into it sequentially, and the cylinder closes before the existing spin sound and firing sequence.
 - The on-page model credit was removed at the user's request. Source attribution remains in this file.
-- Imported mesh geometry/UVs remain intact. Metal materials and a separate brown grip material replace the original pixel texture in the viewer.
+- Imported silhouette and part pivots remain intact. The viewer generates surface-projected UVs on cloned geometry, replacing the tiny pixel atlas with 256px procedural gunmetal and walnut color/roughness/bump textures. Shared materials are generated once without external image downloads; see ../revolver-materials.js.
 - The original file contains a tiny embedded texture; it does not require an external texture download.
 
 ## Web integration
@@ -28,3 +28,4 @@ Deploy Turntable.html, assets/, and vendor/ together alongside the site's existi
 Drag the model to inspect it, and use 重設視角 to restore the initial view. Rendering is on demand and device pixel ratio is capped at 2. The mesh has a deliberately low-poly silhouette; this is not a photorealistic model.
 
 Verification: browser FBX/WebGL loading, orbit interaction, chamber rotation and hit/empty round flow; local source inspection and deterministic game tests. Mobile viewport checks do not replace testing on a physical phone/GPU.
+`nGrip material assignment follows the connected 118-triangle grip shell, including both sides and bevels, instead of a centroid XY cutoff. See ../revolver-grip.js.

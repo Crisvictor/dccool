@@ -1,6 +1,8 @@
 import * as THREE from '../vendor/three/build/three.module.js';
 import { FBXLoader } from '../vendor/three/examples/jsm/loaders/FBXLoader.js';
 import { RoomEnvironment } from '../vendor/three/examples/jsm/environments/RoomEnvironment.js';
+import { createRevolverMaterials, projectSurfaceUVs } from './revolver-materials.js';
+import { assignGripMaterial } from './revolver-grip.js';
 
 export async function createRevolverViewer(stage) {
   const renderer = new THREE.WebGLRenderer({alpha:true,antialias:true});
@@ -44,30 +46,17 @@ export async function createRevolverViewer(stage) {
   const hammerRest=hammer.quaternion.clone();
   const triggerRest=trigger.quaternion.clone();
   model.updateMatrixWorld(true);
-  // Preserve the author's mesh, UVs and independent parts; replace materials for this site.
+  const {metal,wood}=createRevolverMaterials(renderer);
+  // Preserve the silhouette and independent pivots; use surface-scale texture UVs.
   model.traverse(object=>{
     if(!object.isMesh)return;
     object.castShadow=true;
     object.receiveShadow=true;
-    const positions=object.geometry.attributes.position;
-    const point=new THREE.Vector3();
-    const metal=new THREE.MeshStandardMaterial({color:0x1b242e,metalness:.72,roughness:.42,envMapIntensity:.4});
+    projectSurfaceUVs(object);
     object.material=metal;
     if(object.name==='Body') {
-      const wood=new THREE.MeshStandardMaterial({color:0x482516,metalness:.03,roughness:.78});
       object.material=[metal,wood];
-      const geometry=object.geometry;const index=geometry.index;
-      const count=index?index.count:positions.count;
-      geometry.clearGroups();let groupStart=0;let previous=-1;
-      const centroid=new THREE.Vector3();
-      for(let i=0;i<count;i+=3){
-        centroid.set(0,0,0);
-        for(let j=0;j<3;j++)centroid.add(point.fromBufferAttribute(positions,index?index.getX(i+j):i+j).applyMatrix4(object.matrixWorld));
-        centroid.divideScalar(3);
-        const materialIndex=centroid.x>90&&centroid.y<5?1:0;
-        if(previous!==materialIndex){if(previous>=0)geometry.addGroup(groupStart,i-groupStart,previous);groupStart=i;previous=materialIndex;}
-      }
-      geometry.addGroup(groupStart,count-groupStart,previous);
+      assignGripMaterial(object);
     }
   });
   const box=new THREE.Box3().setFromObject(model);
