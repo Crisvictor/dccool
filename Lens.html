@@ -574,6 +574,15 @@ body.wear-active .panel-tabs{margin-bottom:6px}
 #wearShapeSVG{display:block;width:100%;height:auto;max-height:235px;touch-action:none;user-select:none}
 #wearShapeSVG .wear-point{fill:#24c6e8;stroke:#dbf8ff;stroke-width:.7;cursor:ew-resize}
 #wearShapeSVG .wear-point.vert{fill:#f4ae62;cursor:ns-resize}
+#wearShapeSVG .wear-point[data-group="B"]{cursor:move;fill:#ffbd63}
+.wear-bottom-b-control{margin:0 0 9px;padding:10px 12px;background:#102339;border:1px solid #294760;border-radius:10px;display:grid;gap:7px}
+.wear-bottom-b-control[hidden]{display:none}
+.wear-bottom-b-head{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#b7d7ea;font-size:12px;font-weight:600}
+#wearBottomBOffsetValue{font-weight:650;color:#7ed9f6;font-variant-numeric:tabular-nums}
+.wear-bottom-b-slider-row{display:flex;align-items:center;gap:9px;font-size:11px;color:#94b8ca}
+#wearBottomBOffset{min-width:0;flex:1;accent-color:#33bee8;cursor:ew-resize}
+.wear-bottom-b-slider-row .wear-btn{padding:5px 9px;flex:none}
+.wear-shape-limits{font-size:10.5px;color:#8faec3;line-height:1.5;margin:0}
 #wearShapeSVG .wear-point.active{fill:#fff}
 .wear-shape-metrics{color:#9cc9df;font-size:11px;padding:2px 4px}
 .wear-right{display:grid;gap:12px;min-width:0}
@@ -735,14 +744,21 @@ body.wear-active .panel-tabs{margin-bottom:6px}
                   <svg id="wearShapeSVG" viewBox="0 0 220 140" role="img" aria-label="鏡框輪廓示意，自由取型模式可調整14個控制點"></svg>
                   <div class="wear-shape-metrics" id="wearShapeMetrics">框型 A — · B —</div>
                 </div>
+                <div class="wear-bottom-b-control" id="wearBottomBControls" hidden>
+                  <div class="wear-bottom-b-head"><label for="wearBottomBOffset">下 B 點水平偏移</label><output id="wearBottomBOffsetValue" for="wearBottomBOffset">置中 · 0%</output></div>
+                  <div class="wear-bottom-b-slider-row"><span>鼻側</span><input type="range" id="wearBottomBOffset" min="-33" max="33" step="1" value="0" aria-label="下 B 點水平偏移，負數偏鼻側，正數偏顳側"><span>顳側</span><button type="button" class="wear-btn" id="wearBottomBReset">置中</button></div>
+                  <p class="wear-shape-limits" id="wearShapePointRange">可直接拖曳下 B 點調整水平位置；偏移範圍為 A 寬的 ±33%（OD 鏡片自動鏡像）。</p>
+                  <p class="wear-shape-limits">尺寸限制：A 35～75 mm、B 20～65 mm；左右控制點不得跨過對側，B 點與肩點保持 1.8 mm 間距。</p>
+                </div>
                 <div class="wear-fields">
                   <div class="wear-field"><label for="w_frameA">框寬 A (mm)</label><input id="w_frameA" type="number" min="35" max="75" step=".5" value="52"></div>
                   <div class="wear-field"><label for="w_frameB">框高 B (mm)</label><input id="w_frameB" type="number" min="20" max="65" step=".5" value="38"></div>
                   <div class="wear-field"><label for="w_dbl">中樑 DBL (mm)</label><input id="w_dbl" type="number" min="10" max="30" step=".5" value="18"></div>
-                  <div class="wear-field"><label for="w_frameMaterial">鏡框材質</label><select id="w_frameMaterial"><option value="metal" selected>鈦金屬／細框</option><option value="acetate">板料／厚框</option><option value="black">霧黑金屬</option></select></div>
+                  <div class="wear-field"><label for="w_frameMaterial">鏡框材質</label><select id="w_frameMaterial"><option value="metal" selected>鈦金屬／細框</option><option value="acetate">板料／厚框</option><option value="black">霧黑金屬</option><option value="brow" hidden disabled>眉框（黑色膠眉＋金屬上框）</option></select></div>
                   <div class="wear-field"><label for="w_rimType">框類型</label><select id="w_rimType"><option value="full" selected>全框</option><option value="groove">車溝框</option><option value="rimless">無邊框</option></select></div>
                   <div class="wear-field"><label for="w_nosepad">鼻托類型</label><select id="w_nosepad"><option value="integrated">一體式鼻托</option><option value="adjustable" selected>鼻托架＋鼻墊</option></select></div>
                   <div class="wear-field"><label for="w_temple">鏡腿長度 (mm)</label><input id="w_temple" type="number" min="120" max="160" step="5" value="140"></div>
+                  <p id="wearRimChoiceHint" class="wear-geometry-note" style="grid-column:1/-1;margin:1px 0 0">全框可選板料及一體式鼻托；車溝框與無邊框使用鼻托架。</p>
                 </div>
                 <div class="wear-step-actions"><button class="wear-btn primary" type="button" data-wear-next="3">下一步｜配戴設定 ›</button></div>
               </div>
@@ -4210,6 +4226,25 @@ function update3D(res){
  const rad=d=>d*Math.PI/180;
  const clone=(x)=>JSON.parse(JSON.stringify(x));
  const set=(id,val)=>{$(id).value=val;};
+ function syncWearFrameOptions(){
+   const rim=$('w_rimType').value;
+   const groove=rim==='groove', noIntegrated=groove||rim==='rimless';
+   const material=$('w_frameMaterial'),pad=$('w_nosepad');
+   const acetate=material.querySelector('option[value="acetate"]');
+   const brow=material.querySelector('option[value="brow"]');
+   acetate.hidden=groove;acetate.disabled=groove;
+   brow.hidden=!groove;brow.disabled=!groove;
+   if(groove&&material.value==='acetate')material.value='metal';
+   if(!groove&&material.value==='brow')material.value='metal';
+   const integrated=pad.querySelector('option[value="integrated"]');
+   integrated.hidden=noIntegrated;integrated.disabled=noIntegrated;
+   if(noIntegrated&&pad.value==='integrated')pad.value='adjustable';
+   const hint=$('wearRimChoiceHint');
+   if(hint)hint.textContent=groove
+     ? '車溝框：下緣尼龍繩、上半部金屬框圈；材質可選金屬或眉框（上緣約 B 高 80% 起黑色膠眉，端片約 B 高 90%）。鼻托限定鼻托架。'
+     :rim==='rimless'?'無邊框：鼻托限定鼻托架，不使用一體式鼻托。'
+     :'全框：可選鈦金屬、板料或霧黑金屬；可切換一體式鼻托與鼻托架。';
+ }
  const getData=()=>({
    eyes:{od:{s:num('w_od_s'),c:num('w_od_c'),a:num('w_od_a',180),n:num('w_od_n',1.6),
      bc:$('w_od_bc').value.trim()===''?null:Number($('w_od_bc').value),ct:num('w_od_ct',1.2),et:num('w_od_et',1.1),
@@ -4230,11 +4265,73 @@ function update3D(res){
    return {xmin:Math.min(...arr.map(p=>p.x)),xmax:Math.max(...arr.map(p=>p.x)),
      ymin:Math.min(...arr.map(p=>p.y)),ymax:Math.max(...arr.map(p=>p.y))};
  }
+ // 鏡框 A / B 範圍與控制點相對限制。取型點的 y 序列由 B 點縮放統一維護。
+ const FREE_LIMITS=Object.freeze({aMin:35,aMax:75,bMin:20,bMax:65,shoulder:1.8,sideGap:2,bOffset:.33});
+ function freeHorizontalSpan(f){
+   const points=[...f.L,...f.R];
+   return {left:Math.min(...points.map(p=>p.x)),right:Math.max(...points.map(p=>p.x))};
+ }
+ function bottomBPercent(f){
+   if(!f)return 0;
+   const span=freeHorizontalSpan(f);
+   const a=Math.max(1,span.right-span.left);
+   return Math.max(-33,Math.min(33,100*(f.B[0].x-f.T[0].x)/a));
+ }
+ function updateBottomBControls(){
+   const row=$('wearBottomBControls');if(!row)return;
+   row.hidden=state.mode!=='free';
+   if(state.mode!=='free'||!state.free)return;
+   const percent=bottomBPercent(state.free);
+   const value=$('wearBottomBOffsetValue');
+   $('wearBottomBOffset').value=Math.round(percent);
+   value.textContent=Math.abs(percent)<.5?'置中 · 0%':`${Math.abs(percent).toFixed(1)}% · ${percent>0?'顳側':'鼻側'}`;
+ }
+ function setBottomBOffset(f,targetX){
+   const span=freeHorizontalSpan(f),a=Math.max(FREE_LIMITS.aMin,span.right-span.left);
+   const center=f.T[0].x,limit=FREE_LIMITS.bOffset*a;
+   f.B[0].x=safe(targetX,Math.max(span.left+FREE_LIMITS.sideGap,center-limit),
+                         Math.min(span.right-FREE_LIMITS.sideGap,center+limit));
+   // 僅移動下 B 點，不擅自改寫 L6 / R6；雷朋下緣可再手動微調兩側肩點。
+ }
+ function resizeFreeHeight(f,group,targetY){
+   const oldTop=f.T[0].y,oldBottom=f.B[0].y;
+   let top=oldTop,bottom=oldBottom;
+   if(group==='T')top=safe(targetY,oldBottom-FREE_LIMITS.bMax,oldBottom-FREE_LIMITS.bMin);
+   else bottom=safe(targetY,oldTop+FREE_LIMITS.bMin,oldTop+FREE_LIMITS.bMax);
+   const oldSpan=Math.max(.001,oldBottom-oldTop-2*FREE_LIMITS.shoulder);
+   const newSpan=Math.max(.001,bottom-top-2*FREE_LIMITS.shoulder);
+   for(const arr of [f.L,f.R]){
+     for(let i=0;i<arr.length;i++){
+       if(i===0){arr[i].y=top+FREE_LIMITS.shoulder;continue;}
+       if(i===arr.length-1){arr[i].y=bottom-FREE_LIMITS.shoulder;continue;}
+       const u=safe((arr[i].y-oldTop-FREE_LIMITS.shoulder)/oldSpan,0,1);
+       arr[i].y=top+FREE_LIMITS.shoulder+u*newSpan;
+     }
+   }
+   f.T[0].y=top;f.B[0].y=bottom;
+ }
+ function sidePointXLimits(f,group,index){
+   const point=f[group][index];
+   const others=[...f.L,...f.R,...f.T,...f.B].filter(p=>p!==point);
+   const otherMin=Math.min(...others.map(p=>p.x)),otherMax=Math.max(...others.map(p=>p.x));
+   const peer=f[group==='L'?'R':'L'][index];
+   let min=otherMax-FREE_LIMITS.aMax,max=otherMin+FREE_LIMITS.aMax;
+   if(group==='L'){
+     max=Math.min(max,peer.x-FREE_LIMITS.sideGap);
+     if(otherMax-otherMin<FREE_LIMITS.aMin)max=Math.min(max,otherMax-FREE_LIMITS.aMin);
+   }else{
+     min=Math.max(min,peer.x+FREE_LIMITS.sideGap);
+     if(otherMax-otherMin<FREE_LIMITS.aMin)min=Math.max(min,otherMin+FREE_LIMITS.aMin);
+   }
+   // 不會出現範圍反轉；原始預設 A 均在合法區間。
+   return min<=max?{min,max}:{min:point.x,max:point.x};
+ }
  function updateFreeDims(){
    if(state.mode!=='free'||!state.free)return;
    const b=boundsFromFree(state.free);
    set('w_frameA',+(b.xmax-b.xmin).toFixed(2));
    set('w_frameB',+(b.ymax-b.ymin).toFixed(2));
+   updateBottomBControls();
  }
  function baseOutline(a,b){
    const contour=[];
@@ -4285,14 +4382,20 @@ function update3D(res){
      const f=state.free;const bounds=boundsFromFree(f),cx=(bounds.xmin+bounds.xmax)/2,cy=(bounds.ymin+bounds.ymax)/2;
      [['L',f.L],['R',f.R],['T',f.T],['B',f.B]].forEach(([group,pts])=>pts.forEach((point,i)=>{
        const x=center.x+(point.x-cx)*scale, y=center.y+(point.y-cy)*scale;
-       const node=el('circle',{cx:x,cy:y,r:3.1,class:'wear-point'+(group==='T'||group==='B'?' vert':''),
-         'data-group':group,'data-index':i,'aria-label':`${group}${i+1} 控制點`});
+       const constraint=group==='T'||group==='B'
+         ?`B 高 ${FREE_LIMITS.bMin}～${FREE_LIMITS.bMax} mm`
+         :`X ${fmt(sidePointXLimits(f,group,i).min,1)}～${fmt(sidePointXLimits(f,group,i).max,1)} mm`;
+       const pointLabel=group==='T'?'上B':group==='B'?'下B':`${group}${i+1}`;
+       const node=el('circle',{cx:x,cy:y,r:3.6,class:'wear-point'+(group==='T'||group==='B'?' vert':''),
+         'data-group':group,'data-index':i,'aria-label':`${pointLabel}：${constraint}`});
+       const tip=el('title',{},node);tip.textContent=`${pointLabel}｜${constraint}`;
        const t=el('text',{x:x+4.2,y:y-4,'font-size':6,fill:'#b7d5e9','pointer-events':'none'});
        t.textContent=group==='T'?'上B':group==='B'?'下B':group+(i+1);
      }));
    }
    $('wearShapeMetrics').textContent=`${state.mode==='free'?'自由取型（14 點）':'一般框型'}｜A ${fmt(a,1)} mm · B ${fmt(b,1)} mm · 框心距 ${fmt(a+num('w_dbl',18),1)} mm`;
    state.svgParams={center,scale,freeBounds:state.free?boundsFromFree(state.free):null};
+   updateBottomBControls();
  }
  function setMode(mode,preset=null){
    state.mode=mode;
@@ -4553,6 +4656,8 @@ function update3D(res){
      rim,
      highlights:silver,
      noseArm: acetate ? silver : rim,
+     brow:new T.MeshPhysicalMaterial({color:0x0b0b0e,metalness:.02,roughness:.49,clearcoat:.24,clearcoatRoughness:.4}),
+     nylon:new T.MeshStandardMaterial({color:0xc1c8cf,metalness:.06,roughness:.55}),
      temple,
      templeSleeve:new T.MeshPhysicalMaterial({color:0x060709,metalness:.38,roughness:.16,clearcoat:1,clearcoatRoughness:.05}),
      pad:new T.MeshPhysicalMaterial({color:0xf5e5cb,transparent:true,opacity:.82,roughness:.24,metalness:0,transmission:.42,clearcoat:.24}),
@@ -4804,6 +4909,24 @@ function wearContourAnchor(points,side,temporal,targetY=0){
  function lineBetween(a,b,material,parent){
    const T=THREE_G(),geo=new T.BufferGeometry().setFromPoints([a,b]);const line=new T.Line(geo,material);line.computeLineDistances();parent.add(line);return line;
  }
+ function upperRimArc(points,cutY){
+   if(!points||points.length<3)return [];
+   const start=points.findIndex(p=>p.y<cutY);
+   if(start<0)return points.slice();
+   const ordered=points.slice(start).concat(points.slice(0,start));
+   const output=[];
+   for(let i=0;i<ordered.length;i++){
+     const a=ordered[i],b=ordered[(i+1)%ordered.length];
+     const aAbove=a.y>=cutY,bAbove=b.y>=cutY;
+     if(aAbove!==bAbove){
+       const t=Math.max(0,Math.min(1,(cutY-a.y)/(b.y-a.y)));
+       const cross={x:a.x+(b.x-a.x)*t,y:cutY,z:a.z+(b.z-a.z)*t};
+       if(!aAbove&&bAbove){output.push(cross);output.push({...b});}
+       else output.push(cross);
+     }else if(bAbove){output.push({...b});}
+   }
+   return output;
+ }
  function assemble3D(data,out){
    if(!state.scene)return;
    const T=THREE_G(),ctx=state.scene;
@@ -4860,18 +4983,37 @@ function wearContourAnchor(points,side,temporal,targetY=0){
        // 框圈的中心線沿著實際的 V 溝尖，非固定 Z 深度的懸浮雙圓圈。
        meshTube(contourSeat,Math.max(.58,rimRadius),frameMat.rim,eyeUnit,true).name=`BevelSeatFrame_${eye.toUpperCase()}`;
      }else if(rimType==='groove'){
-       meshTube(contourSeat,Math.max(.33,rimRadius*.46),frameMat.rim,eyeUnit,true).name=`GrooveSeatFrame_${eye.toUpperCase()}`;
+       // 下半部為槽內尼龍繩；上方約 50% 另有真正的金屬半框圈。
+       meshTube(contourSeat,Math.max(.30,rimRadius*.36),frameMat.nylon,eyeUnit,true)
+         .name=`NylonGrooveCord_${eye.toUpperCase()}`;
+       const metalUpper=upperRimArc(contourSeat,0);
+       if(metalUpper.length>=2){
+         meshTube(metalUpper,Math.max(.66,rimRadius),frameMat.rim,eyeUnit,false)
+           .name=`MetalUpperHalfRim_${eye.toUpperCase()}`;
+       }
+       if(f.material==='brow'){
+         // 眉框：上框仍為金屬，從 B 高 80% 的位置起包覆黑色膠眉。
+         const browStartY=f.b*(.80-.50);
+         const browPoints=upperRimArc(contourSeat,browStartY);
+         if(browPoints.length>=2){
+           meshTube(browPoints,Math.max(1.75,rimRadius*2.1),frameMat.brow,eyeUnit,false)
+             .name=`BlackBrowOverlay_${eye.toUpperCase()}`;
+         }
+       }
      }
-     const endpieceRatio=Math.max(.50,Math.min(.90,.50+((f.b-28)/(24))*0.40));
-     const outerIndex=wearContourAnchor(localShape,side,true,f.b*endpieceRatio-f.b/2);
+     const endpieceRatio=(rimType==='groove'&&f.material==='brow')
+       ?.90:Math.max(.50,Math.min(.90,.50+((f.b-28)/(24))*0.40));
+     // 以實際側壁輪廓插值取 B 高 50–90% 的端片點，而非偏向最外側 X 的近似索引。
+     const outerAtHeight=nasalRimPointAtY(cut.seat,-side,f.b*(endpieceRatio-.50));
      const noseIndex=wearContourAnchor(localShape,side,false,f.b*.13);
-     const outer=cut.seat[outerIndex].clone();outer.z+=lensSeatZ;
+     const outer=new T.Vector3(outerAtHeight.x,outerAtHeight.y,outerAtHeight.z+lensSeatZ);
      const nasal=cut.seat[noseIndex].clone();nasal.z+=lensSeatZ;
      const noseJoint=new T.Mesh(new T.SphereGeometry(Math.max(.55,rimRadius*.66),12,9),frameMat.rim);
      noseJoint.name=`NoseBridgeConnector_${eye.toUpperCase()}`;
      noseJoint.position.copy(nasal);eyeUnit.add(noseJoint);
      bridgeAnchors.push({eye,side,unit:eyeUnit,point:nasal});
-     padAnchors.push({eye,side,unit:eyeUnit,point:nasal.clone(),seat:cut.seat.map(p=>p.clone())});
+     padAnchors.push({eye,side,unit:eyeUnit,point:nasal.clone(),
+       seat:cut.seat.map(p=>new T.Vector3(p.x,p.y,p.z+lensSeatZ))});
      // 端片由鏡圈顳側實際溝尖定位；先向顳側水平外展，再退到鉸鏈。
      const tipA={x:outer.x,y:outer.y,z:outer.z};
      const tipB={x:outer.x+side*3.4,y:outer.y+.18,z:outer.z};
@@ -4947,11 +5089,11 @@ function wearContourAnchor(points,side,temporal,targetY=0){
    const padRatio=f.b>40 ? Math.min(.50,.33+(f.b-40)*(0.17/18)) : .33;
    const padY=f.b*padRatio-f.b/2;
    if(f.nosepad==='adjustable'){
-     group.updateMatrixWorld(true);
      for(const anchor of padAnchors){
        const side=anchor.side;
-       const anchorRoot=group.worldToLocal(anchor.unit.localToWorld(anchor.point.clone()));
-       const root={x:anchorRoot.x,y:0,z:anchorRoot.z};
+       // 焊接點從鏡圈本身的 B/2 高度取得；鼻托架與鼻墊跟眼鏡圈同層旋轉。
+       // 因此前傾角與面弧改變時，焊點、U 彎、罩子之間不再產生座標系錯位。
+       const root=nasalRimPointAtY(anchor.seat,side,0);
        const yLevel=root.y;
        // 1. 鼻側焊接處先沿 -Z（臉側）退約 5mm。
        const rear={x:root.x,y:yLevel,z:root.z-5};
@@ -4973,9 +5115,9 @@ function wearContourAnchor(points,side,temporal,targetY=0){
        armPath.push({x:openingX+side*.25,y:yLevel-1.1,z:backZ+.01});
        armPath.push({x:openingX+side*.52,y:yLevel-2.15,z:backZ+.05});
        armPath.push({x:coverPos.x,y:coverTopY,z:coverPos.z});
-       meshTube(armPath,.44,frameMat.noseArm,group)
+       meshTube(armPath,.44,frameMat.noseArm,anchor.unit)
          .name=`SNosePadArm_${side<0?'OD':'OS'}_5mmBack_2x2U_3mmDrop`;
-       nosePadAssembly(side,frameMat,group,coverPos.x,coverPos.y,coverPos.z);
+       nosePadAssembly(side,frameMat,anchor.unit,coverPos.x,coverPos.y,coverPos.z);
      }
    }else{
      // 一體式鼻托：保留 B 高 40% 定位和上下接點，改成 2mm 厚的 D 形吐司薄片。
@@ -5002,6 +5144,7 @@ function wearContourAnchor(points,side,temporal,targetY=0){
    camera.position.set(x,y,z);controls.target.set(0,0,-7);controls.update();
  }
  function renderAll(){
+   syncWearFrameOptions();
    const d=getData();
    if(state.mode==='free')updateFreeDims();
    d.frame.a=num('w_frameA',52);d.frame.b=num('w_frameB',38);
@@ -5044,6 +5187,19 @@ function wearContourAnchor(points,side,temporal,targetY=0){
    state.free=pointsFromPreset('預2');if(state.mode==='free'){setMode('free','預2');}else{setMode('normal');}
  });
  for(const btn of root.querySelectorAll('[data-wear-preset]'))btn.addEventListener('click',()=>setMode('free',btn.dataset.wearPreset));
+ $('wearBottomBOffset').addEventListener('input',event=>{
+   if(state.mode!=='free'||!state.free)return;
+   const f=state.free,a=freeHorizontalSpan(f),width=a.right-a.left;
+   setBottomBOffset(f,f.T[0].x+width*Number(event.target.value)/100);
+   state.basePreset=null;root.querySelectorAll('[data-wear-preset]').forEach(btn=>btn.classList.remove('active'));
+   updateFreeDims();renderAll();
+ });
+ $('wearBottomBReset').addEventListener('click',()=>{
+   if(state.mode!=='free'||!state.free)return;
+   setBottomBOffset(state.free,state.free.T[0].x);
+   state.basePreset=null;root.querySelectorAll('[data-wear-preset]').forEach(btn=>btn.classList.remove('active'));
+   updateFreeDims();renderAll();
+ });
  $('wearResetAll').addEventListener('click',restoreDefaults);
  $('wearZeroAlign').addEventListener('click',()=>{
    // 在傾角與面弧存在時，單純使 PD / PH 同值不等於直視投影剛好穿過 OC；
@@ -5082,24 +5238,21 @@ function wearContourAnchor(points,side,temporal,targetY=0){
    if(!state.drag || state.drag.id!==e.pointerId)return;
    e.preventDefault();const m=shapeSVG.getBoundingClientRect();
    const x=((e.clientX-m.left)/m.width)*220, y=((e.clientY-m.top)/m.height)*140;
-   const info=state.drag.viewBasis,p=state.free[state.drag.group][state.drag.index];
-   if(!info)return;
+   const info=state.drag.viewBasis,f=state.free;
+   if(!info||!f)return;
    const bx=info.freeBounds,cx=(bx.xmin+bx.xmax)/2,cy=(bx.ymin+bx.ymax)/2;
-   if(state.drag.group==='T'||state.drag.group==='B'){
-     const yReal=(y-info.center.y)/info.scale+cy;
-     if(state.drag.group==='T'){
-       const max=Math.min(...state.free.L.map(p=>p.y),...state.free.R.map(p=>p.y))-1.8;
-       p.y=Math.min(max,yReal);
-       state.free.L[0].y=p.y+1.8;state.free.R[0].y=p.y+1.8;
-     }else{
-       const min=Math.max(...state.free.L.map(p=>p.y),...state.free.R.map(p=>p.y))+1.8;
-       p.y=Math.max(min,yReal);
-       state.free.L[5].y=p.y-1.8;state.free.R[5].y=p.y-1.8;
-     }
+   const xReal=(x-info.center.x)/info.scale+cx;
+   const yReal=(y-info.center.y)/info.scale+cy;
+   const group=state.drag.group,index=state.drag.index;
+   if(group==='T'||group==='B'){
+     resizeFreeHeight(f,group,yReal); // B 高可放大也可縮小，側面 y 座標跟著比例縮放。
+     if(group==='B')setBottomBOffset(f,xReal); // 直接拖曳下 B 點亦可移動水平位置。
+     const current=(f.B[0].y-f.T[0].y).toFixed(1);
+     $('wearShapePointRange').textContent=`${group==='T'?'上':'下'} B：目前 B ${current} mm，允許 ${FREE_LIMITS.bMin}～${FREE_LIMITS.bMax} mm；下 B 水平偏移最大 ±33% A。`;
    }else{
-     const xReal=(x-info.center.x)/info.scale+cx;
-     const peer=state.free[state.drag.group==='L'?'R':'L'][state.drag.index];
-     p.x=state.drag.group==='L'?Math.min(xReal,peer.x-2):Math.max(xReal,peer.x+2);
+     const limits=sidePointXLimits(f,group,index);
+     f[group][index].x=safe(xReal,limits.min,limits.max);
+     $('wearShapePointRange').textContent=`${group}${index+1}：X ${fmt(f[group][index].x,1)} mm，允許 ${fmt(limits.min,1)}～${fmt(limits.max,1)} mm。`;
    }
    state.basePreset=null;
    root.querySelectorAll('[data-wear-preset]').forEach(btn=>btn.classList.remove('active'));
