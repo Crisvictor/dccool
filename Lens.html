@@ -221,7 +221,9 @@
   .switch-panel .canvas.dimension-canvas{display:block;overflow:auto;aspect-ratio:auto!important;height:auto!important;max-width:100%;justify-content:initial;min-height:0;padding:10px;background:#0c182a;touch-action:pan-x pan-y}
   .switch-panel .canvas.dimension-canvas svg#topView{width:auto!important;height:auto!important;max-width:none!important;min-width:0!important;aspect-ratio:auto!important;display:block;overflow:visible;touch-action:none;user-select:none}
   .shape-metrics{border:1px solid #314963;background:#0c1d31;border-radius:9px;color:#d5f1ff;font-size:13px;font-weight:650;padding:9px 12px;margin-top:9px}
-  .free-dot{cursor:ew-resize;stroke:#f0fdff;stroke-width:.4;fill:#15b8de;touch-action:none}
+  .frame-selected{fill:#ffffff!important;stroke:#ffffff!important;cursor:move!important}
+.frame-marquee{fill:#38bdf82b;stroke:#7dd3fc;stroke-width:1;vector-effect:non-scaling-stroke;stroke-dasharray:4 3;pointer-events:none}
+.free-dot{cursor:ew-resize;stroke:#f0fdff;stroke-width:.4;fill:#15b8de;touch-action:none}
   .free-dot.vert{cursor:ns-resize;fill:#f9b766;stroke:#fff0cc}
   .free-dot.active{stroke:#fff;stroke-width:1;fill:#ffffff}
   .free-dot-label{font-size:2.5px;fill:#c9e9f9;pointer-events:none;text-anchor:middle}
@@ -839,6 +841,7 @@ body.wear-active .panel-tabs{margin-bottom:6px}
                 </div>
                 <div class="wear-shape-container">
                   <svg id="wearShapeSVG" viewBox="0 0 220 140" role="img" aria-label="鏡框輪廓示意，自由取型模式可調整14個控制點"></svg>
+                  <p class="wear-note" style="margin:3px 0;font-size:10px;color:#97bad1">左鍵拖曳空白處框選 · Ctrl 點選多點 · 拖曳白色選取點同步調整 · Esc 清除（上 B 僅單點調整）</p>
                   <div class="wear-shape-metrics" id="wearShapeMetrics">框型 A — · B —</div>
                 </div>
                 <div class="wear-fields">
@@ -1006,6 +1009,7 @@ body.wear-active .panel-tabs{margin-bottom:6px}
               <button type="button" id="eyeOS" class="active" aria-pressed="true">左眼 OS</button>
             </div>
           </div>
+          <p class="note">左鍵框選／Ctrl 多選；拖曳白色點同步調整；Esc 清除。上 B 僅單點調整。</p>
           <p id="shapeInstruction" class="note">一般框型：依輸入 A／B／ED 產生近似輪廓；可切換自由取型。</p>
           <div class="scale-tools">
             <div class="scale-tools-main">
@@ -1173,6 +1177,61 @@ body.wear-active .panel-tabs{margin-bottom:6px}
     </div>
   </div>
 
+<script>
+// Shared selection controller for the two SVG frame editors.
+window.installFrameSelection=function(svg,options){
+ const selected=new Set();let drag=null;
+ const key=n=>n.dataset.group+':'+n.dataset.index;
+ const userPoint=e=>{const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse());};
+ function paint(){
+   svg.querySelectorAll('[data-group]').forEach(n=>{const on=selected.has(key(n))&&n.dataset.group!=='T';n.classList.toggle('frame-selected',on);n.setAttribute('aria-selected',String(on));});
+   let box=svg.querySelector('.frame-marquee');
+   if(drag?.kind==='box'){
+     if(!box){box=document.createElementNS('http://www.w3.org/2000/svg','rect');box.setAttribute('class','frame-marquee');svg.appendChild(box);}
+     const a=drag.start,b=drag.last||a;for(const [k,v] of Object.entries({x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),width:Math.abs(a.x-b.x),height:Math.abs(a.y-b.y)}))box.setAttribute(k,v);
+   }else box?.remove();
+ }
+ function clear(){selected.clear();drag=null;paint();}
+ function valid(f){
+   const all=[...f.L,...f.R,...f.T,...f.B],xs=all.map(p=>p.x),width=Math.max(...xs)-Math.min(...xs),height=f.B[0].y-f.T[0].y;
+   if(width<35-1e-6||width>75+1e-6||height<20-1e-6||height>65+1e-6)return false;
+   for(const g of ['L','R']){let y=f.T[0].y;for(const p of f[g]){if(p.y-y<.15)return false;y=p.y;}if(f.B[0].y-y<.15)return false;}
+   for(let i=0;i<f.L.length;i++)if(f.R[i].x-f.L[i].x<2)return false;
+   const sides=[...f.L,...f.R],lo=Math.min(...sides.map(p=>p.x)),hi=Math.max(...sides.map(p=>p.x));
+   return f.B[0].x>=lo+2&&f.B[0].x<=hi-2&&Math.abs(f.B[0].x-f.T[0].x)<=(hi-lo)*.33+1e-6;
+ }
+ svg.style.touchAction='none';svg.setAttribute('tabindex','0');
+ svg.addEventListener('pointerdown',e=>{
+   if(e.button!==0||!options.enabled())return;e.preventDefault();svg.focus({preventScroll:true});
+   const node=e.target.closest('[data-group]'),start=userPoint(e),base=structuredClone(options.getFree()),add=e.ctrlKey||e.metaKey;
+   if(node){
+     const k=key(node),group=node.dataset.group;
+     if(group==='T'){if(add)return;selected.clear();}
+     else if(add){if(selected.has(k)){selected.delete(k);paint();return;}selected.add(k);}
+     else if(!selected.has(k)){selected.clear();selected.add(k);}
+     drag={kind:'move',id:e.pointerId,start,base,group,index:+node.dataset.index,keys:[...selected],scale:options.scale(),moved:false};
+   }else{drag={kind:'box',id:e.pointerId,start,base,keys:add?[...selected]:[],hits:[...svg.querySelectorAll('[data-group]')].filter(n=>n.dataset.group!=='T').map(n=>({key:key(n),x:+n.getAttribute('cx'),y:+n.getAttribute('cy')}))};if(!add)selected.clear();}
+   svg.setPointerCapture(e.pointerId);paint();
+ });
+ svg.addEventListener('pointermove',e=>{
+   if(!drag||drag.id!==e.pointerId)return;e.preventDefault();const p=userPoint(e);drag.last=p;
+   if(drag.kind==='box'){
+     selected.clear();drag.keys.forEach(k=>selected.add(k));for(const n of drag.hits)if(n.x>=Math.min(p.x,drag.start.x)&&n.x<=Math.max(p.x,drag.start.x)&&n.y>=Math.min(p.y,drag.start.y)&&n.y<=Math.max(p.y,drag.start.y))selected.add(n.key);paint();return;
+   }
+   const dx=(p.x-drag.start.x)/drag.scale,dy=(p.y-drag.start.y)/drag.scale;if(Math.hypot(dx,dy)<.025)return;
+   if(drag.keys.length<=1){options.single(drag.group,drag.index,drag.base[drag.group][drag.index].x+dx,drag.base[drag.group][drag.index].y+dy);}
+   else{
+     const candidate=t=>{const f=structuredClone(drag.base);for(const k of drag.keys){const [g,i]=k.split(':');if(g==='T')continue;f[g][i].x+=dx*t;f[g][i].y+=dy*t;}return f;};
+     let amount=1;if(!valid(candidate(1))){let lo=0,hi=1;for(let i=0;i<24;i++){const mid=(lo+hi)/2;if(valid(candidate(mid)))lo=mid;else hi=mid;}amount=lo;}
+     const f=options.getFree(),next=candidate(amount);for(const g of ['L','R','B'])f[g].forEach((p,i)=>Object.assign(p,next[g][i]));
+   }
+   options.changed();paint();
+ });
+ for(const event of ['pointerup','pointercancel','lostpointercapture'])svg.addEventListener(event,e=>{if(!drag||drag.id!==e.pointerId)return;drag=null;paint();if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId);});
+ svg.addEventListener('keydown',e=>{if(e.key==='Escape'){clear();e.preventDefault();}});
+ svg._frameSelection={paint,clear};return svg._frameSelection;
+};
+</script>
 <script>
 (function(){
   const $ = (id)=>document.getElementById(id);
@@ -3491,6 +3550,7 @@ function update3D(res){
     ]));
   }
   function applyBuiltinPreset(name){
+    $('topView')._frameSelection?.clear();
     const data=BUILTIN_FREE_PRESETS[name];
     if(!data)return;
     if(data.frame)$('DBL').value=data.frame.dbl;
@@ -3753,6 +3813,7 @@ function update3D(res){
     line(svg,sx,ry,sx+50,ry,'#f9fbff',.48);
     for(let k=0;k<=50;k+=5){line(svg,sx+k,ry-(k%10===0?2.4:1.25),sx+k,ry+(k%10===0?2.2:1.25),'#f9fbff',.33);}
     elSVG('text',{x:sx+25,y:110,'font-size':2.8,fill:'#e4e9f2','text-anchor':'middle'},svg).textContent='50 mm 校正尺（請用實體尺對照）';
+    svg._frameSelection?.paint();
     $('shapeMetrics').textContent=`${shapeState.mode==='free'?'自由取型':'一般框型'}　A ${res.A.toFixed(2)} mm　│ B ${res.B.toFixed(2)} mm　│ ED ${res.ED.toFixed(2)} mm　│ 最薄邊厚 ${res.estEdgeMin.toFixed(2)} mm　│ 所需片徑 ${res.minBlank.toFixed(1)} mm`;
   }
   function svgUserPoint(svg,event){
@@ -3836,6 +3897,7 @@ function update3D(res){
     $('summaryEye').textContent=shapeState.eye==='OD'?'右眼 OD':'左眼 OS';
   }
   function setEye(eye){
+    $('topView')._frameSelection?.clear();
     if(eye!== 'OD' && eye!== 'OS')return;
     if(shapeState.eye===eye)return;
     const old=shapeState.eye;
@@ -3863,42 +3925,21 @@ function update3D(res){
   $('eyeOS').addEventListener('click',()=>setEye('OS'));
   syncEyeSwitchUI();
 
-  $('topView').addEventListener('pointerdown',e=>{
-    const handle=e.target.closest('[data-group]');
-    if(shapeState.mode!=='free'||!handle)return;
-    e.preventDefault();
-    const group=handle.getAttribute('data-group'),index=+handle.getAttribute('data-index');
-    shapeState.dragging={group,index,pointerId:e.pointerId};
-    $('topView').setPointerCapture(e.pointerId);
+  window.installFrameSelection($('topView'),{
+    enabled:()=>shapeState.mode==='free',getFree:()=>shapeState.free,scale:()=>1,
+    single:(group,index,x,y)=>{
+      if(group==='L'||group==='R'){const limits=lensSideXLimits(shapeState.free,group,index);shapeState.free[group][index].x=Math.max(limits.min,Math.min(limits.max,x));}
+      else{resizeFreeHeight(group,y);if(group==='B')moveLensBottomB(shapeState.free,x);}
+    },
+    changed:()=>{activePresetByEye[shapeState.eye]=null;syncPresetUI();update();}
   });
-  $('topView').addEventListener('pointermove',e=>{
-    const drag=shapeState.dragging;
-    if(!drag||drag.pointerId!==e.pointerId)return;
-    e.preventDefault();
-    const p=svgUserPoint($('topView'),e),b=shapeState.rawBounds;
-    const midx=(b.xmin+b.xmax)/2,midy=(b.ymin+b.ymax)/2;
-    const r=window.__lensRes;
-    if(!r)return;
-    const target=shapeState.free[drag.group][drag.index];
-    const rawX=p.x-72-r.hDec+midx,rawY=p.y-51-r.vDecY+midy;
-    if(drag.group==='L'||drag.group==='R'){
-      const limits=lensSideXLimits(shapeState.free,drag.group,drag.index);
-      target.x=Math.max(limits.min,Math.min(limits.max,rawX));
-    }else{
-      resizeFreeHeight(drag.group,rawY);
-      if(drag.group==='B')moveLensBottomB(shapeState.free,rawX);
-    }
-    activePresetByEye[shapeState.eye]=null;
-    syncPresetUI();
-    update();
-  });
-  for(const event of ['pointerup','pointercancel','lostpointercapture'])$('topView').addEventListener(event,()=>shapeState.dragging=null);
   $('modeFree').addEventListener('click',()=>{
     if(!shapeState.free)resetFreeGeometry();
     shapeState.mode='free';syncShapeUI();update();
   });
-  $('modeManual').addEventListener('click',()=>{shapeState.mode='manual';syncShapeUI();update();});
+  $('modeManual').addEventListener('click',()=>{$('topView')._frameSelection?.clear();shapeState.mode='manual';syncShapeUI();update();});
   $('resetShape').addEventListener('click',()=>{
+    $('topView')._frameSelection?.clear();
     resetFreeGeometry();
     activePresetByEye[shapeState.eye]=null;
     shapeState.mode='free';syncShapeUI();update();
@@ -4505,9 +4546,11 @@ function update3D(res){
    }
    $('wearShapeMetrics').textContent=`${state.mode==='free'?'自由取型（14 點）':'一般框型'}｜A ${fmt(a,1)} mm · B ${fmt(b,1)} mm · 框心距 ${fmt(a+num('w_dbl',18),1)} mm`;
    state.svgParams={center,scale,freeBounds:state.free?boundsFromFree(state.free):null};
+   svg._frameSelection?.paint();
    
  }
  function setMode(mode,preset=null){
+   $('wearShapeSVG')._frameSelection?.clear();
    state.mode=mode;
    $('wearModeNormal').classList.toggle('active',mode==='normal');
    $('wearModeFree').classList.toggle('active',mode==='free');
@@ -5701,34 +5744,14 @@ function wearContourAnchor(points,side,temporal,targetY=0){
  $('wearShowGuides').addEventListener('change',e=>{state.guideVisible=e.target.checked;renderAll();});
  $('wearShowFace').addEventListener('change',e=>{state.faceVisible=e.target.checked;renderAll();});
  const shapeSVG=$('wearShapeSVG');
- shapeSVG.addEventListener('pointerdown',e=>{
-   const t=e.target.closest('[data-group]');if(!t||state.mode!=='free')return;
-   e.preventDefault();state.drag={group:t.dataset.group,index:+t.dataset.index,id:e.pointerId,startY:e.clientY,viewBasis:{...state.svgParams}};
-   shapeSVG.setPointerCapture(e.pointerId);t.classList.add('active');
+ window.installFrameSelection(shapeSVG,{
+   enabled:()=>state.mode==='free',getFree:()=>state.free,scale:()=>state.svgParams.scale,
+   single:(group,index,x,y)=>{
+     if(group==='T'||group==='B'){resizeFreeHeight(state.free,group,y);if(group==='B')setBottomBOffset(state.free,x);}
+     else{const limits=sidePointXLimits(state.free,group,index);state.free[group][index].x=safe(x,limits.min,limits.max);}
+   },
+   changed:()=>{state.basePreset=null;root.querySelectorAll('[data-wear-preset]').forEach(btn=>{btn.classList.remove('active');btn.setAttribute('aria-pressed','false');});updateFreeDims();renderAll();}
  });
- shapeSVG.addEventListener('pointermove',e=>{
-   if(!state.drag || state.drag.id!==e.pointerId)return;
-   e.preventDefault();const m=shapeSVG.getBoundingClientRect();
-   const x=((e.clientX-m.left)/m.width)*220, y=((e.clientY-m.top)/m.height)*140;
-   const info=state.drag.viewBasis,f=state.free;
-   if(!info||!f)return;
-   const bx=info.freeBounds,cx=(bx.xmin+bx.xmax)/2,cy=(bx.ymin+bx.ymax)/2;
-   const xReal=(x-info.center.x)/info.scale+cx;
-   const yReal=(y-info.center.y)/info.scale+cy;
-   const group=state.drag.group,index=state.drag.index;
-   if(group==='T'||group==='B'){
-     resizeFreeHeight(f,group,yReal); // B 高可放大也可縮小，側面 y 座標跟著比例縮放。
-     if(group==='B')setBottomBOffset(f,xReal); // 直接拖曳下 B 點亦可移動水平位置。
-   }else{
-     const limits=sidePointXLimits(f,group,index);
-     f[group][index].x=safe(xReal,limits.min,limits.max);
-   }
-   state.basePreset=null;
-   root.querySelectorAll('[data-wear-preset]').forEach(btn=>btn.classList.remove('active'));
-   updateFreeDims();renderAll();
- });
- shapeSVG.addEventListener('pointerup',e=>{if(state.drag && state.drag.id===e.pointerId)state.drag=null;});
- shapeSVG.addEventListener('pointercancel',()=>state.drag=null);
  window.addEventListener('resize',refresh3D);
  if(window.ResizeObserver){const resizeObs=new ResizeObserver(()=>{if(state.visible)refresh3D();});resizeObs.observe($('wearThree'));}
  // 先初始化文字和 2D 指標，進入頁籤後再啟用 WebGL。
