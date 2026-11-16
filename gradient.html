@@ -154,9 +154,19 @@
   .rulerText{font-size:3.2px;fill:#333}
   .thinPanelTitle{font-size:13px;font-weight:800;color:#294754;margin-bottom:6px}
   .miniGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.miniGrid label{font-size:12px;margin-bottom:4px}.miniGrid input{height:36px}
+  .miniGrid.threeColumns{grid-template-columns:repeat(3,minmax(0,1fr));align-items:end}
+  .miniGrid.threeColumns>div{min-width:0}
+  .miniGrid.threeColumns input{min-width:0;width:100%;padding-left:8px;padding-right:6px}
+  .miniGrid.threeColumns label{min-height:32px;display:flex;align-items:center;line-height:1.3}
+  .miniGrid.threeColumns .helpLabel{min-height:32px;margin-bottom:4px;gap:4px}
+  .miniGrid.threeColumns .helpLabel label{min-height:0}
   .thinSelect{height:42px;border:1px solid #cbd8de;border-radius:10px;padding:0 10px;background:#fff;font-size:15px;font-weight:700;color:#203843}
   .freeHandle{fill:#fff;stroke:#0d6075;stroke-width:.55;cursor:ew-resize;pointer-events:all}
   .freeHandle:hover{fill:#dff4fa;stroke-width:.8}
+  .freeHandle.vertical{fill:#ffe2b3;stroke:#ba7421;cursor:ns-resize}
+  .freeHandle.bottom{cursor:move}
+  .freeHandle.selected{fill:#b9e5fa;stroke:#08799e;stroke-width:.85}
+  .freeSelectionBox{fill:#b9e5fa;fill-opacity:.25;stroke:#08799e;stroke-width:.35;stroke-dasharray:1.5 1;pointer-events:none}
   .freeHandleLabel{font-size:2.7px;fill:#0d6075;font-weight:700;pointer-events:none;opacity:.70}
   .freeGuide{stroke:#8fb5c2;stroke-width:.22;stroke-dasharray:1 1;opacity:.65}
   .lockedInput{background:#eef3f5!important;color:#697982!important;opacity:.8}
@@ -426,6 +436,38 @@
     body.darkMode svg text{fill:initial}
   }
 
+  .helpLabel{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+  .helpLabel label,.miniGrid .helpLabel label{margin:0}
+  .helpButton{display:inline-flex;align-items:center;justify-content:center;flex:0 0 19px;width:19px;height:19px;padding:0;border:1px solid #91aab7;border-radius:50%;background:transparent;color:#527787;font:700 12px/1 sans-serif;cursor:help}
+  .helpButton:hover,.helpButton[aria-expanded="true"]{background:#e5f3f8;color:#0d6075;border-color:#0d6075}
+  .helpButton:focus-visible{outline:2px solid #0d6075;outline-offset:3px}
+  .frameHelpPopover{position:fixed;z-index:10000;box-sizing:border-box;width:310px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;padding:14px 16px;border:1px solid #c5dbe5;border-radius:12px;background:#fff;color:#36515e;box-shadow:0 8px 28px rgba(13,64,82,.18);font-size:13px;line-height:1.75}
+  .frameHelpPopover strong{display:block;margin-bottom:6px;color:#0d4052;font-size:14px}
+  [hidden]{display:none!important}
+  @media print{.helpButton,.frameHelpPopover{display:none!important}}
+  /* Compact editor spacing; preserve comfortable control hit areas. */
+  .controls{padding:12px 14px;scrollbar-width:thin;scrollbar-color:#adc4ce transparent}
+  .controls .group{padding:9px 0}
+  .controls label{margin-bottom:5px;font-size:13px}
+  .controls .helpLabel label{margin:0}
+  .controls .helpLabel{margin-bottom:5px}
+  .controls .toggleRow{min-height:40px;margin-top:7px;padding:8px;gap:8px}
+  .controls .toggleRow input{flex:0 0 18px}
+  .controls .chip{min-height:36px;padding:6px 5px}
+  .controls .chips{gap:6px}
+  .controls .row{gap:8px}
+  .controls .row input[type=range]{min-width:0;min-height:32px;margin:0}
+  .controls .val{flex-basis:64px;padding:6px 4px;font-size:14px}
+  .controls .segSwitchWrap{margin-top:6px}
+  .controls .segBtn{min-height:34px;padding:6px 8px}
+  .controls .miniGrid{gap:6px 8px}
+  .controls .miniGrid label{font-size:11px}
+  .controls .threeColumns label,.controls .threeColumns .helpLabel{min-height:29px}
+  .controls .threeColumns .helpLabel label{min-height:0}
+  .controls .fieldEstimatePanel,.controls .thicknessEstimatePanel{padding:10px;margin-top:8px}
+  .controls input:focus-visible,.controls select:focus-visible,.controls button:focus-visible{outline:2px solid #1686a3;outline-offset:2px}
+  @media(min-width:901px){.controls{max-height:var(--editor-available-height,calc(100dvh - 160px));overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}}
+  @media(max-width:900px){.controls{max-height:none;overflow:visible}}
 </style>
 </head>
 <body>
@@ -676,7 +718,7 @@
       <div class="group">
         <label for="thinDiaSelect">1. 片徑選擇</label>
         <select id="thinDiaSelect" class="thinSelect"></select>
-        <div class="hint">可選 50Φ～70Φ（每 1 mm）及 75Φ。<br>※建議先用下方 50 mm 校正尺確認螢幕比例。</div>
+        <div class="hint">可選 50Φ～70Φ（每 1 mm）及 75Φ。<br>※建議先用右上方 50 mm 校正尺確認螢幕比例。</div>
         <div class="inlineWarn hidden" id="dia75Warn"><b>75Φ 片徑提醒：</b>系統最大可選片徑為 75Φ；部分高光度處方實際可供片徑可能僅至 70Φ。若個別案例直徑不足，依廠商實際製作條件另行提醒。</div>
       </div>
       <div class="group">
@@ -697,9 +739,9 @@
         </div>
         <div class="hint hidden" id="fieldEstimateAdvanceRow" style="margin-top:8px">進階功能｜<button class="fieldEstimateLink" id="fieldEstimateToggle" type="button">視場估算</button></div>
         <div class="fieldEstimatePanel hidden" id="fieldEstimatePanel">
-          <div class="thinPanelTitle">度數／稜鏡視場估算</div>
-          <div class="hint">輸入處方後，需開啟「鏡框參數比對功能」。系統會依 A、DBL、PD、有效光學內徑、頂點距離與 S/C/A，估算可用視場邊界、誘發稜鏡與水平視場變化。</div>
-          <div class="miniGrid">
+          <div class="helpLabel"><div class="thinPanelTitle" style="margin:0">度數／稜鏡視場估算</div><button class="helpButton" type="button" data-help="fieldEstimateHint" aria-label="視場估算說明" aria-expanded="false" aria-controls="frameHelpPopover">?</button></div>
+          <div class="hint" id="fieldEstimateHint" hidden>輸入處方後，需開啟「鏡框參數比對功能」。系統會依 A、DBL、PD、有效光學內徑、頂點距離與 S/C/A，估算可用視場邊界、誘發稜鏡與水平視場變化。<br><br>※Prentice 法則教學近似：以水平子午線光度與光心至有效視場邊緣距離估算稜鏡；精修薄區不納入清晰視場。</div>
+          <div class="miniGrid threeColumns">
             <div><label for="fieldSphere">S 球面</label><input id="fieldSphere" type="number" min="-20" max="20" step="0.25" value="-6.00"></div>
             <div><label for="fieldCylinder">C 散光</label><input id="fieldCylinder" type="number" min="-6" max="0" step="0.25" value="0.00"></div>
             <div><label for="fieldAxis">A 軸度</label><input id="fieldAxis" type="number" min="0" max="180" step="1" value="180"></div>
@@ -710,7 +752,7 @@
       <div class="group">
         <label class="toggleRow"><input id="thicknessEstimateMode" type="checkbox">開啟厚度理論模擬(非實際尺寸)</label>
         <div class="thicknessEstimatePanel hidden" id="thicknessEstimatePanel">
-          <div class="thinPanelTitle">精修薄厚度粗算</div>
+          <div class="helpLabel"><div class="thinPanelTitle" style="margin:0">精修薄厚度粗算</div><button class="helpButton" type="button" data-help="thicknessEstimateHint" aria-label="厚度粗算說明" aria-expanded="false" aria-controls="frameHelpPopover">?</button></div>
           <div class="miniGrid">
             <div>
               <label for="thicknessIndex">折射率</label>
@@ -725,7 +767,7 @@
               <input id="thicknessPower" type="number" min="-20" max="20" step="0.25" value="-8.00">
             </div>
           </div>
-          <div class="thicknessEstimateNote">依折射率與度數幾何估算目前外徑「未精修」厚度，再以「有效內徑 ÷ 外徑」作為厚度比例粗估。僅供教學比較。</div>
+          <div class="thicknessEstimateNote" id="thicknessEstimateHint" hidden>依折射率與度數幾何估算目前外徑「未精修」厚度，再以「有效內徑 ÷ 外徑」作為厚度比例粗估。僅供教學比較。</div>
         </div>
       </div>
       <div class="group">
@@ -750,27 +792,27 @@
             </div>
           </div>
           <div style="margin-bottom:10px">
-            <label>框型預設</label>
+            <div class="helpLabel"><label>框型預設</label><button class="helpButton" type="button" data-help="shapePresetHint" aria-label="框型操作說明" aria-expanded="false" aria-controls="frameHelpPopover">?</button></div>
             <div class="chips" style="grid-template-columns:repeat(3,1fr)" id="shapePresetChips">
               <button class="chip" id="presetRound" type="button">圓/橢圓形</button>
               <button class="chip" id="presetSquare" type="button">方/長方形</button>
               <button class="chip active" id="presetFree" type="button">自由框型</button>
             </div>
-            <div class="hint" id="shapePresetHint">自由框型：先設定 B 高，再直接拖曳圖中左右各 6 個定位點，定位左右邊緣。 ※定位點：僅水平移動<br>A 寬與 ED 最大內徑會自動計算。<br>※顯示之鏡框形狀僅供參考，請以實體為主</div>
+            <div class="hint" id="shapePresetHint" hidden>自由框型：左右各 6 點調寬，上下橙色 B 點調整高度。 ※左鍵拖曳空白處框選／Ctrl 點擊多選，淡藍色選取點可一起上下左右移動；Esc 清除。<br>上 B 僅單點上下調整；下 B 可上下調高、左右偏移並參與多選。<br>A 寬、B 高與 ED 最大內徑會自動計算。<br>※顯示之鏡框形狀僅供參考，請以實體為主</div>
           </div>
           <div class="hint" id="presetSizeInfo" style="margin:8px 0 10px;padding:8px 10px;border:1px solid #e2eaee;border-radius:10px;background:#f8fbfc;font-weight:700;color:#36515e">框型即時檢測：A 53 / B 38 / ED 58.1</div>
           <div id="freeShapeTools" style="margin:0 0 10px">
             <button class="chip" id="resetFreeShape" type="button" style="width:100%">重設自由框型定位點</button>
           </div>
-          <div class="miniGrid">
-            <div><label for="frameA">A 寬（自動）</label><input id="frameA" type="number" min="30" max="70" step="1" value="54"></div>
+          <div class="miniGrid threeColumns">
+            <div><label for="frameA">A 寬</label><input id="frameA" type="number" min="30" max="70" step="1" value="54"></div>
             <div><label for="frameB">B 高</label><input id="frameB" type="number" min="20" max="60" step="1" value="38"></div>
-            <div><label for="frameED">ED 最大內徑（自動）</label><input id="frameED" type="number" min="38" max="80" step="0.5" value="60"></div>
+            <div><label for="frameED">ED 最大內徑</label><input id="frameED" type="number" min="38" max="80" step="0.5" value="60"></div>
             <div><label for="frameDBL">DBL 中樑距</label><input id="frameDBL" type="number" min="8" max="30" step="1" value="18"></div>
             <div><label for="framePD">PD 瞳距</label><input id="framePD" type="number" min="50" max="76" step="1" value="64"></div>
-            <div><label for="framePH">瞳高</label><input id="framePH" type="number" min="5" max="36" step="0.5" value="22"></div>
+            <div><div class="helpLabel"><label for="framePH">瞳高</label><button class="helpButton" type="button" data-help="pupilHeightHint" aria-label="瞳高設定說明" aria-expanded="false" aria-controls="frameHelpPopover">?</button></div><input id="framePH" type="number" min="5" max="36" step="0.5" value="22"></div>
           </div>
-          <div class="hint">瞳高以鏡框最下緣往上量至實際瞳孔中心。<br>多焦模式會自動套用配鏡十字偏移：康德 −5 mm／偉星 −4 mm，再進行框型定位。<br>精修薄不建議給予配戴瞳高過高。</div>
+          <div class="hint" id="pupilHeightHint" hidden>瞳高以鏡框最下緣往上量至實際瞳孔中心。<br>多焦模式會自動套用配鏡十字偏移：康德 −5 mm／偉星 −4 mm，再進行框型定位。<br>精修薄不建議給予配戴瞳高過高。</div>
         </div>
       </div>
     </div>
@@ -778,7 +820,7 @@
     <div class="group">
       <label>畫面校正</label>
       <div class="row"><input id="scale" type="range" min="0.75" max="1.35" step="0.01" value="1"><div class="val"><span id="scaleVal">100</span>%</div></div>
-      <div class="hint">螢幕 1:1 會受作業系統縮放與螢幕 DPI 影響。<br>請以下方 50 mm 尺校正。</div>
+      <div class="hint">螢幕 1:1 會受作業系統縮放與螢幕 DPI 影響。<br>請以右上方 50 mm 尺校正。</div>
     </div>
   </aside>
 
@@ -1140,8 +1182,8 @@ document.getElementById('framePD').oninput=e=>{thinState.pd=clamp(+e.target.valu
 document.getElementById('framePH').oninput=e=>{thinState.ph=clamp(+e.target.value||19,5,Math.max(5,thinState.frameB-2));draw()};
 const eyeRBtn=document.getElementById('eyeR');
 const eyeLBtn=document.getElementById('eyeL');
-eyeRBtn.onclick=()=>{thinState.eye='R';syncEyeButtons();draw()};
-eyeLBtn.onclick=()=>{thinState.eye='L';syncEyeButtons();draw()};
+eyeRBtn.onclick=()=>{freeSelected.clear();thinState.eye='R';syncEyeButtons();draw()};
+eyeLBtn.onclick=()=>{freeSelected.clear();thinState.eye='L';syncEyeButtons();draw()};
 document.getElementById('presetRound').onclick=()=>setShapePreset('round');
 document.getElementById('presetSquare').onclick=()=>setShapePreset('square');
 document.getElementById('presetFree').onclick=()=>setShapePreset('free');
@@ -1644,35 +1686,136 @@ bindOrderFrameInputs('weixing',renderWeixingQuery);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!weixingRangeModal.classList.contains('hidden'))setWeixingRange(false)});
 
 let freeDrag=null;
+const freeSelected=new Set();
 const freeSvg=document.getElementById('svg');
+freeSvg.style.touchAction='none';
+freeSvg.setAttribute('tabindex','0');
+function freePointerPosition(e){
+  const p=freeSvg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;
+  return p.matrixTransform(freeSvg.getScreenCTM().inverse());
+}
+function freeHandleKey(h){return h.getAttribute('data-free-side')+h.getAttribute('data-free-index');}
+function paintFreeSelection(){
+  freeSvg.querySelectorAll('.freeHandle').forEach(h=>{
+    const selected=freeSelected.has(freeHandleKey(h));
+    h.classList.toggle('selected',selected);h.setAttribute('aria-selected',String(selected));
+  });
+}
+function freeGeometry(){
+  const c=getFreeLocalControlPoints();
+  return {L:c.left,R:c.right,T:[c.top],B:[c.bottom]};
+}
+function freeBottomLimits(f){
+  const xs=[...f.L,...f.R].map(p=>p.x),lo=Math.min(...xs),hi=Math.max(...xs);
+  return {min:Math.max(lo+2,f.T[0].x-(hi-lo)*.33),max:Math.min(hi-2,f.T[0].x+(hi-lo)*.33)};
+}
+function validFreeGeometry(f){
+  const h=f.B[0].y-f.T[0].y,maxSide=Math.max(6,thinState.dia/2-1.5);
+  if(h<20-1e-6||h>Math.min(60,thinState.dia-2)+1e-6)return false;
+  for(const side of ['L','R']){
+    let y=f.T[0].y;
+    for(const p of f[side]){
+      if(p.y-y<.15||p.x<(side==='L'?-maxSide:4)-1e-6||p.x>(side==='L'?-4:maxSide)+1e-6)return false;
+      y=p.y;
+    }
+    if(f.B[0].y-y<.15)return false;
+  }
+  const limits=freeBottomLimits(f);
+  return f.B[0].x>=limits.min-1e-6&&f.B[0].x<=limits.max+1e-6;
+}
+function applyFreeGeometry(f,base,startPH){
+  const height=f.B[0].y-f.T[0].y,mid=(f.T[0].y+f.B[0].y)/2;
+  thinState.frameB=height;
+  // Preserve the opposite endpoint on screen when changing B height.
+  thinState.ph=startPH+f.B[0].y-base.B[0].y;
+  const mirror=thinState.eye==='L';
+  for(const side of ['L','R']){
+    const name=(mirror?(side==='L'?'Right':'Left'):(side==='L'?'Left':'Right'));
+    thinState['free'+name]=f[side].map(p=>mirror?-p.x:p.x);
+    thinState['free'+name+'Y']=f[side].map(p=>(p.y-mid+height/2-1.8)/(height-3.6));
+  }
+  thinState.freeBottomX=f.B[0].x*(mirror?-1:1);
+  syncThinLimits();draw();
+}
 freeSvg.addEventListener('pointerdown',e=>{
-  const side=e.target.getAttribute&&e.target.getAttribute('data-free-side');
-  if(!side||thinState.shapePreset!=='free'||!thinState.showFrame) return;
-  const index=Number(e.target.getAttribute('data-free-index'));
-  const d=freeDisplayArrays();
-  freeDrag={side,index,startClientX:e.clientX,startX:side==='L'?d.left[index]:d.right[index],pointerId:e.pointerId};
-  freeSvg.setPointerCapture?.(e.pointerId);
-  e.preventDefault();
+  if(e.button!==0||freeDrag||appMode!=='thin'||thinState.shapePreset!=='free'||!thinState.showFrame)return;
+  if(e.target.closest?.('[data-rxtype]'))return;
+  const handle=e.target.closest?.('.freeHandle'),start=freePointerPosition(e);
+  freeSvg.focus({preventScroll:true});
+  if(handle){
+    const group=handle.getAttribute('data-free-side'),key=freeHandleKey(handle);
+    if(group==='T'){
+      if(e.ctrlKey)return;
+      freeSelected.clear();
+    }else if(e.ctrlKey){
+      if(freeSelected.has(key)){freeSelected.delete(key);paintFreeSelection();e.preventDefault();return;}
+      freeSelected.add(key);
+    }else if(!freeSelected.has(key)){freeSelected.clear();freeSelected.add(key);}
+    freeDrag={type:'move',start,group,index:Number(handle.getAttribute('data-free-index')),keys:[...freeSelected],base:freeGeometry(),ph:thinState.ph,pointerId:e.pointerId};
+  }else{
+    if(!e.ctrlKey)freeSelected.clear();
+    const box=el('rect',{x:start.x,y:start.y,width:0,height:0,class:'freeSelectionBox'});
+    freeSvg.appendChild(box);
+    const hits=[...freeSvg.querySelectorAll('.freeHandle')].filter(h=>h.getAttribute('data-free-side')!=='T').map(h=>({key:freeHandleKey(h),x:+h.getAttribute('cx'),y:+h.getAttribute('cy')}));
+    freeDrag={type:'select',start,base:new Set(freeSelected),box,hits,pointerId:e.pointerId};
+  }
+  paintFreeSelection();freeSvg.setPointerCapture?.(e.pointerId);e.preventDefault();
 });
-freeSvg.addEventListener('pointermove',e=>{
-  if(!freeDrag) return;
-  const rect=freeSvg.getBoundingClientRect();
-  const vb=freeSvg.viewBox.baseVal;
-  const unitsPerPx=vb.width/Math.max(1,rect.width);
-  let x=freeDrag.startX+(e.clientX-freeDrag.startClientX)*unitsPerPx;
-  const maxSide=Math.max(6,thinState.dia/2-1.5);
-  x=freeDrag.side==='L'?clamp(x,-maxSide,-4):clamp(x,4,maxSide);
-  updateFreePointFromDisplay(freeDrag.side,freeDrag.index,x);
-  syncThinLimits();
-  draw();
-});
+function moveFreePointer(e){
+  if(!freeDrag||e.pointerId!==freeDrag.pointerId)return;
+  const point=freePointerPosition(e),d=freeDrag;
+  const dx=point.x-d.start.x,dy=point.y-d.start.y;
+  if(d.type==='select'){
+    const x=Math.min(point.x,d.start.x),y=Math.min(point.y,d.start.y),width=Math.abs(dx),height=Math.abs(dy);
+    Object.entries({x,y,width,height}).forEach(([k,v])=>d.box.setAttribute(k,v));
+    freeSelected.clear();d.base.forEach(k=>freeSelected.add(k));
+    d.hits.forEach(h=>{if(h.x>=x&&h.x<=x+width&&h.y>=y&&h.y<=y+height)freeSelected.add(h.key);});
+    paintFreeSelection();return;
+  }
+  if(Math.hypot(dx,dy)<.001)return;
+  let next=structuredClone(d.base);
+  if(d.keys.length>1){
+    const candidate=t=>{
+      const f=structuredClone(d.base);
+      d.keys.forEach(k=>{const p=f[k[0]][Number(k.slice(1))];p.x+=dx*t;p.y+=dy*t;});return f;
+    };
+    let amount=1;
+    if(!validFreeGeometry(candidate(1))){
+      let lo=0,hi=1;for(let i=0;i<24;i++){const mid=(lo+hi)/2;if(validFreeGeometry(candidate(mid)))lo=mid;else hi=mid;}amount=lo;
+    }
+    next=candidate(amount);
+  }else if(d.group==='L'||d.group==='R'){
+    const maxSide=Math.max(6,thinState.dia/2-1.5);
+    next[d.group][d.index].x=clamp(next[d.group][d.index].x+dx,d.group==='L'?-maxSide:4,d.group==='L'?-4:maxSide);
+    const limits=freeBottomLimits(next);next.B[0].x=clamp(next.B[0].x,limits.min,limits.max);
+  }else{
+    const top=d.base.T[0].y,bottom=d.base.B[0].y,maxHeight=Math.min(60,thinState.dia-2);
+    if(d.group==='T')next.T[0].y=clamp(top+dy,bottom-maxHeight,bottom-20);
+    else next.B[0].y=clamp(bottom+dy,top+20,top+maxHeight);
+    for(const group of ['L','R'])next[group].forEach((p,i)=>{
+      const u=i===0?0:i===5?1:clamp((d.base[group][i].y-top-1.8)/(bottom-top-3.6),0,1);
+      p.y=next.T[0].y+1.8+u*(next.B[0].y-next.T[0].y-3.6);
+    });
+    if(d.group==='B'){const limits=freeBottomLimits(next);next.B[0].x=clamp(d.base.B[0].x+dx,limits.min,limits.max);}
+  }
+  applyFreeGeometry(next,d.base,d.ph);
+}
+freeSvg.addEventListener('pointermove',moveFreePointer);
 function endFreeDrag(e){
-  if(!freeDrag) return;
-  try{freeSvg.releasePointerCapture?.(freeDrag.pointerId)}catch(_){ }
-  freeDrag=null;
+  if(!freeDrag||e.pointerId!==freeDrag.pointerId)return;
+  if(e.type==='pointerup')moveFreePointer(e);
+  const d=freeDrag;freeDrag=null;d.box?.remove();
+  try{freeSvg.releasePointerCapture?.(d.pointerId)}catch(_){}
 }
 freeSvg.addEventListener('pointerup',endFreeDrag);
 freeSvg.addEventListener('pointercancel',endFreeDrag);
+freeSvg.addEventListener('lostpointercapture',endFreeDrag);
+freeSvg.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(freeDrag)endFreeDrag({type:'cancel',pointerId:freeDrag.pointerId});
+    freeSelected.clear();paintFreeSelection();e.preventDefault();
+  }
+});
 
  document.getElementById('modeBtn').onclick=()=>{
   appMode = appMode==='dye' ? 'thin' : 'dye';
@@ -1848,7 +1991,7 @@ function drawMultifocalMark(g, gx, gy){
   });
 }
 function drawRuler(svg){
-  const x=12,y=239;
+  const x=158,y=12;
   svg.appendChild(el('line',{x1:x,y1:y,x2:x+50,y2:y,class:'ruler'}));
   for(let i=0;i<=50;i+=5){svg.appendChild(el('line',{x1:x+i,y1:y,x2:x+i,y2:y-(i%10===0?3:2),class:'ruler'}));}
   addText(svg,x+25,y-5,'50 mm 校正尺','rulerText');
@@ -1873,13 +2016,12 @@ function resetFreeShape(){
   thinState.freeLeft=[-22,-25,-26.5,-26.5,-25,-22];
   thinState.freeRight=[22,25,26.5,26.5,25,22];
   thinState.frameB=38;
+  thinState.freeLeftY=null;thinState.freeRightY=null;thinState.freeBottomX=0;
+  freeSelected.clear();
   updateFreeMetrics();
 }
 function freeYLevels(){
-  // B 高定義為框型最上緣到最下緣的總高度。
-  // 上、下緣中央各有一個隱藏頂點，分別比 L1/R1 高 2 mm、比 L6/R6 低 2 mm。
-  // 因此隱藏頂點間距 = B，而 L1/R1 到 L6/R6 的定位點垂直跨度 = B-4 mm。
-  const sideSpan=Math.max(2,thinState.frameB-4);
+  const sideSpan=Math.max(2,thinState.frameB-3.6);
   return Array.from({length:6},(_,i)=>-sideSpan/2+i*sideSpan/5);
 }
 function freeDisplayArrays(){
@@ -1906,17 +2048,15 @@ function clampFreePointsToBlank(){
 }
 function updateFreeMetrics(){
   clampFreePointsToBlank();
-  const ys=freeYLevels();
-  const minX=Math.min(...thinState.freeLeft);
-  const maxX=Math.max(...thinState.freeRight);
-  thinState.frameA=Math.max(0,maxX-minX);
-  let maxD=thinState.frameB;
-  let pair='B高';
-  for(let i=0;i<6;i++){
-    for(let j=0;j<6;j++){
-      const d=Math.hypot(thinState.freeRight[j]-thinState.freeLeft[i],ys[j]-ys[i]);
-      if(d>maxD){maxD=d;pair=`L${i+1}↔R${j+1}`;}
-    }
+  const minX=Math.min(...thinState.freeLeft),maxX=Math.max(...thinState.freeRight);
+  thinState.frameA=maxX-minX;
+  const limit=thinState.frameA*.33;
+  thinState.freeBottomX=clamp(thinState.freeBottomX||0,Math.max(minX+2,-limit),Math.min(maxX-2,limit));
+  const c=getFreeLocalControlPoints(),points=[...c.left,...c.right,c.top,c.bottom];
+  let maxD=thinState.frameB,pair='B高';
+  for(let i=0;i<points.length;i++)for(let j=i+1;j<points.length;j++){
+    const a=points[i],b=points[j],distance=Math.hypot(a.x-b.x,a.y-b.y);
+    if(distance>maxD){maxD=distance;pair=(a.side==='T'?'上B':a.side==='B'?'下B':a.side+(a.index+1))+'↔'+(b.side==='T'?'上B':b.side==='B'?'下B':b.side+(b.index+1));}
   }
   thinState.ed=maxD;
   thinState.edPair=pair;
@@ -1938,7 +2078,7 @@ function syncFrameEDLimits(forceVal=null){
     input.value=Number(thinState.ed).toFixed(1).replace(/\.0$/,'');
     input.disabled=freeLock||roundLock;
     input.classList.toggle('lockedInput',freeLock||roundLock);
-    input.title=freeLock?'自由框型的 ED 由 12 個定位點中最遠的左右點距離自動反算。':(roundLock?'圓/橢圓形的 ED 鎖定為最大直徑。':'');
+    input.title=freeLock?'自由框型的 ED 由 14 個定位點的最大距離自動反算。':(roundLock?'圓/橢圓形的 ED 鎖定為最大直徑。':'');
   }
   if(aInput){
     aInput.disabled=freeLock;
@@ -1953,11 +2093,11 @@ function syncShapePresetButtons(){
     if(btn) btn.classList.toggle('active',thinState.shapePreset===key);
   });
   const info=document.getElementById('presetSizeInfo');
-  if(info) info.textContent=thinState.shapePreset==='free' ? `框型即時檢測：A ${thinState.frameA.toFixed(1)} / B ${thinState.frameB} / ED ${thinState.ed.toFixed(1)}（${thinState.edPair||''}）` : `目前尺寸：A ${thinState.frameA} / B ${thinState.frameB} / ED ${Number(thinState.ed).toFixed(1).replace(/\.0$/,'')}`;
+  if(info) info.textContent=thinState.shapePreset==='free' ? `框型即時檢測：A ${thinState.frameA.toFixed(1)} / B ${Number(thinState.frameB).toFixed(1)} / ED ${thinState.ed.toFixed(1)}（${thinState.edPair||''}）` : `目前尺寸：A ${thinState.frameA} / B ${Number(thinState.frameB).toFixed(1)} / ED ${Number(thinState.ed).toFixed(1).replace(/\.0$/,'')}`;
   const help=document.getElementById('shapePresetHint');
   if(help){
     if(thinState.shapePreset==='free'){
-      help.innerHTML='自由框型：先設定 B 高，選擇左/右眼將框型比對，<br>拖曳圖中左右各 6 個定位點，定位框型左右邊緣。<br> ※定位點：僅水平移動<br>A 寬與 ED 最大內徑會自動計算。<br>※顯示之鏡框形狀僅供參考，請以實體為主';
+      help.innerHTML='自由框型：選擇左/右眼比對框型；左右各 6 點調寬，上下橙色 B 點調高。<br> ※左鍵拖曳空白處框選／Ctrl 點擊多選，淡藍色選取點可一起上下左右移動；Esc 清除。<br>上 B 僅單點上下調整；下 B 可上下調高、左右偏移並參與多選。<br>A 寬、B 高與 ED 最大內徑會自動計算。<br>※顯示之鏡框形狀僅供參考，請以實體為主';
     }else if(thinState.shapePreset==='square'){
       help.innerHTML='先選預設框型，再依輸入 A 寬 / B 高 / ED 最大內徑。<br>※顯示之鏡框形狀僅供參考，請以實體為主';
     }else{
@@ -1970,9 +2110,9 @@ function syncShapePresetButtons(){
 function applyShapePreset(key){
   if(!['round','square','free'].includes(key)) key='free';
   const p=shapePresetParams(key);
+  freeSelected.clear();
   thinState.shapePreset=key;
   if(key==='free'){
-    thinState.frameB=p.frameB;
     if(!thinState.freeLeft || thinState.freeLeft.length!==6) resetFreeShape();
     updateFreeMetrics();
   }else{
@@ -2030,7 +2170,7 @@ function syncThinLimits(){
   syncFrameEDLimits();
   const a=document.getElementById('frameA'), b=document.getElementById('frameB'), ed=document.getElementById('frameED'), dbl=document.getElementById('frameDBL'), pd=document.getElementById('framePD'), ph=document.getElementById('framePH');
   if(a) a.value=thinState.shapePreset==='free'?Number(thinState.frameA).toFixed(1):Number(thinState.frameA).toFixed(0);
-  if(b) b.value=Number(thinState.frameB).toFixed(0);
+  if(b){b.value=Number(thinState.frameB).toFixed(2).replace(/\.?0+$/,'');b.disabled=thinState.shapePreset==='free';b.classList.toggle('lockedInput',b.disabled);b.title=b.disabled?'B 高由上下 B 定位點自動計算':'';}
   if(ed) ed.value=Number(thinState.ed).toFixed(1).replace(/\.0$/,'');
   if(dbl) dbl.value=thinState.dbl;
   if(pd) pd.value=thinState.pd;
@@ -2099,6 +2239,7 @@ function sampleCatmullSide(ctrl){
       const p=cat(p0,p1,p2,p3,k/10);
       // 水平值限制在當段兩端之間，避免樣條過衝造成 A / ED 與定位點不一致。
       p.x=clamp(p.x,Math.min(p1.x,p2.x),Math.max(p1.x,p2.x));
+      p.y=clamp(p.y,Math.min(p1.y,p2.y),Math.max(p1.y,p2.y));
       out.push(p);
     }
   }
@@ -2122,21 +2263,18 @@ function sampleEdgeThroughHiddenMidpoint(p0,p1,midpoint,stepsEach=12){
   return [...first,...second.slice(1)];
 }
 function getFreeLocalControlPoints(){
-  const ys=freeYLevels();
-  const d=freeDisplayArrays();
-  return {
-    left:d.left.map((x,i)=>({x,y:ys[i],side:'L',index:i})),
-    right:d.right.map((x,i)=>({x,y:ys[i],side:'R',index:i}))
-  };
+  const d=freeDisplayArrays(),height=thinState.frameB;
+  const leftY=thinState[thinState.eye==='R'?'freeLeftY':'freeRightY'];
+  const rightY=thinState[thinState.eye==='R'?'freeRightY':'freeLeftY'];
+  const make=(xs,ys,side)=>xs.map((x,i)=>({x,y:-height/2+1.8+(ys?.[i]??i/5)*(height-3.6),side,index:i}));
+  return {left:make(d.left,leftY,'L'),right:make(d.right,rightY,'R'),
+    top:{x:0,y:-height/2,side:'T',index:0},
+    bottom:{x:(thinState.freeBottomX||0)*(thinState.eye==='R'?1:-1),y:height/2,side:'B',index:0}};
 }
 function getFreeOutlineLocal(){
   const c=getFreeLocalControlPoints();
-  const arc=2; // 隱藏頂點相對 L1/R1、L6/R6 精確偏移 2 mm
   const topL=c.left[0],topR=c.right[0],botL=c.left[5],botR=c.right[5];
-
-  // B 高是「最上緣隱藏頂點 ↔ 最下緣隱藏頂點」的實際垂直距離。
-  const topMid={x:(topL.x+topR.x)/2,y:topL.y-arc};
-  const bottomMid={x:(botL.x+botR.x)/2,y:botL.y+arc};
+  const topMid=c.top,bottomMid=c.bottom;
 
   const top=sampleEdgeThroughHiddenMidpoint(topL,topR,topMid,14);
   const right=sampleCatmullSide(c.right);
@@ -2204,13 +2342,14 @@ function drawFrameOutline(g,cx,cy){
   if(thinState.shapePreset==='free'){
     const shift=frameDecentration(),vShift=frameVerticalDecentration();
     const c=getFreeLocalControlPoints();
-    [...c.left,...c.right].forEach(p=>{
+    [...c.left,...c.right,c.top,c.bottom].forEach(p=>{
       const px=cx+shift+p.x,py=cy+vShift+p.y;
       g.appendChild(el('line',{x1:px-2.2,y1:py,x2:px+2.2,y2:py,class:'freeGuide'}));
-      const h=el('circle',{cx:px,cy:py,r:1.25,class:'freeHandle','data-free-side':p.side,'data-free-index':p.index});
-      const title=el('title');title.textContent=`${p.side}${p.index+1}｜左右拖曳調整`;
+      const h=el('circle',{cx:px,cy:py,r:1.25,class:'freeHandle'+(['T','B'].includes(p.side)?' vertical':'')+(p.side==='B'?' bottom':'')+(freeSelected.has(p.side+p.index)?' selected':''),'data-free-side':p.side,'data-free-index':p.index});
+      const label=p.side==='T'?'上 B':p.side==='B'?'下 B':p.side+(p.index+1);
+      const title=el('title');title.textContent=label+'｜'+(p.side==='T'?'單點上下調整 B 高':p.side==='B'?'上下調高、左右偏移，可多選':'左右拖曳；多選時可上下左右移動');
       h.appendChild(title);g.appendChild(h);
-      addText(g,px+(p.side==='L'?-2.0:2.0),py-1.6,`${p.side}${p.index+1}`,'freeHandleLabel',p.side==='L'?'end':'start');
+      addText(g,px+(p.side==='L'?-2.0:2.0),py+(p.side==='B'?3.4:-1.6),label,'freeHandleLabel',p.side==='L'?'end':'start');
     });
   }
 }
@@ -2249,8 +2388,8 @@ function drawThinTop(svg){
     const maxD=frameMaxDistanceFromOC();
     const rec=clamp(Math.round(maxD*0.7*2),30,thinState.dia-5);
     addText(svg,136,56,`框型 ${shapePresetName(thinState.shapePreset)}｜${thinState.eye==='R'?'右眼':'左眼'}`,'note','start');
-    addText(svg,136,63,`A ${Number(thinState.frameA).toFixed(1)} / B ${thinState.frameB} / ED ${Number(thinState.ed).toFixed(1)}｜最遠邊 ${maxD.toFixed(1)} mm`,'note','start');
-    addText(svg,136,70,`DBL ${thinState.dbl} / PD ${thinState.pd} / 瞳高 ${thinState.ph}｜建議內徑 ${rec}Φ`,'note','start');
+    addText(svg,136,63,`A ${Number(thinState.frameA).toFixed(1)} / B ${Number(thinState.frameB).toFixed(1)} / ED ${Number(thinState.ed).toFixed(1)}｜最遠邊 ${maxD.toFixed(1)} mm`,'note','start');
+    addText(svg,136,70,`DBL ${thinState.dbl} / PD ${thinState.pd} / 瞳高 ${Number(thinState.ph).toFixed(1)}｜建議內徑 ${rec}Φ`,'note','start');
   }else{
     addText(svg,136,56,'框型比對：關閉','note','start');
     addText(svg,136,63,'開啟後可輸入鏡框尺寸參數','note','start');
@@ -2341,6 +2480,7 @@ function updateFieldEstimatePanel(){
   if(panel) panel.classList.toggle('hidden',!fieldEstimateState.open);
   if(!out || !fieldEstimateState.open) return;
   if(!ready){
+    out.hidden=false;
     out.className='fieldEstimateResult warn';
     out.innerHTML='請先開啟「鏡框參數比對功能」；完成 A / DBL / PD 與眼位資料後，才會啟用度數視場估算。';
     return;
@@ -2351,8 +2491,8 @@ function updateFieldEstimatePanel(){
     out.innerHTML='目前鏡框水平範圍與有效光學內徑沒有可用交集，請重新確認鏡框、PD／移心與有效內徑設定。';
     return;
   }
-  out.className='fieldEstimateResult';
-  out.innerHTML='<span style="opacity:.82">※Prentice 法則教學近似：以水平子午線光度與光心至有效視場邊緣距離估算稜鏡；精修薄區不納入清晰視場。</span>';
+  out.hidden=true;
+  out.textContent='';
 }
 
 
@@ -2806,7 +2946,7 @@ function drawThinSection(svg,x,y,w,h){
   addText(g,mid,fixedCenterLabelY,'光學中心','note');
 }
 function drawDye(svg){
-  addText(svg,110,8,'片坯漸層染色 1:1 設定演示','mmLabel');
+  addText(svg,78,8,'片坯漸層染色 1:1 設定演示','mmLabel');
   const selected = state.show==='all' ? diaList : [Number(state.show)];
   if(state.show==='all'){
     drawLens(svg,38,43,60); drawLens(svg,112,43,65); drawLens(svg,43,121,70); drawLens(svg,128,121,75);
@@ -2850,6 +2990,85 @@ svgEl.addEventListener('click',evt=>{
 applyShapePreset(thinState.shapePreset);
 updateThinWarnings();
 setKanteType('近視',true);
+</script>
+<div id="frameHelpPopover" class="frameHelpPopover" role="tooltip" hidden></div>
+<script>
+(()=>{
+  // Reuse the help popover for general editor instructions, keeping live values and warnings visible.
+  const extraHelp=[
+    ['#dyeColorHint','#colorSelect'],['#dyeDepthHint','#depthSelect'],['#dyeZoneHint','#zone'],
+    ['#decenter','#decenter'],['#diaChips','#diaChips'],['#thinDiaSelect','#thinDiaSelect'],
+    ['#opticalDia','#opticalDia'],['#scale','#scale']
+  ];
+  extraHelp.forEach(([source,control],i)=>{
+    const input=document.querySelector(control),group=input.closest('.group');
+    const hint=source.endsWith('Hint')?document.querySelector(source):group.querySelector(':scope > .hint:not([id])');
+    const label=group.querySelector(':scope > label');
+    if(!hint||!label)return;
+    if(!hint.id)hint.id='editorHelp'+i;
+    hint.hidden=true;
+    const row=document.createElement('div');row.className='helpLabel';
+    label.before(row);row.appendChild(label);
+    const button=document.createElement('button');button.type='button';button.className='helpButton';button.dataset.help=hint.id;
+    button.textContent='?';button.setAttribute('aria-label',label.textContent.replace(/^\d+[.、]\s*/, '')+'說明');button.setAttribute('aria-controls','frameHelpPopover');button.setAttribute('aria-expanded','false');row.appendChild(button);
+  });
+  // Fit the sticky editor below its actual viewport position, including the header.
+  const editor=document.querySelector('.controls');
+  let editorLayoutFrame=0;
+  function fitEditor(){
+    editorLayoutFrame=0;
+    if(innerWidth<=900){editor.style.removeProperty('--editor-available-height');return;}
+    const top=Math.max(12,editor.getBoundingClientRect().top);
+    const height=Math.max(0,Math.floor(innerHeight-top-12));
+    editor.style.setProperty('--editor-available-height',height+'px');
+  }
+  function scheduleEditorFit(){
+    if(!editorLayoutFrame)editorLayoutFrame=requestAnimationFrame(fitEditor);
+  }
+  window.addEventListener('resize',scheduleEditorFit);
+  window.addEventListener('scroll',scheduleEditorFit,{passive:true});
+  new ResizeObserver(scheduleEditorFit).observe(document.querySelector('header'));
+  fitEditor();
+  const popup=document.getElementById('frameHelpPopover');
+  let active=null,pinned=false,timer;
+  function position(){
+    if(!active)return;
+    const r=active.getBoundingClientRect(),w=popup.offsetWidth,h=popup.offsetHeight;
+    const x=r.right+10+w<=innerWidth-12?r.right+10:Math.max(12,Math.min(r.left,innerWidth-w-12));
+    const y=r.right+10+w<=innerWidth-12?r.top-8:r.bottom+8;
+    popup.style.left=x+'px';popup.style.top=Math.max(12,Math.min(y,innerHeight-h-12))+'px';
+  }
+  function close(){
+    clearTimeout(timer);
+    if(active){active.setAttribute('aria-expanded','false');active.removeAttribute('aria-describedby');}
+    active=null;pinned=false;popup.hidden=true;
+  }
+  function open(button){
+    clearTimeout(timer);
+    if(active!==button){close();active=button;}
+    popup.replaceChildren();
+    const title=document.createElement('strong');title.textContent=button.getAttribute('aria-label');popup.appendChild(title);
+    const body=document.createElement('div');body.innerHTML=document.getElementById(button.dataset.help).innerHTML;popup.appendChild(body);
+    popup.hidden=false;button.setAttribute('aria-expanded','true');button.setAttribute('aria-describedby',popup.id);position();
+  }
+  function later(){clearTimeout(timer);if(!pinned)timer=setTimeout(close,180);}
+  document.querySelectorAll('.helpButton').forEach(button=>{
+    button.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')open(button);});
+    button.addEventListener('pointerleave',later);
+    button.addEventListener('focus',()=>open(button));
+    button.addEventListener('blur',()=>{if(!pinned)later();});
+    button.addEventListener('click',()=>{if(active===button&&pinned)close();else{open(button);pinned=true;}});
+    button.addEventListener('keydown',e=>{if(e.key==='Escape'){close();e.stopPropagation();}});
+  });
+  popup.addEventListener('pointerenter',()=>clearTimeout(timer));
+  popup.addEventListener('pointerleave',later);
+  document.addEventListener('pointerdown',e=>{if(active&&!popup.contains(e.target)&&!e.target.closest('.helpButton'))close();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
+  window.addEventListener('resize',position);
+  window.addEventListener('scroll',()=>{if(active)position();},true);
+  const observer=new MutationObserver(()=>{if(active)open(active);});
+  document.querySelectorAll('[data-help]').forEach(button=>observer.observe(document.getElementById(button.dataset.help),{childList:true,subtree:true}));
+})();
 </script>
 </body>
 </html>

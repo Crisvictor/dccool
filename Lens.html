@@ -4887,33 +4887,53 @@ function update3D(res){
    const sign=area>=0?1:-1;
    return points.map((p,i)=>{const a=points[(i+points.length-1)%points.length],b=points[(i+1)%points.length],dx=b.x-a.x,dy=b.y-a.y,l=Math.hypot(dx,dy)||1;return {x:p.x+sign*dy/l*distance,y:p.y-sign*dx/l*distance,z:p.z};});
  }
- function sculptBrow(points,material,parent,side){
+ function browHeightFromContour(seat,side){
+   const peak=seat.reduce((a,b)=>side*b.x>side*a.x?b:a),lo=Math.min(...seat.map(p=>p.y)),hi=Math.max(...seat.map(p=>p.y));
+   const level=(peak.y-lo)/Math.max(1,hi-lo),t=Math.max(0,Math.min(1,(level-.5)/.35));
+   return 75+15*t*t*(3-2*t);
+ }
+ function sculptBrow(points,material,parent,side,frameB,heightPercent,temporalEdge){
    const T=THREE_G(),path=points.filter((p,i)=>!i||Math.hypot(p.x-points[i-1].x,p.y-points[i-1].y)>1e-5).map(p=>({...p}));
-   const temporal=side*path[0].x>side*path[path.length-1].x?0:path.length-1;
-   const root=path[temporal],wingX=side*(Math.max(...path.map(p=>side*p.x))+5.5);
-   const extension=Array.from({length:8},(_,i)=>{const t=(i+1)/8,q=t*t*(3-2*t);return {x:root.x+(wingX-root.x)*t,y:root.y-.8*q,z:root.z,wing:t};});
-   if(temporal===0)path.unshift(...extension.slice().reverse());else path.push(...extension);
+   if(side*path[0].x>side*path[path.length-1].x)path.reverse(); // nasal to temporal
+   const root=path[path.length-1],ratio=heightPercent/100,q=Math.max(0,Math.min(1,(ratio-.8)/.1)),blend=q*q*(3-2*q);
+   const extensionLength=7+3*blend,returnWidth=2.5+1.5*blend,wingX=side*(temporalEdge+extensionLength),jointY=frameB*(ratio-.5);
    let area=0;for(let i=0;i<path.length;i++){const a=path[i],b=path[(i+1)%path.length];area+=a.x*b.y-b.x*a.y;}const sign=area>=0?1:-1;
-   const positions=[],indices=[],N=path.length;
-   for(let i=0;i<N;i++){
-     const p=path[i],a=path[Math.max(0,i-1)],b=path[Math.min(N-1,i+1)];
-     const incoming=new T.Vector2(p.x-a.x,p.y-a.y),outgoing=new T.Vector2(b.x-p.x,b.y-p.y);
-     if(incoming.length()<1e-6)incoming.copy(outgoing);if(outgoing.length()<1e-6)outgoing.copy(incoming);incoming.normalize();outgoing.normalize();
-     const n1=new T.Vector2(sign*incoming.y,-sign*incoming.x),n2=new T.Vector2(sign*outgoing.y,-sign*outgoing.x),n=n1.clone().add(n2).normalize();
-     const miter=Math.min(1.5,1/Math.max(.2,n.dot(n1))),near=side*p.x,extent=Math.max(...points.map(p=>side*p.x)),u=Math.max(0,Math.min(1,(near-extent+5)/10)),width=2.5+.8*u*u*(3-2*u),clearance=.18;
-     // The terminal grows upward into a broad wing, following the marked silhouette.
-     const wingBlend=p.wing===undefined?0:p.wing*p.wing*(3-2*p.wing);
-     const wingWidth=6.0+1.1*Math.sin(Math.PI*(p.wing||0));
-     const profile=[[clearance+.18,-1.1],[clearance,-.9],[clearance,1.25],[clearance+.18,1.43],[clearance+width-.18,1.43],[clearance+width,1.25],[clearance+width,-.9],[clearance+width-.18,-1.1]];
-     for(const [d,z] of profile){
-       const fraction=(d-clearance)/width;
-       positions.push(p.x+n.x*d*miter*(1-wingBlend),p.y+n.y*d*miter*(1-wingBlend)+(fraction*wingWidth)*wingBlend,p.z+z);
-     }
+   const outer=[],inner=[];
+   for(let i=0;i<path.length;i++){
+     const p=path[i],a=path[Math.max(0,i-1)],b=path[Math.min(path.length-1,i+1)],n=new T.Vector2(sign*(b.y-a.y),-sign*(b.x-a.x)).normalize();
+     const t=Math.max(0,Math.min(1,(side*p.x-temporalEdge+6)/6)),width=2.5+(returnWidth-2.5)*t*t*(3-2*t);
+     outer.push(new T.Vector2(p.x+n.x*(width+.02),p.y+n.y*(width+.02)));
+     inner.push(new T.Vector2(p.x+n.x*.18,p.y+n.y*.18));
    }
-   for(let i=0;i<N-1;i++)for(let k=0;k<8;k++){const a=i*8+k,b=i*8+(k+1)%8,c=a+8,d=b+8;if(sign>0)indices.push(a,b,c,b,d,c);else indices.push(a,c,b,b,c,d);}
-   for(let k=1;k<7;k++){if(sign>0)indices.push(0,k+1,k,(N-1)*8,(N-1)*8+k,(N-1)*8+k+1);else indices.push(0,k,k+1,(N-1)*8,(N-1)*8+k+1,(N-1)*8+k);}
-   const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(positions,3));geo.setIndex(indices);geo.computeVertexNormals();geo.computeBoundingSphere();
-   const mesh=new T.Mesh(geo,material);mesh.name=`SculptedAcetateBrow_${side<0?'OD':'OS'}`;geo.userData={width:2.5,terminalWidth:6,clearance:.18,joint:{x:wingX-side*1.2,y:root.y-.8+3,z:root.z-1.1,outerX:wingX}};parent.add(mesh);
+   // The upper edge stays monotone into the mount; the cut-in belongs BELOW it.
+   const highest=outer.reduce((best,p,i)=>p.y>outer[best].y?i:best,0),top=jointY+3,bottom=jointY-3;
+   let shoulder=highest;
+   // Stop BEFORE crossing the terminal top, otherwise a downward tangent makes a notch.
+   for(let i=highest+1;i<outer.length-2;i++){if(outer[i].y<top+.4)break;shoulder=i;}
+   shoulder=Math.max(highest,shoulder-4); // Start blending before the shoulder turns steeply downward.
+   const shape=new T.Shape();shape.moveTo(outer[0].x,outer[0].y);
+   for(let i=1;i<=shoulder;i++)shape.lineTo(outer[i].x,outer[i].y);
+   const a=outer[shoulder],prev=outer[Math.max(0,shoulder-1)],span=Math.abs(wingX-a.x),reach=Math.min(4,span*.32);
+   const slope=(a.y-prev.y)/Math.max(.2,Math.abs(a.x-prev.x));
+   const controlY=Math.max(Math.min(a.y,top),Math.min(Math.max(a.y,top),a.y+slope*reach));
+   shape.bezierCurveTo(a.x+side*reach,controlY,wingX-side*span*.35,top,wingX,top);
+   shape.lineTo(wingX,bottom);
+   // Scoop the underside inward, then retain only the narrow rim-width return tongue.
+   let knee=Math.min(shoulder+1,outer.length-2);
+   for(let i=knee;i<outer.length-2;i++){knee=i;if(outer[i].y<=bottom-1.0)break;}
+   const k=outer[knee],underSpan=Math.abs(wingX-k.x);
+   shape.bezierCurveTo(wingX-side*underSpan*.55,bottom,k.x,bottom,k.x,k.y);
+   for(let i=knee+1;i<outer.length;i++)shape.lineTo(outer[i].x,outer[i].y);
+   for(let i=inner.length-1;i>=0;i--)shape.lineTo(inner[i].x,inner[i].y);shape.closePath();
+   const geo=new T.ExtrudeGeometry(shape,{depth:2.2,bevelEnabled:true,bevelSize:.16,bevelThickness:.16,bevelSegments:3,curveSegments:32,steps:1}),attr=geo.attributes.position,normals=geo.attributes.normal;
+   function depth(x,y){let sum=0,z=0;for(const p of path){const w=1/((x-p.x)**2+(y-p.y)**2+12)**2;sum+=w;z+=p.z*w;}const t=Math.max(0,Math.min(1,(side*x-temporalEdge+4)/4)),w=t*t*(3-2*t);return z/sum*(1-w)+root.z*w;}
+   for(let i=0;i<attr.count;i++){
+     const x=attr.getX(i),y=attr.getY(i),z=depth(x,y),dx=(depth(x+.01,y)-depth(x-.01,y))/.02,dy=(depth(x,y+.01)-depth(x,y-.01))/.02;
+     attr.setZ(i,attr.getZ(i)-.94+z);
+     const n=new T.Vector3(normals.getX(i)-dx*normals.getZ(i),normals.getY(i)-dy*normals.getZ(i),normals.getZ(i)).normalize();normals.setXYZ(i,n.x,n.y,n.z);
+   }
+   geo.computeBoundingSphere();geo.userData={width:2.5,terminalWidth:6,heightPercent,extensionLength,returnWidth,continuousShoulder:true,joint:{x:wingX-side*1.2,y:jointY,z:root.z-1.1,outerX:wingX}};
+   const mesh=new T.Mesh(geo,material);mesh.name=`SculptedAcetateBrow_${side<0?'OD':'OS'}`;parent.add(mesh);
  }
  function makeBrowHinge(p,side,m,parent,eye){
    const T=THREE_G(),g=makeInterleavedHinge({x:p.x-side*1.45,y:p.y,z:p.z-.25},side,true,m,parent,eye);g.name=`BrowCornerHinge_${eye.toUpperCase()}`;g.scale.y=.72;
@@ -5317,23 +5337,22 @@ function wearContourAnchor(points,side,temporal,targetY=0){
    const T=THREE_G(),geo=new T.BufferGeometry().setFromPoints(points);
    const line=new T.LineLoop(geo,material);line.name=name;line.renderOrder=4;parent.add(line);return line;
  }
- function wearSmoothTemple(start,side,length){
-   const pts=[],count=40;
-   let y=start.y,z=start.z;
-   const bendStart=.63,bendEnd=.79;
+ function wearSmoothTemple(start,side,length,straightFront=false){
+   const pts=[],count=100,smooth=v=>{v=Math.max(0,Math.min(1,v));return v*v*(3-2*v);};
+   let x=start.x,y=start.y,z=start.z;
    for(let i=0;i<=count;i++){
-     const t=i/count;
      if(i){
-       const u=(i-.5)/count;
-       const q=Math.max(0,Math.min(1,(u-bendStart)/(bendEnd-bendStart)));
-       const smooth=q*q*(3-2*q);
-       const angle=Math.PI/6*smooth;  // 向下 30°，從 66% 附近漸進轉彎
-       const step=length/count;
-       y-=step*Math.sin(angle);
-       z-=step*Math.cos(angle);
+       const u=(i-.5)/count,step=length/count;
+       const pitch=Math.PI/6*smooth((u-.63)/.16);
+       const inward=13*Math.PI/180*smooth((u-.60)/.14);
+       // Preserve the metal front's gentle flare; acetate/brow fronts are straight.
+       const flare=straightFront?0:Math.atan(15/length*Math.exp(-5*u))*(1-smooth((u-.60)/.14));
+       const yaw=flare-inward;
+       x+=side*step*Math.cos(pitch)*Math.sin(yaw);
+       y-=step*Math.sin(pitch);
+       z-=step*Math.cos(pitch)*Math.cos(yaw);
      }
-     const outward=3.0*(1-Math.exp(-t*5));
-     pts.push({x:start.x+side*outward,y,z});
+     pts.push({x,y,z});
    }
    return pts;
  }
@@ -5438,7 +5457,7 @@ function wearContourAnchor(points,side,temporal,targetY=0){
          const lower=upperRimArc(contourSeat.map(p=>({x:p.x,y:-p.y,z:p.z})), -f.b*.20).map(p=>({x:p.x,y:-p.y,z:p.z}));
          meshTube(lower,.68,frameMat.rim,eyeUnit).name=`BrowMetalLowerRim_${eye.toUpperCase()}`;
          const browPoints=upperRimArc(contourSeat,f.b*.18);
-         if(browPoints.length>2)sculptBrow(browPoints,frameMat.brow,eyeUnit,side);
+         if(browPoints.length>2)sculptBrow(browPoints,frameMat.brow,eyeUnit,side,f.b,browHeightFromContour(contourSeat,side),Math.max(...contourSeat.map(p=>side*p.x)));
        }else{
          meshTube(contourSeat,Math.max(.58,rimRadius),frameMat.rim,eyeUnit,true).name=`BevelSeatFrame_${eye.toUpperCase()}`;
        }
@@ -5456,7 +5475,7 @@ function wearContourAnchor(points,side,temporal,targetY=0){
        const top=contourSeat.reduce((a,b)=>b.y>a.y?b:a);
        topBridgeAnchors.push({unit:eyeUnit,point:new T.Vector3(top.x,top.y+.4,top.z)});
      }
-     const endpieceRatio=.75;
+     const endpieceRatio=f.material==='brow'?browHeightFromContour(contourSeat,side)/100:.75;
      // 只有眉框保留專屬高度規則；雙槓及其餘框系由顳側最突出點起始。
      const outerAtHeight=f.material==='brow'
        ?nasalRimPointAtY(cut.seat,-side,f.b*(endpieceRatio-.50))
@@ -5515,13 +5534,12 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      else makeInterleavedHinge(hingeP,side,false,frameMat,eyeUnit,eye);
      const tlen=Math.max(120,Math.min(160,f.temple));
      const start={x:hingeP.x,y:hingeP.y,z:hingeP.z-(acetateFront?.22:f.material==='brow'?.04:3.2)};
-     const pts=wearSmoothTemple(start,side,tlen);
-     if(acetateFront||f.material==='brow')pts.forEach((p,i)=>{const t=Math.max(0,Math.min(1,(i/(pts.length-1)-.08)/.40));p.x=start.x+side*3*t*t*(3-2*t);});
+     const pts=wearSmoothTemple(start,side,tlen,acetateFront||f.material==='brow');
      if(acetateFront){
        meshPrismaticPath(pts,12,8,2.5,2.5,frameMat.temple,eyeUnit,`AcetateTemple_${eye.toUpperCase()}`,true,1.0);
      }else{
        const brow=f.material==='brow';
-       meshPrismaticPath(brow?pts:pts.slice(0,-2),brow?6:3.4,brow?3.3:1.8,brow?2.4:1.35,brow?2:1.05,brow?frameMat.brow:frameMat.temple,eyeUnit,`TaperedMetalTemple_${eye.toUpperCase()}`,brow);
+       meshPrismaticPath(brow?pts:pts.slice(0,-Math.ceil(7/tlen*(pts.length-1))),brow?6:3.4,brow?3.3:1.8,brow?2.4:1.35,brow?2:1.05,brow?frameMat.brow:frameMat.temple,eyeUnit,`TaperedMetalTemple_${eye.toUpperCase()}`,brow);
        if(!brow){
          const sleevePts=pts.slice(Math.floor((pts.length-1)*.50));
          meshPrismaticPath(sleevePts,3.2,6.2,2.3,2.3,frameMat.templeSleeve,eyeUnit,`RoundedTempleTip_${eye.toUpperCase()}`,true,0,true);
