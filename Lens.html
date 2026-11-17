@@ -852,7 +852,8 @@ body.wear-active .panel-tabs{margin-bottom:6px}
                   </div>
                   <div class="wear-field"><label for="w_frameMaterial">鏡框材質</label><select id="w_frameMaterial"><option value="metal" selected>鈦金屬／細框</option><option value="double-metal">金屬雙槓框</option><option value="acetate">板料／厚框</option><option value="black">霧黑金屬</option><option value="brow">眉框（上膠框＋金屬下框）</option></select></div>
                   <div class="wear-field"><label for="w_rimType">框類型</label><select id="w_rimType"><option value="full" selected>全框</option><option value="groove">車溝框</option><option value="rimless">無邊框</option></select></div>
-                  <div class="wear-field"><label for="w_nosepad">鼻托類型</label><select id="w_nosepad"><option value="integrated">一體式鼻托</option><option value="adjustable" selected>鼻托架＋鼻墊</option></select></div>
+                  <div class="wear-field" id="w_nosepadField"><label for="w_nosepad">鼻托類型</label><select id="w_nosepad"><option value="integrated">一體式鼻托</option><option value="adjustable" selected>鼻托架＋鼻墊</option></select></div>
+                  <div class="wear-field" id="w_rimlessMountField" style="display:none"><label for="w_rimlessMount">裝配選擇</label><select id="w_rimlessMount"><option value="screw">螺絲鑽孔式</option><option value="sleeve">膠套嵌入式</option><option value="clip" hidden disabled>無孔夾扣式</option></select></div>
                   <div class="wear-field"><label for="w_temple">鏡腿長度 (mm)</label><input id="w_temple" type="number" min="120" max="160" step="5" value="140"></div>
                 </div>
                 <div class="wear-step-actions"><button class="wear-btn primary" type="button" data-wear-next="3">下一步｜配戴設定 ›</button></div>
@@ -4381,7 +4382,7 @@ function update3D(res){
  const PRESET_FRAMES=Object.fromEntries(Object.entries(window.LENS_FRAME_PRESETS).filter(([,data])=>data.frame).map(([name,data])=>[name,data.frame]));
  const DEFAULTS={od:{s:-4,c:-1,a:180,n:1.6,ocpd:31,och:20,wearpd:32,wearh:20},
    os:{s:-3.5,c:-.5,a:90,n:1.6,ocpd:31,och:20,wearpd:32,wearh:20},
-   frame:{a:52,b:38,dbl:18,material:'metal',nosepad:'adjustable',temple:140},
+   frame:{a:52,b:38,dbl:18,material:'metal',nosepad:'adjustable',rimlessMount:'screw',temple:140},
    wrap:5,pan:8,vertex:12,refVertex:12};
  const state={mode:'normal',free:null,basePreset:null,drag:null,scene:null,visible:false,
    allMeshes:[],guideVisible:true,faceVisible:true,renderToken:0,frameValues:null,frameContour:null,results:null};
@@ -4395,7 +4396,10 @@ function update3D(res){
  function syncWearFrameOptions(){
    if($('w_frameMaterial').value==='brow'&&$('w_rimType').value==='groove')$('w_rimType').value='full';
    const rim=$('w_rimType').value;
+   if($('w_rimlessMount').value==='clip')$('w_rimlessMount').value='screw';
    const groove=rim==='groove', noIntegrated=rim!=='full'||$('w_frameMaterial').value!=='acetate';
+   $('w_nosepadField').style.display=rim==='rimless'?'none':'';
+   $('w_rimlessMountField').style.display=rim==='rimless'?'':'none';
    const material=$('w_frameMaterial'),pad=$('w_nosepad');
    const acetate=material.querySelector('option[value="acetate"]');
    const brow=material.querySelector('option[value="brow"]');
@@ -4419,7 +4423,7 @@ function update3D(res){
      bc:$('w_os_bc').value.trim()===''?null:Number($('w_os_bc').value),ct:num('w_os_ct',1.2),et:num('w_os_et',1.1),
      ocpd:num('w_os_ocpd',31),och:num('w_os_och',20),wearpd:num('w_wearpd_os',32),wearh:num('w_wearh_os',20)}},
    frame:{a:num('w_frameA',52),b:num('w_frameB',38),dbl:num('w_dbl',18),material:$('w_frameMaterial').value,
-     rimType:$('w_rimType').value,nosepad:$('w_nosepad').value,temple:num('w_temple',140)},
+     rimType:$('w_rimType').value,nosepad:$('w_nosepad').value,rimlessMount:$('w_rimlessMount').value,temple:num('w_temple',140)},
    wrap:rad(num('w_wrap',0)),pan:rad(num('w_pan',0)),vertex:num('w_vertex',12),refVertex:num('w_refvertex',12)
  });
  function pointsFromPreset(name){
@@ -4577,7 +4581,7 @@ function update3D(res){
      for(const key of ['s','c','a','n','ocpd','och'])set(`w_${eye}_${key}`,x[eye][key]);
      set(`w_wearpd_${eye}`,x[eye].wearpd);set(`w_wearh_${eye}`,x[eye].wearh);
    }
-   for(const [k,id] of [['a','w_frameA'],['b','w_frameB'],['dbl','w_dbl'],['material','w_frameMaterial'],['nosepad','w_nosepad'],['temple','w_temple']])
+   for(const [k,id] of [['a','w_frameA'],['b','w_frameB'],['dbl','w_dbl'],['material','w_frameMaterial'],['nosepad','w_nosepad'],['rimlessMount','w_rimlessMount'],['temple','w_temple']])
      set(id,x.frame[k]);
    for(const [k,id] of [['wrap','w_wrap'],['pan','w_pan'],['vertex','w_vertex'],['refVertex','w_refvertex']])set(id,x[k]);
    syncRanges();state.free=null;setMode('normal');
@@ -5394,6 +5398,118 @@ function wearContourAnchor(points,side,temporal,targetY=0){
    }
    return out;
  }
+ // Rimless fittings share the lens surfaces and a single tapered front leaf.
+ function makeRimlessMount(cut,path,mode,m,parent,name){
+   const T=THREE_G(),g=new T.Group();g.name=`RimlessMount_${name}`;g.userData.mountType=mode;parent.add(g);
+   const metal=m.highlights,liner=new T.MeshPhysicalMaterial({color:0xb8ccd3,transparent:true,opacity:.58,roughness:.25,metalness:0,depthWrite:false});
+   const probeMaterial=new T.MeshBasicMaterial({side:T.DoubleSide}),probe=new T.Mesh(cut.geometry,probeMaterial);
+   probe.updateMatrixWorld(true);
+   const ray=new T.Raycaster(),edge=path[0],last=path[path.length-1],dx=Math.sign(last.x-edge.x);
+   const surface=(x,y)=>{
+     ray.set(new T.Vector3(x,y,1000),new T.Vector3(0,0,-1));
+     const hits=ray.intersectObject(probe);
+     if(hits.length>1)return {front:hits[0].point.z,back:hits[hits.length-1].point.z};
+     const i=cut.front.reduce((best,p,i)=>Math.hypot(p.x-x,p.y-y)<Math.hypot(cut.front[best].x-x,cut.front[best].y-y)?i:best,0);
+     return {front:cut.front[i].z,back:cut.back[i].z};
+   };
+   const disc=(x,y,z,r,h,mat,label,sides=32)=>{
+     const mesh=new T.Mesh(new T.CylinderGeometry(r,r,h,sides),mat);mesh.rotation.x=Math.PI/2;mesh.position.set(x,y,z);mesh.name=label;g.add(mesh);return mesh;
+   };
+   const ring=(x,y,z,r,t,mat,label)=>{
+     const mesh=new T.Mesh(new T.TorusGeometry(r,t,8,32),mat);mesh.position.set(x,y,z);mesh.name=label;g.add(mesh);
+   };
+   const roundedLeaf=(start,length,height,depth,back,mat,label)=>{
+     const r=height/2,shape=new T.Shape();
+     shape.moveTo(r,-r);shape.lineTo(length-r,-r);shape.absarc(length-r,0,r,-Math.PI/2,Math.PI/2,false);
+     shape.lineTo(r,r);shape.absarc(r,0,r,Math.PI/2,Math.PI*1.5,false);
+     const geo=new T.ExtrudeGeometry(shape,{depth,bevelEnabled:false,curveSegments:16,steps:1}),pos=geo.attributes.position;
+     for(let i=0;i<pos.count;i++){
+       const x=edge.x+dx*(start+pos.getX(i)),y=edge.y+pos.getY(i),z=pos.getZ(i),surf=surface(x,y);
+       pos.setXYZ(i,x,y,back?surf.back-.03-z:surf.front+.39+z);
+     }
+     // Reflecting X reverses winding for the temporal side.
+     if(dx<0){const a=pos.array;for(let i=0;i<a.length;i+=9)for(let k=0;k<3;k++){const v=a[i+3+k];a[i+3+k]=a[i+6+k];a[i+6+k]=v;}}
+     if(back){const a=pos.array;for(let i=0;i<a.length;i+=9)for(let k=0;k<3;k++){const v=a[i+3+k];a[i+3+k]=a[i+6+k];a[i+6+k]=v;}}
+     geo.computeVertexNormals();const mesh=new T.Mesh(geo,mat);mesh.name=label;mesh.userData={length,height};g.add(mesh);
+   };
+   if(mode==='clip'){
+     // Edge clamp: two padded shoes connected outside the lens, no through pins.
+     const x=edge.x+dx*1.55,y=edge.y,s=surface(x,y),outside=edge.x-dx*.65;
+     const front=[edge,{x,y,z:s.front+.72}];
+     meshPrismaticPath(front,1.65,2.35,.65,.65,metal,g,'ClipFrontShoe');
+     meshPrismaticPath([{x,y,z:s.back-.6},{x:outside,y,z:s.back-.6},{x:outside,y,z:s.front+.72},edge],1.65,1.65,.55,.55,metal,g,'EdgeWrapClip');
+     box(x,y,s.front+.18,2.4,2.2,.28,liner,g).name='ClipFrontCushion';
+     box(x,y,s.back-.18,2.4,2.2,.28,liner,g).name='ClipRearCushion';
+   }else{
+     roundedLeaf(-.6,7.1,mode==='sleeve'?2:2.2,.65,false,metal,'RoundedFrontLeaf');
+     const positions=mode==='sleeve'?[2,5]:[5.65];
+     for(const [i,inset] of positions.entries()){
+       const x=edge.x+dx*inset,y=edge.y,s=surface(x,y),depth=s.front-s.back;
+       if(mode==='sleeve'){
+         // Two polymer bushes with visible collars and a press-fit metal core.
+         const shell=new T.Mesh(new T.LatheGeometry([new T.Vector2(.35,-depth/2-.28),new T.Vector2(.61,-depth/2-.28),new T.Vector2(.61,depth/2+.30),new T.Vector2(.35,depth/2+.30),new T.Vector2(.35,-depth/2-.28)],24),liner);
+         shell.rotation.x=Math.PI/2;shell.position.set(x,y,(s.front+s.back)/2);shell.name=`PolymerSleeve_${i}`;g.add(shell);
+         disc(x,y,s.front+.99-1.5,.33,3,metal,`PressFitPin_${i}`);
+         ring(x,y,s.front+.32,.57,.13,liner,`SleeveFrontCollar_${i}`);
+         ring(x,y,s.back-.32,.57,.13,liner,`SleeveRearCollar_${i}`);
+         disc(x,y,s.front+1.08,.57,.18,metal,`FlushPinHead_${i}`);
+       }else{
+         disc(x,y,(s.front+s.back)/2,.36,depth+1.65,metal,'ThroughScrew');
+         ring(x,y,s.front+.25,.66,.16,liner,'ProtectiveFrontWasher');
+         ring(x,y,s.back-.22,.66,.16,liner,'ProtectiveRearWasher');
+         disc(x,y,s.front+1.02,.83,.30,metal,'SlottedScrewHead');
+         box(x,y,s.front+1.18,1.12,.16,.025,m.templeSleeve,g).name='ScrewHeadSlot';
+         disc(x,y,s.back-.52,.72,.55,metal,'HexRearNut',6);
+       }
+     }
+     if(mode==='sleeve'){
+       const white=new T.MeshStandardMaterial({color:0xf5f5f2,transparent:true,opacity:.30,depthWrite:false,roughness:.32,metalness:0});
+       roundedLeaf(1.9,3.2,1.2,.8,true,white,'WhiteTwinSleeveRearBar');
+     }
+   }
+   if(mode==='screw'){
+     const x=edge.x+dx*2,y=edge.y,surf=surface(x,y);
+     if(name.startsWith('Temporal'))disc(x,y,surf.front+.72-1,.5,2,metal,'TemporalLocatingPin_1mmBy2mm');
+     if(!cut.mountSlots)cut.mountSlots=[];
+     cut.mountSlots.push({x:edge.x,y:edge.y,dx,r:.57,inset:2,surface});
+   }
+   probeMaterial.dispose();
+ }
+ // Subtract open, round-ended slots from the actual lens triangles (including coating).
+ function carveRimlessSlots(cut){
+   const T=THREE_G();let geo=cut.geometry.index?cut.geometry.toNonIndexed():cut.geometry.clone();
+   for(const slot of cut.mountSlots||[]){
+     const {x,y,dx,r,inset,surface}=slot,polygon=[[-3,-r],[inset,-r]];
+     for(let i=1;i<=16;i++){const a=-Math.PI/2+i*Math.PI/16;polygon.push([inset+r*Math.cos(a),r*Math.sin(a)]);}
+     polygon.push([-3,r]);
+     const verts=geo.attributes.position,norm=geo.attributes.normal,out=[],normals=[];
+     const emit=poly=>{for(let j=1;j<poly.length-1;j++)for(const v of [poly[0],poly[j],poly[j+1]]){out.push(...v.slice(0,3));normals.push(...v.slice(3));}};
+     for(let i=0;i<verts.count;i+=3){
+       let inside=[0,1,2].map(k=>[verts.getX(i+k),verts.getY(i+k),verts.getZ(i+k),norm.getX(i+k),norm.getY(i+k),norm.getZ(i+k)]);
+       for(let e=0;e<polygon.length&&inside.length;e++){
+         const a=polygon[e],b=polygon[(e+1)%polygon.length],dist=v=>(b[0]-a[0])*(v[1]-y-a[1])-(b[1]-a[1])*((v[0]-x)*dx-a[0]);
+         const keep=[],outside=[];
+         for(let j=0;j<inside.length;j++){
+           const v=inside[j],w=inside[(j+1)%inside.length],dv=dist(v),dw=dist(w);
+           (dv>=0?keep:outside).push(v);
+           if((dv>=0)!==(dw>=0)){const t=dv/(dv-dw),p=v.map((n,k)=>n+(w[k]-n)*t);keep.push(p);outside.push(p);}
+         }
+         emit(outside);inside=keep;
+       }
+     }
+     // Expose the slot's sidewalls, following the original front/back curvature.
+     const boundary=[[0,-r],...polygon.slice(1,-1),[0,r]];
+     for(let j=0;j<boundary.length-1;j++){
+       const a=boundary[j],b=boundary[j+1],ax=x+dx*a[0],ay=y+a[1],bx=x+dx*b[0],by=y+b[1],sa=surface(ax,ay),sb=surface(bx,by);
+       const n=new T.Vector3(-dx*(b[1]-a[1]),b[0]-a[0],0).normalize();
+       const v=(px,py,z)=>[px,py,z,n.x,n.y,n.z];
+       const wall=[v(ax,ay,sa.front),v(bx,by,sb.front),v(bx,by,sb.back),v(ax,ay,sa.back)];
+       emit(dx>0?wall:wall.reverse());
+     }
+     geo.dispose();geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(out,3));geo.setAttribute('normal',new T.Float32BufferAttribute(normals,3));
+   }
+   geo.computeBoundingSphere();geo.userData.slotCount=(cut.mountSlots||[]).length;return geo;
+ }
  function assemble3D(data,out){
    if(!state.scene)return;
    const T=THREE_G(),ctx=state.scene;
@@ -5484,11 +5600,11 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      const outer=new T.Vector3(outerAtHeight.x,outerAtHeight.y,outerAtHeight.z+lensSeatZ);
      eyeUnit.userData.endpieceOrigin={x:outer.x,y:outer.y,z:outer.z,rule:f.material==='brow'?'special-height':'temporal-extreme'};
      const nasal=f.material==='brow'?(()=>{const p=nasalRimPointAtY(cut.seat,side,f.b*.22);return new T.Vector3(p.x,p.y,p.z);})():cut.seat[noseIndex].clone();nasal.z+=lensSeatZ;
-     // 無邊框在前表面設置約 5mm 的鏡片內延伸段，沿前表弧度保留 0.72mm 間隔。
+     // 無邊框在前表面設置約 6.5mm 的鏡片內延伸段，沿前表弧度保留 0.72mm 間隔。
      const rimlessNasalEdge={x:nasal.x,y:nasal.y};
-     const rimlessNasalInner={x:nasal.x+side*5,y:nasal.y};
+     const rimlessNasalInner={x:nasal.x+side*6.5,y:nasal.y};
      const rimlessOuterEdge={x:outer.x,y:outer.y};
-     const rimlessOuterInner={x:outer.x-side*5,y:outer.y};
+     const rimlessOuterInner={x:outer.x-side*6.5,y:outer.y};
      const nasalMount=rimlessFrontPath(cut,rimlessNasalEdge,rimlessNasalInner,ocX,ocY,lensSeatZ);
      const temporalMount=rimlessFrontPath(cut,rimlessOuterEdge,rimlessOuterInner,ocX,ocY,lensSeatZ);
      const bridgeEdgeAttach=rimType==='rimless'
@@ -5497,14 +5613,11 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      const bridgeInnerAttach=rimType==='rimless'
        ?new T.Vector3(nasalMount[nasalMount.length-1].x,nasalMount[nasalMount.length-1].y,nasalMount[nasalMount.length-1].z)
        :nasal;
-     if(rimType==='rimless'){
-       meshTube(nasalMount,.50,frameMat.highlights,eyeUnit,false).name=`RimlessBridgeFrontMount_${eye.toUpperCase()}`;
-     }
      const noseJoint=new T.Mesh(new T.SphereGeometry(Math.max(.55,rimRadius*.66),12,9),frameMat.rim);
      noseJoint.name=`NoseBridgeConnector_${eye.toUpperCase()}`;
      noseJoint.position.copy(bridgeEdgeAttach);if(!(f.material==='acetate'&&rimType==='full'))eyeUnit.add(noseJoint);else noseJoint.geometry.dispose();
      bridgeAnchors.push({eye,side,unit:eyeUnit,point:bridgeEdgeAttach});
-     padAnchors.push({eye,side,unit:eyeUnit,point:nasal.clone(),bridgeAttach:bridgeEdgeAttach.clone(),bridgeInnerAttach:bridgeInnerAttach.clone(),rimType,
+     padAnchors.push({eye,side,unit:eyeUnit,rimlessPadRoot:{x:nasal.x+side*2,y:nasal.y,z:rimlessFrontAt(cut,nasal.x+side*2,nasal.y,ocX,ocY,lensSeatZ)},point:nasal.clone(),bridgeAttach:bridgeEdgeAttach.clone(),bridgeInnerAttach:bridgeInnerAttach.clone(),rimType,
        seat:cut.seat.map(p=>new T.Vector3(p.x,p.y,p.z+lensSeatZ))});
      // 端片由鏡圈顳側實際溝尖定位；先向顳側水平外展，再退到鉸鏈。
      const tipA=rimType==='rimless'?{...temporalMount[0]}:{x:outer.x,y:outer.y,z:outer.z};
@@ -5515,10 +5628,6 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      const acetateFront=(f.material==='acetate'&&rimType==='full');
      // 板料款端片改為與面材同語彙的一體式厚片；金屬款維持圓管。
      const endpieceRadius=Math.max(rimRadius*1.28, style.templeRadius*(f.material==='acetate'?1.64:1.36));
-     if(rimType==='rimless'){
-       meshTube(temporalMount,Math.max(.66,endpieceRadius*.78),frameMat.highlights,eyeUnit,false)
-         .name=`RimlessTempleFrontMount_${eye.toUpperCase()}`;
-     }
      if(acetateFront){
        acetateEyes.push({eye,side,unit:eyeUnit,seat:contourSeat,outer,nasal});
        hingeP.x=side*(Math.max(...contourSeat.map(p=>side*p.x))+5);hingeP.z=tipBaseZ-(12-Math.PI);
@@ -5571,12 +5680,24 @@ function wearContourAnchor(points,side,temporal,targetY=0){
        lineBetween(new T.Vector3(eyeX,eyeY,-data.vertex-2),new T.Vector3(eyeX,eyeY,8),axisMat,group);
      }
      if(rimType==='rimless'){
-       // 鼻側與顳側各約 5mm 的前表面裝配段，彎度與實際鏡片 BC 一致，不穿入鏡片。
-       const mountMat=frameMat.highlights;
-       meshTube(temporalMount,.5,mountMat,eyeUnit,false).name=`RimlessTempleFrontMount_${eye.toUpperCase()}`;
-       const nHead=nasalMount[nasalMount.length-1],tHead=temporalMount[temporalMount.length-1];
-       sphere(nHead.x,nHead.y,nHead.z,.75,mountMat,eyeUnit).name=`RimlessNasalFrontFix_${eye.toUpperCase()}`;
-       sphere(tHead.x,tHead.y,tHead.z,.75,mountMat,eyeUnit).name=`RimlessTemporalFrontFix_${eye.toUpperCase()}`;
+       makeRimlessMount(cut,nasalMount,f.rimlessMount,frameMat,eyeUnit,`Nasal_${eye.toUpperCase()}`);
+       makeRimlessMount(cut,temporalMount,f.rimlessMount,frameMat,eyeUnit,`Temporal_${eye.toUpperCase()}`);
+       if(f.rimlessMount==='screw'){
+         const slotted=carveRimlessSlots(cut);
+         lens.geometry=slotted;coat.geometry.dispose();coat.geometry=slotted.clone();
+         cut.geometry.dispose();cut.geometry=slotted;
+         // Replace the old uninterrupted edge traces with the actual notched edge.
+         for(const line of tracing.children.slice()){
+           const pos=line.geometry.attributes.position,segments=[];
+           const inSlot=p=>(cut.mountSlots||[]).some(s=>{const u=(p.x-s.x)*s.dx,v=p.y-s.y;return u>=-3&&(u<=s.inset?Math.abs(v)<=s.r:Math.hypot(u-s.inset,v)<=s.r);});
+           for(let i=0;i<pos.count;i++){
+             const a=new T.Vector3().fromBufferAttribute(pos,i),b=new T.Vector3().fromBufferAttribute(pos,(i+1)%pos.count);
+             for(let k=0;k<8;k++)if(!inSlot(a.clone().lerp(b,(k+.5)/8)))segments.push(a.clone().lerp(b,k/8),a.clone().lerp(b,(k+1)/8));
+           }
+           const replacement=new T.LineSegments(new T.BufferGeometry().setFromPoints(segments),line.material);
+           replacement.name=line.name;tracing.remove(line);line.geometry.dispose();tracing.add(replacement);
+         }
+       }
      }
    }
    if(acetateEyes.length===2){group.updateMatrixWorld(true);sculptAcetateFront(acetateEyes,f.b,frameMat.rim,group);}
@@ -5612,6 +5733,7 @@ function wearContourAnchor(points,side,temporal,targetY=0){
          // 無邊框：從中樑鏡片銜接點先朝 -Z 退 6mm；下延 6–15mm 時持續再朝 -Z 傾約 8°。
          const root=nasalRimPointAtY(anchor.seat,side,anchor.bridgeAttach.y);
          root.z+=anchor.bridgeAttach.z-anchor.point.z;
+         if(f.rimlessMount==='screw')Object.assign(root,anchor.rimlessPadRoot);
          const rear={x:root.x,y:root.y,z:root.z-6};
          const drop=Math.max(8.5,Math.min(18.5,8.5+(f.b-28)*(10/37)));
          const flare=Math.tan(Math.PI/180*8)*drop*.45;
