@@ -5399,19 +5399,43 @@ function wearContourAnchor(points,side,temporal,targetY=0){
    return out;
  }
  // Rimless fittings share the lens surfaces and a single tapered front leaf.
+ // Index the original lens triangles once per eye. Queries retain the mesh's exact
+ // piecewise-linear surfaces without raycasting through the entire lens per vertex.
+ function createRimlessSurfaceSampler(cut){
+   const pos=cut.geometry.attributes.position,index=cut.geometry.index,grid=new Map(),cache=new Map(),cell=3;
+   const count=index?index.count:pos.count;
+   for(let i=0;i<count;i+=3){
+     const ids=[0,1,2].map(k=>index?index.getX(i+k):i+k);
+     const t=ids.flatMap(j=>[pos.getX(j),pos.getY(j),pos.getZ(j)]);
+     const den=(t[4]-t[7])*(t[0]-t[6])+(t[6]-t[3])*(t[1]-t[7]);
+     if(Math.abs(den)<1e-10)continue;
+     t.push(1/den);
+     const x0=Math.floor(Math.min(t[0],t[3],t[6])/cell),x1=Math.floor(Math.max(t[0],t[3],t[6])/cell);
+     const y0=Math.floor(Math.min(t[1],t[4],t[7])/cell),y1=Math.floor(Math.max(t[1],t[4],t[7])/cell);
+     for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++){const key=x+','+y;let bin=grid.get(key);if(!bin)grid.set(key,bin=[]);bin.push(t);}
+   }
+   return (x,y)=>{
+     const key=x.toFixed(5)+','+y.toFixed(5);if(cache.has(key))return cache.get(key);
+     let front=-Infinity,back=Infinity;
+     for(const t of grid.get(Math.floor(x/cell)+','+Math.floor(y/cell))||[]){
+       const a=((t[4]-t[7])*(x-t[6])+(t[6]-t[3])*(y-t[7]))*t[9];
+       const b=((t[7]-t[1])*(x-t[6])+(t[0]-t[6])*(y-t[7]))*t[9],c=1-a-b;
+       if(a< -1e-7||b< -1e-7||c< -1e-7)continue;
+       const z=a*t[2]+b*t[5]+c*t[8];front=Math.max(front,z);back=Math.min(back,z);
+     }
+     if(!Number.isFinite(front)){
+       let nearest=0,distance=Infinity;
+       for(let i=0;i<cut.front.length;i++){const p=cut.front[i],d=(p.x-x)**2+(p.y-y)**2;if(d<distance){distance=d;nearest=i;}}
+       front=cut.front[nearest].z;back=cut.back[nearest].z;
+     }
+     const result={front,back};cache.set(key,result);return result;
+   };
+ }
  function makeRimlessMount(cut,path,mode,m,parent,name){
    const T=THREE_G(),g=new T.Group();g.name=`RimlessMount_${name}`;g.userData.mountType=mode;parent.add(g);
    const metal=m.highlights,liner=new T.MeshPhysicalMaterial({color:0xb8ccd3,transparent:true,opacity:.58,roughness:.25,metalness:0,depthWrite:false});
-   const probeMaterial=new T.MeshBasicMaterial({side:T.DoubleSide}),probe=new T.Mesh(cut.geometry,probeMaterial);
-   probe.updateMatrixWorld(true);
-   const ray=new T.Raycaster(),edge=path[0],last=path[path.length-1],dx=Math.sign(last.x-edge.x);
-   const surface=(x,y)=>{
-     ray.set(new T.Vector3(x,y,1000),new T.Vector3(0,0,-1));
-     const hits=ray.intersectObject(probe);
-     if(hits.length>1)return {front:hits[0].point.z,back:hits[hits.length-1].point.z};
-     const i=cut.front.reduce((best,p,i)=>Math.hypot(p.x-x,p.y-y)<Math.hypot(cut.front[best].x-x,cut.front[best].y-y)?i:best,0);
-     return {front:cut.front[i].z,back:cut.back[i].z};
-   };
+   const edge=path[0],last=path[path.length-1],dx=Math.sign(last.x-edge.x);
+   const surface=cut.mountSurface||(cut.mountSurface=createRimlessSurfaceSampler(cut));
    const disc=(x,y,z,r,h,mat,label,sides=32)=>{
      const mesh=new T.Mesh(new T.CylinderGeometry(r,r,h,sides),mat);mesh.rotation.x=Math.PI/2;mesh.position.set(x,y,z);mesh.name=label;g.add(mesh);return mesh;
    };
@@ -5490,7 +5514,7 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      }
      if(mode==='sleeve'){
        const white=new T.MeshStandardMaterial({color:0xf5f5f2,transparent:true,opacity:.30,depthWrite:false,roughness:.32,metalness:0});
-       roundedLeaf(1.9,3.2,1.2,.8,true,white,'WhiteTwinSleeveRearBar');
+       roundedLeaf(1.25,4.5,1.2,.8,true,white,'WhiteTwinSleeveRearBar');
      }
    }
    if(mode==='screw'){
@@ -5499,7 +5523,6 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      if(!cut.mountSlots)cut.mountSlots=[];
      cut.mountSlots.push({x:edge.x,y:edge.y,dx,r:.57,inset:2,surface});
    }
-   probeMaterial.dispose();
  }
  // Subtract open, round-ended slots from the actual lens triangles (including coating).
  function carveRimlessSlots(cut){
@@ -5512,6 +5535,8 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      const emit=poly=>{for(let j=1;j<poly.length-1;j++)for(const v of [poly[0],poly[j],poly[j+1]]){out.push(...v.slice(0,3));normals.push(...v.slice(3));}};
      for(let i=0;i<verts.count;i+=3){
        let inside=[0,1,2].map(k=>[verts.getX(i+k),verts.getY(i+k),verts.getZ(i+k),norm.getX(i+k),norm.getY(i+k),norm.getZ(i+k)]);
+       const us=inside.map(v=>(v[0]-x)*dx),vs=inside.map(v=>v[1]-y);
+       if(Math.max(...us)<-3||Math.min(...us)>inset+r||Math.max(...vs)<-r||Math.min(...vs)>r){emit(inside);continue;}
        for(let e=0;e<polygon.length&&inside.length;e++){
          const a=polygon[e],b=polygon[(e+1)%polygon.length],dist=v=>(b[0]-a[0])*(v[1]-y-a[1])-(b[1]-a[1])*((v[0]-x)*dx-a[0]);
          const keep=[],outside=[];
