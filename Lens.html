@@ -5422,15 +5422,40 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      const r=height/2,shape=new T.Shape();
      shape.moveTo(r,-r);shape.lineTo(length-r,-r);shape.absarc(length-r,0,r,-Math.PI/2,Math.PI/2,false);
      shape.lineTo(r,r);shape.absarc(r,0,r,Math.PI/2,Math.PI*1.5,false);
-     const geo=new T.ExtrudeGeometry(shape,{depth,bevelEnabled:false,curveSegments:16,steps:1}),pos=geo.attributes.position;
+     const domed=mode==='sleeve'&&!back&&label==='RoundedFrontLeaf';
+     let geo=new T.ExtrudeGeometry(shape,{depth,bevelEnabled:false,curveSegments:16,steps:1});
+     if(domed){
+       const source=geo.attributes.position,vertices=[];
+       const split=(a,b,c,level)=>{
+         if(!level){vertices.push(...a,...b,...c);return;}
+         const mid=(u,v)=>u.map((n,k)=>(n+v[k])/2),ab=mid(a,b),bc=mid(b,c),ca=mid(c,a);
+         split(a,ab,ca,level-1);split(ab,b,bc,level-1);split(ca,bc,c,level-1);split(ab,bc,ca,level-1);
+       };
+       for(let i=0;i<source.count;i+=3){
+         const v=[0,1,2].map(k=>[source.getX(i+k),source.getY(i+k),source.getZ(i+k)]);
+         split(...v,v.every(p=>Math.abs(p[2]-depth)<.00001)?3:0);
+       }
+       geo.dispose();geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));
+     }
+     const pos=geo.attributes.position;
      for(let i=0;i<pos.count;i++){
        const x=edge.x+dx*(start+pos.getX(i)),y=edge.y+pos.getY(i),z=pos.getZ(i),surf=surface(x,y);
-       pos.setXYZ(i,x,y,back?surf.back-.03-z:surf.front+.39+z);
+       const u=pos.getX(i),v=pos.getY(i),nearest=Math.max(r,Math.min(length-r,u));
+       const dome=domed&&Math.abs(z-depth)<.00001?.18*Math.max(0,1-((u-nearest)**2+v*v)/(r*r)):0;
+       pos.setXYZ(i,x,y,back?surf.back-.03-z:surf.front+.39+z+dome);
      }
      // Reflecting X reverses winding for the temporal side.
      if(dx<0){const a=pos.array;for(let i=0;i<a.length;i+=9)for(let k=0;k<3;k++){const v=a[i+3+k];a[i+3+k]=a[i+6+k];a[i+6+k]=v;}}
      if(back){const a=pos.array;for(let i=0;i<a.length;i+=9)for(let k=0;k<3;k++){const v=a[i+3+k];a[i+3+k]=a[i+6+k];a[i+6+k]=v;}}
-     geo.computeVertexNormals();const mesh=new T.Mesh(geo,mat);mesh.name=label;mesh.userData={length,height};g.add(mesh);
+     geo.computeVertexNormals();
+     if(domed){
+       const normals=geo.attributes.normal;
+       for(let i=0;i<pos.count;i++)if(normals.getZ(i)>.5){
+         const u=(pos.getX(i)-edge.x)*dx-start,v=pos.getY(i)-edge.y,nearest=Math.max(r,Math.min(length-r,u));
+         const n=new T.Vector3(dx*.36*(u-nearest)/(r*r),.36*v/(r*r),1).normalize();normals.setXYZ(i,n.x,n.y,n.z);
+       }
+     }
+     const mesh=new T.Mesh(geo,mat);mesh.name=label;mesh.userData={length,height,frontDome:domed?.18:0};g.add(mesh);
    };
    if(mode==='clip'){
      // Edge clamp: two padded shoes connected outside the lens, no through pins.
@@ -5441,8 +5466,9 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      box(x,y,s.front+.18,2.4,2.2,.28,liner,g).name='ClipFrontCushion';
      box(x,y,s.back-.18,2.4,2.2,.28,liner,g).name='ClipRearCushion';
    }else{
-     roundedLeaf(-.6,7.1,mode==='sleeve'?2:2.2,.65,false,metal,'RoundedFrontLeaf');
-     const positions=mode==='sleeve'?[2,5]:[5.65];
+     // Sleeve leaf front is surface + 1.27 mm, above the pin-head face at + 1.17 mm.
+     roundedLeaf(-.6,mode==='screw'?6.1:7.1,mode==='sleeve'?2:2.2,mode==='sleeve'?.88:.65,false,mode==='sleeve'?m.rim:metal,'RoundedFrontLeaf');
+     const positions=mode==='sleeve'?[2,5]:[4.3];
      for(const [i,inset] of positions.entries()){
        const x=edge.x+dx*inset,y=edge.y,s=surface(x,y),depth=s.front-s.back;
        if(mode==='sleeve'){
@@ -5454,12 +5480,12 @@ function wearContourAnchor(points,side,temporal,targetY=0){
          ring(x,y,s.back-.32,.57,.13,liner,`SleeveRearCollar_${i}`);
          disc(x,y,s.front+1.08,.57,.18,metal,`FlushPinHead_${i}`);
        }else{
-         disc(x,y,(s.front+s.back)/2,.36,depth+1.65,metal,'ThroughScrew');
+         disc(x,y,(s.front+s.back)/2-.30,.36,depth+2.25,metal,'ThroughScrew');
          ring(x,y,s.front+.25,.66,.16,liner,'ProtectiveFrontWasher');
          ring(x,y,s.back-.22,.66,.16,liner,'ProtectiveRearWasher');
          disc(x,y,s.front+1.02,.83,.30,metal,'SlottedScrewHead');
          box(x,y,s.front+1.18,1.12,.16,.025,m.templeSleeve,g).name='ScrewHeadSlot';
-         disc(x,y,s.back-.52,.72,.55,metal,'HexRearNut',6);
+         disc(x,y,s.back-.82,.72,1.15,metal,'HexRearNut',6);
        }
      }
      if(mode==='sleeve'){
@@ -5602,9 +5628,10 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      const nasal=f.material==='brow'?(()=>{const p=nasalRimPointAtY(cut.seat,side,f.b*.22);return new T.Vector3(p.x,p.y,p.z);})():cut.seat[noseIndex].clone();nasal.z+=lensSeatZ;
      // 無邊框在前表面設置約 6.5mm 的鏡片內延伸段，沿前表弧度保留 0.72mm 間隔。
      const rimlessNasalEdge={x:nasal.x,y:nasal.y};
-     const rimlessNasalInner={x:nasal.x+side*6.5,y:nasal.y};
+     const rimlessExtension=f.rimlessMount==='screw'?5.5:6.5;
+     const rimlessNasalInner={x:nasal.x+side*rimlessExtension,y:nasal.y};
      const rimlessOuterEdge={x:outer.x,y:outer.y};
-     const rimlessOuterInner={x:outer.x-side*6.5,y:outer.y};
+     const rimlessOuterInner={x:outer.x-side*rimlessExtension,y:outer.y};
      const nasalMount=rimlessFrontPath(cut,rimlessNasalEdge,rimlessNasalInner,ocX,ocY,lensSeatZ);
      const temporalMount=rimlessFrontPath(cut,rimlessOuterEdge,rimlessOuterInner,ocX,ocY,lensSeatZ);
      const bridgeEdgeAttach=rimType==='rimless'
@@ -5722,7 +5749,7 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      const bridgePts=[left.clone(),left.clone().lerp(center,.35),center,
                       right.clone().lerp(center,.35),right.clone()];
      const bridgeRadius=rimType==='rimless'?.75:Math.max(.90,rimRadius*1.02);
-     meshTube(bridgePts,bridgeRadius,rimType==='rimless'?frameMat.highlights:frameMat.rim,group).name='ConnectedNoseBridge';
+     meshTube(bridgePts,bridgeRadius,rimType==='rimless'?(f.material==='black'?frameMat.temple:frameMat.highlights):frameMat.rim,group).name='ConnectedNoseBridge';
    }
 
    const nosePadDrop=3.5;
