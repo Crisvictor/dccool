@@ -4845,14 +4845,20 @@ function update3D(res){
    const mesh=new T.Mesh(geo,material);mesh.name=name;parent.add(mesh);return mesh;
  }
  // Two front knuckles straddle one temple knuckle on a shared vertical pin.
- function makeInterleavedHinge(p,side,acetate,m,parent,eye){
+ function makeInterleavedHinge(p,side,acetate,m,parent,eye,endpiecePath=null){
    const T=THREE_G(),g=new T.Group();g.name=`TwoToOneHinge_${eye.toUpperCase()}`;g.position.set(p.x,p.y,p.z);parent.add(g);
    const h=acetate?5.7:3.6,r=acetate?.85:.64,gap=.12,band=(h-2*gap)/3;
+   // The two front leaves follow the same terminal curve as the endpiece.
+   const frontCurve=endpiecePath?new T.CatmullRomCurve3(endpiecePath.map(q=>new T.Vector3(q.x,q.y,q.z))):null;
+   const frontLength=frontCurve?frontCurve.getLength():0;
    for(let k=0;k<3;k++){
      const y=-h/2+band/2+k*(band+gap),knuckle=new T.Mesh(new T.CylinderGeometry(r,r,band,24),m.highlights);
      knuckle.position.y=y;knuckle.name=k===1?'TempleCenterKnuckle':'FrontForkKnuckle_'+k;g.add(knuckle);
      const rear=k===1;
-     meshPrismaticPath([{x:0,y,z:rear?-.15:.15},{x:rear?0:-side*.65,y,z:rear?-4:2.5}],band*.82,band*.82,acetate?.65:.48,acetate?.65:.48,m.highlights,g,rear?'TempleLeaf':'FrontForkLeaf');
+     const leafPath=!rear&&frontCurve
+       ?[.15,.7,1.4,2.1,2.8].map(distance=>{const q=frontCurve.getPointAt(Math.max(0,1-distance/frontLength));return {x:q.x-p.x,y:y+q.y-p.y,z:q.z-p.z};})
+       :[{x:0,y,z:rear?-.15:.15},{x:rear?0:-side*.65,y,z:rear?-4:2.5}];
+     meshPrismaticPath(leafPath,band*.82,band*.82,acetate?.65:.48,acetate?.65:.48,m.highlights,g,rear?'TempleLeaf':'FrontForkLeaf');
    }
    const pin=new T.Mesh(new T.CylinderGeometry(.26,.26,h+.35,16),m.highlights);pin.name='HingePin';g.add(pin);
    const head=new T.Mesh(new T.CylinderGeometry(r*.72,r*.72,.18,24),m.highlights);head.position.y=h/2+.1;g.add(head);
@@ -4864,6 +4870,37 @@ function update3D(res){
    }
    g.userData={structure:'2-front / 1-temple',mount:acetate?'inset-riveted-plates':'slim-welded-leaves'};
    return g;
+ }
+ // Use the finished temple's inner flat face, including its taper and yaw,
+ // as the mating surface of the temple-side hinge leaf.
+ function fitMetalTempleHinge(hinge,temple,side){
+   const T=THREE_G(),old=hinge.getObjectByName('TempleLeaf');
+   if(!old)return;
+   const material=old.material;hinge.remove(old);old.geometry.dispose();
+   const pos=temple.geometry.attributes.position,vertices=[],indices=[],centers=[];
+   const pair=side>0?[6,7]:[2,3],read=i=>new T.Vector3().fromBufferAttribute(pos,i);
+   let length=0,previous=null;
+   for(let ring=0;ring<pos.count/8;ring++){
+     const a=read(ring*8+pair[0]),b=read(ring*8+pair[1]),center=a.clone().add(b).multiplyScalar(.5);
+     if(previous)length+=center.distanceTo(previous);
+     if(length>5.5&&ring>1)break;
+     previous=center.clone();
+     const core=new T.Vector3();for(let k=0;k<8;k++)core.add(read(ring*8+k));core.multiplyScalar(1/8);
+     const inward=center.clone().sub(core).normalize(),up=a.clone().sub(b).normalize();
+     // The mating face stays on the temple; the leaf thickness grows inward.
+     const local=center.sub(hinge.position);centers.push(local.clone().addScaledVector(inward,.21));
+     for(const [h,d] of [[-.46,0],[.46,0],[.46,.42],[-.46,.42]]){
+       const v=local.clone().addScaledVector(up,h).addScaledVector(inward,d);vertices.push(v.x,v.y,v.z);
+     }
+   }
+   const n=centers.length;
+   for(let i=0;i<n-1;i++)for(let k=0;k<4;k++){const a=i*4+k,b=i*4+(k+1)%4;indices.push(a,b,a+4,b,b+4,a+4);}
+   indices.push(0,2,1,0,3,2);const last=(n-1)*4;indices.push(last,last+1,last+2,last,last+2,last+3);
+   for(let i=0;i<indices.length;i+=3){const swap=indices[i+1];indices[i+1]=indices[i+2];indices[i+2]=swap;}
+   const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(vertices,3));geo.setIndex(indices);geo.computeVertexNormals();
+   const leaf=new T.Mesh(geo,material);leaf.name='TempleLeaf';leaf.userData={attachment:'temple-inner-face',thickness:.42};hinge.add(leaf);
+   const neck=[new T.Vector3(0,0,-.15),centers[0]];
+   meshPrismaticPath(neck,.92,.92,.42,.42,material,hinge,'TempleLeafNeck');
  }
  // Butt joint hardware sits on the inner wall, leaving the exterior flat mating faces visible.
  function makeButtJointHinge(p,side,brow,m,parent,eye){
@@ -5518,10 +5555,11 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      }
    }
    if(mode==='screw'){
-     const x=edge.x+dx*2,y=edge.y,surf=surface(x,y);
+     const inset=1.5;
+     const x=edge.x+dx*inset,y=edge.y,surf=surface(x,y);
      if(name.startsWith('Temporal'))disc(x,y,surf.front+.72-1,.5,2,metal,'TemporalLocatingPin_1mmBy2mm');
      if(!cut.mountSlots)cut.mountSlots=[];
-     cut.mountSlots.push({x:edge.x,y:edge.y,dx,r:.57,inset:2,surface});
+     cut.mountSlots.push({x:edge.x,y:edge.y,dx,r:.57,inset,surface});
    }
  }
  // Subtract open, round-ended slots from the actual lens triangles (including coating).
@@ -5616,6 +5654,12 @@ function wearContourAnchor(points,side,temporal,targetY=0){
        cut.extra.forEach((points,i)=>wearLineLoop(points,grooveLine,tracing,'GrooveLine_'+i));
      }
      const contourSeat=cut.seat.map(p=>({x:p.x,y:p.y,z:p.z+lensSeatZ}));
+     // Groove-frame hardware attaches to the outer lens edge at groove-center Z.
+     // The recessed seat remains the path for the nylon cord and existing rim geometry.
+     const attachmentSeat=rimType==='groove'
+       ?cut.shoulderFront.map((p,i)=>p.clone().lerp(cut.shoulderBack[i],.5))
+       :cut.seat;
+     const attachmentContour=attachmentSeat.map(p=>({x:p.x,y:p.y,z:p.z+lensSeatZ}));
      if(rimType==='full'){
        // 金屬框維持細圓管；板料由內外雙輪廓生成實體寬框面、後側壁與窄倒角。
        if(f.material==='acetate'){
@@ -5639,18 +5683,18 @@ function wearContourAnchor(points,side,temporal,targetY=0){
        }
      }
      if(f.material==='double-metal'){
-       const top=contourSeat.reduce((a,b)=>b.y>a.y?b:a);
+       const top=attachmentContour.reduce((a,b)=>b.y>a.y?b:a);
        topBridgeAnchors.push({unit:eyeUnit,point:new T.Vector3(top.x,top.y+.4,top.z)});
      }
      const endpieceRatio=f.material==='brow'?browHeightFromContour(contourSeat,side)/100:.75;
      // 只有眉框保留專屬高度規則；雙槓及其餘框系由顳側最突出點起始。
      const outerAtHeight=f.material==='brow'
-       ?nasalRimPointAtY(cut.seat,-side,f.b*(endpieceRatio-.50))
-       :cut.seat.reduce((a,b)=>side*b.x>side*a.x?b:a);
+       ?nasalRimPointAtY(attachmentSeat,-side,f.b*(endpieceRatio-.50))
+       :attachmentSeat.reduce((a,b)=>side*b.x>side*a.x?b:a);
      const noseIndex=sharedNasalIndex;
      const outer=new T.Vector3(outerAtHeight.x,outerAtHeight.y,outerAtHeight.z+lensSeatZ);
      eyeUnit.userData.endpieceOrigin={x:outer.x,y:outer.y,z:outer.z,rule:f.material==='brow'?'special-height':'temporal-extreme'};
-     const nasal=f.material==='brow'?(()=>{const p=nasalRimPointAtY(cut.seat,side,f.b*.22);return new T.Vector3(p.x,p.y,p.z);})():cut.seat[noseIndex].clone();nasal.z+=lensSeatZ;
+     const nasal=f.material==='brow'?(()=>{const p=nasalRimPointAtY(attachmentSeat,side,f.b*.22);return new T.Vector3(p.x,p.y,p.z);})():attachmentSeat[noseIndex].clone();nasal.z+=lensSeatZ;
      // 無邊框在前表面設置約 6.5mm 的鏡片內延伸段，沿前表弧度保留 0.72mm 間隔。
      const rimlessNasalEdge={x:nasal.x,y:nasal.y};
      const rimlessExtension=f.rimlessMount==='screw'?5.5:6.5;
@@ -5669,9 +5713,9 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      noseJoint.name=`NoseBridgeConnector_${eye.toUpperCase()}`;
      noseJoint.position.copy(bridgeEdgeAttach);if(!(f.material==='acetate'&&rimType==='full'))eyeUnit.add(noseJoint);else noseJoint.geometry.dispose();
      bridgeAnchors.push({eye,side,unit:eyeUnit,point:bridgeEdgeAttach});
-     padAnchors.push({eye,side,unit:eyeUnit,rimlessPadRoot:{x:nasal.x+side*2,y:nasal.y,z:rimlessFrontAt(cut,nasal.x+side*2,nasal.y,ocX,ocY,lensSeatZ)},point:nasal.clone(),bridgeAttach:bridgeEdgeAttach.clone(),bridgeInnerAttach:bridgeInnerAttach.clone(),rimType,
+     padAnchors.push({eye,side,unit:eyeUnit,rimlessPadRoot:{x:nasal.x+side*1.5,y:nasal.y,z:rimlessFrontAt(cut,nasal.x+side*1.5,nasal.y,ocX,ocY,lensSeatZ)},point:nasal.clone(),bridgeAttach:bridgeEdgeAttach.clone(),bridgeInnerAttach:bridgeInnerAttach.clone(),rimType,
        seat:cut.seat.map(p=>new T.Vector3(p.x,p.y,p.z+lensSeatZ))});
-     // 端片由鏡圈顳側實際溝尖定位；先向顳側水平外展，再退到鉸鏈。
+     // 端片由顳側接點定位（車溝框採鏡片外緣）；先向顳側水平外展，再退到鉸鏈。
      const tipA=rimType==='rimless'?{...temporalMount[0]}:{x:outer.x,y:outer.y,z:outer.z};
      const tipBaseZ=rimType==='rimless'?temporalMount[0].z:outer.z;
      const tipB={x:outer.x+side*3.4,y:outer.y+.18,z:tipBaseZ};
@@ -5692,15 +5736,29 @@ function wearContourAnchor(points,side,temporal,targetY=0){
      }
      if(f.material==='brow')makeBrowHinge(hingeP,side,frameMat,eyeUnit,eye);
      else if(acetateFront)makeButtJointHinge(hingeP,side,false,frameMat,eyeUnit,eye);
-     else makeInterleavedHinge(hingeP,side,false,frameMat,eyeUnit,eye);
+     else{
+       const hinge=makeInterleavedHinge(hingeP,side,false,frameMat,eyeUnit,eye,[tipA,tipB,tipC,hingeP]);
+       // Recess the complete metal hinge, including its pin and screw, behind the outer endpiece.
+       hinge.position.x-=side*.8;hinge.userData.inwardOffset=.8;
+     }
      const tlen=Math.max(120,Math.min(160,f.temple));
      const start={x:hingeP.x,y:hingeP.y,z:hingeP.z-(acetateFront?.22:f.material==='brow'?.04:3.2)};
      const pts=wearSmoothTemple(start,side,tlen,acetateFront||f.material==='brow');
+     if(!acetateFront&&f.material!=='brow'){
+       // Move both temples 0.8 mm outward from their previous path;
+       // Keep the head 1 mm behind its previous position; blend into the shaft over 15 mm.
+       for(let i=0;i<pts.length;i++){
+         const t=Math.min(1,(i/(pts.length-1)*tlen)/15),blend=1-t*t*(3-2*t);
+         pts[i].x+=side*.8*(1-blend);
+         pts[i].z+=3*blend;
+       }
+     }
      if(acetateFront){
        meshPrismaticPath(pts,12,8,2.5,2.5,frameMat.temple,eyeUnit,`AcetateTemple_${eye.toUpperCase()}`,true,1.0);
      }else{
        const brow=f.material==='brow';
-       meshPrismaticPath(brow?pts:pts.slice(0,-Math.ceil(7/tlen*(pts.length-1))),brow?6:3.4,brow?3.3:1.8,brow?2.4:1.35,brow?2:1.05,brow?frameMat.brow:frameMat.temple,eyeUnit,`TaperedMetalTemple_${eye.toUpperCase()}`,brow);
+       const templeMesh=meshPrismaticPath(brow?pts:pts.slice(0,-Math.ceil(7/tlen*(pts.length-1))),brow?6:3.4,brow?3.3:1.8,brow?2.4:1.35,brow?2:1.05,brow?frameMat.brow:frameMat.temple,eyeUnit,`TaperedMetalTemple_${eye.toUpperCase()}`,brow);
+       if(!brow)fitMetalTempleHinge(eyeUnit.getObjectByName(`TwoToOneHinge_${eye.toUpperCase()}`),templeMesh,side);
        if(!brow){
          const sleevePts=pts.slice(Math.floor((pts.length-1)*.50));
          meshPrismaticPath(sleevePts,3.2,6.2,2.3,2.3,frameMat.templeSleeve,eyeUnit,`RoundedTempleTip_${eye.toUpperCase()}`,true,0,true);
