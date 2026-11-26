@@ -4574,7 +4574,7 @@ function renderThemeIcon(dark){
   }
   function loadToolPage(){
     const tool=$('toolChoice').value,frame=$('toolFrame');
-    const url='gradient.html?tool='+tool+'#lens-tools';
+    const url='Old_gradient.html?tool='+tool+'#lens-tools';
     frame.title=$('toolChoice').selectedOptions[0].textContent;
     if(frame.getAttribute('src')===url)sendTool();else frame.src=url;
   }
